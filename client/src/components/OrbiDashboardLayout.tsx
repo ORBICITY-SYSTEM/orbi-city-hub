@@ -9,8 +9,11 @@ import {
   Truck,
   FileText,
   LogOut,
-  Loader2
+  Loader2,
+  Moon,
+  Sun
 } from "lucide-react";
+import { useTheme } from "@/contexts/ThemeContext";
 import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
 
@@ -32,12 +35,13 @@ const navItems: NavItem[] = [
 export default function OrbiDashboardLayout({ children }: { children: React.ReactNode }) {
   const { user, loading, isAuthenticated, logout } = useAuth();
   const [location] = useLocation();
+  const { theme, toggleTheme } = useTheme();
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100">
         <div className="text-center">
-          <Loader2 className="w-12 h-12 animate-spin text-blue-600 mx-auto mb-4" />
+          <Loader2 className="w-12 h-12 animate-spin text-primary mx-auto mb-4" />
           <p className="text-slate-600">Loading ORBI City Hub...</p>
         </div>
       </div>
@@ -46,7 +50,7 @@ export default function OrbiDashboardLayout({ children }: { children: React.Reac
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-slate-50">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 via-white to-slate-50">
         <div className="max-w-md w-full mx-4">
           <div className="bg-white rounded-2xl shadow-xl p-8 border border-slate-200">
             <div className="text-center mb-8">
@@ -64,9 +68,9 @@ export default function OrbiDashboardLayout({ children }: { children: React.Reac
             </div>
             
             <div className="space-y-4">
-              <div className="bg-blue-50 rounded-lg p-4 border border-blue-100">
-                <h3 className="font-semibold text-blue-900 mb-2">Features:</h3>
-                <ul className="text-sm text-blue-700 space-y-1">
+              <div className="bg-green-50 rounded-lg p-4 border border-green-100">
+                <h3 className="font-semibold text-green-900 mb-2">Features:</h3>
+                <ul className="text-sm text-green-700 space-y-1">
                   <li>• Real-time KPIs & Analytics</li>
                   <li>• Gmail Integration</li>
                   <li>• AI-Powered Insights</li>
@@ -77,7 +81,7 @@ export default function OrbiDashboardLayout({ children }: { children: React.Reac
               
               <Button 
                 onClick={() => window.location.href = getLoginUrl()}
-                className="w-full bg-blue-600 hover:bg-blue-700"
+                className="w-full bg-primary hover:bg-primary/90"
                 size="lg"
               >
                 Sign In to Continue
@@ -116,7 +120,7 @@ export default function OrbiDashboardLayout({ children }: { children: React.Reac
                   className={cn(
                     "flex items-center gap-3 px-4 py-3 rounded-lg transition-all",
                     isActive
-                      ? "bg-blue-50 text-blue-700 font-medium"
+                      ? "bg-green-50 text-green-700 font-medium"
                       : "text-slate-700 hover:bg-slate-100"
                   )}
                 >
@@ -128,10 +132,26 @@ export default function OrbiDashboardLayout({ children }: { children: React.Reac
           })}
         </nav>
 
+        {/* Theme Toggle */}
+        <div className="px-4 pb-2">
+          <Button
+            onClick={toggleTheme}
+            variant="ghost"
+            size="sm"
+            className="w-full justify-start"
+          >
+            {theme === 'dark' ? (
+              <><Sun className="w-4 h-4 mr-2" /> Light Mode</>
+            ) : (
+              <><Moon className="w-4 h-4 mr-2" /> Dark Mode</>
+            )}
+          </Button>
+        </div>
+
         {/* User Profile */}
         <div className="p-4 border-t border-slate-200">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-semibold">
+            <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-semibold">
               {user?.name?.charAt(0) || "U"}
             </div>
             <div className="flex-1 min-w-0">

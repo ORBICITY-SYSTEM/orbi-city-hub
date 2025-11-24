@@ -4,27 +4,46 @@ import { invokeLLM, type Message } from "../_core/llm";
 import { getDb } from "../db";
 import { aiConversations } from "../../drizzle/schema";
 import { eq, desc } from "drizzle-orm";
+import { KNOWLEDGE_BASE } from "../../shared/aiKnowledgeBase";
 
-const ORBI_CONTEXT = `You are an AI assistant for ORBI City Hub, an aparthotel management system in Batumi, Georgia.
+// Get module-specific system prompt
+function getSystemPrompt(module: string): string {
+  const baseContext = `You are an AI assistant for ORBI City Batumi - a 60-studio aparthotel in Batumi, Georgia.
 
-ORBI City Details:
-- Location: Batumi, Georgia (Black Sea coast)
-- Property: 60 sea-view studios
-- Channels: 15 distribution platforms (Booking.com, Airbnb, Expedia, Agoda, Ostrovok, TikTok, Trip.com, Sutochno, etc.)
-- Average occupancy: 85%
-- Average rating: 9.2/10
-- Target market: International tourists, business travelers
-- Peak season: June-September
-- Currency: Georgian Lari (₾)
+## Property Details
+${JSON.stringify(KNOWLEDGE_BASE.property, null, 2)}
 
-Your role varies by module:
-- CEO Dashboard: Strategic insights, KPI analysis, growth recommendations
-- Reservations: Booking management, guest communication, pricing optimization
-- Finance: P&L analysis, cost optimization, revenue forecasting
-- Marketing: Channel performance, campaign ideas, ROI optimization
-- Logistics: Inventory management, housekeeping optimization, staff scheduling
+## Georgian Tax System
+VAT: ${KNOWLEDGE_BASE.tax.vat.rate * 100}% (${KNOWLEDGE_BASE.tax.vat.description})
+Corporate Income Tax: ${KNOWLEDGE_BASE.tax.incomeTax.corporate.rate * 100}% (${KNOWLEDGE_BASE.tax.incomeTax.corporate.description})
+Personal Income Tax: ${KNOWLEDGE_BASE.tax.incomeTax.personal.rate * 100}%
+Tourist Tax: ${KNOWLEDGE_BASE.tax.touristTax.rate}
 
-Always provide actionable, data-driven insights specific to ORBI City's context.`;
+## Batumi Tourism Market
+High Season: ${KNOWLEDGE_BASE.tourism.seasonality.high.months.join(", ")} (Occupancy: ${KNOWLEDGE_BASE.tourism.seasonality.high.occupancyRate * 100}%, ADR: $${KNOWLEDGE_BASE.tourism.seasonality.high.averageDailyRate})
+Shoulder Season: ${KNOWLEDGE_BASE.tourism.seasonality.shoulder.months.join(", ")} (Occupancy: ${KNOWLEDGE_BASE.tourism.seasonality.shoulder.occupancyRate * 100}%, ADR: $${KNOWLEDGE_BASE.tourism.seasonality.shoulder.averageDailyRate})
+Low Season: ${KNOWLEDGE_BASE.tourism.seasonality.low.months.join(", ")} (Occupancy: ${KNOWLEDGE_BASE.tourism.seasonality.low.occupancyRate * 100}%, ADR: $${KNOWLEDGE_BASE.tourism.seasonality.low.averageDailyRate})
+
+## Distribution Channels
+${Object.entries(KNOWLEDGE_BASE.tourism.bookingChannels).map(([channel, data]) => 
+  `${channel}: ${data.share * 100}% share, ${data.commission * 100}% commission`
+).join("\n")}
+`;
+
+  // Add module-specific prompt
+  const modulePrompts: Record<string, string> = {
+    "CEO Dashboard": KNOWLEDGE_BASE.prompts.ceo.systemPrompt,
+    "Reservations": KNOWLEDGE_BASE.prompts.reservations.systemPrompt,
+    "Finance": KNOWLEDGE_BASE.prompts.finance.systemPrompt,
+    "Marketing": KNOWLEDGE_BASE.prompts.marketing.systemPrompt,
+    "Logistics": KNOWLEDGE_BASE.prompts.logistics.systemPrompt,
+    "Reports & Analytics": KNOWLEDGE_BASE.prompts.reports.systemPrompt,
+  };
+
+  const modulePrompt = modulePrompts[module] || KNOWLEDGE_BASE.prompts.ceo.systemPrompt;
+
+  return `${baseContext}\n\n${modulePrompt}`;
+}
 
 export const aiRouter = router({
   chat: protectedProcedure
@@ -42,11 +61,7 @@ export const aiRouter = router({
       const startTime = Date.now();
 
       // Build system prompt based on module
-      const systemPrompt = `${ORBI_CONTEXT}
-
-Current Module: ${module}
-
-Provide helpful, specific answers based on the user's question. If they upload data (Excel, CSV), analyze it thoroughly. Use markdown formatting for better readability.`;
+      const systemPrompt = getSystemPrompt(module);
 
       // Build messages
       const messages: Message[] = [
