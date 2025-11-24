@@ -1,17 +1,16 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
+import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, boolean, decimal } from "drizzle-orm/mysql-core";
 
 /**
- * Core user table backing auth flow.
- * Extend this file with additional tables as your product grows.
- * Columns use camelCase to match both database fields and generated types.
+ * ORBI City Hub Database Schema
+ * Complete schema for aparthotel management system
  */
+
+// ============================================================================
+// USERS & AUTHENTICATION
+// ============================================================================
+
 export const users = mysqlTable("users", {
-  /**
-   * Surrogate primary key. Auto-incremented numeric value managed by the database.
-   * Use this for relations between tables.
-   */
   id: int("id").autoincrement().primaryKey(),
-  /** Manus OAuth identifier (openId) returned from the OAuth callback. Unique per user. */
   openId: varchar("openId", { length: 64 }).notNull().unique(),
   name: text("name"),
   email: varchar("email", { length: 320 }),
@@ -25,4 +24,258 @@ export const users = mysqlTable("users", {
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 
-// TODO: Add your tables here
+// ============================================================================
+// RESERVATIONS & GUESTS
+// ============================================================================
+
+export const guests = mysqlTable("guests", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  email: varchar("email", { length: 320 }),
+  phone: varchar("phone", { length: 50 }),
+  country: varchar("country", { length: 100 }),
+  language: varchar("language", { length: 10 }),
+  notes: text("notes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Guest = typeof guests.$inferSelect;
+export type InsertGuest = typeof guests.$inferInsert;
+
+export const bookings = mysqlTable("bookings", {
+  id: int("id").autoincrement().primaryKey(),
+  guestId: int("guestId").notNull(),
+  
+  // Booking details
+  bookingNumber: varchar("bookingNumber", { length: 100 }).notNull().unique(),
+  channel: varchar("channel", { length: 100 }).notNull(), // Booking.com, Airbnb, etc.
+  status: mysqlEnum("status", ["pending", "confirmed", "checked_in", "checked_out", "cancelled"]).default("pending").notNull(),
+  
+  // Dates (store as UTC timestamps in milliseconds)
+  checkIn: timestamp("checkIn").notNull(),
+  checkOut: timestamp("checkOut").notNull(),
+  bookedAt: timestamp("bookedAt").defaultNow().notNull(),
+  
+  // Room & guests
+  roomNumber: varchar("roomNumber", { length: 20 }),
+  roomType: varchar("roomType", { length: 100 }).default("Sea View Studio"),
+  adults: int("adults").default(2).notNull(),
+  children: int("children").default(0).notNull(),
+  
+  // Pricing (store in cents/tetri to avoid decimal issues)
+  totalPrice: int("totalPrice").notNull(), // in tetri (₾ * 100)
+  currency: varchar("currency", { length: 3 }).default("GEL").notNull(),
+  
+  // Special requests
+  specialRequests: text("specialRequests"),
+  lateCheckIn: boolean("lateCheckIn").default(false),
+  earlyCheckOut: boolean("earlyCheckOut").default(false),
+  
+  // Email reference
+  emailId: varchar("emailId", { length: 255 }),
+  
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Booking = typeof bookings.$inferSelect;
+export type InsertBooking = typeof bookings.$inferInsert;
+
+// ============================================================================
+// FINANCE
+// ============================================================================
+
+export const transactions = mysqlTable("transactions", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // Transaction details
+  type: mysqlEnum("type", ["revenue", "expense"]).notNull(),
+  category: varchar("category", { length: 100 }).notNull(), // Accommodation, Utilities, Marketing, etc.
+  description: text("description").notNull(),
+  
+  // Amount (in tetri/cents)
+  amount: int("amount").notNull(),
+  currency: varchar("currency", { length: 3 }).default("GEL").notNull(),
+  
+  // Date
+  transactionDate: timestamp("transactionDate").notNull(),
+  
+  // References
+  bookingId: int("bookingId"),
+  channel: varchar("channel", { length: 100 }),
+  
+  // Metadata
+  notes: text("notes"),
+  createdBy: int("createdBy"),
+  
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Transaction = typeof transactions.$inferSelect;
+export type InsertTransaction = typeof transactions.$inferInsert;
+
+// ============================================================================
+// MARKETING
+// ============================================================================
+
+export const campaigns = mysqlTable("campaigns", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  name: varchar("name", { length: 255 }).notNull(),
+  channel: varchar("channel", { length: 100 }).notNull(), // TikTok, Instagram, Google Ads, etc.
+  status: mysqlEnum("status", ["draft", "active", "paused", "completed"]).default("draft").notNull(),
+  
+  // Dates
+  startDate: timestamp("startDate"),
+  endDate: timestamp("endDate"),
+  
+  // Budget (in tetri)
+  budget: int("budget"),
+  spent: int("spent").default(0),
+  
+  // Performance metrics
+  impressions: int("impressions").default(0),
+  clicks: int("clicks").default(0),
+  conversions: int("conversions").default(0),
+  revenue: int("revenue").default(0), // in tetri
+  
+  // Content
+  description: text("description"),
+  targetAudience: text("targetAudience"),
+  
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Campaign = typeof campaigns.$inferSelect;
+export type InsertCampaign = typeof campaigns.$inferInsert;
+
+export const channelPerformance = mysqlTable("channelPerformance", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  channel: varchar("channel", { length: 100 }).notNull(),
+  month: varchar("month", { length: 7 }).notNull(), // YYYY-MM format
+  
+  // Performance metrics
+  bookings: int("bookings").default(0),
+  revenue: int("revenue").default(0), // in tetri
+  commission: int("commission").default(0), // in tetri
+  occupancyRate: int("occupancyRate").default(0), // percentage * 100 (e.g., 8500 = 85%)
+  
+  // Ratings
+  averageRating: int("averageRating"), // rating * 10 (e.g., 92 = 9.2)
+  reviewCount: int("reviewCount").default(0),
+  
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ChannelPerformance = typeof channelPerformance.$inferSelect;
+export type InsertChannelPerformance = typeof channelPerformance.$inferInsert;
+
+// ============================================================================
+// LOGISTICS & INVENTORY
+// ============================================================================
+
+export const inventoryItems = mysqlTable("inventoryItems", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  name: varchar("name", { length: 255 }).notNull(),
+  category: varchar("category", { length: 100 }).notNull(), // Toiletries, Linens, Cleaning, etc.
+  
+  // Quantities
+  currentQuantity: int("currentQuantity").default(0).notNull(),
+  minimumQuantity: int("minimumQuantity").default(0).notNull(),
+  unit: varchar("unit", { length: 50 }).default("pieces").notNull(),
+  
+  // Pricing (in tetri)
+  unitPrice: int("unitPrice"),
+  
+  // Status
+  status: mysqlEnum("status", ["in_stock", "low_stock", "out_of_stock"]).default("in_stock").notNull(),
+  
+  // Supplier
+  supplier: varchar("supplier", { length: 255 }),
+  lastOrderDate: timestamp("lastOrderDate"),
+  
+  notes: text("notes"),
+  
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type InventoryItem = typeof inventoryItems.$inferSelect;
+export type InsertInventoryItem = typeof inventoryItems.$inferInsert;
+
+export const housekeepingTasks = mysqlTable("housekeepingTasks", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  roomNumber: varchar("roomNumber", { length: 20 }).notNull(),
+  taskType: mysqlEnum("taskType", ["cleaning", "maintenance", "inspection"]).notNull(),
+  status: mysqlEnum("status", ["pending", "in_progress", "completed", "cancelled"]).default("pending").notNull(),
+  priority: mysqlEnum("priority", ["low", "medium", "high", "urgent"]).default("medium").notNull(),
+  
+  // Assignment
+  assignedTo: varchar("assignedTo", { length: 255 }),
+  assignedAt: timestamp("assignedAt"),
+  
+  // Timing
+  scheduledFor: timestamp("scheduledFor").notNull(),
+  completedAt: timestamp("completedAt"),
+  
+  // Details
+  description: text("description"),
+  notes: text("notes"),
+  
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type HousekeepingTask = typeof housekeepingTasks.$inferSelect;
+export type InsertHousekeepingTask = typeof housekeepingTasks.$inferInsert;
+
+// ============================================================================
+// AI CHAT HISTORY
+// ============================================================================
+
+export const aiConversations = mysqlTable("aiConversations", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  userId: int("userId").notNull(),
+  module: varchar("module", { length: 100 }).notNull(), // CEO, Reservations, Finance, etc.
+  
+  // Message
+  userMessage: text("userMessage").notNull(),
+  aiResponse: text("aiResponse").notNull(),
+  
+  // Context
+  fileUrl: varchar("fileUrl", { length: 500 }),
+  fileName: varchar("fileName", { length: 255 }),
+  fileType: varchar("fileType", { length: 50 }),
+  
+  // Metadata
+  responseTime: int("responseTime"), // in milliseconds
+  tokensUsed: int("tokensUsed"),
+  
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type AIConversation = typeof aiConversations.$inferSelect;
+export type InsertAIConversation = typeof aiConversations.$inferInsert;
+
+// ============================================================================
+// SYSTEM CONFIGURATION
+// ============================================================================
+
+export const systemConfig = mysqlTable("systemConfig", {
+  id: int("id").autoincrement().primaryKey(),
+  key: varchar("key", { length: 100 }).notNull().unique(),
+  value: text("value").notNull(),
+  description: text("description"),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type SystemConfig = typeof systemConfig.$inferSelect;
+export type InsertSystemConfig = typeof systemConfig.$inferInsert;
