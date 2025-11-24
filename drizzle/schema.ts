@@ -1,4 +1,4 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, boolean, decimal } from "drizzle-orm/mysql-core";
+import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, boolean, decimal, json } from "drizzle-orm/mysql-core";
 
 /**
  * ORBI City Hub Database Schema
@@ -209,32 +209,124 @@ export const inventoryItems = mysqlTable("inventoryItems", {
 export type InventoryItem = typeof inventoryItems.$inferSelect;
 export type InsertInventoryItem = typeof inventoryItems.$inferInsert;
 
-export const housekeepingTasks = mysqlTable("housekeepingTasks", {
+// Rooms table (base for all room-related operations)
+export const rooms = mysqlTable("rooms", {
   id: int("id").autoincrement().primaryKey(),
-  
-  roomNumber: varchar("roomNumber", { length: 20 }).notNull(),
-  taskType: mysqlEnum("taskType", ["cleaning", "maintenance", "inspection"]).notNull(),
-  status: mysqlEnum("status", ["pending", "in_progress", "completed", "cancelled"]).default("pending").notNull(),
-  priority: mysqlEnum("priority", ["low", "medium", "high", "urgent"]).default("medium").notNull(),
-  
-  // Assignment
-  assignedTo: varchar("assignedTo", { length: 255 }),
-  assignedAt: timestamp("assignedAt"),
-  
-  // Timing
-  scheduledFor: timestamp("scheduledFor").notNull(),
-  completedAt: timestamp("completedAt"),
-  
-  // Details
-  description: text("description"),
-  notes: text("notes"),
-  
+  roomNumber: varchar("roomNumber", { length: 20 }).notNull().unique(),
+  userId: int("userId"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
 
-export type HousekeepingTask = typeof housekeepingTasks.$inferSelect;
-export type InsertHousekeepingTask = typeof housekeepingTasks.$inferInsert;
+export type Room = typeof rooms.$inferSelect;
+export type InsertRoom = typeof rooms.$inferInsert;
+
+// Housekeeping schedules (from Lovable)
+export const housekeepingSchedules = mysqlTable("housekeepingSchedules", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId"),
+  scheduledDate: varchar("scheduledDate", { length: 10 }).notNull(), // YYYY-MM-DD
+  rooms: json("rooms").notNull(), // Array of room numbers
+  totalRooms: int("totalRooms").notNull(),
+  status: mysqlEnum("status", ["pending", "in_progress", "completed", "cancelled"]).default("pending").notNull(),
+  notes: text("notes"),
+  additionalNotes: text("additionalNotes"),
+  mediaUrls: json("mediaUrls"), // Array of media URLs
+  completedAt: timestamp("completedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type HousekeepingSchedule = typeof housekeepingSchedules.$inferSelect;
+export type InsertHousekeepingSchedule = typeof housekeepingSchedules.$inferInsert;
+
+// Maintenance schedules (from Lovable)
+export const maintenanceSchedules = mysqlTable("maintenanceSchedules", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId"),
+  roomNumber: varchar("roomNumber", { length: 20 }).notNull(),
+  scheduledDate: varchar("scheduledDate", { length: 10 }).notNull(), // YYYY-MM-DD
+  problem: text("problem").notNull(),
+  notes: text("notes"),
+  status: mysqlEnum("status", ["pending", "in_progress", "completed", "cancelled"]).default("pending").notNull(),
+  cost: int("cost"), // in tetri
+  solvingDate: varchar("solvingDate", { length: 10 }), // YYYY-MM-DD
+  additionalNotes: text("additionalNotes"),
+  mediaUrls: json("mediaUrls"), // Array of media URLs
+  completedAt: timestamp("completedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type MaintenanceSchedule = typeof maintenanceSchedules.$inferSelect;
+export type InsertMaintenanceSchedule = typeof maintenanceSchedules.$inferInsert;
+
+// Standard inventory items (template for room inventory)
+export const standardInventoryItems = mysqlTable("standardInventoryItems", {
+  id: int("id").autoincrement().primaryKey(),
+  itemName: varchar("itemName", { length: 255 }).notNull(),
+  category: varchar("category", { length: 100 }).notNull(),
+  standardQuantity: int("standardQuantity").default(1).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type StandardInventoryItem = typeof standardInventoryItems.$inferSelect;
+export type InsertStandardInventoryItem = typeof standardInventoryItems.$inferInsert;
+
+// Room inventory items (actual inventory per room)
+export const roomInventoryItems = mysqlTable("roomInventoryItems", {
+  id: int("id").autoincrement().primaryKey(),
+  roomId: int("roomId").notNull(),
+  standardItemId: int("standardItemId").notNull(),
+  actualQuantity: int("actualQuantity").default(0).notNull(),
+  condition: mysqlEnum("condition", ["good", "fair", "poor", "missing"]).default("good"),
+  lastChecked: timestamp("lastChecked").defaultNow().notNull(),
+  notes: text("notes"),
+  issueDetectedAt: timestamp("issueDetectedAt"),
+  issueResolvedAt: timestamp("issueResolvedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type RoomInventoryItem = typeof roomInventoryItems.$inferSelect;
+export type InsertRoomInventoryItem = typeof roomInventoryItems.$inferInsert;
+
+// Room inventory change history
+export const roomInventoryDescriptions = mysqlTable("roomInventoryDescriptions", {
+  id: int("id").autoincrement().primaryKey(),
+  roomId: int("roomId").notNull(),
+  userId: int("userId"),
+  descriptionDate: varchar("descriptionDate", { length: 10 }).notNull(), // YYYY-MM-DD
+  changeType: varchar("changeType", { length: 50 }), // added, removed, missing, transfer
+  itemsAdded: text("itemsAdded"),
+  itemsRemoved: text("itemsRemoved"),
+  itemsMissing: text("itemsMissing"),
+  transferFromRoom: varchar("transferFromRoom", { length: 20 }),
+  transferToRoom: varchar("transferToRoom", { length: 20 }),
+  notes: text("notes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type RoomInventoryDescription = typeof roomInventoryDescriptions.$inferSelect;
+export type InsertRoomInventoryDescription = typeof roomInventoryDescriptions.$inferInsert;
+
+// Logistics activity log (audit trail)
+export const logisticsActivityLog = mysqlTable("logisticsActivityLog", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  userEmail: varchar("userEmail", { length: 320 }),
+  action: varchar("action", { length: 50 }).notNull(), // create, update, delete, complete
+  entityType: varchar("entityType", { length: 100 }).notNull(), // housekeeping_schedule, maintenance_schedule, etc.
+  entityId: varchar("entityId", { length: 100 }),
+  entityName: varchar("entityName", { length: 255 }),
+  changes: json("changes"), // JSON object with change details
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type LogisticsActivityLog = typeof logisticsActivityLog.$inferSelect;
+export type InsertLogisticsActivityLog = typeof logisticsActivityLog.$inferInsert;
 
 // ============================================================================
 // AI CHAT HISTORY

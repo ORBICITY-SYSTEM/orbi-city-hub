@@ -1,111 +1,127 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Truck, Package, AlertTriangle } from "lucide-react";
-import ManusAIChat from "@/components/ManusAIChat";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Package, Sparkles, Wrench, ShoppingCart, Users } from "lucide-react";
 
-export default function Logistics() {
-  const inventory = [
-    { name: "Shampoo", quantity: 45, min: 20, status: "good" },
-    { name: "Towels", quantity: 120, min: 80, status: "good" },
-    { name: "Soap", quantity: 15, min: 25, status: "low" },
-    { name: "Bed Sheets", quantity: 90, min: 60, status: "good" },
-    { name: "Toilet Paper", quantity: 8, min: 30, status: "critical" },
-  ];
 
+const Logistics = () => {
   return (
-    <div className="p-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-slate-900 mb-2">Logistics</h1>
-        <p className="text-slate-600">Inventory and housekeeping management</p>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Package className="w-5 h-5" />
-              Total Items
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-slate-900">278</div>
-            <p className="text-sm text-slate-600">In stock</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <AlertTriangle className="w-5 h-5 text-yellow-600" />
-              Low Stock
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-yellow-600">2</div>
-            <p className="text-sm text-slate-600">Items need reorder</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Truck className="w-5 h-5" />
-              Pending Tasks
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-slate-900">12</div>
-            <p className="text-sm text-slate-600">Housekeeping tasks</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Inventory Status</CardTitle>
-          <CardDescription>Current stock levels</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {inventory.map((item) => (
-              <div key={item.name} className="flex items-center justify-between p-4 border border-slate-200 rounded-lg">
-                <div className="flex-1">
-                  <div className="font-medium text-slate-900 mb-1">{item.name}</div>
-                  <div className="text-sm text-slate-600">
-                    Minimum: {item.min} units
-                  </div>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="text-right">
-                    <div className="text-2xl font-bold text-slate-900">{item.quantity}</div>
-                    <div className="text-xs text-slate-500">units</div>
-                  </div>
-                  <Badge
-                    variant={item.status === "critical" ? "destructive" : item.status === "low" ? "outline" : "default"}
-                    className={
-                      item.status === "good"
-                        ? "bg-green-100 text-green-700 border-green-300"
-                        : item.status === "low"
-                        ? "text-yellow-700 border-yellow-300"
-                        : ""
-                    }
-                  >
-                    {item.status === "critical" ? "Critical" : item.status === "low" ? "Low" : "Good"}
-                  </Badge>
-                </div>
-              </div>
-            ))}
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-green-500 to-emerald-600">
+            <Package className="h-6 w-6 text-white" />
           </div>
-        </CardContent>
-      </Card>
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">
+              ლოგისტიკა
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              ინვენტარი, დასუფთავება და ტექნიკური მოვლა
+            </p>
+          </div>
+        </div>
+      </div>
 
-      {/* Manus AI Assistant */}
-      <ManusAIChat
-        module="Logistics"
-        title="🚚 Logistics AI Agent"
-        description="Upload inventory data or ask about stock management, housekeeping optimization, supply chain"
-        placeholder="e.g., 'What items need reorder?' or 'Optimize housekeeping schedule'"
-      />
+      {/* Sub-Modules Tabs */}
+      <Tabs defaultValue="inventory" className="w-full">
+        <TabsList className="grid w-full grid-cols-5 mb-6">
+          <TabsTrigger value="inventory" className="flex items-center gap-2">
+            <Package className="h-4 w-4" />
+            ინვენტარი
+          </TabsTrigger>
+          <TabsTrigger value="housekeeping" className="flex items-center gap-2">
+            <Sparkles className="h-4 w-4" />
+            დასუფთავება
+          </TabsTrigger>
+          <TabsTrigger value="maintenance" className="flex items-center gap-2">
+            <Wrench className="h-4 w-4" />
+            ტექნიკური მოვლა
+          </TabsTrigger>
+          <TabsTrigger value="supplies" className="flex items-center gap-2">
+            <ShoppingCart className="h-4 w-4" />
+            მარაგები
+          </TabsTrigger>
+          <TabsTrigger value="staff" className="flex items-center gap-2">
+            <Users className="h-4 w-4" />
+            პერსონალი
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="inventory">
+          <Card>
+            <CardHeader>
+              <CardTitle>ინვენტარის მართვა</CardTitle>
+              <CardDescription>მარაგების თვალყურის დევნება და მართვა</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground">
+                აქ იქნება ინვენტარის სრული სისტემა - ყველა 60 სტუდიოს ინვენტარი, დაბალი მარაგის შეტყობინებები, და ავტომატური შეკვეთები.
+              </p>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="housekeeping">
+          <Card>
+            <CardHeader>
+              <CardTitle>დასუფთავების მართვა</CardTitle>
+              <CardDescription>დასუფთავების გრაფიკები და ამოცანები</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground">
+                აქ იქნება დასუფთავების სრული სისტემა - დღიური გრაფიკები, პერსონალის დანიშვნები, და ხარისხის კონტროლი.
+              </p>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="maintenance">
+          <Card>
+            <CardHeader>
+              <CardTitle>ტექნიკური მოვლა</CardTitle>
+              <CardDescription>რემონტისა და მოვლის თვალყურის დევნება</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground">
+                აქ იქნება ტექნიკური მოვლის სისტემა - პრობლემების რეგისტრაცია, რემონტის გრაფიკები, და ხარჯების აღრიცხვა.
+              </p>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="supplies">
+          <Card>
+            <CardHeader>
+              <CardTitle>მარაგების მართვა</CardTitle>
+              <CardDescription>მარაგების შეკვეთა და მართვა</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground">
+                აქ იქნება მარაგების სისტემა - ავტომატური შეკვეთები, მომწოდებლების მართვა, და ხარჯების ოპტიმიზაცია.
+              </p>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="staff">
+          <Card>
+            <CardHeader>
+              <CardTitle>პერსონალის მართვა</CardTitle>
+              <CardDescription>პერსონალის გრაფიკი და დავალებები</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground">
+                აქ იქნება პერსონალის სისტემა - სამუშაო გრაფიკები, დავალებების განაწილება, და შესრულების თვალყურის დევნება.
+              </p>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+
+
     </div>
   );
-}
+};
+
+export default Logistics;
