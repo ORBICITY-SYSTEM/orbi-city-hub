@@ -5,6 +5,15 @@ import { getDb } from "../db";
 import { aiConversations } from "../../drizzle/schema";
 import { eq, desc } from "drizzle-orm";
 import { KNOWLEDGE_BASE } from "../../shared/aiKnowledgeBase";
+import {
+  detectConflicts,
+  checkAvailability,
+  parseNaturalDateQuery,
+  formatConflictMessage,
+  formatAvailabilitySummary,
+  type Reservation,
+} from "../../shared/reservationConflicts";
+import { bookings } from "../../drizzle/schema";
 
 // Get module-specific system prompt
 function getSystemPrompt(module: string): string {
@@ -139,5 +148,123 @@ export const aiRouter = router({
         console.error("[AI] Failed to fetch history:", error);
         return [];
       }
+    }),
+
+  // Check for booking conflicts (for Excel upload validation)
+  checkConflicts: protectedProcedure
+    .input(
+      z.object({
+        newBookings: z.array(
+          z.object({
+            roomNumber: z.string(),
+            guestName: z.string(),
+            checkIn: z.string(), // ISO date string
+            checkOut: z.string(),
+            status: z.enum(["confirmed", "pending", "checked_out"]),
+            price: z.number(),
+            source: z.string(),
+          })
+        ),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+
+      // Fetch existing reservations
+      const existingReservations = await db.select().from(bookings);
+
+      // Convert to Reservation type
+      const existing: Reservation[] = existingReservations.map((r) => ({
+        id: r.id,
+        roomNumber: r.roomNumber || "Unknown",
+        guestName: `Guest #${r.guestId}`, // Will need to join with guests table for actual name
+        checkIn: new Date(r.checkIn),
+        checkOut: new Date(r.checkOut),
+        status: r.status === "checked_in" ? "confirmed" : r.status === "cancelled" ? "checked_out" : r.status as "confirmed" | "pending" | "checked_out",
+        price: r.totalPrice / 100, // Convert from tetri to lari
+        source: r.channel,
+      }));
+
+      const newBookings: Reservation[] = input.newBookings.map((b) => ({
+        roomNumber: b.roomNumber,
+        guestName: b.guestName,
+        checkIn: new Date(b.checkIn),
+        checkOut: new Date(b.checkOut),
+        status: b.status,
+        price: b.price,
+        source: b.source,
+      }));
+
+      const result = detectConflicts(newBookings, existing);
+
+      return {
+        hasConflict: result.hasConflict,
+        conflicts: result.conflicts.map((c) => ({
+          message: formatConflictMessage(c),
+          newBooking: c.newBooking,
+          existingBooking: c.existingBooking,
+          overlapDays: c.overlapDays,
+        })),
+      };
+    }),
+
+  // Check room availability (for AI Q&A)
+  checkAvailability: protectedProcedure
+    .input(
+      z.object({
+        query: z.string().optional(), // Natural language: "10-15 Aug"
+        startDate: z.string().optional(), // ISO date
+        endDate: z.string().optional(),
+        roomNumber: z.string().optional(),
+      })
+    )
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+
+      let startDate: Date | null = null;
+      let endDate: Date | null = null;
+
+      // Parse natural language query if provided
+      if (input.query) {
+        const parsed = parseNaturalDateQuery(input.query);
+        startDate = parsed.startDate;
+        endDate = parsed.endDate;
+      }
+
+      // Override with explicit dates if provided
+      if (input.startDate) startDate = new Date(input.startDate);
+      if (input.endDate) endDate = new Date(input.endDate);
+
+      if (!startDate || !endDate) {
+        throw new Error(
+          "Could not parse dates. Please provide dates in format: '10-15 Aug' or ISO dates."
+        );
+      }
+
+      // Fetch existing reservations
+      const existingReservations = await db.select().from(bookings);
+
+      const existing: Reservation[] = existingReservations.map((r) => ({
+        id: r.id,
+        roomNumber: r.roomNumber || "Unknown",
+        guestName: `Guest #${r.guestId}`,
+        checkIn: new Date(r.checkIn),
+        checkOut: new Date(r.checkOut),
+        status: r.status === "checked_in" ? "confirmed" : r.status === "cancelled" ? "checked_out" : r.status as "confirmed" | "pending" | "checked_out",
+        price: r.totalPrice / 100,
+        source: r.channel,
+      }));
+
+      const result = checkAvailability(
+        { startDate, endDate, roomNumber: input.roomNumber },
+        existing
+      );
+
+      return {
+        ...result,
+        summary: formatAvailabilitySummary(result, { startDate, endDate }),
+      };
     }),
 });
