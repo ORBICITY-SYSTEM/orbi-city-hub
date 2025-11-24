@@ -4,10 +4,6 @@ import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router } from "./_core/trpc";
 import { aiRouter } from "./routers/ai";
 import { modulesRouter } from "./routers/modules";
-import { backupRouter } from "./routers/backup";
-import { healthRouter } from "./routers/health";
-import { rbacRouter } from "./routers/rbac";
-import { housekeepingRouter } from "./routers/housekeeping";
 
 export const appRouter = router({
   system: systemRouter,
@@ -23,10 +19,6 @@ export const appRouter = router({
   }),
   ai: aiRouter,
   modules: modulesRouter,
-  backup: backupRouter,
-  health: healthRouter,
-  rbac: rbacRouter,
-  housekeeping: housekeepingRouter,
 });
 
 export type AppRouter = typeof appRouter;
