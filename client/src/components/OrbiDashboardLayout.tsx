@@ -115,18 +115,18 @@ export default function OrbiDashboardLayout({ children }: { children: React.Reac
             const isActive = location === item.path;
             
             return (
-              <Link 
-                key={item.path} 
-                href={item.path}
-                className={cn(
-                  "flex items-center gap-3 px-4 py-3 rounded-lg transition-all",
-                  isActive
-                    ? "bg-green-50 text-green-700 font-medium"
-                    : "text-slate-700 hover:bg-slate-100"
-                )}
-              >
-                <Icon className="w-5 h-5" />
-                <span>{item.name}</span>
+              <Link key={item.path} href={item.path}>
+                <a
+                  className={cn(
+                    "flex items-center gap-3 px-4 py-3 rounded-lg transition-all",
+                    isActive
+                      ? "bg-green-50 text-green-700 font-medium"
+                      : "text-slate-700 hover:bg-slate-100"
+                  )}
+                >
+                  <Icon className="w-5 h-5" />
+                  <span>{item.name}</span>
+                </a>
               </Link>
             );
           })}
