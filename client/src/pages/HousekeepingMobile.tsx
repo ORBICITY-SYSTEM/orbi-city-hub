@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { Check, X, Loader2, LogOut, Download } from "lucide-react";
+import { Check, X, Loader2, LogOut } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { APP_LOGO, APP_TITLE } from "@/const";
@@ -18,50 +18,6 @@ export default function HousekeepingMobile() {
   const [pin, setPin] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [staffName, setStaffName] = useState("");
-  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
-  const [showInstallPrompt, setShowInstallPrompt] = useState(false);
-
-  // Register service worker and handle install prompt
-  useEffect(() => {
-    // Register service worker
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js')
-        .then((registration) => {
-          console.log('[PWA] Service Worker registered:', registration);
-        })
-        .catch((error) => {
-          console.error('[PWA] Service Worker registration failed:', error);
-        });
-    }
-
-    // Listen for beforeinstallprompt event
-    const handleBeforeInstallPrompt = (e: Event) => {
-      e.preventDefault();
-      setDeferredPrompt(e);
-      setShowInstallPrompt(true);
-    };
-
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-
-    return () => {
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-    };
-  }, []);
-
-  // Handle install button click
-  const handleInstallClick = async () => {
-    if (!deferredPrompt) return;
-
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    
-    if (outcome === 'accepted') {
-      toast.success('App installed successfully!');
-    }
-    
-    setDeferredPrompt(null);
-    setShowInstallPrompt(false);
-  };
 
   // Fetch room statuses
   const { data: rooms, isLoading, refetch } = trpc.housekeeping.getRoomStatuses.useQuery(
@@ -174,27 +130,14 @@ export default function HousekeepingMobile() {
               <p className="text-sm text-slate-600">Welcome, {staffName}</p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            {showInstallPrompt && (
-              <Button 
-                onClick={handleInstallClick} 
-                variant="default" 
-                size="sm"
-                className="bg-primary hover:bg-primary/90"
-              >
-                <Download className="w-4 h-4 mr-2" />
-                Install App
-              </Button>
-            )}
-            <Button 
-              onClick={handleLogout} 
-              variant="outline" 
-              size="sm"
-            >
-              <LogOut className="w-4 h-4 mr-2" />
-              Sign Out
-            </Button>
-          </div>
+          <Button 
+            onClick={handleLogout} 
+            variant="outline" 
+            size="sm"
+          >
+            <LogOut className="w-4 h-4 mr-2" />
+            Sign Out
+          </Button>
         </div>
       </div>
 
