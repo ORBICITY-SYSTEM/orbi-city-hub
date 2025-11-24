@@ -199,25 +199,11 @@
 - [ ] Guide user: Gmail integration setup (IMAP + App Password)
 - [ ] Guide user: Publish to production
 
-## Phase 17: PWA Conversion - Housekeeping Mobile
 
-### PWA Setup
-- [x] Create manifest.json with app metadata
-- [x] Generate app icons from logo (192x192, 512x512)
-- [x] Create service worker for offline support
-- [x] Add PWA meta tags to HTML
-- [x] Implement "Add to Home Screen" install prompt
-- [x] Test PWA installation (ready for mobile testing)
-- [x] Configure caching strategy for offline mode
-
-## Phase 18: Bug Fixes & Production Deployment
-
-### Critical Bugs
-- [x] Fix nested anchor tag error in OrbiDashboardLayout navigation
-- [x] Verify all module pages load correctly
-- [x] Test navigation between modules
-
-### Production Deployment
-- [x] Address Google Cloud Run deployment concerns
-- [x] Document rollback procedures (DEPLOYMENT_GUIDE.md)
-- [x] Ensure version control safety (checkpoints + GitHub)
+## Phase 17: CRITICAL FIX - Navigation Crash Issue
+- [ ] Remove all broken module routes from App.tsx temporarily
+- [ ] Fix nested anchor tag in OrbiDashboardLayout navigation
+- [ ] Keep only CEO Dashboard working initially
+- [ ] Test and save checkpoint
+- [ ] Publish stable version to production
+- [ ] Gradually re-add modules one by one after testing each
