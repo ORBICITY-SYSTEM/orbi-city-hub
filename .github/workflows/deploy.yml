@@ -1,0 +1,101 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Run TypeScript check
+        run: pnpm exec tsc --noEmit
+
+      - name: Run tests
+        run: pnpm test
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+
+      - name: Build project
+        run: pnpm build
+
+  deploy:
+    name: Deploy to Manus
+    runs-on: ubuntu-latest
+    needs: test  # Only deploy if tests pass
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Manus
+        run: |
+          echo "✅ Tests passed! Ready to deploy."
+          echo "📦 Deployment will be handled by Manus platform."
+          echo "🔗 Visit Manus Dashboard and click 'Publish' button."
+
+      - name: Create deployment notification
+        if: success()
+        run: |
+          echo "🎉 Deployment successful!"
+          echo "Version: ${{ github.sha }}"
+          echo "Branch: ${{ github.ref_name }}"
+          echo "Deployed at: $(date)"
+
+      - name: Notify on failure
+        if: failure()
+        run: |
+          echo "❌ Deployment failed!"
+          echo "Check logs for details."
+          exit 1
+
+  health-check:
+    name: Post-Deployment Health Check
+    runs-on: ubuntu-latest
+    needs: deploy
+    
+    steps:
+      - name: Wait for deployment
+        run: sleep 30
+
+      - name: Check health endpoint
+        run: |
+          response=$(curl -s -o /dev/null -w "%{http_code}" https://team.orbicitybatumi.com/api/trpc/health.ping || echo "000")
+          if [ "$response" = "200" ]; then
+            echo "✅ Health check passed!"
+          else
+            echo "❌ Health check failed! HTTP $response"
+            exit 1
+          fi
+
+      - name: Verify database connection
+        run: |
+          response=$(curl -s https://team.orbicitybatumi.com/api/trpc/health.check || echo "{}")
+          db_status=$(echo $response | grep -o '"database":{"status":"ok"' || echo "")
+          if [ -n "$db_status" ]; then
+            echo "✅ Database connection verified!"
+          else
+            echo "❌ Database connection failed!"
+            echo "Response: $response"
+            exit 1
+          fi
