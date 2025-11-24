@@ -2,6 +2,7 @@ import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router } from "./_core/trpc";
+import { fileUploadRouter } from "./routers/fileUpload";
 import { aiRouter } from "./routers/ai";
 import { modulesRouter } from "./routers/modules";
 import { backupRouter } from "./routers/backup";
@@ -9,6 +10,7 @@ import { healthRouter } from "./routers/health";
 import { rbacRouter } from "./routers/rbac";
 
 export const appRouter = router({
+  fileUpload: fileUploadRouter,
   system: systemRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),

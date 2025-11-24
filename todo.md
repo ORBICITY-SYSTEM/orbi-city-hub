@@ -173,3 +173,18 @@
 - [ ] Check mobile responsiveness
 - [ ] Save production checkpoint
 - [ ] Prepare Phase 2 setup guides
+
+
+## Phase 20: Fix Upload Buttons
+- [x] Find all upload buttons in Finance, Marketing, Logistics, Reports modules
+- [x] Check current implementation (placeholder vs functional)
+- [x] Implement file upload with S3 storage (storagePut)
+- [x] Add file input handling in frontend
+- [x] Create tRPC endpoint for file upload)
+- [x] Test upload in Finance module (AI Agent file upload)
+- [x] Test upload in other modules (Reservations, Marketing, Logistics, Reports)
+- [x] Add file type validation (Excel, CSV, PDF)
+- [x] Add file size limit (10MB)
+- [x] Show upload progress indicator
+- [x] Display uploaded files list (via AI chat integration)
+- [x] Implement FileUpload component in all modules

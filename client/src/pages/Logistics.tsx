@@ -3,7 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Package, Sparkles, Wrench, ShoppingCart, Users, Bot } from "lucide-react";
 import { AIChatBox } from "@/components/AIChatBox";
 import { Button } from "@/components/ui/button";
-import { Upload } from "lucide-react";
+import { FileUpload } from "@/components/FileUpload";
 import { useState } from "react";
 import { trpc } from "@/lib/trpc";
 
@@ -167,16 +167,13 @@ const Logistics = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               {/* File Upload Section */}
-              <div className="border-2 border-dashed border-border rounded-lg p-6 text-center">
-                <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-                <p className="text-sm text-muted-foreground mb-2">
-                  ატვირთეთ ფოტოები ან Excel ფაილები ინვენტარის ანალიზისთვის
-                </p>
-                <Button variant="outline" size="sm">
-                  <Upload className="h-4 w-4 mr-2" />
-                  აირჩიეთ ფაილები
-                </Button>
-              </div>
+              <FileUpload
+                module="logistics"
+                onUploadSuccess={(url, fileName) => {
+                  // Send uploaded file info to AI for analysis
+                  handleSendMessage(`გააანალიზე ეს ფაილი: ${fileName} (${url})`);
+                }}
+              />
 
               {/* AI Chat Interface */}
               <AIChatBox
