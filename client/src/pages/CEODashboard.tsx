@@ -1,57 +1,107 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { TrendingUp, TrendingDown, Users, Star, Bot, Download } from "lucide-react";
+import { TrendingUp, TrendingDown, Users, Star, Bot, Download, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { exportCEODashboardToCSV, type CEODashboardData } from "@/lib/csvExport";
 import { toast } from "sonner";
+import { trpc } from "@/lib/trpc";
 
 export default function CEODashboard() {
-  // Mock data - will be replaced with real tRPC queries
-  const kpis = [
+  // Fetch real-time data from tRPC
+  const { data: kpisData, isLoading: kpisLoading } = trpc.ceoDashboard.getKPIs.useQuery();
+  const { data: channelData, isLoading: channelLoading } = trpc.ceoDashboard.getRevenueByChannel.useQuery();
+  const { data: monthlyData, isLoading: monthlyLoading } = trpc.ceoDashboard.getMonthlyOverview.useQuery();
+
+  const isLoading = kpisLoading || channelLoading || monthlyLoading;
+
+  // Map KPI data to display format
+  const kpis = kpisData ? [
     {
       title: "Revenue",
-      value: "45,230 ₾",
-      change: "+15%",
-      trend: "up",
+      value: kpisData.revenue.formatted,
+      change: `${kpisData.revenue.change > 0 ? '+' : ''}${kpisData.revenue.change}%`,
+      trend: kpisData.revenue.change >= 0 ? "up" : "down",
       icon: TrendingUp,
       color: "text-green-600",
       bgColor: "bg-green-50",
     },
     {
       title: "Occupancy",
-      value: "85%",
-      change: "+5%",
-      trend: "up",
+      value: kpisData.occupancy.formatted,
+      change: `${kpisData.occupancy.change > 0 ? '+' : ''}${kpisData.occupancy.change}%`,
+      trend: kpisData.occupancy.change >= 0 ? "up" : "down",
       icon: Users,
       color: "text-blue-600",
       bgColor: "bg-blue-50",
     },
     {
       title: "Rating",
-      value: "9.2/10",
-      change: "+0.3",
-      trend: "up",
+      value: kpisData.rating.formatted,
+      change: `${kpisData.rating.change > 0 ? '+' : ''}${kpisData.rating.change}`,
+      trend: kpisData.rating.change >= 0 ? "up" : "down",
       icon: Star,
       color: "text-yellow-600",
       bgColor: "bg-yellow-50",
     },
     {
       title: "AI Tasks",
-      value: "247",
-      change: "+89",
+      value: kpisData.aiTasks.formatted,
+      change: `+${kpisData.aiTasks.change}`,
       trend: "up",
       icon: Bot,
       color: "text-purple-600",
       bgColor: "bg-purple-50",
     },
-  ];
+  ] : [];
 
-  const channels = [
-    { name: "Booking.com", revenue: 18900, percentage: 42, color: "bg-blue-500" },
-    { name: "Airbnb", revenue: 13570, percentage: 30, color: "bg-pink-500" },
-    { name: "Expedia", revenue: 6785, percentage: 15, color: "bg-yellow-500" },
-    { name: "Agoda", revenue: 4523, percentage: 10, color: "bg-green-500" },
-    { name: "Others", revenue: 1452, percentage: 3, color: "bg-gray-500" },
-  ];
+  const channels = channelData || [];
+
+  const handleExportCSV = () => {
+    if (!kpisData || !channelData || !monthlyData) {
+      toast.error("Data is still loading. Please wait...");
+      return;
+    }
+
+    const dashboardData: CEODashboardData = {
+      kpis: {
+        revenue: kpisData.revenue.value,
+        revenueChange: kpisData.revenue.change,
+        occupancy: kpisData.occupancy.value,
+        occupancyChange: kpisData.occupancy.change,
+        rating: kpisData.rating.value,
+        ratingChange: kpisData.rating.change,
+        aiTasks: kpisData.aiTasks.value,
+        aiTasksChange: kpisData.aiTasks.change,
+      },
+      revenueByChannel: channels.map(ch => ({
+        channel: ch.channel,
+        amount: ch.revenue,
+        percentage: ch.percentage,
+      })),
+      monthlyOverview: {
+        totalBookings: monthlyData.totalBookings,
+        bookingsChange: monthlyData.bookingsChange,
+        avgStay: monthlyData.avgStay,
+        avgStayChange: monthlyData.avgStayChange,
+        avgPrice: monthlyData.avgPrice,
+        avgPriceChange: monthlyData.avgPriceChange,
+        cancellationRate: monthlyData.cancellationRate,
+        cancellationRateChange: monthlyData.cancellationRateChange,
+      },
+    };
+    exportCEODashboardToCSV(dashboardData);
+    toast.success("Dashboard data exported to CSV successfully!");
+  };
+
+  if (isLoading) {
+    return (
+      <div className="p-8 flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <Loader2 className="w-12 h-12 animate-spin text-green-600 mx-auto mb-4" />
+          <p className="text-slate-600">Loading dashboard data...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-8">
@@ -62,38 +112,9 @@ export default function CEODashboard() {
           <p className="text-slate-600">Real-time insights for ORBI City Batumi</p>
         </div>
         <Button
-          onClick={() => {
-            const dashboardData: CEODashboardData = {
-              kpis: {
-                revenue: 45230,
-                revenueChange: 15,
-                occupancy: 85,
-                occupancyChange: 5,
-                rating: 9.2,
-                ratingChange: 0.3,
-                aiTasks: 247,
-                aiTasksChange: 89,
-              },
-              revenueByChannel: channels.map(ch => ({
-                channel: ch.name,
-                amount: ch.revenue,
-                percentage: ch.percentage,
-              })),
-              monthlyOverview: {
-                totalBookings: 127,
-                bookingsChange: 12,
-                avgStay: 3.2,
-                avgStayChange: "Same as Oct",
-                avgPrice: 356,
-                avgPriceChange: 8,
-                cancellationRate: 2.1,
-                cancellationRateChange: -0.5,
-              },
-            };
-            exportCEODashboardToCSV(dashboardData);
-            toast.success("Dashboard data exported to CSV successfully!");
-          }}
+          onClick={handleExportCSV}
           className="bg-green-600 hover:bg-green-700"
+          disabled={isLoading}
         >
           <Download className="w-4 h-4 mr-2" />
           Export to CSV
@@ -140,29 +161,34 @@ export default function CEODashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {channels.map((channel) => (
-                <div key={channel.name}>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-slate-700">
-                      {channel.name}
-                    </span>
-                    <div className="text-right">
-                      <div className="text-sm font-semibold text-slate-900">
-                        {channel.revenue.toLocaleString()} ₾
-                      </div>
-                      <div className="text-xs text-slate-500">
-                        {channel.percentage}%
+              {channels.map((channel, idx) => {
+                const colors = ["bg-blue-500", "bg-pink-500", "bg-yellow-500", "bg-green-500", "bg-gray-500"];
+                const color = colors[idx % colors.length];
+                
+                return (
+                  <div key={channel.channel}>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-medium text-slate-700">
+                        {channel.channel}
+                      </span>
+                      <div className="text-right">
+                        <div className="text-sm font-semibold text-slate-900">
+                          {channel.revenue.toLocaleString()} ₾
+                        </div>
+                        <div className="text-xs text-slate-500">
+                          {channel.percentage}%
+                        </div>
                       </div>
                     </div>
+                    <div className="w-full bg-slate-100 rounded-full h-2">
+                      <div
+                        className={`${color} h-2 rounded-full transition-all`}
+                        style={{ width: `${channel.percentage}%` }}
+                      />
+                    </div>
                   </div>
-                  <div className="w-full bg-slate-100 rounded-full h-2">
-                    <div
-                      className={`${channel.color} h-2 rounded-full transition-all`}
-                      style={{ width: `${channel.percentage}%` }}
-                    />
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </CardContent>
         </Card>
@@ -181,10 +207,12 @@ export default function CEODashboard() {
                   </div>
                   <div>
                     <h4 className="font-semibold text-green-900 mb-1">
-                      Strong October Performance
+                      Strong Performance
                     </h4>
                     <p className="text-sm text-green-700">
-                      Revenue up 28% compared to September. Booking.com leading with 42% share.
+                      {kpisData && kpisData.revenue.change > 0 
+                        ? `Revenue up ${kpisData.revenue.change}% compared to last month.`
+                        : "Monitoring revenue trends for optimization opportunities."}
                     </p>
                   </div>
                 </div>
@@ -197,10 +225,12 @@ export default function CEODashboard() {
                   </div>
                   <div>
                     <h4 className="font-semibold text-blue-900 mb-1">
-                      Excellent Guest Ratings
+                      Guest Ratings
                     </h4>
                     <p className="text-sm text-blue-700">
-                      Average rating improved to 9.2/10. Sea view and location most praised.
+                      {kpisData 
+                        ? `Average rating: ${kpisData.rating.value}/10. ${kpisData.rating.change >= 0 ? 'Improving' : 'Needs attention'}.`
+                        : "Tracking guest satisfaction metrics."}
                     </p>
                   </div>
                 </div>
@@ -216,7 +246,9 @@ export default function CEODashboard() {
                       AI Optimization Active
                     </h4>
                     <p className="text-sm text-purple-700">
-                      247 automated tasks completed this month. 89 more than last month.
+                      {kpisData 
+                        ? `${kpisData.aiTasks.value} automated tasks completed. ${kpisData.aiTasks.change} more than last month.`
+                        : "AI systems processing operational tasks."}
                     </p>
                   </div>
                 </div>
@@ -227,36 +259,44 @@ export default function CEODashboard() {
       </div>
 
       {/* Monthly Stats */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Monthly Overview</CardTitle>
-          <CardDescription>Key metrics for November 2025</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            <div>
-              <div className="text-sm text-slate-600 mb-1">Total Bookings</div>
-              <div className="text-2xl font-bold text-slate-900">127</div>
-              <div className="text-xs text-green-600">+12% from Oct</div>
+      {monthlyData && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Monthly Overview</CardTitle>
+            <CardDescription>Key metrics for {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              <div>
+                <div className="text-sm text-slate-600 mb-1">Total Bookings</div>
+                <div className="text-2xl font-bold text-slate-900">{monthlyData.totalBookings}</div>
+                <div className={`text-xs ${monthlyData.bookingsChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  {monthlyData.bookingsChange > 0 ? '+' : ''}{monthlyData.bookingsChange}% from last month
+                </div>
+              </div>
+              <div>
+                <div className="text-sm text-slate-600 mb-1">Avg. Stay</div>
+                <div className="text-2xl font-bold text-slate-900">{monthlyData.avgStay} nights</div>
+                <div className="text-xs text-slate-500">{monthlyData.avgStayChange}</div>
+              </div>
+              <div>
+                <div className="text-sm text-slate-600 mb-1">Avg. Price</div>
+                <div className="text-2xl font-bold text-slate-900">{monthlyData.avgPrice} ₾</div>
+                <div className={`text-xs ${monthlyData.avgPriceChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  {monthlyData.avgPriceChange > 0 ? '+' : ''}{monthlyData.avgPriceChange}% from last month
+                </div>
+              </div>
+              <div>
+                <div className="text-sm text-slate-600 mb-1">Cancellation Rate</div>
+                <div className="text-2xl font-bold text-slate-900">{monthlyData.cancellationRate}%</div>
+                <div className={`text-xs ${monthlyData.cancellationRateChange <= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  {monthlyData.cancellationRateChange > 0 ? '+' : ''}{monthlyData.cancellationRateChange}% from last month
+                </div>
+              </div>
             </div>
-            <div>
-              <div className="text-sm text-slate-600 mb-1">Avg. Stay</div>
-              <div className="text-2xl font-bold text-slate-900">3.2 nights</div>
-              <div className="text-xs text-slate-500">Same as Oct</div>
-            </div>
-            <div>
-              <div className="text-sm text-slate-600 mb-1">Avg. Price</div>
-              <div className="text-2xl font-bold text-slate-900">356 ₾</div>
-              <div className="text-xs text-green-600">+8% from Oct</div>
-            </div>
-            <div>
-              <div className="text-sm text-slate-600 mb-1">Cancellation Rate</div>
-              <div className="text-2xl font-bold text-slate-900">2.1%</div>
-              <div className="text-xs text-green-600">-0.5% from Oct</div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

@@ -8,6 +8,7 @@ import { backupRouter } from "./routers/backup";
 import { healthRouter } from "./routers/health";
 import { rbacRouter } from "./routers/rbac";
 import { housekeepingRouter } from "./routers/housekeeping";
+import { ceoDashboardRouter } from "./routers/ceoDashboard";
 
 export const appRouter = router({
   system: systemRouter,
@@ -27,6 +28,7 @@ export const appRouter = router({
   health: healthRouter,
   rbac: rbacRouter,
   housekeeping: housekeepingRouter,
+  ceoDashboard: ceoDashboardRouter,
 });
 
 export type AppRouter = typeof appRouter;
