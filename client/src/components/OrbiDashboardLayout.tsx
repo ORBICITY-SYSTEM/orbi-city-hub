@@ -7,6 +7,7 @@ import {
   DollarSign, 
   Megaphone, 
   Truck,
+  FileText,
   LogOut,
   Loader2
 } from "lucide-react";
@@ -25,6 +26,7 @@ const navItems: NavItem[] = [
   { name: "Finance", path: "/finance", icon: DollarSign },
   { name: "Marketing", path: "/marketing", icon: Megaphone },
   { name: "Logistics", path: "/logistics", icon: Truck },
+  { name: "Reports & Analytics", path: "/reports", icon: FileText },
 ];
 
 export default function OrbiDashboardLayout({ children }: { children: React.ReactNode }) {

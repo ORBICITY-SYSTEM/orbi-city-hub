@@ -1,9 +1,41 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Package, Sparkles, Wrench, ShoppingCart, Users } from "lucide-react";
-
+import { Package, Sparkles, Wrench, ShoppingCart, Users, Bot } from "lucide-react";
+import { AIChatBox } from "@/components/AIChatBox";
+import { Button } from "@/components/ui/button";
+import { Upload } from "lucide-react";
+import { useState } from "react";
+import { trpc } from "@/lib/trpc";
 
 const Logistics = () => {
+  const [chatHistory, setChatHistory] = useState<Array<{ role: "user" | "assistant"; content: string }>>([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const chatMutation = trpc.ai.chat.useMutation();
+
+  const handleSendMessage = async (content: string) => {
+    const newMessage = { role: "user" as const, content };
+    setChatHistory(prev => [...prev, newMessage]);
+    setIsLoading(true);
+
+    try {
+      const response = await chatMutation.mutateAsync({
+        module: "Logistics",
+        userMessage: content,
+      });
+
+      setChatHistory(prev => [...prev, { role: "assistant", content: response.response }]);
+    } catch (error) {
+      console.error("Chat error:", error);
+      setChatHistory(prev => [...prev, { 
+        role: "assistant", 
+        content: "Sorry, I encountered an error. Please try again." 
+      }]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -25,7 +57,7 @@ const Logistics = () => {
 
       {/* Sub-Modules Tabs */}
       <Tabs defaultValue="inventory" className="w-full">
-        <TabsList className="grid w-full grid-cols-5 mb-6">
+        <TabsList className="grid w-full grid-cols-6 mb-6">
           <TabsTrigger value="inventory" className="flex items-center gap-2">
             <Package className="h-4 w-4" />
             ინვენტარი
@@ -36,7 +68,7 @@ const Logistics = () => {
           </TabsTrigger>
           <TabsTrigger value="maintenance" className="flex items-center gap-2">
             <Wrench className="h-4 w-4" />
-            ტექნიკური მოვლა
+            ტექნიკური
           </TabsTrigger>
           <TabsTrigger value="supplies" className="flex items-center gap-2">
             <ShoppingCart className="h-4 w-4" />
@@ -45,6 +77,10 @@ const Logistics = () => {
           <TabsTrigger value="staff" className="flex items-center gap-2">
             <Users className="h-4 w-4" />
             პერსონალი
+          </TabsTrigger>
+          <TabsTrigger value="ai" className="flex items-center gap-2">
+            <Bot className="h-4 w-4" />
+            🤖 AI
           </TabsTrigger>
         </TabsList>
 
@@ -117,9 +153,61 @@ const Logistics = () => {
             </CardContent>
           </Card>
         </TabsContent>
+
+        <TabsContent value="ai">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Bot className="h-5 w-5 text-purple-500" />
+                🤖 Logistics AI Agent
+              </CardTitle>
+              <CardDescription>
+                AI აგენტი მარაგების ანალიზისთვის ფოტოებიდან/სიებიდან და ავტომატური შეკვეთების რეკომენდაციებისთვის
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* File Upload Section */}
+              <div className="border-2 border-dashed border-border rounded-lg p-6 text-center">
+                <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
+                <p className="text-sm text-muted-foreground mb-2">
+                  ატვირთეთ ფოტოები ან Excel ფაილები ინვენტარის ანალიზისთვის
+                </p>
+                <Button variant="outline" size="sm">
+                  <Upload className="h-4 w-4 mr-2" />
+                  აირჩიეთ ფაილები
+                </Button>
+              </div>
+
+              {/* AI Chat Interface */}
+              <AIChatBox
+                messages={chatHistory}
+                onSendMessage={handleSendMessage}
+                isLoading={isLoading}
+                placeholder="მაგ: 'რა მარაგები არის დაბალი დონეზე?' ან 'გააანალიზე ეს ინვენტარის ფოტო'"
+                height={400}
+              />
+
+              {/* Quick Actions */}
+              <div className="grid grid-cols-2 gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => handleSendMessage("რა მარაგები არის დაბალი დონეზე?")}
+                >
+                  დაბალი მარაგები
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => handleSendMessage("რა უნდა შევუკვეთო ამ კვირაში?")}
+                >
+                  შეკვეთის რეკომენდაცია
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
       </Tabs>
-
-
     </div>
   );
 };

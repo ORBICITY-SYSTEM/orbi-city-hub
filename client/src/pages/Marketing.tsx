@@ -1,103 +1,98 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Megaphone } from "lucide-react";
-import ManusAIChat from "@/components/ManusAIChat";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { BarChart3, Star, Send, Instagram, Bot } from "lucide-react";
+import { AIChatBox } from "@/components/AIChatBox";
+import { Button } from "@/components/ui/button";
+import { Upload } from "lucide-react";
+import { useState } from "react";
+import { trpc } from "@/lib/trpc";
 
-export default function Marketing() {
-  const channels = [
-    { name: "Booking.com", status: "active", bookings: 53 },
-    { name: "Airbnb", status: "active", bookings: 38 },
-    { name: "Expedia", status: "active", bookings: 19 },
-    { name: "Agoda", status: "active", bookings: 12 },
-    { name: "Ostrovok", status: "active", bookings: 8 },
-    { name: "TikTok", status: "active", bookings: 6 },
-    { name: "Trip.com", status: "active", bookings: 5 },
-    { name: "Sutochno", status: "active", bookings: 4 },
-  ];
+const Marketing = () => {
+  const [chatHistory, setChatHistory] = useState<Array<{ role: "user" | "assistant"; content: string }>>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const chatMutation = trpc.ai.chat.useMutation();
+
+  const handleSendMessage = async (content: string) => {
+    const newMessage = { role: "user" as const, content };
+    setChatHistory(prev => [...prev, newMessage]);
+    setIsLoading(true);
+
+    try {
+      const response = await chatMutation.mutateAsync({
+        module: "Marketing",
+        userMessage: content,
+      });
+      setChatHistory(prev => [...prev, { role: "assistant", content: response.response }]);
+    } catch (error) {
+      console.error("Chat error:", error);
+      setChatHistory(prev => [...prev, { role: "assistant", content: "Sorry, I encountered an error. Please try again." }]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
-    <div className="p-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-slate-900 mb-2">Marketing</h1>
-        <p className="text-slate-600">Distribution channels and campaigns</p>
-      </div>
-
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Megaphone className="w-5 h-5" />
-            Distribution Channels
-          </CardTitle>
-          <CardDescription>15 active booking platforms</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {channels.map((channel) => (
-              <div
-                key={channel.name}
-                className="p-4 border border-slate-200 rounded-lg hover:border-blue-300 transition-colors"
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <span className="font-medium text-slate-900">{channel.name}</span>
-                  <Badge variant="outline" className="text-green-600 border-green-600">
-                    Active
-                  </Badge>
-                </div>
-                <div className="text-2xl font-bold text-slate-900">{channel.bookings}</div>
-                <p className="text-xs text-slate-600">bookings this month</p>
-              </div>
-            ))}
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-pink-500 to-rose-600">
+            <BarChart3 className="h-6 w-6 text-white" />
           </div>
-        </CardContent>
-      </Card>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Social Media</CardTitle>
-            <CardDescription>TikTok & Instagram performance</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="font-medium">TikTok Views</span>
-                  <span className="text-lg font-bold">15.2K</span>
-                </div>
-                <div className="text-sm text-green-600">+120% this month</div>
-              </div>
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="font-medium">Instagram Engagement</span>
-                  <span className="text-lg font-bold">8.5%</span>
-                </div>
-                <div className="text-sm text-green-600">+2.3% this month</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Campaign ROI</CardTitle>
-            <CardDescription>Return on marketing investment</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-4xl font-bold text-green-600 mb-2">12.5x</div>
-            <p className="text-sm text-slate-600">
-              Every 1 ₾ spent generates 12.5 ₾ in revenue
-            </p>
-          </CardContent>
-        </Card>
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">მარკეტინგი</h1>
+            <p className="text-sm text-muted-foreground">მარკეტინგული კამპანიები და არხების შესრულება</p>
+          </div>
+        </div>
       </div>
 
-      {/* Manus AI Assistant */}
-      <ManusAIChat
-        module="Marketing"
-        title="📢 Marketing AI Agent"
-        description="Upload campaign data or ask about channel performance, ROI optimization, social media strategy"
-        placeholder="e.g., 'Which channel has best ROI?' or 'Suggest TikTok content ideas'"
-      />
+      <Tabs defaultValue="channels" className="w-full">
+        <TabsList className="grid w-full grid-cols-5 mb-6">
+          <TabsTrigger value="channels"><BarChart3 className="h-4 w-4 mr-2" />არხები</TabsTrigger>
+          <TabsTrigger value="reputation"><Star className="h-4 w-4 mr-2" />რეპუტაცია</TabsTrigger>
+          <TabsTrigger value="campaigns"><Send className="h-4 w-4 mr-2" />კამპანიები</TabsTrigger>
+          <TabsTrigger value="social"><Instagram className="h-4 w-4 mr-2" />სოც. მედია</TabsTrigger>
+          <TabsTrigger value="ai"><Bot className="h-4 w-4 mr-2" />🤖 AI</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="channels">
+          <Card><CardHeader><CardTitle>არხების შესრულება</CardTitle><CardDescription>ანალიტიკა რომელი OTA მეტ შემოსავალს იძლევა</CardDescription></CardHeader>
+          <CardContent><p className="text-muted-foreground">აქ იქნება არხების ანალიზი - Booking.com vs Airbnb vs Expedia შემოსავლები, კონვერსია, და ROI.</p></CardContent></Card>
+        </TabsContent>
+
+        <TabsContent value="reputation">
+          <Card><CardHeader><CardTitle>რეპუტაციის მენეჯერი</CardTitle><CardDescription>სტუმრების რევიუების წაკითხვა და პასუხი</CardDescription></CardHeader>
+          <CardContent><p className="text-muted-foreground">აქ იქნება რევიუების სისტემა - ყველა OTA-დან რევიუების აგრეგაცია, sentiment ანალიზი, და ავტომატური პასუხები.</p></CardContent></Card>
+        </TabsContent>
+
+        <TabsContent value="campaigns">
+          <Card><CardHeader><CardTitle>კამპანიების შემქმნელი</CardTitle><CardDescription>ელფოსტა/SMS კამპანიების შედგენა</CardDescription></CardHeader>
+          <CardContent><p className="text-muted-foreground">აქ იქნება კამპანიების სისტემა - email/SMS blasts, segmentation, A/B testing, და analytics.</p></CardContent></Card>
+        </TabsContent>
+
+        <TabsContent value="social">
+          <Card><CardHeader><CardTitle>სოციალური მედია პლანერი</CardTitle><CardDescription>Instagram/TikTok პოსტების კალენდარი</CardDescription></CardHeader>
+          <CardContent><p className="text-muted-foreground">აქ იქნება სოციალური მედიის სისტემა - პოსტების დაგეგმვა, კონტენტის ბიბლიოთეკა, და engagement analytics.</p></CardContent></Card>
+        </TabsContent>
+
+        <TabsContent value="ai">
+          <Card><CardHeader><CardTitle className="flex items-center gap-2"><Bot className="h-5 w-5 text-purple-500" />🤖 Marketing AI Agent</CardTitle>
+          <CardDescription>AI აგენტი კრეატიული ტექსტებისა და პოსტების შესაქმნელად</CardDescription></CardHeader>
+          <CardContent className="space-y-4">
+            <div className="border-2 border-dashed border-border rounded-lg p-6 text-center">
+              <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
+              <p className="text-sm text-muted-foreground mb-2">ატვირთეთ რევიუები ან analytics რეპორტები ანალიზისთვის</p>
+              <Button variant="outline" size="sm"><Upload className="h-4 w-4 mr-2" />აირჩიეთ ფაილები</Button>
+            </div>
+            <AIChatBox messages={chatHistory} onSendMessage={handleSendMessage} isLoading={isLoading} placeholder="მაგ: 'დაწერე Instagram პოსტი' ან 'გააანალიზე რევიუების sentiment'" height={400} />
+            <div className="grid grid-cols-2 gap-2">
+              <Button variant="outline" size="sm" onClick={() => handleSendMessage("დაწერე Instagram პოსტი ზაფხულის სეზონისთვის")}>Instagram პოსტი</Button>
+              <Button variant="outline" size="sm" onClick={() => handleSendMessage("გააანალიზე რევიუების sentiment")}>Sentiment ანალიზი</Button>
+            </div>
+          </CardContent></Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
-}
+};
+
+export default Marketing;
