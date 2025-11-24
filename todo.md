@@ -198,3 +198,12 @@
 - [ ] Guide user: Update favicon via Management UI
 - [ ] Guide user: Gmail integration setup (IMAP + App Password)
 - [ ] Guide user: Publish to production
+
+
+## Phase 17: CRITICAL FIX - Navigation Crash Issue
+- [ ] Remove all broken module routes from App.tsx temporarily
+- [ ] Fix nested anchor tag in OrbiDashboardLayout navigation
+- [ ] Keep only CEO Dashboard working initially
+- [ ] Test and save checkpoint
+- [ ] Publish stable version to production
+- [ ] Gradually re-add modules one by one after testing each
