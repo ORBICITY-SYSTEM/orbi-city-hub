@@ -198,3 +198,14 @@
 - [ ] Guide user: Update favicon via Management UI
 - [ ] Guide user: Gmail integration setup (IMAP + App Password)
 - [ ] Guide user: Publish to production
+
+## Phase 17: PWA Conversion - Housekeeping Mobile
+
+### PWA Setup
+- [x] Create manifest.json with app metadata
+- [x] Generate app icons from logo (192x192, 512x512)
+- [x] Create service worker for offline support
+- [x] Add PWA meta tags to HTML
+- [x] Implement "Add to Home Screen" install prompt
+- [x] Test PWA installation (ready for mobile testing)
+- [x] Configure caching strategy for offline mode
