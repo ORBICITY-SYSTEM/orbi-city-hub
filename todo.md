@@ -199,40 +199,25 @@
 - [ ] Guide user: Gmail integration setup (IMAP + App Password)
 - [ ] Guide user: Publish to production
 
+## Phase 17: PWA Conversion - Housekeeping Mobile
 
-## Phase 17: CRITICAL FIX - Navigation Crash Issue
-- [ ] Remove all broken module routes from App.tsx temporarily
-- [ ] Fix nested anchor tag in OrbiDashboardLayout navigation
-- [ ] Keep only CEO Dashboard working initially
-- [ ] Test and save checkpoint
-- [ ] Publish stable version to production
-- [ ] Gradually re-add modules one by one after testing each
+### PWA Setup
+- [x] Create manifest.json with app metadata
+- [x] Generate app icons from logo (192x192, 512x512)
+- [x] Create service worker for offline support
+- [x] Add PWA meta tags to HTML
+- [x] Implement "Add to Home Screen" install prompt
+- [x] Test PWA installation (ready for mobile testing)
+- [x] Configure caching strategy for offline mode
 
+## Phase 18: Bug Fixes & Production Deployment
 
-## Phase 18: Module Restoration & CSV Export Feature
+### Critical Bugs
+- [x] Fix nested anchor tag error in OrbiDashboardLayout navigation
+- [x] Verify all module pages load correctly
+- [x] Test navigation between modules
 
-### Module Restoration (One by one with testing)
-- [x] Restore Marketing module - add route to App.tsx and navigation link
-- [x] Test Marketing module - verify no blank screens or navigation crashes
-- [x] Restore Logistics module - add route to App.tsx and navigation link
-- [x] Test Logistics module - verify no blank screens or navigation crashes
-- [x] Restore Reservations module with Gantt Chart - add route to App.tsx and navigation link
-- [x] Test Reservations module - verify Gantt Chart loads correctly for 60 rooms
-- [x] Restore Finance module - add route to App.tsx and navigation link
-- [x] Test Finance module - verify charts and data load correctly
-- [x] Restore Reports & Analytics module - add route to App.tsx and navigation link
-- [x] Test Reports module - verify analytics display correctly
-
-### CSV Export Feature for CEO Dashboard
-- [x] Create CSV export utility function in client/src/lib/csvExport.ts
-- [x] Add export button to CEO Dashboard UI
-- [x] Implement data collection from all CEO Dashboard sections (KPIs, Revenue by Channel, Monthly Overview)
-- [x] Add tRPC endpoint for CEO Dashboard data export (server/routers.ts) - Not needed, using client-side export
-- [x] Test CSV export with real data
-- [x] Verify CSV file downloads correctly with proper formatting
-
-### Final Testing
-- [x] Test all modules navigation - ensure no blank screens
-- [x] Test CSV export functionality
-- [x] Run TypeScript check - ensure 0 errors
-- [x] Create checkpoint with all modules restored and CSV export working
+### Production Deployment
+- [x] Address Google Cloud Run deployment concerns
+- [x] Document rollback procedures (DEPLOYMENT_GUIDE.md)
+- [x] Ensure version control safety (checkpoints + GitHub)
