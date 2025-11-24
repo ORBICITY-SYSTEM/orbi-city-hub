@@ -1,0 +1,32 @@
+name: Production Health Check
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Run health check every 6 hours
+    - cron: '0 */6 * * *'
+
+jobs:
+  health-check:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || github.event_name == 'schedule'
+    
+    steps:
+    - name: Check production health
+      run: |
+        response=$(curl -s -o /dev/null -w "%{http_code}" https://team.orbicitybatumi.com/api/trpc/health.ping)
+        if [ $response -eq 200 ]; then
+          echo "✅ Production is healthy"
+        else
+          echo "❌ Production health check failed"
+          exit 1
+        fi
+    
+    - name: Notify on failure
+      if: failure()
+      run: |
+        echo "🚨 Production health check failed at $(date)"
+        echo "Please check https://team.orbicitybatumi.com"
