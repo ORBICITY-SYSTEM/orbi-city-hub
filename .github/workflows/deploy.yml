@@ -1,0 +1,49 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '22'
+        
+    - name: Install pnpm
+      uses: pnpm/action-setup@v2
+      with:
+        version: 8
+        
+    - name: Install dependencies
+      run: pnpm install
+      
+    - name: Run tests
+      run: pnpm test
+      
+    - name: Build project
+      run: pnpm build
+      
+  health-check:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Check production health
+      run: |
+        response=$(curl -s -o /dev/null -w "%{http_code}" https://team.orbicitybatumi.com/api/trpc/health.ping )
+        if [ $response -eq 200 ]; then
+          echo "✅ Production is healthy"
+        else
+          echo "❌ Production health check failed"
+          exit 1
+        fi
