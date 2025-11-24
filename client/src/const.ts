@@ -2,7 +2,7 @@ export { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
 
 export const APP_TITLE = import.meta.env.VITE_APP_TITLE || "ORBI City Hub";
 
-export const APP_LOGO = "https://orbicitybatumi.com/wp-content/uploads/2023/10/logo-orbi-city.png";
+export const APP_LOGO = "/logo-orbi.jpg";
 
 // Generate login URL at runtime so redirect URI reflects the current origin.
 export const getLoginUrl = () => {
