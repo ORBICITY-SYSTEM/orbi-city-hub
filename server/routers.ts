@@ -9,6 +9,7 @@ import { healthRouter } from "./routers/health";
 import { rbacRouter } from "./routers/rbac";
 import { housekeepingRouter } from "./routers/housekeeping";
 import { logisticsRouter } from "./routers/logistics";
+import { financeRouter } from "./routers/finance";
 
 export const appRouter = router({
   system: systemRouter,
@@ -29,6 +30,7 @@ export const appRouter = router({
   rbac: rbacRouter,
   housekeeping: housekeepingRouter,
   logistics: logisticsRouter,
+  finance: financeRouter,
 });
 
 export type AppRouter = typeof appRouter;
