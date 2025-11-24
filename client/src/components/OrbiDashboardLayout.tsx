@@ -25,12 +25,11 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { name: "CEO Dashboard", path: "/", icon: LayoutDashboard },
-  // Temporarily disabled broken modules - will re-add one by one after testing
-  // { name: "Reservations", path: "/reservations", icon: Calendar },
-  // { name: "Finance", path: "/finance", icon: DollarSign },
-  // { name: "Marketing", path: "/marketing", icon: Megaphone },
-  // { name: "Logistics", path: "/logistics", icon: Truck },
-  // { name: "Reports & Analytics", path: "/reports", icon: FileText },
+  { name: "Reservations", path: "/reservations", icon: Calendar },
+  { name: "Finance", path: "/finance", icon: DollarSign },
+  { name: "Marketing", path: "/marketing", icon: Megaphone },
+  { name: "Logistics", path: "/logistics", icon: Truck },
+  { name: "Reports & Analytics", path: "/reports", icon: FileText },
 ];
 
 export default function OrbiDashboardLayout({ children }: { children: React.ReactNode }) {

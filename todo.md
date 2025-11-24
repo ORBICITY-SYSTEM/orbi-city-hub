@@ -207,3 +207,32 @@
 - [ ] Test and save checkpoint
 - [ ] Publish stable version to production
 - [ ] Gradually re-add modules one by one after testing each
+
+
+## Phase 18: Module Restoration & CSV Export Feature
+
+### Module Restoration (One by one with testing)
+- [x] Restore Marketing module - add route to App.tsx and navigation link
+- [x] Test Marketing module - verify no blank screens or navigation crashes
+- [x] Restore Logistics module - add route to App.tsx and navigation link
+- [x] Test Logistics module - verify no blank screens or navigation crashes
+- [x] Restore Reservations module with Gantt Chart - add route to App.tsx and navigation link
+- [x] Test Reservations module - verify Gantt Chart loads correctly for 60 rooms
+- [x] Restore Finance module - add route to App.tsx and navigation link
+- [x] Test Finance module - verify charts and data load correctly
+- [x] Restore Reports & Analytics module - add route to App.tsx and navigation link
+- [x] Test Reports module - verify analytics display correctly
+
+### CSV Export Feature for CEO Dashboard
+- [x] Create CSV export utility function in client/src/lib/csvExport.ts
+- [x] Add export button to CEO Dashboard UI
+- [x] Implement data collection from all CEO Dashboard sections (KPIs, Revenue by Channel, Monthly Overview)
+- [x] Add tRPC endpoint for CEO Dashboard data export (server/routers.ts) - Not needed, using client-side export
+- [x] Test CSV export with real data
+- [x] Verify CSV file downloads correctly with proper formatting
+
+### Final Testing
+- [x] Test all modules navigation - ensure no blank screens
+- [x] Test CSV export functionality
+- [x] Run TypeScript check - ensure 0 errors
+- [x] Create checkpoint with all modules restored and CSV export working

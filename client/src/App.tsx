@@ -8,12 +8,12 @@ import OrbiDashboardLayout from "./components/OrbiDashboardLayout";
 
 // Pages
 import CEODashboard from "./pages/CEODashboard";
-// Temporarily disabled broken modules
-// import Reservations from "./pages/Reservations";
-// import Finance from "./pages/Finance";
-// import Marketing from "./pages/Marketing";
-// import Logistics from "./pages/Logistics";
-// import Reports from "./pages/Reports";
+// All modules restored
+import Marketing from "./pages/Marketing";
+import Logistics from "./pages/Logistics";
+import Reservations from "./pages/Reservations";
+import Finance from "./pages/Finance";
+import Reports from "./pages/Reports";
 import HousekeepingMobile from "./pages/HousekeepingMobile";
 
 function Router() {
@@ -27,12 +27,12 @@ function Router() {
         <OrbiDashboardLayout>
           <Switch>
             <Route path="/" component={CEODashboard} />
-            {/* Temporarily disabled broken modules */}
-            {/* <Route path="/reservations" component={Reservations} /> */}
-            {/* <Route path="/finance" component={Finance} /> */}
-            {/* <Route path="/marketing" component={Marketing} /> */}
-            {/* <Route path="/logistics" component={Logistics} /> */}
-            {/* <Route path="/reports" component={Reports} /> */}
+            {/* All modules restored */}
+            <Route path="/marketing" component={Marketing} />
+            <Route path="/logistics" component={Logistics} />
+            <Route path="/reservations" component={Reservations} />
+            <Route path="/finance" component={Finance} />
+            <Route path="/reports" component={Reports} />
             <Route path="/404" component={NotFound} />
             <Route component={NotFound} />
           </Switch>
