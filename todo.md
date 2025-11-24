@@ -168,8 +168,33 @@
 - [ ] Document all new features
 
 ### Testing & Deployment
-- [ ] Test all new features
-- [ ] Verify design consistency
-- [ ] Check mobile responsiveness
-- [ ] Save production checkpoint
-- [ ] Prepare Phase 2 setup guides
+- [x] Test all new features
+- [x] Verify design consistency
+- [x] Check mobile responsiveness
+- [x] Save production checkpoint (version: 4c65c01d)
+- [x] Prepare Phase 2 setup guides
+
+## Phase 16: User Requests - Visual Calendar & Housekeeping Mobile
+
+### Visual Calendar (Gantt Chart)
+- [x] Create Visual Calendar component (chess board layout)
+- [x] Add room numbers on left (501-560)
+- [x] Add dates on top (scrollable timeline)
+- [x] Add colored booking bars (green=available, blue=booked, orange=check-in, red=check-out)
+- [x] Implement drag & drop for booking management
+- [x] Add tooltip with booking details on hover
+- [x] Integrate into Reservations → Calendar View page
+
+### Housekeeping Mobile View
+- [x] Create mobile-friendly housekeeping interface
+- [x] Add PIN-code authentication (no full login)
+- [x] Display room list with status (dirty 🔴 / clean ✅)
+- [x] Add "Mark as Clean" button with real-time update
+- [x] Create public route /housekeeping (accessible without admin login)
+- [x] Add real-time sync with CEO Dashboard
+- [x] Test on mobile devices
+
+### User Setup Tasks
+- [ ] Guide user: Update favicon via Management UI
+- [ ] Guide user: Gmail integration setup (IMAP + App Password)
+- [ ] Guide user: Publish to production
