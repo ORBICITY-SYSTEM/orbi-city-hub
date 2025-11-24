@@ -3,7 +3,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CalendarDays, List, Users, Mail, Bot } from "lucide-react";
 import { AIChatBox } from "@/components/AIChatBox";
 import VisualCalendar from "@/components/VisualCalendar";
-import PlotlyGanttChart, { type GanttReservation } from "@/components/PlotlyGanttChart";
 import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
 import { useState } from "react";
@@ -59,7 +58,7 @@ const Reservations = () => {
 
       {/* Sub-Modules Tabs */}
       <Tabs defaultValue="calendar" className="w-full">
-        <TabsList className="grid w-full grid-cols-6 mb-6">
+        <TabsList className="grid w-full grid-cols-5 mb-6">
           <TabsTrigger value="calendar" className="flex items-center gap-2">
             <CalendarDays className="h-4 w-4" />
             კალენდარი
@@ -75,10 +74,6 @@ const Reservations = () => {
           <TabsTrigger value="mail" className="flex items-center gap-2">
             <Mail className="h-4 w-4" />
             📧 ელფოსტა
-          </TabsTrigger>
-          <TabsTrigger value="gantt" className="flex items-center gap-2">
-            <CalendarDays className="h-4 w-4" />
-            📊 Timeline
           </TabsTrigger>
           <TabsTrigger value="ai" className="flex items-center gap-2">
             <Bot className="h-4 w-4" />
@@ -161,91 +156,6 @@ const Reservations = () => {
               <p className="text-muted-foreground">
                 აქ იქნება Gmail ინტეგრაცია - ავტომატური ბრონირებების პარსინგი Booking.com, Airbnb, Expedia-დან, და სტუმრებთან კომუნიკაცია.
               </p>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="gantt">
-          <Card>
-            <CardHeader>
-              <CardTitle>Room Occupancy Timeline (Gantt Chart)</CardTitle>
-              <CardDescription>
-                Visual timeline showing room bookings with color-coded status
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <PlotlyGanttChart
-                reservations={[
-                  {
-                    id: 1,
-                    roomNumber: "505",
-                    guestName: "John Smith",
-                    checkIn: new Date(2025, 10, 20),
-                    checkOut: new Date(2025, 10, 25),
-                    status: "confirmed",
-                    price: 450,
-                    source: "Booking.com",
-                  },
-                  {
-                    id: 2,
-                    roomNumber: "510",
-                    guestName: "Maria Garcia",
-                    checkIn: new Date(2025, 10, 22),
-                    checkOut: new Date(2025, 10, 28),
-                    status: "confirmed",
-                    price: 600,
-                    source: "Airbnb",
-                  },
-                  {
-                    id: 3,
-                    roomNumber: "515",
-                    guestName: "David Lee",
-                    checkIn: new Date(2025, 10, 18),
-                    checkOut: new Date(2025, 10, 23),
-                    status: "checked_out",
-                    price: 500,
-                    source: "Direct",
-                  },
-                  {
-                    id: 4,
-                    roomNumber: "520",
-                    guestName: "Sarah Johnson",
-                    checkIn: new Date(2025, 10, 25),
-                    checkOut: new Date(2025, 10, 30),
-                    status: "pending",
-                    price: 550,
-                    source: "Booking.com",
-                  },
-                  {
-                    id: 5,
-                    roomNumber: "505",
-                    guestName: "Michael Brown",
-                    checkIn: new Date(2025, 10, 26),
-                    checkOut: new Date(2025, 11, 2),
-                    status: "confirmed",
-                    price: 700,
-                    source: "Airbnb",
-                  },
-                ] as GanttReservation[]}
-              />
-              
-              <div className="mt-6 p-4 bg-slate-50 rounded-lg border border-slate-200">
-                <h3 className="font-semibold mb-2">Legend:</h3>
-                <div className="flex gap-4 flex-wrap">
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 bg-green-500 rounded"></div>
-                    <span className="text-sm">Confirmed</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 bg-yellow-500 rounded"></div>
-                    <span className="text-sm">Pending</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 bg-gray-500 rounded"></div>
-                    <span className="text-sm">Checked Out</span>
-                  </div>
-                </div>
-              </div>
             </CardContent>
           </Card>
         </TabsContent>

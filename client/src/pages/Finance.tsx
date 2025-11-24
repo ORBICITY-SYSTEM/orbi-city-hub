@@ -1,10 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Receipt, TrendingUp, Users, FileText, Bot, DollarSign, PieChart, Building2 } from "lucide-react";
-import { PLOverview } from "@/components/finance/PLOverview";
-import { CostAnalysis } from "@/components/finance/CostAnalysis";
-import { StudioPerformance } from "@/components/finance/StudioPerformance";
-import { FinanceAIAnalyst } from "@/components/finance/FinanceAIAnalyst";
+import { Receipt, TrendingUp, Users, FileText, Bot } from "lucide-react";
 import { AIChatBox } from "@/components/AIChatBox";
 import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
@@ -49,29 +45,14 @@ const Finance = () => {
         </div>
       </div>
 
-      <Tabs defaultValue="pl-overview" className="w-full">
-        <TabsList className="grid w-full grid-cols-6 mb-6">
-          <TabsTrigger value="pl-overview"><DollarSign className="h-4 w-4 mr-2" />P&L Overview</TabsTrigger>
-          <TabsTrigger value="cost-analysis"><PieChart className="h-4 w-4 mr-2" />Cost Analysis</TabsTrigger>
-          <TabsTrigger value="studio-performance"><Building2 className="h-4 w-4 mr-2" />Studio Performance</TabsTrigger>
+      <Tabs defaultValue="transactions" className="w-full">
+        <TabsList className="grid w-full grid-cols-5 mb-6">
           <TabsTrigger value="transactions"><Receipt className="h-4 w-4 mr-2" />ტრანზაქციები</TabsTrigger>
           <TabsTrigger value="pl"><TrendingUp className="h-4 w-4 mr-2" />P&L</TabsTrigger>
           <TabsTrigger value="settlements"><Users className="h-4 w-4 mr-2" />ანგარიშსწორება</TabsTrigger>
           <TabsTrigger value="invoices"><FileText className="h-4 w-4 mr-2" />ინვოისები</TabsTrigger>
           <TabsTrigger value="ai"><Bot className="h-4 w-4 mr-2" />🤖 AI</TabsTrigger>
         </TabsList>
-
-        <TabsContent value="pl-overview">
-          <PLOverview />
-        </TabsContent>
-
-        <TabsContent value="cost-analysis">
-          <CostAnalysis />
-        </TabsContent>
-
-        <TabsContent value="studio-performance">
-          <StudioPerformance />
-        </TabsContent>
 
         <TabsContent value="transactions">
           <Card><CardHeader><CardTitle>ტრანზაქციების ლოგი</CardTitle><CardDescription>დღიური შემოსავლები/ხარჯები კატეგორიებით</CardDescription></CardHeader>
@@ -94,7 +75,20 @@ const Finance = () => {
         </TabsContent>
 
         <TabsContent value="ai">
-          <FinanceAIAnalyst />
+          <Card><CardHeader><CardTitle className="flex items-center gap-2"><Bot className="h-5 w-5 text-purple-500" />🤖 Finance AI Agent</CardTitle>
+          <CardDescription>AI აგენტი Excel რეპორტების ანალიზისთვის</CardDescription></CardHeader>
+          <CardContent className="space-y-4">
+            <div className="border-2 border-dashed border-border rounded-lg p-6 text-center">
+              <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
+              <p className="text-sm text-muted-foreground mb-2">ატვირთეთ Excel/CSV ფინანსური რეპორტები ანალიზისთვის</p>
+              <Button variant="outline" size="sm"><Upload className="h-4 w-4 mr-2" />აირჩიეთ ფაილები</Button>
+            </div>
+            <AIChatBox messages={chatHistory} onSendMessage={handleSendMessage} isLoading={isLoading} placeholder="მაგ: 'რა არის ჩვენი უდიდესი ხარჯი?' ან 'გააანალიზე ეს P&L რეპორტი'" height={400} />
+            <div className="grid grid-cols-2 gap-2">
+              <Button variant="outline" size="sm" onClick={() => handleSendMessage("რა არის ჩვენი უდიდესი ხარჯი?")}>უდიდესი ხარჯი</Button>
+              <Button variant="outline" size="sm" onClick={() => handleSendMessage("როგორ ავამაღლო მოგება?")}>მოგების ოპტიმიზაცია</Button>
+            </div>
+          </CardContent></Card>
         </TabsContent>
       </Tabs>
     </div>
