@@ -1,8 +1,5 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { TrendingUp, TrendingDown, Users, Star, Bot, Download } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { exportCEODashboardToCSV, type CEODashboardData } from "@/lib/csvExport";
-import { toast } from "sonner";
+import { TrendingUp, TrendingDown, Users, Star, Bot } from "lucide-react";
 
 export default function CEODashboard() {
   // Mock data - will be replaced with real tRPC queries
@@ -56,48 +53,9 @@ export default function CEODashboard() {
   return (
     <div className="p-8">
       {/* Header */}
-      <div className="mb-8 flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-slate-900 mb-2">CEO Dashboard</h1>
-          <p className="text-slate-600">Real-time insights for ORBI City Batumi</p>
-        </div>
-        <Button
-          onClick={() => {
-            const dashboardData: CEODashboardData = {
-              kpis: {
-                revenue: 45230,
-                revenueChange: 15,
-                occupancy: 85,
-                occupancyChange: 5,
-                rating: 9.2,
-                ratingChange: 0.3,
-                aiTasks: 247,
-                aiTasksChange: 89,
-              },
-              revenueByChannel: channels.map(ch => ({
-                channel: ch.name,
-                amount: ch.revenue,
-                percentage: ch.percentage,
-              })),
-              monthlyOverview: {
-                totalBookings: 127,
-                bookingsChange: 12,
-                avgStay: 3.2,
-                avgStayChange: "Same as Oct",
-                avgPrice: 356,
-                avgPriceChange: 8,
-                cancellationRate: 2.1,
-                cancellationRateChange: -0.5,
-              },
-            };
-            exportCEODashboardToCSV(dashboardData);
-            toast.success("Dashboard data exported to CSV successfully!");
-          }}
-          className="bg-green-600 hover:bg-green-700"
-        >
-          <Download className="w-4 h-4 mr-2" />
-          Export to CSV
-        </Button>
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-slate-900 mb-2">CEO Dashboard</h1>
+        <p className="text-slate-600">Real-time insights for ORBI City Batumi</p>
       </div>
 
       {/* KPIs */}

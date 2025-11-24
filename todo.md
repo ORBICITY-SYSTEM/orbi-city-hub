@@ -168,71 +168,8 @@
 - [ ] Document all new features
 
 ### Testing & Deployment
-- [x] Test all new features
-- [x] Verify design consistency
-- [x] Check mobile responsiveness
-- [x] Save production checkpoint (version: 4c65c01d)
-- [x] Prepare Phase 2 setup guides
-
-## Phase 16: User Requests - Visual Calendar & Housekeeping Mobile
-
-### Visual Calendar (Gantt Chart)
-- [x] Create Visual Calendar component (chess board layout)
-- [x] Add room numbers on left (501-560)
-- [x] Add dates on top (scrollable timeline)
-- [x] Add colored booking bars (green=available, blue=booked, orange=check-in, red=check-out)
-- [x] Implement drag & drop for booking management
-- [x] Add tooltip with booking details on hover
-- [x] Integrate into Reservations → Calendar View page
-
-### Housekeeping Mobile View
-- [x] Create mobile-friendly housekeeping interface
-- [x] Add PIN-code authentication (no full login)
-- [x] Display room list with status (dirty 🔴 / clean ✅)
-- [x] Add "Mark as Clean" button with real-time update
-- [x] Create public route /housekeeping (accessible without admin login)
-- [x] Add real-time sync with CEO Dashboard
-- [x] Test on mobile devices
-
-### User Setup Tasks
-- [ ] Guide user: Update favicon via Management UI
-- [ ] Guide user: Gmail integration setup (IMAP + App Password)
-- [ ] Guide user: Publish to production
-
-
-## Phase 17: CRITICAL FIX - Navigation Crash Issue
-- [ ] Remove all broken module routes from App.tsx temporarily
-- [ ] Fix nested anchor tag in OrbiDashboardLayout navigation
-- [ ] Keep only CEO Dashboard working initially
-- [ ] Test and save checkpoint
-- [ ] Publish stable version to production
-- [ ] Gradually re-add modules one by one after testing each
-
-
-## Phase 18: Module Restoration & CSV Export Feature
-
-### Module Restoration (One by one with testing)
-- [x] Restore Marketing module - add route to App.tsx and navigation link
-- [x] Test Marketing module - verify no blank screens or navigation crashes
-- [x] Restore Logistics module - add route to App.tsx and navigation link
-- [x] Test Logistics module - verify no blank screens or navigation crashes
-- [x] Restore Reservations module with Gantt Chart - add route to App.tsx and navigation link
-- [x] Test Reservations module - verify Gantt Chart loads correctly for 60 rooms
-- [x] Restore Finance module - add route to App.tsx and navigation link
-- [x] Test Finance module - verify charts and data load correctly
-- [x] Restore Reports & Analytics module - add route to App.tsx and navigation link
-- [x] Test Reports module - verify analytics display correctly
-
-### CSV Export Feature for CEO Dashboard
-- [x] Create CSV export utility function in client/src/lib/csvExport.ts
-- [x] Add export button to CEO Dashboard UI
-- [x] Implement data collection from all CEO Dashboard sections (KPIs, Revenue by Channel, Monthly Overview)
-- [x] Add tRPC endpoint for CEO Dashboard data export (server/routers.ts) - Not needed, using client-side export
-- [x] Test CSV export with real data
-- [x] Verify CSV file downloads correctly with proper formatting
-
-### Final Testing
-- [x] Test all modules navigation - ensure no blank screens
-- [x] Test CSV export functionality
-- [x] Run TypeScript check - ensure 0 errors
-- [x] Create checkpoint with all modules restored and CSV export working
+- [ ] Test all new features
+- [ ] Verify design consistency
+- [ ] Check mobile responsiveness
+- [ ] Save production checkpoint
+- [ ] Prepare Phase 2 setup guides
