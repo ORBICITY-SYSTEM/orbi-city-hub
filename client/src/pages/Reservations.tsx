@@ -2,8 +2,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CalendarDays, List, Users, Mail, Bot } from "lucide-react";
 import { AIChatBox } from "@/components/AIChatBox";
+import VisualCalendar from "@/components/VisualCalendar";
 import { Button } from "@/components/ui/button";
-import { FileUpload } from "@/components/FileUpload";
+import { Upload } from "lucide-react";
 import { useState } from "react";
 import { trpc } from "@/lib/trpc";
 
@@ -81,17 +82,40 @@ const Reservations = () => {
         </TabsList>
 
         <TabsContent value="calendar">
-          <Card>
-            <CardHeader>
-              <CardTitle>კალენდარის ხედი</CardTitle>
-              <CardDescription>Gantt-chart სტილის ვიზუალური ბრონირების კალენდარი</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">
-                აქ იქნება ვიზუალური კალენდარი - ყველა 60 სტუდიოს ბრონირებები Gantt-chart ფორმატში, drag-and-drop ფუნქციით.
-              </p>
-            </CardContent>
-          </Card>
+          <VisualCalendar 
+            bookings={[
+              // Sample data - in production, fetch from trpc.modules.getData
+              {
+                id: 1,
+                roomNumber: "505",
+                guestName: "John Smith",
+                checkIn: new Date(2025, 10, 20),
+                checkOut: new Date(2025, 10, 25),
+                status: "confirmed",
+                channel: "Booking.com"
+              },
+              {
+                id: 2,
+                roomNumber: "510",
+                guestName: "Maria Garcia",
+                checkIn: new Date(2025, 10, 22),
+                checkOut: new Date(2025, 10, 28),
+                status: "checked-in",
+                channel: "Airbnb"
+              },
+              {
+                id: 3,
+                roomNumber: "515",
+                guestName: "David Lee",
+                checkIn: new Date(2025, 10, 18),
+                checkOut: new Date(2025, 10, 24),
+                status: "checked-in",
+                channel: "Direct"
+              },
+            ]}
+            totalRooms={60}
+            startRoomNumber={501}
+          />
         </TabsContent>
 
         <TabsContent value="bookings">
@@ -149,13 +173,16 @@ const Reservations = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               {/* File Upload Section */}
-              <FileUpload
-                module="reservations"
-                onUploadSuccess={(url, fileName) => {
-                  // Send uploaded file info to AI for analysis
-                  handleSendMessage(`გააანალიზე ეს ფაილი: ${fileName} (${url})`);
-                }}
-              />
+              <div className="border-2 border-dashed border-border rounded-lg p-6 text-center">
+                <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
+                <p className="text-sm text-muted-foreground mb-2">
+                  ატვირთეთ ვაუჩერები, ბრონირების ფაილები, ან Excel რეპორტები ანალიზისთვის
+                </p>
+                <Button variant="outline" size="sm">
+                  <Upload className="h-4 w-4 mr-2" />
+                  აირჩიეთ ფაილები
+                </Button>
+              </div>
 
               {/* AI Chat Interface */}
               <AIChatBox

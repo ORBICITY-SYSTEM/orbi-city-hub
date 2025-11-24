@@ -3,7 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Receipt, TrendingUp, Users, FileText, Bot } from "lucide-react";
 import { AIChatBox } from "@/components/AIChatBox";
 import { Button } from "@/components/ui/button";
-import { FileUpload } from "@/components/FileUpload";
+import { Upload } from "lucide-react";
 import { useState } from "react";
 import { trpc } from "@/lib/trpc";
 
@@ -78,13 +78,11 @@ const Finance = () => {
           <Card><CardHeader><CardTitle className="flex items-center gap-2"><Bot className="h-5 w-5 text-purple-500" />🤖 Finance AI Agent</CardTitle>
           <CardDescription>AI აგენტი Excel რეპორტების ანალიზისთვის</CardDescription></CardHeader>
           <CardContent className="space-y-4">
-            <FileUpload
-              module="finance"
-              onUploadSuccess={(url, fileName) => {
-                // Send uploaded file info to AI for analysis
-                handleSendMessage(`გააანალიზე ეს ფაილი: ${fileName} (${url})`);
-              }}
-            />
+            <div className="border-2 border-dashed border-border rounded-lg p-6 text-center">
+              <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
+              <p className="text-sm text-muted-foreground mb-2">ატვირთეთ Excel/CSV ფინანსური რეპორტები ანალიზისთვის</p>
+              <Button variant="outline" size="sm"><Upload className="h-4 w-4 mr-2" />აირჩიეთ ფაილები</Button>
+            </div>
             <AIChatBox messages={chatHistory} onSendMessage={handleSendMessage} isLoading={isLoading} placeholder="მაგ: 'რა არის ჩვენი უდიდესი ხარჯი?' ან 'გააანალიზე ეს P&L რეპორტი'" height={400} />
             <div className="grid grid-cols-2 gap-2">
               <Button variant="outline" size="sm" onClick={() => handleSendMessage("რა არის ჩვენი უდიდესი ხარჯი?")}>უდიდესი ხარჯი</Button>

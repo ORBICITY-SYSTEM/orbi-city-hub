@@ -2,7 +2,7 @@ import { z } from "zod";
 import { protectedProcedure, router } from "../_core/trpc";
 import { invokeLLM, type Message } from "../_core/llm";
 import { getDb } from "../db";
-import { aiConversations } from "../../drizzle/schema";
+import { aiConversations, files } from "../../drizzle/schema";
 import { eq, desc } from "drizzle-orm";
 import { KNOWLEDGE_BASE } from "../../shared/aiKnowledgeBase";
 
@@ -59,6 +59,7 @@ export const aiRouter = router({
     .mutation(async ({ input, ctx }) => {
       const { module, userMessage, fileUrl, fileName, fileType } = input;
       const startTime = Date.now();
+      const db = await getDb();
 
       // Build system prompt based on module
       const systemPrompt = getSystemPrompt(module);
@@ -68,9 +69,33 @@ export const aiRouter = router({
         { role: "system", content: systemPrompt },
       ];
 
-      // Add user message
+      // Check if user is referencing a file by name
       let userContent = userMessage;
-      if (fileUrl) {
+      let referencedFile = null;
+
+      // Match patterns like "ნახე ფაილი სახელად X" or "analyze file named X"
+      const fileNamePattern = /(?:ნახე ფაილი სახელად|analyze file named|check file named|ფაილი სახელად)\s+["']?([^"'\n]+)["']?/i;
+      const match = userMessage.match(fileNamePattern);
+
+      if (match && db) {
+        const searchName = match[1].trim();
+        // Search for file by name
+        const userFiles = await db
+          .select()
+          .from(files)
+          .where(eq(files.userId, ctx.user.id))
+          .orderBy(desc(files.uploadedAt));
+
+        referencedFile = userFiles.find(f => 
+          f.fileName.toLowerCase().includes(searchName.toLowerCase()) && !f.isDeleted
+        );
+
+        if (referencedFile) {
+          userContent = `${userMessage}\n\n[Referenced file: ${referencedFile.fileName}]\n[File URL: ${referencedFile.fileUrl}]\n[File type: ${referencedFile.mimeType}]\n[File size: ${(referencedFile.fileSize / 1024).toFixed(1)} KB]\n\nPlease analyze this file and respond to the user's request.`;
+        } else {
+          userContent = `${userMessage}\n\n[Note: File "${searchName}" not found in uploaded files. Please ask the user to upload it first.]`;
+        }
+      } else if (fileUrl) {
         userContent = `${userMessage}\n\n[File uploaded: ${fileName || "file"}]`;
       }
 
@@ -86,7 +111,6 @@ export const aiRouter = router({
       const responseTime = Date.now() - startTime;
 
       // Save conversation to database
-      const db = await getDb();
       if (db) {
         try {
           await db.insert(aiConversations).values({
