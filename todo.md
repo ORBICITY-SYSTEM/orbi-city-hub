@@ -168,50 +168,23 @@
 - [ ] Document all new features
 
 ### Testing & Deployment
-- [x] Test all new features
-- [x] Verify design consistency
-- [x] Check mobile responsiveness
-- [x] Save production checkpoint (version: 4c65c01d)
-- [x] Prepare Phase 2 setup guides
+- [ ] Test all new features
+- [ ] Verify design consistency
+- [ ] Check mobile responsiveness
+- [ ] Save production checkpoint
+- [ ] Prepare Phase 2 setup guides
 
-## Phase 16: User Requests - Visual Calendar & Housekeeping Mobile
 
-### Visual Calendar (Gantt Chart)
-- [x] Create Visual Calendar component (chess board layout)
-- [x] Add room numbers on left (501-560)
-- [x] Add dates on top (scrollable timeline)
-- [x] Add colored booking bars (green=available, blue=booked, orange=check-in, red=check-out)
-- [x] Implement drag & drop for booking management
-- [x] Add tooltip with booking details on hover
-- [x] Integrate into Reservations → Calendar View page
-
-### Housekeeping Mobile View
-- [x] Create mobile-friendly housekeeping interface
-- [x] Add PIN-code authentication (no full login)
-- [x] Display room list with status (dirty 🔴 / clean ✅)
-- [x] Add "Mark as Clean" button with real-time update
-- [x] Create public route /housekeeping (accessible without admin login)
-- [x] Add real-time sync with CEO Dashboard
-- [x] Test on mobile devices
-
-### User Setup Tasks
-- [ ] Guide user: Update favicon via Management UI
-- [ ] Guide user: Gmail integration setup (IMAP + App Password)
-- [ ] Guide user: Publish to production
-
-## Phase 21: Centralized File Manager System
-- [x] Fix upload button click issue (file input not triggering)
-- [x] Design files database table (id, userId, fileName, originalName, fileUrl, fileSize, mimeType, uploadedAt, module, tags)
-- [x] Create tRPC fileManager router (upload, list, delete, download, rename)
-- [x] Build FileManager UI component with drag-and-drop upload
-- [x] Add upload history table with search and filter
-- [ ] Implement file preview (images, PDFs)
-- [x] Add file download functionality
-- [x] Add file delete with confirmation
-- [x] Add file rename functionality
-- [x] Add file tagging system
-- [x] Integrate File Manager into CEO Dashboard
-- [x] Update AI agents to reference files by name (e.g., "analyze file named october 2025")
-- [ ] Add file sharing links
-- [x] Test all file operations
-- [x] Create checkpoint after File Manager is complete
+## Phase 20: Fix Upload Buttons
+- [x] Find all upload buttons in Finance, Marketing, Logistics, Reports modules
+- [x] Check current implementation (placeholder vs functional)
+- [x] Implement file upload with S3 storage (storagePut)
+- [x] Add file input handling in frontend
+- [x] Create tRPC endpoint for file upload)
+- [x] Test upload in Finance module (AI Agent file upload)
+- [x] Test upload in other modules (Reservations, Marketing, Logistics, Reports)
+- [x] Add file type validation (Excel, CSV, PDF)
+- [x] Add file size limit (10MB)
+- [x] Show upload progress indicator
+- [x] Display uploaded files list (via AI chat integration)
+- [x] Implement FileUpload component in all modules

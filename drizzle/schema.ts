@@ -261,41 +261,6 @@ export const maintenanceSchedules = mysqlTable("maintenanceSchedules", {
 export type MaintenanceSchedule = typeof maintenanceSchedules.$inferSelect;
 export type InsertMaintenanceSchedule = typeof maintenanceSchedules.$inferInsert;
 
-// ============================================================================
-// FILE MANAGEMENT
-// ============================================================================
-
-export const files = mysqlTable("files", {
-  id: int("id").autoincrement().primaryKey(),
-  
-  // User who uploaded the file
-  userId: int("userId").notNull(),
-  
-  // File details
-  fileName: varchar("fileName", { length: 255 }).notNull(), // User-friendly name (can be renamed)
-  originalName: varchar("originalName", { length: 255 }).notNull(), // Original filename from upload
-  fileUrl: text("fileUrl").notNull(), // S3 URL
-  fileKey: varchar("fileKey", { length: 500 }).notNull(), // S3 key for deletion
-  
-  // File metadata
-  fileSize: int("fileSize").notNull(), // in bytes
-  mimeType: varchar("mimeType", { length: 100 }).notNull(),
-  
-  // Organization
-  module: varchar("module", { length: 50 }), // finance, reservations, marketing, logistics, reports
-  tags: json("tags"), // Array of tags for searching
-  description: text("description"),
-  
-  // Status
-  isDeleted: boolean("isDeleted").default(false).notNull(),
-  
-  uploadedAt: timestamp("uploadedAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-});
-
-export type File = typeof files.$inferSelect;
-export type InsertFile = typeof files.$inferInsert;
-
 // Standard inventory items (template for room inventory)
 export const standardInventoryItems = mysqlTable("standardInventoryItems", {
   id: int("id").autoincrement().primaryKey(),

@@ -1,6 +1,5 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp, TrendingDown, Users, Star, Bot } from "lucide-react";
-import { FileManager } from "@/components/FileManager";
 
 export default function CEODashboard() {
   // Mock data - will be replaced with real tRPC queries
@@ -216,11 +215,6 @@ export default function CEODashboard() {
           </div>
         </CardContent>
       </Card>
-
-      {/* File Manager */}
-      <div className="mt-8">
-        <FileManager />
-      </div>
     </div>
   );
 }
