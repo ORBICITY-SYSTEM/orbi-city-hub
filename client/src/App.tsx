@@ -13,37 +13,28 @@ import Finance from "./pages/Finance";
 import Marketing from "./pages/Marketing";
 import Logistics from "./pages/Logistics";
 import Reports from "./pages/Reports";
-import HousekeepingMobile from "./pages/HousekeepingMobile";
 
 function Router() {
   return (
-    <Switch>
-      {/* Public housekeeping route (no dashboard layout) */}
-      <Route path="/housekeeping" component={HousekeepingMobile} />
-      
-      {/* Dashboard routes */}
-      <Route path="/">
-        <OrbiDashboardLayout>
-          <Switch>
-            <Route path="/" component={CEODashboard} />
-            <Route path="/reservations" component={Reservations} />
-            <Route path="/finance" component={Finance} />
-            <Route path="/marketing" component={Marketing} />
-            <Route path="/logistics" component={Logistics} />
-            <Route path="/reports" component={Reports} />
-            <Route path="/404" component={NotFound} />
-            <Route component={NotFound} />
-          </Switch>
-        </OrbiDashboardLayout>
-      </Route>
-    </Switch>
+    <OrbiDashboardLayout>
+      <Switch>
+        <Route path="/" component={CEODashboard} />
+        <Route path="/reservations" component={Reservations} />
+        <Route path="/finance" component={Finance} />
+        <Route path="/marketing" component={Marketing} />
+        <Route path="/logistics" component={Logistics} />
+        <Route path="/reports" component={Reports} />
+        <Route path="/404" component={NotFound} />
+        <Route component={NotFound} />
+      </Switch>
+    </OrbiDashboardLayout>
   );
 }
 
 function App() {
   return (
     <ErrorBoundary>
-      <ThemeProvider defaultTheme="light" switchable>
+      <ThemeProvider defaultTheme="light">
         <TooltipProvider>
           <Toaster />
           <Router />
