@@ -12,7 +12,10 @@ import {
   Star,
   ExternalLink,
   Mail,
-  FileSpreadsheet
+  FileSpreadsheet,
+  DollarSign,
+  Target,
+  MousePointer
 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { GoogleReviewsWidget } from "@/components/GoogleReviewsWidget";
@@ -47,6 +50,10 @@ export default function Google() {
           <TabsTrigger value="calendar" className="gap-2">
             <Calendar className="w-4 h-4" />
             Calendar
+          </TabsTrigger>
+          <TabsTrigger value="ads" className="gap-2">
+            <Target className="w-4 h-4" />
+            Ads
           </TabsTrigger>
           <TabsTrigger value="drive" className="gap-2">
             <FolderOpen className="w-4 h-4" />
@@ -261,6 +268,183 @@ export default function Google() {
               Open Google Calendar
               <ExternalLink className="w-4 h-4" />
             </a>
+          </div>
+        </TabsContent>
+
+        {/* Google Ads Tab */}
+        <TabsContent value="ads" className="space-y-6">
+          <div className="glass-card p-6">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h3 className="text-xl font-bold text-slate-900">Google Ads Campaigns</h3>
+                <p className="text-slate-600 text-sm mt-1">
+                  Monitor advertising performance and ROI across Google Search and Display networks
+                </p>
+              </div>
+              <Target className="w-8 h-8 text-blue-600" />
+            </div>
+
+            {/* Campaign Performance KPIs */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+              <div className="p-4 rounded-lg bg-gradient-to-br from-blue-500/10 to-blue-600/10 border border-blue-500/20">
+                <div className="flex items-center gap-2 mb-2">
+                  <DollarSign className="w-5 h-5 text-blue-600" />
+                  <span className="text-sm font-medium text-slate-700">Ad Spend</span>
+                </div>
+                <div className="text-2xl font-bold text-blue-600">₾8,450</div>
+                <div className="text-xs text-slate-600 mt-1">This month</div>
+              </div>
+
+              <div className="p-4 rounded-lg bg-gradient-to-br from-green-500/10 to-green-600/10 border border-green-500/20">
+                <div className="flex items-center gap-2 mb-2">
+                  <TrendingUp className="w-5 h-5 text-green-600" />
+                  <span className="text-sm font-medium text-slate-700">Revenue</span>
+                </div>
+                <div className="text-2xl font-bold text-green-600">₾42,890</div>
+                <div className="text-xs text-slate-600 mt-1">From ads</div>
+              </div>
+
+              <div className="p-4 rounded-lg bg-gradient-to-br from-purple-500/10 to-purple-600/10 border border-purple-500/20">
+                <div className="flex items-center gap-2 mb-2">
+                  <MousePointer className="w-5 h-5 text-purple-600" />
+                  <span className="text-sm font-medium text-slate-700">Clicks</span>
+                </div>
+                <div className="text-2xl font-bold text-purple-600">3,245</div>
+                <div className="text-xs text-slate-600 mt-1">CTR: 4.2%</div>
+              </div>
+
+              <div className="p-4 rounded-lg bg-gradient-to-br from-orange-500/10 to-orange-600/10 border border-orange-500/20">
+                <div className="flex items-center gap-2 mb-2">
+                  <Target className="w-5 h-5 text-orange-600" />
+                  <span className="text-sm font-medium text-slate-700">ROI</span>
+                </div>
+                <div className="text-2xl font-bold text-orange-600">407%</div>
+                <div className="text-xs text-slate-600 mt-1">Return on ad spend</div>
+              </div>
+            </div>
+
+            {/* Active Campaigns */}
+            <div className="mb-6">
+              <h4 className="font-semibold text-slate-900 mb-4">Active Campaigns</h4>
+              <div className="space-y-3">
+                <div className="p-4 rounded-lg bg-white/50 border border-slate-200">
+                  <div className="flex items-center justify-between mb-2">
+                    <div>
+                      <h5 className="font-semibold text-slate-900">Batumi Luxury Apartments - Search</h5>
+                      <p className="text-sm text-slate-600">Google Search Network</p>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-lg font-bold text-green-600">₾18,450</div>
+                      <div className="text-xs text-slate-600">Revenue</div>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-3 gap-4 mt-3 pt-3 border-t border-slate-200">
+                    <div>
+                      <div className="text-xs text-slate-600">Impressions</div>
+                      <div className="font-semibold text-slate-900">45,230</div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-slate-600">Clicks</div>
+                      <div className="font-semibold text-slate-900">1,892</div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-slate-600">Conversions</div>
+                      <div className="font-semibold text-slate-900">42</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-4 rounded-lg bg-white/50 border border-slate-200">
+                  <div className="flex items-center justify-between mb-2">
+                    <div>
+                      <h5 className="font-semibold text-slate-900">ORBI City - Display Network</h5>
+                      <p className="text-sm text-slate-600">Google Display Network</p>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-lg font-bold text-green-600">₾12,340</div>
+                      <div className="text-xs text-slate-600">Revenue</div>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-3 gap-4 mt-3 pt-3 border-t border-slate-200">
+                    <div>
+                      <div className="text-xs text-slate-600">Impressions</div>
+                      <div className="font-semibold text-slate-900">128,450</div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-slate-600">Clicks</div>
+                      <div className="font-semibold text-slate-900">892</div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-slate-600">Conversions</div>
+                      <div className="font-semibold text-slate-900">28</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-4 rounded-lg bg-white/50 border border-slate-200">
+                  <div className="flex items-center justify-between mb-2">
+                    <div>
+                      <h5 className="font-semibold text-slate-900">Remarketing - Previous Visitors</h5>
+                      <p className="text-sm text-slate-600">Remarketing Campaign</p>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-lg font-bold text-green-600">₾12,100</div>
+                      <div className="text-xs text-slate-600">Revenue</div>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-3 gap-4 mt-3 pt-3 border-t border-slate-200">
+                    <div>
+                      <div className="text-xs text-slate-600">Impressions</div>
+                      <div className="font-semibold text-slate-900">32,890</div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-slate-600">Clicks</div>
+                      <div className="font-semibold text-slate-900">461</div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-slate-600">Conversions</div>
+                      <div className="font-semibold text-slate-900">18</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Optimization Tips */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="p-4 rounded-lg bg-blue-50 border border-blue-200">
+                <div className="flex items-center gap-2 mb-2">
+                  <Target className="w-5 h-5 text-blue-600" />
+                  <h4 className="font-semibold text-blue-900">Keyword Optimization</h4>
+                </div>
+                <p className="text-sm text-blue-800">
+                  Focus on high-converting keywords like "luxury apartments Batumi" and "ORBI City rentals"
+                </p>
+              </div>
+
+              <div className="p-4 rounded-lg bg-green-50 border border-green-200">
+                <div className="flex items-center gap-2 mb-2">
+                  <TrendingUp className="w-5 h-5 text-green-600" />
+                  <h4 className="font-semibold text-green-900">Budget Allocation</h4>
+                </div>
+                <p className="text-sm text-green-800">
+                  Increase budget for Search campaigns (407% ROI) and optimize Display targeting
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-6">
+              <a
+                href="https://ads.google.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                <Target className="w-4 h-4" />
+                Open Google Ads
+                <ExternalLink className="w-4 h-4" />
+              </a>
+            </div>
           </div>
         </TabsContent>
 

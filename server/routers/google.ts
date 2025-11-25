@@ -3,6 +3,7 @@ import { publicProcedure, router } from "../_core/trpc";
 import { fetchGoogleBusinessReviews, replyToGoogleReview, deleteGoogleReviewReply } from "../googleBusinessProfile";
 import { getGA4Metrics, getGA4RealTimeMetrics } from "../googleAnalytics";
 import { createBookingCalendarEvent, updateBookingCalendarEvent, deleteBookingCalendarEvent, processBookingEmail, type BookingEvent } from "../googleCalendar";
+import { listDriveFiles, uploadToDrive, downloadFromDrive, deleteFromDrive, createDriveFolder } from "../googleDrive";
 
 export const googleRouter = router({
   // Get Google Business Profile reviews
@@ -120,5 +121,56 @@ export const googleRouter = router({
     )
     .mutation(async ({ input }) => {
       return await processBookingEmail(input.emailContent, input.subject);
+    }),
+
+  // Google Drive - List files
+  listDriveFiles: publicProcedure
+    .input(
+      z.object({
+        folderId: z.string().optional(),
+        pageSize: z.number().min(1).max(100).default(20),
+        pageToken: z.string().optional(),
+      })
+    )
+    .query(async ({ input }) => {
+      return await listDriveFiles(input.folderId, input.pageSize, input.pageToken);
+    }),
+
+  // Google Drive - Upload file
+  uploadToDrive: publicProcedure
+    .input(
+      z.object({
+        fileName: z.string(),
+        mimeType: z.string(),
+        fileBuffer: z.string(), // Base64 encoded
+        folderId: z.string().optional(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const buffer = Buffer.from(input.fileBuffer, 'base64');
+      return await uploadToDrive(input.fileName, input.mimeType, buffer, input.folderId);
+    }),
+
+  // Google Drive - Delete file
+  deleteDriveFile: publicProcedure
+    .input(
+      z.object({
+        fileId: z.string(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      return await deleteFromDrive(input.fileId);
+    }),
+
+  // Google Drive - Create folder
+  createDriveFolder: publicProcedure
+    .input(
+      z.object({
+        folderName: z.string(),
+        parentFolderId: z.string().optional(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      return await createDriveFolder(input.folderName, input.parentFolderId);
     }),
 });

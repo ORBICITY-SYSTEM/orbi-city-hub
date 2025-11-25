@@ -6,6 +6,7 @@ import { FileHistory } from "@/components/FileHistory";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { GoogleReviewsWidget } from "@/components/GoogleReviewsWidget";
+import { GA4RealTimeWidget } from "@/components/GA4RealTimeWidget";
 
 export default function CEODashboard() {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
@@ -111,6 +112,11 @@ export default function CEODashboard() {
             </div>
           );
         })}
+      </div>
+
+      {/* GA4 Real-time Traffic */}
+      <div className="mb-8">
+        <GA4RealTimeWidget />
       </div>
 
       {/* Channel Performance, Quick Insights & Google Reviews */}
