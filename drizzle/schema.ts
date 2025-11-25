@@ -459,3 +459,30 @@ export const systemSettings = mysqlTable("systemSettings", {
 
 export type SystemSetting = typeof systemSettings.$inferSelect;
 export type InsertSystemSetting = typeof systemSettings.$inferInsert;
+
+
+// Reservations
+export const reservations = mysqlTable("reservations", {
+  id: int("id").autoincrement().primaryKey(),
+  guestId: int("guestId").references(() => guests.id),
+  guestName: varchar("guestName", { length: 255 }).notNull(),
+  checkIn: timestamp("checkIn").notNull(),
+  checkOut: timestamp("checkOut").notNull(),
+  roomNumber: varchar("roomNumber", { length: 50 }),
+  price: int("price"), // in cents/tetri
+  currency: varchar("currency", { length: 10 }).default("GEL"),
+  channel: mysqlEnum("channel", ["Booking.com", "Airbnb", "Expedia", "Agoda", "Direct", "Other"]).notNull(),
+  bookingId: varchar("bookingId", { length: 255 }).notNull().unique(),
+  status: mysqlEnum("status", ["confirmed", "pending", "cancelled", "checked-in", "checked-out"]).default("confirmed").notNull(),
+  guestEmail: varchar("guestEmail", { length: 320 }),
+  guestPhone: varchar("guestPhone", { length: 50 }),
+  numberOfGuests: int("numberOfGuests").default(1),
+  specialRequests: text("specialRequests"),
+  source: varchar("source", { length: 50 }).default("email"), // email, manual, excel
+  emailThreadId: varchar("emailThreadId", { length: 255 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Reservation = typeof reservations.$inferSelect;
+export type InsertReservation = typeof reservations.$inferInsert;

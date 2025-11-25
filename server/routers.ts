@@ -9,10 +9,16 @@ import { backupRouter } from "./routers/backup";
 import { healthRouter } from "./routers/health";
 import { rbacRouter } from "./routers/rbac";
 import { fileManagerRouter } from "./routers/fileManager";
+import { adminRouter } from "./routers/admin";
+import { gmailRouter } from "./routers/gmail";
+import { reservationsRouter } from "./routers/reservations";
 
 export const appRouter = router({
   fileUpload: fileUploadRouter,
   fileManager: fileManagerRouter,
+  admin: adminRouter,
+  gmail: gmailRouter,
+  reservations: reservationsRouter,
   system: systemRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),

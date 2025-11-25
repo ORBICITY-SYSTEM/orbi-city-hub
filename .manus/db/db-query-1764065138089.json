@@ -1,0 +1,22 @@
+{
+  "query": "SELECT id, username, role, createdAt FROM adminUsers LIMIT 5",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user c2qSkVB4gKtEmor.bc3c8c9ce52a --database VzNbWtRJAsr2zJAegEjRtX --execute SELECT id, username, role, createdAt FROM adminUsers LIMIT 5",
+  "rows": [
+    {
+      "id": "1",
+      "username": "testadmin_1764064633459",
+      "role": "admin",
+      "createdAt": "2025-11-25 09:57:13"
+    },
+    {
+      "id": "2",
+      "username": "testadmin2_1764064633673",
+      "role": "admin",
+      "createdAt": "2025-11-25 09:57:13"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tusername\trole\tcreatedAt\n1\ttestadmin_1764064633459\tadmin\t2025-11-25 09:57:13\n2\ttestadmin2_1764064633673\tadmin\t2025-11-25 09:57:13\n",
+  "stderr": "",
+  "execution_time_ms": 91
+}

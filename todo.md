@@ -346,3 +346,157 @@
 
 **Status:** ✅ READY FOR PHASE 2 (Admin Panel Development)
 
+
+
+---
+
+## 🔄 Phase 2: Admin Panel + Hybrid AI System (IN PROGRESS - 2025-11-25)
+
+### Admin Authentication
+- [ ] Create admin login page (/admin/login)
+- [ ] Build admin tRPC router (admin.login, admin.logout, admin.me)
+- [ ] Implement bcrypt password verification
+- [ ] Create admin session management (JWT or cookies)
+- [ ] Add admin route protection middleware
+- [ ] Test admin authentication flow
+
+### Module Management UI
+- [ ] Create Admin Dashboard layout (/admin/dashboard)
+- [ ] Build module list component with drag-and-drop (dnd-kit)
+- [ ] Add module CRUD forms (Create, Edit, Delete)
+- [ ] Implement module reordering
+- [ ] Add module activation/deactivation toggle
+- [ ] Create AI Prompt editor for each module
+- [ ] Add icon picker component
+- [ ] Test all module management features
+
+### Hybrid AI System
+- [ ] Create intent analyzer (classifies user queries)
+- [ ] Build Main AI Coordinator (routes to specialists)
+- [ ] Create CEO AI specialist router
+- [ ] Create Reservations AI specialist router
+- [ ] Create Finance AI specialist router
+- [ ] Create Marketing AI specialist router
+- [ ] Create Logistics AI specialist router
+- [ ] Integrate specialists into existing module pages
+- [ ] Add context switching logic
+- [ ] Test AI routing and responses
+
+### Testing & Checkpoint
+- [ ] Write vitest tests for admin authentication
+- [ ] Write vitest tests for module management
+- [ ] Write vitest tests for AI intent analyzer
+- [ ] Verify all features work end-to-end
+- [ ] Save Phase 2 checkpoint
+
+
+
+---
+
+## 🔄 Phase 3: Gmail Integration & Reservation Management (IN PROGRESS - 2025-11-25)
+
+### Gmail IMAP Integration
+- [ ] Set up Gmail MCP server connection
+- [ ] Test IMAP authentication
+- [ ] Create email fetching function
+- [ ] Filter booking-related emails
+- [ ] Parse email content (sender, subject, body)
+
+### Email Parsing & Extraction
+- [ ] Create AI-powered email parser (using Gemini)
+- [ ] Extract booking details (guest name, dates, room, price, channel)
+- [ ] Validate extracted data
+- [ ] Handle multiple email formats (Booking.com, Airbnb, etc.)
+
+### Reservation Database Schema
+- [ ] Create reservations table (id, guestName, checkIn, checkOut, roomNumber, price, channel, status, source)
+- [ ] Create guests table (id, name, email, phone, nationality)
+- [ ] Add relations between reservations and guests
+- [ ] Create indexes for performance
+
+### Reservation CRUD Operations
+- [ ] Create reservation helpers in db.ts
+- [ ] Build tRPC reservation router
+- [ ] Add procedures: list, create, update, delete, getById
+- [ ] Add filtering (by date, status, channel)
+- [ ] Add search functionality
+
+### Reservation Management UI
+- [ ] Create Reservations page with table view
+- [ ] Add filters (date range, status, channel)
+- [ ] Implement search by guest name
+- [ ] Add booking details modal
+- [ ] Create guest profile view
+- [ ] Add calendar view component
+
+### Excel Bulk Upload
+- [ ] Enhance file upload to support multiple files
+- [ ] Add drag-and-drop for multiple files
+- [ ] Create Excel parser for reservations
+- [ ] Validate data before import
+- [ ] Show import preview
+- [ ] Bulk insert to database
+
+### Testing & Checkpoint
+- [ ] Test Gmail email fetching
+- [ ] Test AI email parsing accuracy
+- [ ] Test reservation CRUD operations
+- [ ] Test UI filters and search
+- [ ] Test Excel bulk import
+- [ ] Write vitest tests
+- [ ] Save Phase 3 checkpoint
+
+
+
+---
+
+## ✅ Phase 3: Gmail Integration & Reservation Management (COMPLETED - 2025-11-25)
+
+### Gmail IMAP Integration
+- [x] Set up Gmail MCP server connection
+- [x] Test IMAP authentication
+- [x] Create email fetching function
+- [x] Filter booking-related emails
+- [x] Parse email content (sender, subject, body)
+
+### Email Parsing & Extraction
+- [x] Create AI-powered email parser (using Gemini)
+- [x] Extract booking details (guest name, dates, room, price, channel)
+- [x] Validate extracted data with Zod schema
+- [x] Handle multiple email formats (Booking.com, Airbnb, Expedia, Agoda)
+
+### Reservation Database Schema
+- [x] Create reservations table (id, guestName, checkIn, checkOut, roomNumber, price, channel, status, source)
+- [x] Reuse existing guests table from schema
+- [x] Add relations between reservations and guests
+- [x] Create indexes for performance
+
+### Reservation CRUD Operations
+- [x] Create reservation helpers in reservationDb.ts (10 functions)
+- [x] Build tRPC reservation router (10 procedures)
+- [x] Add procedures: list, create, update, delete, getById
+- [x] Add filtering (by date, status, channel)
+- [x] Add search functionality
+- [x] Add upcomingCheckIns, currentGuests, byDateRange, stats
+
+### Gmail Router (3 procedures)
+- [x] searchBookingEmails - search Gmail for booking emails
+- [x] readAndParseThreads - read specific threads and parse with AI
+- [x] fetchRecentBookings - fetch and parse recent booking emails (last 30 days)
+
+### Next Steps (Phase 4 - UI)
+- [ ] Create Reservations page with table view
+- [ ] Add filters (date range, status, channel)
+- [ ] Implement search by guest name
+- [ ] Add booking details modal
+- [ ] Create guest profile view
+- [ ] Add calendar view component
+- [ ] Excel bulk upload for reservations
+
+### Technical Notes
+- Gmail MCP integration works perfectly (tested with 5 real emails)
+- AI parser successfully extracts booking data from Expedia, Agoda, Itrip emails
+- Database schema uses existing guests table (no duplication)
+- All TypeScript errors resolved
+- Ready for UI implementation
+
