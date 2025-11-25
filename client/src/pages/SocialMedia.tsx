@@ -14,8 +14,12 @@ import {
   Share2,
   BarChart3,
   Clock,
-  Calendar,
+  Calendar as CalendarIcon,
+  Music2,
+  Target,
 } from "lucide-react";
+import ContentCalendar from "@/components/ContentCalendar";
+import CompetitorComparison from "@/components/CompetitorComparison";
 import { Loader2 } from "lucide-react";
 
 export default function SocialMedia() {
@@ -38,6 +42,14 @@ export default function SocialMedia() {
   // Fetch Instagram data
   const { data: igInsights, isLoading: loadingIg } =
     trpc.socialMedia.getInstagramInsights.useQuery({});
+
+  // Fetch TikTok data
+  const { data: ttInsights, isLoading: loadingTt } =
+    trpc.socialMedia.getTikTokInsights.useQuery({});
+  const { data: ttVideos } = trpc.socialMedia.getTikTokVideos.useQuery({
+    limit: 12,
+  });
+  const { data: ttSounds } = trpc.socialMedia.getTikTokTrendingSounds.useQuery();
   const { data: igPosts } = trpc.socialMedia.getInstagramPosts.useQuery({
     limit: 9,
   });
@@ -45,7 +57,7 @@ export default function SocialMedia() {
     {}
   );
 
-  if (loadingCombined || loadingFb || loadingIg) {
+  if (loadingCombined || loadingFb || loadingIg || loadingTt) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
@@ -61,7 +73,7 @@ export default function SocialMedia() {
           Social Media Analytics
         </h1>
         <p className="text-white/70">
-          Track your Facebook and Instagram performance
+          Track your Facebook, Instagram, and TikTok performance
         </p>
       </div>
 
@@ -123,6 +135,18 @@ export default function SocialMedia() {
           <TabsTrigger value="instagram">
             <Instagram className="w-4 h-4 mr-2" />
             Instagram
+          </TabsTrigger>
+          <TabsTrigger value="tiktok">
+            <Music2 className="w-4 h-4 mr-2" />
+            TikTok
+          </TabsTrigger>
+          <TabsTrigger value="calendar">
+            <CalendarIcon className="w-4 h-4 mr-2" />
+            Calendar
+          </TabsTrigger>
+          <TabsTrigger value="competitors">
+            <Target className="w-4 h-4 mr-2" />
+            Competitors
           </TabsTrigger>
           <TabsTrigger value="comparison">Comparison</TabsTrigger>
           <TabsTrigger value="audience">Audience</TabsTrigger>
@@ -384,6 +408,117 @@ export default function SocialMedia() {
           </div>
         </TabsContent>
 
+        {/* TikTok Tab */}
+        <TabsContent value="tiktok">
+          <div className="space-y-6">
+            {/* TikTok Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6">
+                <div className="flex items-center justify-between mb-2">
+                  <Users className="w-8 h-8 text-pink-400" />
+                </div>
+                <div className="text-2xl font-bold text-white">
+                  {ttInsights?.data?.followers.toLocaleString() || "0"}
+                </div>
+                <div className="text-sm text-white/70">Followers</div>
+              </Card>
+              <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6">
+                <div className="flex items-center justify-between mb-2">
+                  <Eye className="w-8 h-8 text-purple-400" />
+                </div>
+                <div className="text-2xl font-bold text-white">
+                  {ttInsights?.data?.totalViews.toLocaleString() || "0"}
+                </div>
+                <div className="text-sm text-white/70">Total Views</div>
+              </Card>
+              <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6">
+                <div className="flex items-center justify-between mb-2">
+                  <Heart className="w-8 h-8 text-red-400" />
+                </div>
+                <div className="text-2xl font-bold text-white">
+                  {ttInsights?.data?.avgEngagementRate.toFixed(1) || "0"}%
+                </div>
+                <div className="text-sm text-white/70">Engagement Rate</div>
+              </Card>
+            </div>
+
+            {/* Top Videos */}
+            <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6">
+              <h3 className="text-xl font-bold text-white mb-4">Top Videos</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {ttVideos?.videos?.slice(0, 6).map((video: any) => (
+                  <div
+                    key={video.id}
+                    className="bg-white/5 rounded-lg overflow-hidden"
+                  >
+                    <img
+                      src={video.coverUrl}
+                      alt="Video thumbnail"
+                      className="w-full h-48 object-cover"
+                    />
+                    <div className="p-3">
+                      <p className="text-white text-sm mb-2 line-clamp-2">
+                        {video.caption}
+                      </p>
+                      <div className="flex items-center gap-3 text-xs text-white/70">
+                        <span className="flex items-center gap-1">
+                          <Eye className="w-3 h-3" />
+                          {video.views.toLocaleString()}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Heart className="w-3 h-3" />
+                          {video.likes.toLocaleString()}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <MessageCircle className="w-3 h-3" />
+                          {video.comments.toLocaleString()}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Card>
+
+            {/* Trending Sounds */}
+            <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6">
+              <h3 className="text-xl font-bold text-white mb-4 flex items-center">
+                <Music2 className="w-6 h-6 mr-2 text-purple-400" />
+                Trending Sounds
+              </h3>
+              <div className="space-y-3">
+                {ttSounds?.sounds?.slice(0, 5).map((sound: any) => (
+                  <div
+                    key={sound.id}
+                    className="flex items-center justify-between bg-white/5 p-4 rounded-lg"
+                  >
+                    <div>
+                      <p className="text-white font-semibold">{sound.title}</p>
+                      <p className="text-white/70 text-sm">{sound.author}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-white font-bold">
+                        {sound.useCount.toLocaleString()}
+                      </p>
+                      <p className="text-white/70 text-xs">uses</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          </div>
+        </TabsContent>
+
+        {/* Calendar Tab */}
+        <TabsContent value="calendar">
+          <ContentCalendar />
+        </TabsContent>
+
+        {/* Competitors Tab */}
+        <TabsContent value="competitors">
+          <CompetitorComparison />
+        </TabsContent>
+
         {/* Comparison Tab */}
         <TabsContent value="comparison">
           <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6">
@@ -397,6 +532,7 @@ export default function SocialMedia() {
                     <th className="text-left text-white/70 pb-3">Metric</th>
                     <th className="text-right text-white/70 pb-3">Facebook</th>
                     <th className="text-right text-white/70 pb-3">Instagram</th>
+                    <th className="text-right text-white/70 pb-3">TikTok</th>
                     <th className="text-right text-white/70 pb-3">Total</th>
                   </tr>
                 </thead>
@@ -409,18 +545,24 @@ export default function SocialMedia() {
                     <td className="text-right">
                       {igInsights?.data?.followers.toLocaleString() || "0"}
                     </td>
+                    <td className="text-right">
+                      {ttInsights?.data?.followers.toLocaleString() || "0"}
+                    </td>
                     <td className="text-right font-bold">
                       {combinedStats?.data?.totalFollowers.toLocaleString() ||
                         "0"}
                     </td>
                   </tr>
                   <tr className="border-b border-white/10">
-                    <td className="py-3">Reach</td>
+                    <td className="py-3">Reach/Views</td>
                     <td className="text-right">
                       {fbInsights?.data?.reach.total.toLocaleString() || "0"}
                     </td>
                     <td className="text-right">
                       {igInsights?.data?.reach.toLocaleString() || "0"}
+                    </td>
+                    <td className="text-right">
+                      {ttInsights?.data?.totalViews.toLocaleString() || "0"}
                     </td>
                     <td className="text-right font-bold">
                       {combinedStats?.data?.totalReach.toLocaleString() || "0"}
@@ -436,22 +578,29 @@ export default function SocialMedia() {
                       {igInsights?.data?.engagement.total.toLocaleString() ||
                         "0"}
                     </td>
+                    <td className="text-right">
+                      {ttInsights?.data?.totalLikes.toLocaleString() || "0"}
+                    </td>
                     <td className="text-right font-bold">
                       {combinedStats?.data?.totalEngagement.toLocaleString() ||
                         "0"}
                     </td>
                   </tr>
                   <tr>
-                    <td className="py-3">Posts</td>
+                    <td className="py-3">Posts/Videos</td>
                     <td className="text-right">
                       {fbInsights?.data?.postCount || "0"}
                     </td>
                     <td className="text-right">
                       {igInsights?.data?.mediaCount || "0"}
                     </td>
+                    <td className="text-right">
+                      {ttInsights?.data?.videoCount || "0"}
+                    </td>
                     <td className="text-right font-bold">
                       {(fbInsights?.data?.postCount || 0) +
-                        (igInsights?.data?.mediaCount || 0)}
+                        (igInsights?.data?.mediaCount || 0) +
+                        (ttInsights?.data?.videoCount || 0)}
                     </td>
                   </tr>
                 </tbody>

@@ -11,6 +11,12 @@ import {
   getInstagramStories,
   getInstagramAudience,
 } from "../instagramApi";
+import {
+  getTikTokInsights,
+  getTikTokTopVideos,
+  getTikTokTrendingSounds,
+  getTikTokAudience,
+} from "../tiktokApi";
 
 export const socialMediaRouter = router({
   // Facebook endpoints
@@ -87,14 +93,51 @@ export const socialMediaRouter = router({
       return await getInstagramAudience(input.accountId);
     }),
 
+  // TikTok endpoints
+  getTikTokInsights: publicProcedure
+    .input(
+      z.object({
+        accountId: z.string().optional(),
+      })
+    )
+    .query(async ({ input }) => {
+      return await getTikTokInsights(input.accountId);
+    }),
+
+  getTikTokVideos: publicProcedure
+    .input(
+      z.object({
+        accountId: z.string().optional(),
+        limit: z.number().min(1).max(50).default(12),
+      })
+    )
+    .query(async ({ input }) => {
+      return await getTikTokTopVideos(input.accountId, input.limit);
+    }),
+
+  getTikTokTrendingSounds: publicProcedure.query(async () => {
+    return await getTikTokTrendingSounds();
+  }),
+
+  getTikTokAudience: publicProcedure
+    .input(
+      z.object({
+        accountId: z.string().optional(),
+      })
+    )
+    .query(async ({ input }) => {
+      return await getTikTokAudience(input.accountId);
+    }),
+
   // Combined stats
   getCombinedStats: publicProcedure.query(async () => {
-    const [fbInsights, igInsights] = await Promise.all([
+    const [fbInsights, igInsights, ttInsights] = await Promise.all([
       getFacebookPageInsights(),
       getInstagramInsights(),
+      getTikTokInsights(),
     ]);
 
-    if (!fbInsights.success || !igInsights.success) {
+    if (!fbInsights.success || !igInsights.success || !ttInsights.success) {
       return {
         success: false,
         error: "Failed to fetch combined stats",
@@ -102,12 +145,13 @@ export const socialMediaRouter = router({
     }
 
     const totalFollowers =
-      (fbInsights.data?.followers || 0) + (igInsights.data?.followers || 0);
+      (fbInsights.data?.followers || 0) + (igInsights.data?.followers || 0) + (ttInsights.data?.followers || 0);
     const totalReach =
-      (fbInsights.data?.reach.total || 0) + (igInsights.data?.reach || 0);
+      (fbInsights.data?.reach.total || 0) + (igInsights.data?.reach || 0) + (ttInsights.data?.totalViews || 0);
     const totalEngagement =
       (fbInsights.data?.engagement.total || 0) +
-      (igInsights.data?.engagement.total || 0);
+      (igInsights.data?.engagement.total || 0) +
+      (ttInsights.data?.totalLikes || 0);
     const avgEngagementRate =
       totalFollowers > 0
         ? ((totalEngagement / totalFollowers) * 100).toFixed(2)
@@ -122,6 +166,7 @@ export const socialMediaRouter = router({
         avgEngagementRate: parseFloat(avgEngagementRate),
         facebook: fbInsights.data,
         instagram: igInsights.data,
+        tiktok: ttInsights.data,
       },
     };
   }),
