@@ -390,3 +390,27 @@ export const auditLogs = mysqlTable("auditLogs", {
 
 export type AuditLog = typeof auditLogs.$inferSelect;
 export type InsertAuditLog = typeof auditLogs.$inferInsert;
+
+// ============================================================================
+// FILE UPLOADS
+// ============================================================================
+
+export const files = mysqlTable("files", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  
+  // File metadata
+  fileName: varchar("fileName", { length: 255 }).notNull(),
+  fileUrl: varchar("fileUrl", { length: 500 }).notNull(),
+  fileSize: int("fileSize").notNull(), // in bytes
+  mimeType: varchar("mimeType", { length: 100 }).notNull(),
+  
+  // Optional metadata
+  module: varchar("module", { length: 100 }), // Which module uploaded it (CEO, Finance, etc.)
+  description: text("description"),
+  
+  uploadedAt: timestamp("uploadedAt").defaultNow().notNull(),
+});
+
+export type File = typeof files.$inferSelect;
+export type InsertFile = typeof files.$inferInsert;

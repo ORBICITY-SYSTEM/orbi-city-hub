@@ -2,9 +2,10 @@ import { z } from "zod";
 import { protectedProcedure, router } from "../_core/trpc";
 import { invokeLLM, type Message } from "../_core/llm";
 import { getDb } from "../db";
-import { aiConversations } from "../../drizzle/schema";
-import { eq, desc } from "drizzle-orm";
+import { aiConversations, files } from "../../drizzle/schema";
+import { eq, desc, like } from "drizzle-orm";
 import { KNOWLEDGE_BASE } from "../../shared/aiKnowledgeBase";
+import { parseExcelFromUrl, formatExcelForAI, getExcelSummary } from "../utils/excelParser";
 
 // Get module-specific system prompt
 function getSystemPrompt(module: string): string {
@@ -63,6 +64,28 @@ export const aiRouter = router({
       // Build system prompt based on module
       const systemPrompt = getSystemPrompt(module);
 
+      // Check if user is referencing a file by name
+      let referencedFile = null;
+      const fileNameMatch = userMessage.match(/ფაილ(?:ი)?\s+სახელად\s+["']?([^"']+)["']?/i) || 
+                           userMessage.match(/file\s+named\s+["']?([^"']+)["']?/i);
+      
+      if (fileNameMatch) {
+        const searchFileName = fileNameMatch[1].trim();
+        const db = await getDb();
+        if (db) {
+          const matchingFiles = await db
+            .select()
+            .from(files)
+            .where(eq(files.userId, ctx.user.id))
+            .limit(10);
+          
+          // Find file with matching name (case-insensitive partial match)
+          referencedFile = matchingFiles.find(f => 
+            f.fileName.toLowerCase().includes(searchFileName.toLowerCase())
+          );
+        }
+      }
+
       // Build messages
       const messages: Message[] = [
         { role: "system", content: systemPrompt },
@@ -70,7 +93,25 @@ export const aiRouter = router({
 
       // Add user message
       let userContent = userMessage;
-      if (fileUrl) {
+      
+      // If user referenced a file by name, add it to context
+      if (referencedFile) {
+        let fileContext = `[Referenced file: ${referencedFile.fileName}]\n[File URL: ${referencedFile.fileUrl}]\n[File type: ${referencedFile.mimeType}]\n[File size: ${(referencedFile.fileSize / 1024).toFixed(1)} KB]\n[Uploaded: ${new Date(referencedFile.uploadedAt).toLocaleString('ka-GE')}]`;
+        
+        // If it's an Excel file, parse it automatically
+        if (referencedFile.mimeType.includes('spreadsheet') || referencedFile.mimeType.includes('excel')) {
+          try {
+            const excelData = await parseExcelFromUrl(referencedFile.fileUrl, referencedFile.fileName);
+            const formattedData = formatExcelForAI(excelData, 30); // Show first 30 rows
+            fileContext += `\n\n${formattedData}`;
+          } catch (error) {
+            console.error('[AI] Excel parsing error:', error);
+            fileContext += '\n\n[Note: Could not parse Excel file automatically]';
+          }
+        }
+        
+        userContent = `${userMessage}\n\n${fileContext}`;
+      } else if (fileUrl) {
         userContent = `${userMessage}\n\n[File uploaded: ${fileName || "file"}]`;
       }
 

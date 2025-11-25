@@ -8,9 +8,11 @@ import { modulesRouter } from "./routers/modules";
 import { backupRouter } from "./routers/backup";
 import { healthRouter } from "./routers/health";
 import { rbacRouter } from "./routers/rbac";
+import { fileManagerRouter } from "./routers/fileManager";
 
 export const appRouter = router({
   fileUpload: fileUploadRouter,
+  fileManager: fileManagerRouter,
   system: systemRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),

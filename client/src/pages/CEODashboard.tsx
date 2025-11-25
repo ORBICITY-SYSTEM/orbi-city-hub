@@ -1,7 +1,12 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp, TrendingDown, Users, Star, Bot } from "lucide-react";
+import { FileUploadManager } from "@/components/FileUploadManager";
+import { FileHistory } from "@/components/FileHistory";
+import { useState } from "react";
 
 export default function CEODashboard() {
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+
   // Mock data - will be replaced with real tRPC queries
   const kpis = [
     {
@@ -182,6 +187,22 @@ export default function CEODashboard() {
             </div>
           </CardContent>
         </Card>
+      </div>
+
+      {/* File Upload Section */}
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold text-slate-900 mb-4">📁 ფაილების მართვა</h2>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div>
+            <FileUploadManager
+              module="CEO"
+              onUploadSuccess={() => setRefreshTrigger((prev) => prev + 1)}
+            />
+          </div>
+          <div>
+            <FileHistory module="CEO" refreshTrigger={refreshTrigger} />
+          </div>
+        </div>
       </div>
 
       {/* Monthly Stats */}
