@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { FileUpload } from "@/components/FileUpload";
 import { useState } from "react";
 import { trpc } from "@/lib/trpc";
+import { MarketingDashboard } from "@/components/MarketingDashboard";
 
 const Marketing = () => {
   const [chatHistory, setChatHistory] = useState<Array<{ role: "user" | "assistant"; content: string }>>([]);
@@ -45,14 +46,19 @@ const Marketing = () => {
         </div>
       </div>
 
-      <Tabs defaultValue="channels" className="w-full">
-        <TabsList className="grid w-full grid-cols-5 mb-6">
+      <Tabs defaultValue="dashboard" className="w-full">
+        <TabsList className="grid w-full grid-cols-6 mb-6">
+          <TabsTrigger value="dashboard"><BarChart3 className="h-4 w-4 mr-2" />Dashboard</TabsTrigger>
           <TabsTrigger value="channels"><BarChart3 className="h-4 w-4 mr-2" />არხები</TabsTrigger>
           <TabsTrigger value="reputation"><Star className="h-4 w-4 mr-2" />რეპუტაცია</TabsTrigger>
           <TabsTrigger value="campaigns"><Send className="h-4 w-4 mr-2" />კამპანიები</TabsTrigger>
           <TabsTrigger value="social"><Instagram className="h-4 w-4 mr-2" />სოც. მედია</TabsTrigger>
           <TabsTrigger value="ai"><Bot className="h-4 w-4 mr-2" />🤖 AI</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="dashboard">
+          <MarketingDashboard />
+        </TabsContent>
 
         <TabsContent value="channels">
           <Card><CardHeader><CardTitle>არხების შესრულება</CardTitle><CardDescription>ანალიტიკა რომელი OTA მეტ შემოსავალს იძლევა</CardDescription></CardHeader>

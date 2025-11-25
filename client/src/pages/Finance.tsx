@@ -7,8 +7,12 @@ import { FileUpload } from "@/components/FileUpload";
 import { useState } from "react";
 import { trpc } from "@/lib/trpc";
 import { FinanceDashboardContent } from "@/components/FinanceDashboardContent";
+import { FinanceTransactions } from "@/components/FinanceTransactions";
+import { FinancePL } from "@/components/FinancePL";
+import { FinanceInvoices } from "@/components/FinanceInvoices";
 
 const Finance = () => {
+  const [activeTab, setActiveTab] = useState("dashboard");
   const [chatHistory, setChatHistory] = useState<Array<{ role: "user" | "assistant"; content: string }>>([]);
   const [isLoading, setIsLoading] = useState(false);
   const chatMutation = trpc.ai.chat.useMutation();
@@ -46,7 +50,7 @@ const Finance = () => {
         </div>
       </div>
 
-      <Tabs defaultValue="dashboard" className="w-full">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-6 mb-6">
           <TabsTrigger value="dashboard"><BarChart3 className="h-4 w-4 mr-2" />Dashboard</TabsTrigger>
           <TabsTrigger value="transactions"><Receipt className="h-4 w-4 mr-2" />ტრანზაქციები</TabsTrigger>
@@ -61,13 +65,11 @@ const Finance = () => {
         </TabsContent>
 
         <TabsContent value="transactions">
-          <Card><CardHeader><CardTitle>ტრანზაქციების ლოგი</CardTitle><CardDescription>დღიური შემოსავლები/ხარჯები კატეგორიებით</CardDescription></CardHeader>
-          <CardContent><p className="text-muted-foreground">აქ იქნება ტრანზაქციების სრული სისტემა - შემოსავლების/ხარჯების რეგისტრაცია, კატეგორიზაცია, და ანალიზი.</p></CardContent></Card>
+          <FinanceTransactions />
         </TabsContent>
 
         <TabsContent value="pl">
-          <Card><CardHeader><CardTitle>P&L ანალიზი</CardTitle><CardDescription>ვიზუალური მოგება-ზარალის დიაგრამები</CardDescription></CardHeader>
-          <CardContent><p className="text-muted-foreground">აქ იქნება P&L რეპორტები - თვიური/წლიური მოგება-ზარალი, ტენდენციების ვიზუალიზაცია, და პროგნოზები.</p></CardContent></Card>
+          <FinancePL />
         </TabsContent>
 
         <TabsContent value="settlements">
@@ -76,8 +78,7 @@ const Finance = () => {
         </TabsContent>
 
         <TabsContent value="invoices">
-          <Card><CardHeader><CardTitle>ინვოისები</CardTitle><CardDescription>PDF ინვოისების გენერაცია და თვალყურის დევნება</CardDescription></CardHeader>
-          <CardContent><p className="text-muted-foreground">აქ იქნება ინვოისების სისტემა - PDF გენერაცია, გაგზავნა, და გადახდების სტატუსის თვალყურის დევნება.</p></CardContent></Card>
+          <FinanceInvoices />
         </TabsContent>
 
         <TabsContent value="ai">

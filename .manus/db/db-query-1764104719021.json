@@ -1,0 +1,9 @@
+{
+  "query": "INSERT INTO financial_data (month, year, month_number, studios, days_available, days_occupied, occupancy_rate, avg_price, total_revenue, cleaning_tech, marketing, salaries, utilities, total_expenses, total_profit, company_profit, owners_profit) VALUES\n('September', 2025, 9, 55, 1650, 1328, 80.48, 114.25, 114074.00, 12500.00, 8500.00, 15000.00, 3200.00, 39200.00, 74874.00, 14974.80, 59899.20),\n('August', 2025, 8, 54, 1674, 1515, 90.50, 144.30, 218594.00, 15200.00, 11000.00, 15000.00, 3800.00, 45000.00, 173594.00, 34718.80, 138875.20),\n('July', 2025, 7, 53, 1643, 1446, 88.00, 121.40, 175512.00, 14000.00, 9500.00, 15000.00, 3500.00, 42000.00, 133512.00, 26702.40, 106809.60)",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user c2qSkVB4gKtEmor.bc3c8c9ce52a --database VzNbWtRJAsr2zJAegEjRtX --execute INSERT INTO financial_data (month, year, month_number, studios, days_available, days_occupied, occupancy_rate, avg_price, total_revenue, cleaning_tech, marketing, salaries, utilities, total_expenses, total_profit, company_profit, owners_profit) VALUES\n('September', 2025, 9, 55, 1650, 1328, 80.48, 114.25, 114074.00, 12500.00, 8500.00, 15000.00, 3200.00, 39200.00, 74874.00, 14974.80, 59899.20),\n('August', 2025, 8, 54, 1674, 1515, 90.50, 144.30, 218594.00, 15200.00, 11000.00, 15000.00, 3800.00, 45000.00, 173594.00, 34718.80, 138875.20),\n('July', 2025, 7, 53, 1643, 1446, 88.00, 121.40, 175512.00, 14000.00, 9500.00, 15000.00, 3500.00, 42000.00, 133512.00, 26702.40, 106809.60)",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 63
+}

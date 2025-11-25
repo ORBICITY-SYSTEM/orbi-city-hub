@@ -6,8 +6,10 @@ import { Button } from "@/components/ui/button";
 import { FileUpload } from "@/components/FileUpload";
 import { useState } from "react";
 import { trpc } from "@/lib/trpc";
+import { LogisticsHousekeeping } from "@/components/LogisticsHousekeeping";
 
 const Logistics = () => {
+  const [activeTab, setActiveTab] = useState("inventory");
   const [chatHistory, setChatHistory] = useState<Array<{ role: "user" | "assistant"; content: string }>>([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -56,7 +58,7 @@ const Logistics = () => {
       </div>
 
       {/* Sub-Modules Tabs */}
-      <Tabs defaultValue="inventory" className="w-full">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-6 mb-6">
           <TabsTrigger value="inventory" className="flex items-center gap-2">
             <Package className="h-4 w-4" />
@@ -99,17 +101,7 @@ const Logistics = () => {
         </TabsContent>
 
         <TabsContent value="housekeeping">
-          <Card>
-            <CardHeader>
-              <CardTitle>დასუფთავების მართვა</CardTitle>
-              <CardDescription>დასუფთავების გრაფიკები და ამოცანები</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">
-                აქ იქნება დასუფთავების სრული სისტემა - დღიური გრაფიკები, პერსონალის დანიშვნები, და ხარისხის კონტროლი.
-              </p>
-            </CardContent>
-          </Card>
+          <LogisticsHousekeeping />
         </TabsContent>
 
         <TabsContent value="maintenance">
