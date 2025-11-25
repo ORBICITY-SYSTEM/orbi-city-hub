@@ -1,11 +1,12 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Receipt, TrendingUp, Users, FileText, Bot } from "lucide-react";
+import { Receipt, TrendingUp, Users, FileText, Bot, BarChart3 } from "lucide-react";
 import { AIChatBox } from "@/components/AIChatBox";
 import { Button } from "@/components/ui/button";
 import { FileUpload } from "@/components/FileUpload";
 import { useState } from "react";
 import { trpc } from "@/lib/trpc";
+import { FinanceDashboardContent } from "@/components/FinanceDashboardContent";
 
 const Finance = () => {
   const [chatHistory, setChatHistory] = useState<Array<{ role: "user" | "assistant"; content: string }>>([]);
@@ -45,14 +46,19 @@ const Finance = () => {
         </div>
       </div>
 
-      <Tabs defaultValue="transactions" className="w-full">
-        <TabsList className="grid w-full grid-cols-5 mb-6">
+      <Tabs defaultValue="dashboard" className="w-full">
+        <TabsList className="grid w-full grid-cols-6 mb-6">
+          <TabsTrigger value="dashboard"><BarChart3 className="h-4 w-4 mr-2" />Dashboard</TabsTrigger>
           <TabsTrigger value="transactions"><Receipt className="h-4 w-4 mr-2" />ტრანზაქციები</TabsTrigger>
           <TabsTrigger value="pl"><TrendingUp className="h-4 w-4 mr-2" />P&L</TabsTrigger>
           <TabsTrigger value="settlements"><Users className="h-4 w-4 mr-2" />ანგარიშსწორება</TabsTrigger>
           <TabsTrigger value="invoices"><FileText className="h-4 w-4 mr-2" />ინვოისები</TabsTrigger>
           <TabsTrigger value="ai"><Bot className="h-4 w-4 mr-2" />🤖 AI</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="dashboard">
+          <FinanceDashboardContent />
+        </TabsContent>
 
         <TabsContent value="transactions">
           <Card><CardHeader><CardTitle>ტრანზაქციების ლოგი</CardTitle><CardDescription>დღიური შემოსავლები/ხარჯები კატეგორიებით</CardDescription></CardHeader>

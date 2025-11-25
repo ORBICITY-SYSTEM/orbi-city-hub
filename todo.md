@@ -572,3 +572,50 @@
 - Reservations page renders blank (routing problem)
 - Need to debug React rendering
 
+
+
+---
+
+## 🔧 Phase 5: Fix Reservations Routing (IN PROGRESS - 2025-11-25)
+
+- [ ] Debug blank Reservations page
+- [ ] Check React component rendering
+- [ ] Verify tRPC queries work
+- [ ] Test BookingsTable display
+- [ ] Save checkpoint
+
+
+## Phase 28: Lovable Dashboard Migration (Analytics-Focused)
+- [ ] Parse Excel financial data (12 sheets)
+- [ ] Create financialData database table
+- [ ] Build dashboard UI with 5 KPI cards (Revenue, Expenses, Profit, Company Share, Owners Share)
+- [ ] Create monthly performance grid (12 cards)
+- [ ] Add 7 charts (Revenue trend, Profit bars, Occupancy line, Studio growth, Expense pie, etc.)
+- [ ] Test with real OTELMS data
+- [ ] Save checkpoint
+
+
+## Phase 28: Lovable Dashboard Migration
+- [x] Create financial_data database schema
+- [x] Create Excel parser for OTELMS data
+- [x] Create finance tRPC router (getSummary, getMonthlyData)
+- [x] Build Finance Dashboard UI with KPI cards
+- [x] Add Period Selector component
+- [x] Create Monthly Performance Breakdown cards (3 columns grid)
+- [ ] Add 7 financial charts
+- [ ] Revenue trend line chart
+- [ ] Expense breakdown pie chart
+- [ ] Profit margin trend chart
+- [ ] Occupancy rate bar chart
+- [ ] Average price trend chart
+- [ ] Company vs Owners split donut chart
+- [ ] Monthly comparison multi-line chart
+
+
+## Phase 28: Lovable Dashboard Migration (REBUILD AFTER RESET)
+- [x] Install Chart.js
+- [x] Create FinanceCharts component (7 charts)
+- [x] Update FinanceDashboardContent to include charts
+- [x] Test all charts render correctly
+- [ ] **CRITICAL: Save checkpoint after completion**
+- [ ] **CRITICAL: Git commit and push to GitHub**

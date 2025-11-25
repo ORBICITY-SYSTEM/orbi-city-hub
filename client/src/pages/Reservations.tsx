@@ -1,5 +1,4 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CalendarDays, List, Users, Mail, Bot } from "lucide-react";
 import { AIChatBox } from "@/components/AIChatBox";
 import { Button } from "@/components/ui/button";
@@ -7,8 +6,10 @@ import { FileUpload } from "@/components/FileUpload";
 import { BookingsTable } from "@/components/BookingsTable";
 import { useState } from "react";
 import { trpc } from "@/lib/trpc";
+import { cn } from "@/lib/utils";
 
 const Reservations = () => {
+  const [activeTab, setActiveTab] = useState("calendar");
   const [chatHistory, setChatHistory] = useState<Array<{ role: "user" | "assistant"; content: string }>>([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -37,6 +38,14 @@ const Reservations = () => {
     }
   };
 
+  const tabs = [
+    { id: "calendar", label: "კალენდარი", icon: CalendarDays },
+    { id: "bookings", label: "ბრონირებები", icon: List },
+    { id: "crm", label: "CRM", icon: Users },
+    { id: "mail", label: "📧 ელფოსტა", icon: Mail },
+    { id: "ai", label: "🤖 AI", icon: Bot },
+  ];
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -56,128 +65,125 @@ const Reservations = () => {
         </div>
       </div>
 
-      {/* Sub-Modules Tabs */}
-      <Tabs defaultValue="calendar" className="w-full">
-        <TabsList className="grid w-full grid-cols-5 mb-6">
-          <TabsTrigger value="calendar" className="flex items-center gap-2">
-            <CalendarDays className="h-4 w-4" />
-            კალენდარი
-          </TabsTrigger>
-          <TabsTrigger value="bookings" className="flex items-center gap-2">
-            <List className="h-4 w-4" />
-            ბრონირებები
-          </TabsTrigger>
-          <TabsTrigger value="crm" className="flex items-center gap-2">
-            <Users className="h-4 w-4" />
-            CRM
-          </TabsTrigger>
-          <TabsTrigger value="mail" className="flex items-center gap-2">
-            <Mail className="h-4 w-4" />
-            📧 ელფოსტა
-          </TabsTrigger>
-          <TabsTrigger value="ai" className="flex items-center gap-2">
-            <Bot className="h-4 w-4" />
-            🤖 AI
-          </TabsTrigger>
-        </TabsList>
+      {/* Custom Tabs */}
+      <div className="w-full">
+        {/* Tab List */}
+        <div className="inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground w-full mb-6">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={cn(
+                "inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 flex-1 gap-2",
+                activeTab === tab.id
+                  ? "bg-background text-foreground shadow-sm"
+                  : "hover:bg-background/50"
+              )}
+            >
+              <tab.icon className="h-4 w-4" />
+              {tab.label}
+            </button>
+          ))}
+        </div>
 
-        <TabsContent value="calendar">
-          <Card>
-            <CardHeader>
-              <CardTitle>კალენდარის ხედი</CardTitle>
-              <CardDescription>Gantt-chart სტილის ვიზუალური ბრონირების კალენდარი</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">
-                აქ იქნება ვიზუალური კალენდარი - ყველა 60 სტუდიოს ბრონირებები Gantt-chart ფორმატში, drag-and-drop ფუნქციით.
-              </p>
-            </CardContent>
-          </Card>
-        </TabsContent>
+        {/* Tab Content */}
+        <div>
+          {activeTab === "calendar" && (
+            <Card>
+              <CardHeader>
+                <CardTitle>კალენდარის ხედი</CardTitle>
+                <CardDescription>Gantt-chart სტილის ვიზუალური ბრონირების კალენდარი</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  აქ იქნება ვიზუალური კალენდარი - ყველა 60 სტუდიოს ბრონირებები Gantt-chart ფორმატში, drag-and-drop ფუნქციით.
+                </p>
+              </CardContent>
+            </Card>
+          )}
 
-        <TabsContent value="bookings">
-          <BookingsTable />
-        </TabsContent>
+          {activeTab === "bookings" && <BookingsTable />}
 
-        <TabsContent value="crm">
-          <Card>
-            <CardHeader>
-              <CardTitle>სტუმრების CRM</CardTitle>
-              <CardDescription>სტუმრების პროფილები, ისტორია და პრეფერენციები</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">
-                აქ იქნება სტუმრების მონაცემთა ბაზა - სრული პროფილები, ბრონირებების ისტორია, პრეფერენციები, და ლოიალობის პროგრამა.
-              </p>
-            </CardContent>
-          </Card>
-        </TabsContent>
+          {activeTab === "crm" && (
+            <Card>
+              <CardHeader>
+                <CardTitle>სტუმრების CRM</CardTitle>
+                <CardDescription>სტუმრების პროფილები, ისტორია და პრეფერენციები</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  აქ იქნება სტუმრების მონაცემთა ბაზა - სრული პროფილები, ბრონირებების ისტორია, პრეფერენციები, და ლოიალობის პროგრამა.
+                </p>
+              </CardContent>
+            </Card>
+          )}
 
-        <TabsContent value="mail">
-          <Card>
-            <CardHeader>
-              <CardTitle>📧 ელფოსტის ოთახი</CardTitle>
-              <CardDescription>Gmail სინქრონიზაცია და OTA ბრონირებების პარსერი</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">
-                აქ იქნება Gmail ინტეგრაცია - ავტომატური ბრონირებების პარსინგი Booking.com, Airbnb, Expedia-დან, და სტუმრებთან კომუნიკაცია.
-              </p>
-            </CardContent>
-          </Card>
-        </TabsContent>
+          {activeTab === "mail" && (
+            <Card>
+              <CardHeader>
+                <CardTitle>📧 ელფოსტის ოთახი</CardTitle>
+                <CardDescription>Gmail სინქრონიზაცია და OTA ბრონირებების პარსერი</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  აქ იქნება Gmail ინტეგრაცია - ავტომატური ბრონირებების პარსინგი Booking.com, Airbnb, Expedia-დან, და სტუმრებთან კომუნიკაცია.
+                </p>
+              </CardContent>
+            </Card>
+          )}
 
-        <TabsContent value="ai">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Bot className="h-5 w-5 text-purple-500" />
-                🤖 Reservations AI Agent
-              </CardTitle>
-              <CardDescription>
-                AI აგენტი ელფოსტების შედგენა, ტენდენციების ანალიზი, ვაუჩერების პარსინგი
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {/* File Upload Section */}
-              <FileUpload
-                module="reservations"
-                onUploadSuccess={(url, fileName) => {
-                  // Send uploaded file info to AI for analysis
-                  handleSendMessage(`გააანალიზე ეს ფაილი: ${fileName} (${url})`);
-                }}
-              />
+          {activeTab === "ai" && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Bot className="h-5 w-5 text-purple-500" />
+                  🤖 Reservations AI Agent
+                </CardTitle>
+                <CardDescription>
+                  AI აგენტი ელფოსტების შედგენა, ტენდენციების ანალიზი, ვაუჩერების პარსინგი
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* File Upload Section */}
+                <FileUpload
+                  module="reservations"
+                  onUploadSuccess={(url, fileName) => {
+                    // Send uploaded file info to AI for analysis
+                    handleSendMessage(`გააანალიზე ეს ფაილი: ${fileName} (${url})`);
+                  }}
+                />
 
-              {/* AI Chat Interface */}
-              <AIChatBox
-                messages={chatHistory}
-                onSendMessage={handleSendMessage}
-                isLoading={isLoading}
-                placeholder="მაგ: 'დაწერე პასუხი ამ სტუმარს' ან 'რა ტენდენციებია ბრონირებებში?'"
-                height={400}
-              />
+                {/* AI Chat Interface */}
+                <AIChatBox
+                  messages={chatHistory}
+                  onSendMessage={handleSendMessage}
+                  isLoading={isLoading}
+                  placeholder="მაგ: 'დაწერე პასუხი ამ სტუმარს' ან 'რა ტენდენციებია ბრონირებებში?'"
+                  height={400}
+                />
 
-              {/* Quick Actions */}
-              <div className="grid grid-cols-2 gap-2">
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => handleSendMessage("რა არის ბრონირებების ტენდენცია ამ თვეში?")}
-                >
-                  ტენდენციების ანალიზი
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => handleSendMessage("დაწერე პროფესიონალური პასუხი სტუმარს")}
-                >
-                  ელფოსტის შაბლონი
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+                {/* Quick Actions */}
+                <div className="grid grid-cols-2 gap-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => handleSendMessage("რა არის ბრონირებების ტენდენცია ამ თვეში?")}
+                  >
+                    ტენდენციების ანალიზი
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => handleSendMessage("დაწერე პროფესიონალური პასუხი სტუმარს")}
+                  >
+                    ელფოსტის შაბლონი
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      </div>
     </div>
   );
 };

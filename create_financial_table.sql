@@ -1,0 +1,23 @@
+CREATE TABLE IF NOT EXISTS financial_data (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  month VARCHAR(50) NOT NULL,
+  year INT NOT NULL,
+  month_number INT NOT NULL,
+  studios INT NOT NULL,
+  days_available INT NOT NULL,
+  days_occupied INT NOT NULL,
+  occupancy_rate DECIMAL(5,2) NOT NULL,
+  avg_price DECIMAL(10,2) NOT NULL,
+  total_revenue DECIMAL(15,2) NOT NULL,
+  cleaning_tech DECIMAL(15,2) NOT NULL,
+  marketing DECIMAL(15,2) NOT NULL,
+  salaries DECIMAL(15,2) NOT NULL,
+  utilities DECIMAL(15,2) NOT NULL,
+  total_expenses DECIMAL(15,2) NOT NULL,
+  total_profit DECIMAL(15,2) NOT NULL,
+  company_profit DECIMAL(15,2) NOT NULL,
+  owners_profit DECIMAL(15,2) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_month_year (year, month_number)
+);

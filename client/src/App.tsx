@@ -14,6 +14,7 @@ import Marketing from "./pages/Marketing";
 import Logistics from "./pages/Logistics";
 import Reports from "./pages/Reports";
 import AdminLogin from "./pages/AdminLogin";
+import FinanceDashboard from "./pages/FinanceDashboard";
 
 function Router() {
   const [location] = useLocation();
@@ -37,6 +38,7 @@ function Router() {
         <Route path="/" component={CEODashboard} />
         <Route path="/reservations" component={Reservations} />
         <Route path="/finance" component={Finance} />
+        <Route path="/finance-dashboard" component={FinanceDashboard} />
         <Route path="/marketing" component={Marketing} />
         <Route path="/logistics" component={Logistics} />
         <Route path="/reports" component={Reports} />
