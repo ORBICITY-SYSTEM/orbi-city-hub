@@ -15,6 +15,7 @@ import Logistics from "./pages/Logistics";
 import Reports from "./pages/Reports";
 import AdminLogin from "./pages/AdminLogin";
 import FinanceDashboard from "./pages/FinanceDashboard";
+import Admin from "./pages/Admin";
 
 function Router() {
   const [location] = useLocation();
@@ -25,6 +26,7 @@ function Router() {
     return (
       <Switch>
         <Route path="/admin/login" component={AdminLogin} />
+        <Route path="/admin" component={Admin} />
         <Route path="/404" component={NotFound} />
         <Route component={NotFound} />
       </Switch>

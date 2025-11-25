@@ -1,16 +1,28 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { CalendarDays, List, Users, Mail, Bot } from "lucide-react";
+import { useState } from "react";
+import { CalendarDays, List, Users, Mail, Bot, TrendingUp, TrendingDown, Calendar, DollarSign, Star, CheckCircle2, XCircle, Clock } from "lucide-react";
 import { AIChatBox } from "@/components/AIChatBox";
 import { Button } from "@/components/ui/button";
-import { FileUpload } from "@/components/FileUpload";
-import { BookingsTable } from "@/components/BookingsTable";
-import { useState } from "react";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { trpc } from "@/lib/trpc";
 import { cn } from "@/lib/utils";
 
+// Mock data for demonstration
+const mockBookings = [
+  { id: "BK-001", guest: "John Smith", room: "A 3041", checkIn: "2025-11-26", checkOut: "2025-11-30", status: "confirmed", channel: "Booking.com", price: 450, nights: 4 },
+  { id: "BK-002", guest: "მარიამ გელაშვილი", room: "C 2641", checkIn: "2025-11-27", checkOut: "2025-12-02", status: "confirmed", channel: "Airbnb", price: 520, nights: 5 },
+  { id: "BK-003", guest: "David Brown", room: "D 3418", checkIn: "2025-11-26", checkOut: "2025-11-28", status: "checked-in", channel: "Expedia", price: 280, nights: 2 },
+  { id: "BK-004", guest: "Anna Müller", room: "A 2441", checkIn: "2025-11-28", checkOut: "2025-12-05", status: "pending", channel: "Booking.com", price: 780, nights: 7 },
+  { id: "BK-005", guest: "ნინო ბერიძე", room: "C 2547", checkIn: "2025-11-26", checkOut: "2025-11-29", status: "checked-in", channel: "Direct", price: 360, nights: 3 },
+  { id: "BK-006", guest: "Michael Johnson", room: "A 1833", checkIn: "2025-11-29", checkOut: "2025-12-03", status: "confirmed", channel: "Airbnb", price: 520, nights: 4 },
+  { id: "BK-007", guest: "თამარ მახარაძე", room: "C 4706", checkIn: "2025-11-27", checkOut: "2025-12-01", status: "confirmed", channel: "Agoda", price: 450, nights: 4 },
+  { id: "BK-008", guest: "Sophie Martin", room: "A 4027", checkIn: "2025-11-30", checkOut: "2025-12-07", status: "pending", channel: "Booking.com", price: 890, nights: 7 },
+];
+
 const Reservations = () => {
   const [activeTab, setActiveTab] = useState("calendar");
-  const [chatHistory, setChatHistory] = useState<Array<{ role: "user" | "assistant"; content: string }>>([]);
+  const [chatHistory, setChatHistory] = useState<Array<{ role: "system" | "user" | "assistant"; content: string }>>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const chatMutation = trpc.ai.chat.useMutation();
@@ -46,143 +58,250 @@ const Reservations = () => {
     { id: "ai", label: "🤖 AI", icon: Bot },
   ];
 
+  const getStatusBadge = (status: string) => {
+    const variants: Record<string, { variant: "default" | "secondary" | "destructive" | "outline"; label: string; icon: any }> = {
+      "confirmed": { variant: "default", label: "დადასტურებული", icon: CheckCircle2 },
+      "checked-in": { variant: "secondary", label: "ჩასახლებული", icon: Calendar },
+      "pending": { variant: "outline", label: "მოლოდინში", icon: Clock },
+      "cancelled": { variant: "destructive", label: "გაუქმებული", icon: XCircle },
+    };
+    const config = variants[status] || variants.pending;
+    const Icon = config.icon;
+    return (
+      <Badge variant={config.variant} className="gap-1">
+        <Icon className="h-3 w-3" />
+        {config.label}
+      </Badge>
+    );
+  };
+
+  // Calculate KPIs
+  const totalBookings = mockBookings.length;
+  const checkInsToday = mockBookings.filter(b => b.checkIn === "2025-11-26").length;
+  const checkOutsToday = mockBookings.filter(b => b.checkOut === "2025-11-26").length;
+  const occupancyRate = 85;
+  const totalRevenue = mockBookings.reduce((sum, b) => sum + b.price, 0);
+
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600">
-            <CalendarDays className="h-6 w-6 text-white" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">
-              ბრონირებები
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              ბრონირების მართვა და სტუმრების სერვისი
-            </p>
-          </div>
-        </div>
+      <div>
+        <h1 className="text-3xl font-bold">ბრონირებები</h1>
+        <p className="text-gray-600">მართეთ ბრონირებები და სტუმრები</p>
       </div>
 
-      {/* Custom Tabs */}
-      <div className="w-full">
-        {/* Tab List */}
-        <div className="inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground w-full mb-6">
-          {tabs.map((tab) => (
+      {/* KPI Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+        <Card className="p-4 bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="text-sm text-blue-700 font-medium">სულ ბრონირებები</div>
+              <div className="text-3xl font-bold text-blue-900">{totalBookings}</div>
+              <div className="text-xs text-blue-600 mt-1 flex items-center">
+                <TrendingUp className="h-3 w-3 mr-1" />
+                +12% vs ბოლო თვე
+              </div>
+            </div>
+            <Calendar className="h-10 w-10 text-blue-600 opacity-50" />
+          </div>
+        </Card>
+
+        <Card className="p-4 bg-gradient-to-br from-green-50 to-green-100 border-green-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="text-sm text-green-700 font-medium">ჩასახლება დღეს</div>
+              <div className="text-3xl font-bold text-green-900">{checkInsToday}</div>
+              <div className="text-xs text-green-600 mt-1">{mockBookings.filter(b => b.checkIn === "2025-11-26").map(b => b.room).join(", ")}</div>
+            </div>
+            <CheckCircle2 className="h-10 w-10 text-green-600 opacity-50" />
+          </div>
+        </Card>
+
+        <Card className="p-4 bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="text-sm text-orange-700 font-medium">გასახლება დღეს</div>
+              <div className="text-3xl font-bold text-orange-900">{checkOutsToday}</div>
+              <div className="text-xs text-orange-600 mt-1">დასუფთავება საჭიროა</div>
+            </div>
+            <XCircle className="h-10 w-10 text-orange-600 opacity-50" />
+          </div>
+        </Card>
+
+        <Card className="p-4 bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="text-sm text-purple-700 font-medium">დაკავებულობა</div>
+              <div className="text-3xl font-bold text-purple-900">{occupancyRate}%</div>
+              <div className="text-xs text-purple-600 mt-1 flex items-center">
+                <TrendingUp className="h-3 w-3 mr-1" />
+                +5% vs ბოლო თვე
+              </div>
+            </div>
+            <Star className="h-10 w-10 text-purple-600 opacity-50" />
+          </div>
+        </Card>
+
+        <Card className="p-4 bg-gradient-to-br from-yellow-50 to-yellow-100 border-yellow-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="text-sm text-yellow-700 font-medium">შემოსავალი</div>
+              <div className="text-3xl font-bold text-yellow-900">₾{totalRevenue.toLocaleString()}</div>
+              <div className="text-xs text-yellow-600 mt-1">მიმდინარე ბრონირებები</div>
+            </div>
+            <DollarSign className="h-10 w-10 text-yellow-600 opacity-50" />
+          </div>
+        </Card>
+      </div>
+
+      {/* Tabs */}
+      <div className="flex gap-2 border-b">
+        {tabs.map((tab) => {
+          const Icon = tab.icon;
+          return (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={cn(
-                "inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 flex-1 gap-2",
+                "flex items-center gap-2 px-4 py-2 border-b-2 transition-colors",
                 activeTab === tab.id
-                  ? "bg-background text-foreground shadow-sm"
-                  : "hover:bg-background/50"
+                  ? "border-green-600 text-green-600 font-medium"
+                  : "border-transparent text-gray-600 hover:text-gray-900"
               )}
             >
-              <tab.icon className="h-4 w-4" />
+              <Icon className="h-4 w-4" />
               {tab.label}
             </button>
-          ))}
-        </div>
+          );
+        })}
+      </div>
 
-        {/* Tab Content */}
-        <div>
-          {activeTab === "calendar" && (
-            <Card>
-              <CardHeader>
-                <CardTitle>კალენდარის ხედი</CardTitle>
-                <CardDescription>Gantt-chart სტილის ვიზუალური ბრონირების კალენდარი</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  აქ იქნება ვიზუალური კალენდარი - ყველა 60 სტუდიოს ბრონირებები Gantt-chart ფორმატში, drag-and-drop ფუნქციით.
-                </p>
-              </CardContent>
-            </Card>
-          )}
-
-          {activeTab === "bookings" && <BookingsTable />}
-
-          {activeTab === "crm" && (
-            <Card>
-              <CardHeader>
-                <CardTitle>სტუმრების CRM</CardTitle>
-                <CardDescription>სტუმრების პროფილები, ისტორია და პრეფერენციები</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  აქ იქნება სტუმრების მონაცემთა ბაზა - სრული პროფილები, ბრონირებების ისტორია, პრეფერენციები, და ლოიალობის პროგრამა.
-                </p>
-              </CardContent>
-            </Card>
-          )}
-
-          {activeTab === "mail" && (
-            <Card>
-              <CardHeader>
-                <CardTitle>📧 ელფოსტის ოთახი</CardTitle>
-                <CardDescription>Gmail სინქრონიზაცია და OTA ბრონირებების პარსერი</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  აქ იქნება Gmail ინტეგრაცია - ავტომატური ბრონირებების პარსინგი Booking.com, Airbnb, Expedia-დან, და სტუმრებთან კომუნიკაცია.
-                </p>
-              </CardContent>
-            </Card>
-          )}
-
-          {activeTab === "ai" && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Bot className="h-5 w-5 text-purple-500" />
-                  🤖 Reservations AI Agent
-                </CardTitle>
-                <CardDescription>
-                  AI აგენტი ელფოსტების შედგენა, ტენდენციების ანალიზი, ვაუჩერების პარსინგი
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {/* File Upload Section */}
-                <FileUpload
-                  module="reservations"
-                  onUploadSuccess={(url, fileName) => {
-                    // Send uploaded file info to AI for analysis
-                    handleSendMessage(`გააანალიზე ეს ფაილი: ${fileName} (${url})`);
-                  }}
-                />
-
-                {/* AI Chat Interface */}
-                <AIChatBox
-                  messages={chatHistory}
-                  onSendMessage={handleSendMessage}
-                  isLoading={isLoading}
-                  placeholder="მაგ: 'დაწერე პასუხი ამ სტუმარს' ან 'რა ტენდენციებია ბრონირებებში?'"
-                  height={400}
-                />
-
-                {/* Quick Actions */}
-                <div className="grid grid-cols-2 gap-2">
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => handleSendMessage("რა არის ბრონირებების ტენდენცია ამ თვეში?")}
-                  >
-                    ტენდენციების ანალიზი
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => handleSendMessage("დაწერე პროფესიონალური პასუხი სტუმარს")}
-                  >
-                    ელფოსტის შაბლონი
-                  </Button>
+      {/* Tab Content */}
+      <div className="mt-6">
+        {activeTab === "calendar" && (
+          <Card className="p-6">
+            <h2 className="text-xl font-bold mb-4">კალენდარი</h2>
+            <div className="bg-gradient-to-br from-gray-50 to-gray-100 p-8 rounded-lg border-2 border-dashed border-gray-300">
+              <div className="text-center">
+                <CalendarDays className="h-16 w-16 mx-auto text-gray-400 mb-4" />
+                <h3 className="text-lg font-semibold text-gray-700 mb-2">კალენდარის ვიზუალიზაცია</h3>
+                <p className="text-gray-600 mb-4">აქ გამოჩნდება ინტერაქტიული კალენდარი ყველა ბრონირებით</p>
+                <div className="grid grid-cols-7 gap-2 max-w-2xl mx-auto">
+                  {["ორშ", "სამ", "ოთხ", "ხუთ", "პარ", "შაბ", "კვი"].map((day, i) => (
+                    <div key={i} className="text-xs font-semibold text-gray-500">{day}</div>
+                  ))}
+                  {Array.from({ length: 35 }).map((_, i) => (
+                    <div 
+                      key={i} 
+                      className={cn(
+                        "aspect-square rounded border text-sm flex items-center justify-center",
+                        i % 7 === 5 || i % 7 === 6 ? "bg-gray-100 border-gray-200" : "bg-white border-gray-300",
+                        i >= 25 && i <= 28 ? "bg-green-100 border-green-300 font-semibold" : ""
+                      )}
+                    >
+                      {i + 1}
+                    </div>
+                  ))}
                 </div>
-              </CardContent>
-            </Card>
-          )}
-        </div>
+              </div>
+            </div>
+          </Card>
+        )}
+
+        {activeTab === "bookings" && (
+          <Card>
+            <div className="p-4 border-b">
+              <h2 className="text-xl font-bold">ყველა ბრონირება</h2>
+              <p className="text-sm text-gray-600">სულ {totalBookings} აქტიური ბრონირება</p>
+            </div>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>ID</TableHead>
+                  <TableHead>სტუმარი</TableHead>
+                  <TableHead>ოთახი</TableHead>
+                  <TableHead>ჩასახლება</TableHead>
+                  <TableHead>გასახლება</TableHead>
+                  <TableHead>ღამეები</TableHead>
+                  <TableHead>სტატუსი</TableHead>
+                  <TableHead>არხი</TableHead>
+                  <TableHead className="text-right">ფასი</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {mockBookings.map((booking) => (
+                  <TableRow key={booking.id}>
+                    <TableCell className="font-mono text-xs">{booking.id}</TableCell>
+                    <TableCell className="font-medium">{booking.guest}</TableCell>
+                    <TableCell>
+                      <Badge variant="outline">{booking.room}</Badge>
+                    </TableCell>
+                    <TableCell className="text-sm">{booking.checkIn}</TableCell>
+                    <TableCell className="text-sm">{booking.checkOut}</TableCell>
+                    <TableCell className="text-center">{booking.nights}</TableCell>
+                    <TableCell>{getStatusBadge(booking.status)}</TableCell>
+                    <TableCell className="text-sm text-gray-600">{booking.channel}</TableCell>
+                    <TableCell className="text-right font-semibold">₾{booking.price}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </Card>
+        )}
+
+        {activeTab === "crm" && (
+          <Card className="p-6">
+            <h2 className="text-xl font-bold mb-4">სტუმრების CRM</h2>
+            <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-8 rounded-lg border-2 border-dashed border-purple-300">
+              <div className="text-center">
+                <Users className="h-16 w-16 mx-auto text-purple-400 mb-4" />
+                <h3 className="text-lg font-semibold text-purple-700 mb-2">სტუმრების მართვა</h3>
+                <p className="text-purple-600 mb-4">აქ გამოჩნდება სტუმრების პროფილები, ისტორია და პრეფერენციები</p>
+                <div className="grid grid-cols-3 gap-4 max-w-xl mx-auto mt-6">
+                  <Card className="p-4 bg-white">
+                    <div className="text-2xl font-bold text-purple-900">156</div>
+                    <div className="text-xs text-purple-600">სულ სტუმარი</div>
+                  </Card>
+                  <Card className="p-4 bg-white">
+                    <div className="text-2xl font-bold text-purple-900">42</div>
+                    <div className="text-xs text-purple-600">VIP სტუმარი</div>
+                  </Card>
+                  <Card className="p-4 bg-white">
+                    <div className="text-2xl font-bold text-purple-900">89%</div>
+                    <div className="text-xs text-purple-600">დაბრუნების %</div>
+                  </Card>
+                </div>
+              </div>
+            </div>
+          </Card>
+        )}
+
+        {activeTab === "mail" && (
+          <Card className="p-6">
+            <h2 className="text-xl font-bold mb-4">📧 ელფოსტის ინტეგრაცია</h2>
+            <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-8 rounded-lg border-2 border-dashed border-blue-300">
+              <div className="text-center">
+                <Mail className="h-16 w-16 mx-auto text-blue-400 mb-4" />
+                <h3 className="text-lg font-semibold text-blue-700 mb-2">Gmail სინქრონიზაცია</h3>
+                <p className="text-blue-600 mb-4">ავტომატური ბრონირების ამოღება Booking.com, Airbnb და სხვა არხებიდან</p>
+                <Button className="mt-4">
+                  <Mail className="h-4 w-4 mr-2" />
+                  დააკავშირე Gmail
+                </Button>
+              </div>
+            </div>
+          </Card>
+        )}
+
+        {activeTab === "ai" && (
+          <div>
+            <AIChatBox
+              messages={chatHistory}
+              isLoading={isLoading}
+              onSendMessage={handleSendMessage}
+            />
+          </div>
+        )}
       </div>
     </div>
   );
