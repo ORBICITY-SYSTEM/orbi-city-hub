@@ -1,0 +1,8 @@
+{
+  "query": "ALTER TABLE files \nCHANGE COLUMN uploadedat uploadedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\nCHANGE COLUMN createdat createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\nCHANGE COLUMN updatedat updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user c2qSkVB4gKtEmor.bc3c8c9ce52a --database VzNbWtRJAsr2zJAegEjRtX --execute ALTER TABLE files \nCHANGE COLUMN uploadedat uploadedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\nCHANGE COLUMN createdat createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\nCHANGE COLUMN updatedat updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'createdat' in 'files'"
+  ]
+}
