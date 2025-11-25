@@ -238,3 +238,111 @@
 - [ ] Verify all features work 100%
 - [ ] Create stable checkpoint
 - [ ] Prepare for production deployment
+
+
+---
+
+## 🚀 Phase 1: Database Migration to Prisma ORM - IN PROGRESS
+
+### Day 1: Prisma Setup & Schema Definition
+
+#### Install Prisma
+- [ ] Install Prisma CLI and Client packages
+- [ ] Initialize Prisma with `prisma init`
+- [ ] Configure DATABASE_URL in .env
+- [ ] Create prisma directory structure
+
+#### Define Database Schema
+- [ ] Create schema.prisma file
+- [ ] Define User model (with Role enum)
+- [ ] Define File model
+- [ ] Define AiConversation model
+- [ ] Define AdminUser model (NEW)
+- [ ] Define Module model (NEW)
+- [ ] Define SystemSettings model (NEW)
+- [ ] Define Reservation model
+- [ ] Add all relations between models
+- [ ] Add indexes for performance
+
+#### Run Initial Migration
+- [ ] Run `prisma migrate dev --name init`
+- [ ] Generate Prisma Client
+- [ ] Verify migration in database
+- [ ] Test Prisma Studio (`prisma studio`)
+
+### Day 2: Code Migration & Testing
+
+#### Update Database Helpers
+- [ ] Replace Drizzle imports with Prisma
+- [ ] Update getDb() function
+- [ ] Update upsertUser() function
+- [ ] Update getUserByOpenId() function
+- [ ] Test all database helpers
+
+#### Migrate tRPC Routers
+- [ ] Update auth router (auth.ts)
+- [ ] Update fileManager router (fileManager.ts)
+- [ ] Update ai router (ai.ts)
+- [ ] Update system router (systemRouter.ts)
+- [ ] Test each router after migration
+
+#### Testing & Cleanup
+- [ ] Run all vitest tests
+- [ ] Fix any failing tests
+- [ ] Remove Drizzle dependencies (`pnpm remove drizzle-orm drizzle-kit`)
+- [ ] Delete drizzle/ directory
+- [ ] Update imports across codebase
+- [ ] Run TypeScript check (`tsc --noEmit`)
+
+#### Final Verification
+- [ ] Test file upload functionality
+- [ ] Test AI chat functionality
+- [ ] Test user authentication
+- [ ] Check dev server for errors
+- [ ] Run full test suite
+- [ ] Save checkpoint
+
+
+
+---
+
+## ✅ Phase 1: Drizzle Enhancement (COMPLETED - 2025-11-25)
+
+### Database Foundation
+- [x] Remove Prisma dependencies (incompatible with TiDB Cloud SSL)
+- [x] Add new models to Drizzle schema (AdminUser, Module, SystemSettings)
+- [x] Create database tables (adminUsers, modules, systemSettings)
+- [x] Create adminDb.ts with full CRUD operations (15 functions)
+- [x] Write comprehensive tests (14/14 passed ✅)
+- [x] Install bcryptjs for password hashing
+
+**Key Files Created:**
+- `/drizzle/schema.ts` - Updated with 3 new admin models
+- `/server/adminDb.ts` - Complete CRUD helpers (AdminUsers, Modules, SystemSettings)
+- `/server/adminDb.test.ts` - 14 passing tests
+
+**Test Results:**
+```
+✓ AdminUsers (3 tests) - 356ms
+  ✓ should create an admin user
+  ✓ should get admin user by username
+  ✓ should get all admin users
+
+✓ Modules (5 tests)
+  ✓ should create a module
+  ✓ should get all modules
+  ✓ should get module by slug
+  ✓ should update a module
+  ✓ should delete a module
+
+✓ SystemSettings (6 tests)
+  ✓ should create a setting
+  ✓ should update an existing setting
+  ✓ should get setting by key
+  ✓ should get settings by category
+  ✓ should get all settings
+  ✓ should delete a setting
+```
+
+**Status:** ✅ READY FOR PHASE 2 (Admin Panel Development)
+

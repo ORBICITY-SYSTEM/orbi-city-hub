@@ -1,0 +1,19 @@
+{
+  "query": "SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME IN ('adminUsers', 'modules', 'systemSettings')",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user c2qSkVB4gKtEmor.bc3c8c9ce52a --database VzNbWtRJAsr2zJAegEjRtX --execute SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME IN ('adminUsers', 'modules', 'systemSettings')",
+  "rows": [
+    {
+      "TABLE_NAME": "adminUsers"
+    },
+    {
+      "TABLE_NAME": "modules"
+    },
+    {
+      "TABLE_NAME": "systemSettings"
+    }
+  ],
+  "messages": [],
+  "stdout": "TABLE_NAME\nadminUsers\nmodules\nsystemSettings\n",
+  "stderr": "",
+  "execution_time_ms": 65
+}
