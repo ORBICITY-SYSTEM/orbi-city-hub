@@ -2,7 +2,7 @@ import { z } from "zod";
 import { protectedProcedure, router } from "../_core/trpc";
 import { invokeLLM, type Message } from "../_core/llm";
 import { getDb } from "../db";
-import { aiConversations, files } from "../../drizzle/schema";
+import { aiConversations } from "../../drizzle/schema";
 import { eq, desc } from "drizzle-orm";
 import { KNOWLEDGE_BASE } from "../../shared/aiKnowledgeBase";
 
@@ -63,31 +63,6 @@ export const aiRouter = router({
       // Build system prompt based on module
       const systemPrompt = getSystemPrompt(module);
 
-      // Check if user is referencing a file by name
-      const db = await getDb();
-      let resolvedFileUrl = fileUrl;
-      let resolvedFileName = fileName;
-
-      // Look for file references in user message (e.g., "analyze file named october 2025")
-      const fileNameMatch = userMessage.match(/\u10e4\u10d0\u10d8\u10da(?:\u10d8)?\s+(?:\u10e1\u10d0\u10ee\u10d4\u10da\u10d8\u10d7|\u10e1\u10d0\u10ee\u10d4\u10da\u10d0\u10d3)\s+["']?([^"'\n]+)["']?|file\s+(?:named|called)\s+["']?([^"'\n]+)["']?/i);
-      
-      if (fileNameMatch && db) {
-        const searchName = fileNameMatch[1] || fileNameMatch[2];
-        const userFiles = await db
-          .select()
-          .from(files)
-          .where(eq(files.userId, ctx.user.id));
-        
-        const matchedFile = userFiles.find(f => 
-          f.originalName.toLowerCase().includes(searchName.toLowerCase())
-        );
-
-        if (matchedFile) {
-          resolvedFileUrl = matchedFile.fileUrl;
-          resolvedFileName = matchedFile.originalName;
-        }
-      }
-
       // Build messages
       const messages: Message[] = [
         { role: "system", content: systemPrompt },
@@ -95,8 +70,8 @@ export const aiRouter = router({
 
       // Add user message
       let userContent = userMessage;
-      if (resolvedFileUrl) {
-        userContent = `${userMessage}\n\n[File referenced: ${resolvedFileName || "file"} - URL: ${resolvedFileUrl}]`;
+      if (fileUrl) {
+        userContent = `${userMessage}\n\n[File uploaded: ${fileName || "file"}]`;
       }
 
       messages.push({
@@ -111,7 +86,7 @@ export const aiRouter = router({
       const responseTime = Date.now() - startTime;
 
       // Save conversation to database
-      // db already declared above
+      const db = await getDb();
       if (db) {
         try {
           await db.insert(aiConversations).values({

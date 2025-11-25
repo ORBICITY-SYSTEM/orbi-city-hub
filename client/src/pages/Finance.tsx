@@ -1,9 +1,9 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Receipt, TrendingUp, Users, FileText, Bot, Activity, Download } from "lucide-react";
+import { Receipt, TrendingUp, Users, FileText, Bot } from "lucide-react";
 import { AIChatBox } from "@/components/AIChatBox";
 import { Button } from "@/components/ui/button";
-
+import { FileUpload } from "@/components/FileUpload";
 import { useState } from "react";
 import { trpc } from "@/lib/trpc";
 
@@ -46,12 +46,11 @@ const Finance = () => {
       </div>
 
       <Tabs defaultValue="transactions" className="w-full">
-        <TabsList className="grid w-full grid-cols-6 mb-6">
+        <TabsList className="grid w-full grid-cols-5 mb-6">
           <TabsTrigger value="transactions"><Receipt className="h-4 w-4 mr-2" />ტრანზაქციები</TabsTrigger>
           <TabsTrigger value="pl"><TrendingUp className="h-4 w-4 mr-2" />P&L</TabsTrigger>
           <TabsTrigger value="settlements"><Users className="h-4 w-4 mr-2" />ანგარიშსწორება</TabsTrigger>
           <TabsTrigger value="invoices"><FileText className="h-4 w-4 mr-2" />ინვოისები</TabsTrigger>
-          <TabsTrigger value="reports"><Activity className="h-4 w-4 mr-2" />რეპორტები</TabsTrigger>
           <TabsTrigger value="ai"><Bot className="h-4 w-4 mr-2" />🤖 AI</TabsTrigger>
         </TabsList>
 
@@ -75,41 +74,17 @@ const Finance = () => {
           <CardContent><p className="text-muted-foreground">აქ იქნება ინვოისების სისტემა - PDF გენერაცია, გაგზავნა, და გადახდების სტატუსის თვალყურის დევნება.</p></CardContent></Card>
         </TabsContent>
 
-        <TabsContent value="reports">
-          <Tabs defaultValue="monthly" className="w-full">
-            <TabsList className="grid w-full grid-cols-4 mb-4">
-              <TabsTrigger value="monthly"><FileText className="h-4 w-4 mr-2" />თვიური</TabsTrigger>
-              <TabsTrigger value="yearly"><TrendingUp className="h-4 w-4 mr-2" />წლიური</TabsTrigger>
-              <TabsTrigger value="heatmap"><Activity className="h-4 w-4 mr-2" />Heatmap</TabsTrigger>
-              <TabsTrigger value="export"><Download className="h-4 w-4 mr-2" />ექსპორტი</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="monthly">
-              <Card><CardHeader><CardTitle>თვიური მიმოხილვა</CardTitle><CardDescription>მაღალი დონის PDF რეპორტი CEO-სთვის</CardDescription></CardHeader>
-              <CardContent><p className="text-muted-foreground">აქ იქნება თვიური რეპორტები - ავტომატური PDF გენერაცია ყველა KPI-თი, ტენდენციებით, და რეკომენდაციებით.</p></CardContent></Card>
-            </TabsContent>
-
-            <TabsContent value="yearly">
-              <Card><CardHeader><CardTitle>წლიური ზრდა</CardTitle><CardDescription>წლიური შედარების დიაგრამები</CardDescription></CardHeader>
-              <CardContent><p className="text-muted-foreground">აქ იქნება წლიური ანალიზი - Year-over-Year შედარება, ზრდის ტენდენციები, და პროგნოზები.</p></CardContent></Card>
-            </TabsContent>
-
-            <TabsContent value="heatmap">
-              <Card><CardHeader><CardTitle>დაკავების თერმული რუკა</CardTitle><CardDescription>პიკური თარიღების და დაბალი სეზონის ვიზუალიზაცია</CardDescription></CardHeader>
-              <CardContent><p className="text-muted-foreground">აქ იქნება occupancy heatmap - ვიზუალური კალენდარი პიკური და დაბალი სეზონების იდენტიფიკაციისთვის.</p></CardContent></Card>
-            </TabsContent>
-
-            <TabsContent value="export">
-              <Card><CardHeader><CardTitle>ექსპორტის ცენტრი</CardTitle><CardDescription>ყველა მონაცემის ჩამოტვირთვა (CSV/Excel)</CardDescription></CardHeader>
-              <CardContent><p className="text-muted-foreground">აქ იქნება ექსპორტის სისტემა - ყველა მონაცემის ჩამოტვირთვა CSV/Excel ფორმატში ანალიზისთვის.</p></CardContent></Card>
-            </TabsContent>
-          </Tabs>
-        </TabsContent>
-
         <TabsContent value="ai">
           <Card><CardHeader><CardTitle className="flex items-center gap-2"><Bot className="h-5 w-5 text-purple-500" />🤖 Finance AI Agent</CardTitle>
           <CardDescription>AI აგენტი Excel რეპორტების ანალიზისთვის</CardDescription></CardHeader>
           <CardContent className="space-y-4">
+            <FileUpload
+              module="finance"
+              onUploadSuccess={(url, fileName) => {
+                // Send uploaded file info to AI for analysis
+                handleSendMessage(`გააანალიზე ეს ფაილი: ${fileName} (${url})`);
+              }}
+            />
             <AIChatBox messages={chatHistory} onSendMessage={handleSendMessage} isLoading={isLoading} placeholder="მაგ: 'რა არის ჩვენი უდიდესი ხარჯი?' ან 'გააანალიზე ეს P&L რეპორტი'" height={400} />
             <div className="grid grid-cols-2 gap-2">
               <Button variant="outline" size="sm" onClick={() => handleSendMessage("რა არის ჩვენი უდიდესი ხარჯი?")}>უდიდესი ხარჯი</Button>

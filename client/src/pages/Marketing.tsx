@@ -3,7 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BarChart3, Star, Send, Instagram, Bot } from "lucide-react";
 import { AIChatBox } from "@/components/AIChatBox";
 import { Button } from "@/components/ui/button";
-
+import { FileUpload } from "@/components/FileUpload";
 import { useState } from "react";
 import { trpc } from "@/lib/trpc";
 
@@ -78,6 +78,12 @@ const Marketing = () => {
           <Card><CardHeader><CardTitle className="flex items-center gap-2"><Bot className="h-5 w-5 text-purple-500" />🤖 Marketing AI Agent</CardTitle>
           <CardDescription>AI აგენტი კრეატიული ტექსტებისა და პოსტების შესაქმნელად</CardDescription></CardHeader>
           <CardContent className="space-y-4">
+            <FileUpload
+              module="marketing"
+              onUploadSuccess={(url, fileName) => {
+                handleSendMessage(`გააანალიზე ეს ფაილი: ${fileName} (${url})`);
+              }}
+            />
             <AIChatBox messages={chatHistory} onSendMessage={handleSendMessage} isLoading={isLoading} placeholder="მაგ: 'დაწერე Instagram პოსტი' ან 'გააანალიზე რევიუების sentiment'" height={400} />
             <div className="grid grid-cols-2 gap-2">
               <Button variant="outline" size="sm" onClick={() => handleSendMessage("დაწერე Instagram პოსტი ზაფხულის სეზონისთვის")}>Instagram პოსტი</Button>

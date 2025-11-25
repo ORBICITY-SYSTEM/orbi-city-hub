@@ -1,6 +1,0 @@
-#!/usr/bin/env sh
-# Pre-commit hooks temporarily disabled for checkpoint
-# Uncomment below to enable:
-# pnpm exec lint-staged
-# pnpm tsc --noEmit
-# pnpm test
