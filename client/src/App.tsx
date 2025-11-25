@@ -15,6 +15,7 @@ import Logistics from "./pages/LogisticsNew";
 import Reports from "./pages/Reports";
 import Files from "./pages/Files";
 import Google from "./pages/Google";
+import SocialMedia from "./pages/SocialMedia";
 import AdminLogin from "./pages/AdminLogin";
 import FinanceDashboard from "./pages/FinanceDashboard";
 import Admin from "./pages/Admin";
@@ -48,6 +49,7 @@ function Router() {
         <Route path="/reports" component={Reports} />
         <Route path="/files" component={Files} />
       <Route path="/google" component={Google} />
+        <Route path="/social-media" component={SocialMedia} />
         <Route path="/404" component={NotFound} />
         <Route component={NotFound} />
       </Switch>

@@ -16,6 +16,7 @@ import { reservationsRouter } from "./routers/reservations";
 import { excelImportRouter } from "./routers/excelImport";
 import { financeRouter } from "./routers/finance";
 import { fileRouter } from "./fileRouter";
+import { socialMediaRouter } from "./routers/socialMediaRouter";
 
 export const appRouter = router({
   google: googleRouter,
@@ -27,6 +28,7 @@ export const appRouter = router({
   excelImport: excelImportRouter,
   finance: financeRouter,
   file: fileRouter,
+  socialMedia: socialMediaRouter,
   system: systemRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
