@@ -13,6 +13,7 @@ import Finance from "./pages/Finance";
 import Marketing from "./pages/Marketing";
 import Logistics from "./pages/Logistics";
 import Reports from "./pages/Reports";
+import Files from "./pages/Files";
 import AdminLogin from "./pages/AdminLogin";
 import FinanceDashboard from "./pages/FinanceDashboard";
 import Admin from "./pages/Admin";
@@ -44,6 +45,7 @@ function Router() {
         <Route path="/marketing" component={Marketing} />
         <Route path="/logistics" component={Logistics} />
         <Route path="/reports" component={Reports} />
+        <Route path="/files" component={Files} />
         <Route path="/404" component={NotFound} />
         <Route component={NotFound} />
       </Switch>

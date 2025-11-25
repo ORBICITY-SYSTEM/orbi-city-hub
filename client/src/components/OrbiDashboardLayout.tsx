@@ -8,6 +8,7 @@ import {
   Megaphone, 
   Truck,
   FileText,
+  FolderOpen,
   LogOut,
   Loader2,
   Moon,
@@ -30,6 +31,7 @@ const navItems: NavItem[] = [
   { name: "Marketing", path: "/marketing", icon: Megaphone },
   { name: "Logistics", path: "/logistics", icon: Truck },
   { name: "Reports & Analytics", path: "/reports", icon: FileText },
+  { name: "Files", path: "/files", icon: FolderOpen },
 ];
 
 export default function OrbiDashboardLayout({ children }: { children: React.ReactNode }) {
