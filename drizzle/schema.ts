@@ -25,6 +25,34 @@ export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 
 // ============================================================================
+// FILES & UPLOADS
+// ============================================================================
+
+export const files = mysqlTable("files", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  
+  // File details
+  fileName: varchar("fileName", { length: 255 }).notNull(), // Generated unique filename
+  originalName: varchar("originalName", { length: 255 }).notNull(), // User's original filename
+  fileUrl: text("fileUrl").notNull(), // S3 URL
+  fileSize: int("fileSize").notNull(), // in bytes
+  mimeType: varchar("mimeType", { length: 100 }).notNull(),
+  
+  // Metadata
+  module: varchar("module", { length: 100 }), // finance, marketing, logistics, etc.
+  tags: json("tags"), // Array of tags for search
+  description: text("description"),
+  
+  uploadedAt: timestamp("uploadedat").defaultNow().notNull(),
+  createdAt: timestamp("createdat").defaultNow().notNull(),
+  updatedAt: timestamp("updatedat").defaultNow().onUpdateNow().notNull(),
+});
+
+export type File = typeof files.$inferSelect;
+export type InsertFile = typeof files.$inferInsert;
+
+// ============================================================================
 // RESERVATIONS & GUESTS
 // ============================================================================
 

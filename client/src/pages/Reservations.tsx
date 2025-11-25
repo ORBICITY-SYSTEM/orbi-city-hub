@@ -3,7 +3,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CalendarDays, List, Users, Mail, Bot } from "lucide-react";
 import { AIChatBox } from "@/components/AIChatBox";
 import { Button } from "@/components/ui/button";
-import { FileUpload } from "@/components/FileUpload";
 import { useState } from "react";
 import { trpc } from "@/lib/trpc";
 
@@ -149,13 +148,6 @@ const Reservations = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               {/* File Upload Section */}
-              <FileUpload
-                module="reservations"
-                onUploadSuccess={(url, fileName) => {
-                  // Send uploaded file info to AI for analysis
-                  handleSendMessage(`გააანალიზე ეს ფაილი: ${fileName} (${url})`);
-                }}
-              />
 
               {/* AI Chat Interface */}
               <AIChatBox

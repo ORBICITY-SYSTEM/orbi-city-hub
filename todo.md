@@ -270,3 +270,19 @@
 - [x] Run full test suite
 - [x] Create production checkpoint
 - [x] Document all new systems
+
+## Phase 24: Unified File Upload Module
+- [x] Create files database table (id, userId, fileName, originalName, fileUrl, fileSize, mimeType, uploadedAt, module, tags)
+- [x] Create fileManager tRPC router (upload, list, delete, rename, search)
+- [x] Build File Manager UI component with drag-and-drop
+- [x] Add File Manager to CEO Dashboard
+- [x] Remove upload buttons from Finance AI tab
+- [x] Remove upload buttons from Marketing AI tab
+- [x] Remove upload buttons from Logistics AI tab
+- [x] Remove upload buttons from Reservations AI tab
+- [x] Remove upload buttons from Reports AI tab
+- [x] Update AI agents to support file reference by name
+- [x] Test file upload functionality
+- [x] Test file management (delete, rename, download)
+- [x] Test AI file reference
+- [x] Create checkpoint
