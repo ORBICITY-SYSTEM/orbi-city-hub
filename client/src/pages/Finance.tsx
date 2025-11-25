@@ -44,8 +44,8 @@ const Finance = () => {
             <Receipt className="h-6 w-6 text-white" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-foreground">ფინანსები</h1>
-            <p className="text-sm text-muted-foreground">ფინანსური მართვა და რეპორტინგი</p>
+            <h1 className="text-2xl font-bold text-foreground">Finance</h1>
+            <p className="text-sm text-muted-foreground">Financial management and reporting</p>
           </div>
         </div>
       </div>

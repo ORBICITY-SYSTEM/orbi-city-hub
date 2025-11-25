@@ -45,7 +45,7 @@ export function FileUploadManager({ module = "CEO", onUploadSuccess }: FileUploa
       onUploadSuccess?.();
     },
     onError: (error) => {
-      toast.error(error.message || "ფაილის ატვირთვა ვერ მოხერხდა");
+      toast.error(error.message || "ფაილის Upload ვერ მოხერხდა");
     },
   });
 
@@ -163,10 +163,10 @@ export function FileUploadManager({ module = "CEO", onUploadSuccess }: FileUploa
                 ჩააგდეთ ფაილი აქ ან დააჭირეთ ასარჩევად
               </p>
               <p className="text-sm text-muted-foreground mt-2">
-                მხარდაჭერილი ფორმატები: Excel (.xlsx, .xls), CSV, PDF, სურათები (JPG, PNG, WEBP), Word, PowerPoint
+                Supported formats: Excel (.xlsx, .xls), CSV, PDF, სურათები (JPG, PNG, WEBP), Word, PowerPoint
               </p>
               <p className="text-xs text-muted-foreground mt-1">
-                მაქსიმალური ზომა: 10MB
+                Maximum size: 10MB
               </p>
             </div>
             <Button variant="outline" className="mt-2">

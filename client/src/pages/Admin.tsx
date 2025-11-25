@@ -96,9 +96,9 @@ const Admin = () => {
         <TabsList className="grid w-full grid-cols-6 mb-6">
           <TabsTrigger value="overview"><Settings className="h-4 w-4 mr-2" />მიმოხილვა</TabsTrigger>
           <TabsTrigger value="reservations"><Calendar className="h-4 w-4 mr-2" />ბრონირებები</TabsTrigger>
-          <TabsTrigger value="finance"><DollarSign className="h-4 w-4 mr-2" />ფინანსები</TabsTrigger>
-          <TabsTrigger value="marketing"><TrendingUp className="h-4 w-4 mr-2" />მარკეტინგი</TabsTrigger>
-          <TabsTrigger value="logistics"><Package className="h-4 w-4 mr-2" />ლოჯისტიკა</TabsTrigger>
+          <TabsTrigger value="finance"><DollarSign className="h-4 w-4 mr-2" />Finance</TabsTrigger>
+          <TabsTrigger value="marketing"><TrendingUp className="h-4 w-4 mr-2" />Marketing</TabsTrigger>
+          <TabsTrigger value="logistics"><Package className="h-4 w-4 mr-2" />Logistics</TabsTrigger>
           <TabsTrigger value="database"><Database className="h-4 w-4 mr-2" />Database</TabsTrigger>
         </TabsList>
 
@@ -120,7 +120,7 @@ const Admin = () => {
                             <div className="text-sm text-green-700">CEO Dashboard</div>
                             <div className="text-lg font-bold text-green-900">მუშაობს ✅</div>
                           </div>
-                          <Button size="sm" variant="outline">რედაქტირება</Button>
+                          <Button size="sm" variant="outline">Edit</Button>
                         </div>
                       </CardContent>
                     </Card>
@@ -132,7 +132,7 @@ const Admin = () => {
                             <div className="text-sm text-green-700">Finance Module</div>
                             <div className="text-lg font-bold text-green-900">მუშაობს ✅</div>
                           </div>
-                          <Button size="sm" variant="outline">რედაქტირება</Button>
+                          <Button size="sm" variant="outline">Edit</Button>
                         </div>
                       </CardContent>
                     </Card>
@@ -144,7 +144,7 @@ const Admin = () => {
                             <div className="text-sm text-green-700">Marketing Module</div>
                             <div className="text-lg font-bold text-green-900">მუშაობს ✅</div>
                           </div>
-                          <Button size="sm" variant="outline">რედაქტირება</Button>
+                          <Button size="sm" variant="outline">Edit</Button>
                         </div>
                       </CardContent>
                     </Card>
@@ -156,7 +156,7 @@ const Admin = () => {
                             <div className="text-sm text-green-700">Logistics Module</div>
                             <div className="text-lg font-bold text-green-900">მუშაობს ✅</div>
                           </div>
-                          <Button size="sm" variant="outline">რედაქტირება</Button>
+                          <Button size="sm" variant="outline">Edit</Button>
                         </div>
                       </CardContent>
                     </Card>
@@ -198,8 +198,8 @@ const Admin = () => {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle>ბრონირებების მართვა</CardTitle>
-                  <CardDescription>დაამატე, შეცვალე ან წაშალე ბრონირებები</CardDescription>
+                  <CardTitle>Reservations Management</CardTitle>
+                  <CardDescription>Add, edit or delete reservations</CardDescription>
                 </div>
                 <div className="flex gap-2">
                   <Button variant="outline">
@@ -248,11 +248,11 @@ const Admin = () => {
                     <div className="flex gap-2 mt-4">
                       <Button className="flex-1">
                         <Save className="h-4 w-4 mr-2" />
-                        შენახვა
+                        Save
                       </Button>
                       <Button variant="outline">
                         <X className="h-4 w-4 mr-2" />
-                        გაუქმება
+                        Cancel
                       </Button>
                     </div>
                   </CardContent>
@@ -311,8 +311,8 @@ const Admin = () => {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle>ფინანსური მონაცემების მართვა</CardTitle>
-                  <CardDescription>დაამატე, შეცვალე ან წაშალე ფინანსური ჩანაწერები</CardDescription>
+                  <CardTitle>Financial Data Management</CardTitle>
+                  <CardDescription>Add, edit or delete financial records</CardDescription>
                 </div>
                 <div className="flex gap-2">
                   <Button variant="outline">
@@ -353,11 +353,11 @@ const Admin = () => {
                     <div className="flex gap-2 mt-4">
                       <Button className="flex-1">
                         <Save className="h-4 w-4 mr-2" />
-                        შენახვა
+                        Save
                       </Button>
                       <Button variant="outline">
                         <X className="h-4 w-4 mr-2" />
-                        გაუქმება
+                        Cancel
                       </Button>
                     </div>
                   </CardContent>

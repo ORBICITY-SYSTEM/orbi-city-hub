@@ -40,8 +40,8 @@ const Marketing = () => {
             <BarChart3 className="h-6 w-6 text-white" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-foreground">მარკეტინგი</h1>
-            <p className="text-sm text-muted-foreground">მარკეტინგული კამპანიები და არხების შესრულება</p>
+            <h1 className="text-2xl font-bold text-foreground">Marketing</h1>
+            <p className="text-sm text-muted-foreground">Marketing campaigns and channel performance</p>
           </div>
         </div>
       </div>

@@ -54,7 +54,7 @@ export function FileHistory({ module, refreshTrigger }: FileHistoryProps) {
       refetch();
     },
     onError: (error) => {
-      toast.error(error.message || "ფაილის წაშლა ვერ მოხერხდა");
+      toast.error(error.message || "ფაილის Delete ვერ მოხერხდა");
     },
   });
 
@@ -114,7 +114,7 @@ export function FileHistory({ module, refreshTrigger }: FileHistoryProps) {
   };
 
   const handleDelete = async (fileId: number) => {
-    if (confirm("დარწმუნებული ხართ რომ გსურთ ფაილის წაშლა?")) {
+    if (confirm("დარწმუნებული ხართ რომ გსურთ ფაილის Delete?")) {
       await deleteMutation.mutateAsync({ fileId });
     }
   };

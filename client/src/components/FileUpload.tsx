@@ -147,7 +147,7 @@ export function FileUpload({
                 onClick={handleUpload}
                 disabled={isUploading}
               >
-                {isUploading ? "იტვირთება..." : "ატვირთვა"}
+                {isUploading ? "იტვირთება..." : "Upload"}
               </Button>
               <Button
                 variant="ghost"

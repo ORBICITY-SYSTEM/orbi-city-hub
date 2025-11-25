@@ -52,7 +52,7 @@ const Reservations = () => {
 
   const tabs = [
     { id: "calendar", label: "კალენდარი", icon: CalendarDays },
-    { id: "bookings", label: "ბრონირებები", icon: List },
+    { id: "bookings", label: "Reservations", icon: List },
     { id: "crm", label: "CRM", icon: Users },
     { id: "mail", label: "📧 ელფოსტა", icon: Mail },
     { id: "ai", label: "🤖 AI", icon: Bot },
@@ -86,8 +86,8 @@ const Reservations = () => {
     <div className="p-8 min-h-screen space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold">ბრონირებები</h1>
-        <p className="text-gray-600">მართეთ ბრონირებები და სტუმრები</p>
+        <h1 className="text-3xl font-bold">Reservations</h1>
+        <p className="text-gray-600">მართეთ Reservations და სტუმრები</p>
       </div>
 
       {/* KPI Cards */}
@@ -95,7 +95,7 @@ const Reservations = () => {
         <Card className="p-4 bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
           <div className="flex items-center justify-between">
             <div>
-              <div className="text-sm text-blue-700 font-medium">სულ ბრონირებები</div>
+              <div className="text-sm text-blue-700 font-medium">სულ Reservations</div>
               <div className="text-3xl font-bold text-blue-900">{totalBookings}</div>
               <div className="text-xs text-blue-600 mt-1 flex items-center">
                 <TrendingUp className="h-3 w-3 mr-1" />
@@ -147,7 +147,7 @@ const Reservations = () => {
             <div>
               <div className="text-sm text-yellow-700 font-medium">შემოსავალი</div>
               <div className="text-3xl font-bold text-yellow-900">₾{totalRevenue.toLocaleString()}</div>
-              <div className="text-xs text-yellow-600 mt-1">მიმდინარე ბრონირებები</div>
+              <div className="text-xs text-yellow-600 mt-1">მიმდინარე Reservations</div>
             </div>
             <DollarSign className="h-10 w-10 text-yellow-600 opacity-50" />
           </div>

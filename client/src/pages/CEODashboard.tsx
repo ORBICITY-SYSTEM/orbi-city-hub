@@ -283,20 +283,20 @@ export default function CEODashboard() {
         <div className="flex items-center gap-2 mb-6">
           <Download className="w-5 h-5 text-slate-600" />
           <div>
-            <h3 className="text-xl font-bold text-slate-900">ფაილების მართვა</h3>
+            <h3 className="text-xl font-bold text-slate-900">File Manager</h3>
             <p className="text-slate-600 text-sm">ატვირთეთ ფაილი ან ჩამოტვირთეთ ასარჩევი</p>
           </div>
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div>
-            <h4 className="font-semibold text-slate-700 mb-3">ახალი ფაილის ატვირთვა</h4>
+            <h4 className="font-semibold text-slate-700 mb-3">Upload New File</h4>
             <FileUploadManager 
               onUploadSuccess={() => setRefreshTrigger(prev => prev + 1)}
             />
             <p className="text-xs text-slate-500 mt-2">
-              მხარდაჭერილი ფორმატები: Excel (.xlsx, .xls), CSV, PDF, Word, PowerPoint<br />
-              მაქსიმალური ზომა: 10MB
+              Supported formats: Excel (.xlsx, .xls), CSV, PDF, Word, PowerPoint<br />
+              Maximum size: 10MB
             </p>
           </div>
           
