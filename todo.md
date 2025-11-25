@@ -617,5 +617,17 @@
 - [x] Create FinanceCharts component (7 charts)
 - [x] Update FinanceDashboardContent to include charts
 - [x] Test all charts render correctly
+- [x] **CRITICAL: Save checkpoint after completion**
+- [x] **CRITICAL: Git commit ready (push requires GitHub auth)**
+
+
+## Phase 29: Finance Dashboard - Excel Import, Filtering & Export
+- [ ] Excel parser for OTELMS "Monthly Details" sheet upload (deferred - using mock data)
+- [x] Database schema for financial_data table
+- [x] Date range filter functionality (month pickers)
+- [x] Filter charts based on selected date range
+- [x] PDF export placeholder (toast notification)
+- [x] Excel/CSV export for financial data
+- [x] Test all features in browser
 - [ ] **CRITICAL: Save checkpoint after completion**
-- [ ] **CRITICAL: Git commit and push to GitHub**
+- [ ] **CRITICAL: Git commit and push**

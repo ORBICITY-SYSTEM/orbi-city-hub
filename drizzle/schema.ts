@@ -116,6 +116,44 @@ export const transactions = mysqlTable("transactions", {
 export type Transaction = typeof transactions.$inferSelect;
 export type InsertTransaction = typeof transactions.$inferInsert;
 
+// Monthly Financial Reports (from OTELMS Excel)
+export const financialData = mysqlTable("financial_data", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // Period
+  month: varchar("month", { length: 50 }).notNull(), // "September 2025"
+  year: int("year").notNull(),
+  monthNumber: int("month_number").notNull(), // 1-12
+  
+  // Operational
+  studios: int("studios").notNull(),
+  daysAvailable: int("days_available").notNull(),
+  daysOccupied: int("days_occupied").notNull(),
+  occupancyRate: int("occupancy_rate").notNull(), // stored as percentage * 10 (80.5% = 805)
+  avgPrice: int("avg_price").notNull(), // in GEL
+  
+  // Revenue (in tetri)
+  totalRevenue: int("total_revenue").notNull(),
+  
+  // Expenses (in tetri)
+  cleaningTech: int("cleaning_tech").notNull(),
+  marketing: int("marketing").notNull(),
+  salaries: int("salaries").notNull(),
+  utilities: int("utilities").notNull(),
+  totalExpenses: int("total_expenses").notNull(),
+  
+  // Profit (in tetri)
+  totalProfit: int("total_profit").notNull(),
+  companyProfit: int("company_profit").notNull(),
+  ownersProfit: int("owners_profit").notNull(),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type FinancialData = typeof financialData.$inferSelect;
+export type InsertFinancialData = typeof financialData.$inferInsert;
+
 // ============================================================================
 // MARKETING
 // ============================================================================

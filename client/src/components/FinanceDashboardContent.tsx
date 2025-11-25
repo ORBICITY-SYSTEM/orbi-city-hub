@@ -1,12 +1,76 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Download, Plus, Settings } from "lucide-react";
+import { Download, Plus, Settings, FileSpreadsheet, FileText } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { FinanceCharts } from "@/components/FinanceCharts";
+import { useState, useMemo } from "react";
+import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
 
 export function FinanceDashboardContent() {
   const { data: summary, isLoading } = trpc.finance.getSummary.useQuery();
   const { data: monthlyData } = trpc.finance.getMonthlyData.useQuery();
+  
+  // Date filter state
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+
+  // Filter monthly data by date range
+  const filteredData = useMemo(() => {
+    if (!monthlyData) return [];
+    if (!startDate && !endDate) return monthlyData;
+
+    return monthlyData.filter((item: any) => {
+      const itemDate = new Date(item.year, item.monthNumber - 1);
+      const start = startDate ? new Date(startDate) : new Date(0);
+      const end = endDate ? new Date(endDate) : new Date();
+      
+      return itemDate >= start && itemDate <= end;
+    });
+  }, [monthlyData, startDate, endDate]);
+
+  // Export handlers
+  const handleExportPDF = () => {
+    toast.info("PDF export feature coming soon!");
+  };
+
+  const handleExportExcel = () => {
+    if (!filteredData || filteredData.length === 0) {
+      toast.error("No data to export");
+      return;
+    }
+
+    // Create CSV content
+    const headers = [
+      "Month", "Year", "Studios", "Days Available", "Days Occupied", "Occupancy %",
+      "Avg Price", "Total Revenue", "Cleaning/Tech", "Marketing", "Salaries",
+      "Utilities", "Total Expenses", "Total Profit", "Company Profit", "Owners Profit"
+    ];
+    
+    const rows = filteredData.map((d: any) => [
+      d.month, d.year, d.studios, d.daysAvailable, d.daysOccupied, d.occupancyRate,
+      d.avgPrice, d.totalRevenue, d.cleaningTech, d.marketing, d.salaries,
+      d.utilities, d.totalExpenses, d.totalProfit, d.companyProfit, d.ownersProfit
+    ]);
+
+    const csvContent = [
+      headers.join(","),
+      ...rows.map(row => row.join(","))
+    ].join("\\n");
+
+    // Download CSV
+    const blob = new Blob([csvContent], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `financial-report-${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    toast.success("Excel file downloaded!");
+  };
 
   if (isLoading) {
     return <div className="flex items-center justify-center p-12"><div className="text-lg">Loading...</div></div>;
@@ -19,9 +83,10 @@ export function FinanceDashboardContent() {
         <div className="flex items-center justify-between mb-6">
           <div className="bg-gradient-to-r from-yellow-400 to-orange-400 h-2 w-64 rounded-full" />
           <div className="flex gap-2">
-            <Button variant="outline" size="sm"><Settings className="w-4 h-4 mr-2" />Manage Fields</Button>
-            <Button variant="outline" size="sm"><Download className="w-4 h-4 mr-2" />Export</Button>
-            <Button className="bg-yellow-500 hover:bg-yellow-600" size="sm"><Plus className="w-4 h-4 mr-2" />Add Month</Button>
+            <Button variant="outline" size="sm" onClick={() => toast.info("Manage Fields coming soon!")}><Settings className="w-4 h-4 mr-2" />Manage Fields</Button>
+            <Button variant="outline" size="sm" onClick={handleExportPDF}><FileText className="w-4 h-4 mr-2" />Export PDF</Button>
+            <Button variant="outline" size="sm" onClick={handleExportExcel}><FileSpreadsheet className="w-4 h-4 mr-2" />Export Excel</Button>
+            <Button className="bg-yellow-500 hover:bg-yellow-600" size="sm" onClick={() => toast.info("Add Month coming soon!")}><Plus className="w-4 h-4 mr-2" />Add Month</Button>
           </div>
         </div>
         
@@ -32,7 +97,7 @@ export function FinanceDashboardContent() {
           <Card className="p-4 bg-yellow-50 border-yellow-200">
             <div className="text-sm text-gray-600 mb-1">TOTAL REVENUE</div>
             <div className="text-2xl font-bold text-yellow-700">₾{summary?.totalRevenue.toLocaleString() || '0'}</div>
-            <div className="text-xs text-yellow-600 mt-1">1 Period Performance</div>
+            <div className="text-xs text-yellow-600 mt-1">{filteredData.length} Period{filteredData.length !== 1 ? 's' : ''}</div>
           </Card>
 
           <Card className="p-4 bg-red-50 border-red-200">
@@ -66,12 +131,33 @@ export function FinanceDashboardContent() {
         <div className="flex items-center justify-between">
           <div>
             <h3 className="font-semibold mb-1">Period Selection</h3>
-            <p className="text-sm text-gray-600">Filter reports by custom date range • October 2024 - September 2025</p>
+            <p className="text-sm text-gray-600">Filter reports by custom date range</p>
           </div>
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm">Start Date</Button>
+          <div className="flex gap-2 items-center">
+            <Input 
+              type="month" 
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              className="w-40"
+              placeholder="Start Date"
+            />
             <span className="text-gray-400">to</span>
-            <Button variant="outline" size="sm">End Date</Button>
+            <Input 
+              type="month"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              className="w-40"
+              placeholder="End Date"
+            />
+            {(startDate || endDate) && (
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={() => { setStartDate(""); setEndDate(""); }}
+              >
+                Clear
+              </Button>
+            )}
           </div>
         </div>
       </Card>
@@ -82,13 +168,13 @@ export function FinanceDashboardContent() {
         <p className="text-sm text-gray-600 mb-4">Detailed metrics and financial analysis for each reporting period</p>
 
         <div className="grid grid-cols-3 gap-4">
-          {monthlyData?.map((month: any, idx: number) => (
+          {filteredData?.map((month: any, idx: number) => (
             <Card key={idx} className="p-4 hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-bold text-lg">{month.month}</h3>
                 <div className="flex gap-2">
-                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">✏️</Button>
-                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">🗑️</Button>
+                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={() => toast.info("Edit coming soon!")}>✏️</Button>
+                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={() => toast.info("Delete coming soon!")}>🗑️</Button>
                 </div>
               </div>
 
@@ -153,8 +239,8 @@ export function FinanceDashboardContent() {
       </div>
 
       {/* Charts Section */}
-      {monthlyData && monthlyData.length > 0 && (
-        <FinanceCharts monthlyData={monthlyData} />
+      {filteredData && filteredData.length > 0 && (
+        <FinanceCharts monthlyData={filteredData} />
       )}
     </div>
   );
