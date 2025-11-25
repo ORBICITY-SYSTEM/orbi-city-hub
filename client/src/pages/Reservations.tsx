@@ -4,6 +4,7 @@ import { CalendarDays, List, Users, Mail, Bot } from "lucide-react";
 import { AIChatBox } from "@/components/AIChatBox";
 import { Button } from "@/components/ui/button";
 import { FileUpload } from "@/components/FileUpload";
+import { BookingsTable } from "@/components/BookingsTable";
 import { useState } from "react";
 import { trpc } from "@/lib/trpc";
 
@@ -95,17 +96,7 @@ const Reservations = () => {
         </TabsContent>
 
         <TabsContent value="bookings">
-          <Card>
-            <CardHeader>
-              <CardTitle>ყველა ბრონირება</CardTitle>
-              <CardDescription>ძიებადი ცხრილი ყველა ბრონირებისთვის</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">
-                აქ იქნება ბრონირებების სრული ცხრილი - ძიება, ფილტრაცია, სორტირება, და ექსპორტი Excel/CSV ფორმატში.
-              </p>
-            </CardContent>
-          </Card>
+          <BookingsTable />
         </TabsContent>
 
         <TabsContent value="crm">
