@@ -286,3 +286,18 @@
 - [x] Test file management (delete, rename, download)
 - [x] Test AI file reference
 - [x] Create checkpoint
+
+## Phase 25: File Preview, Bulk Operations & Finance Restructure
+- [x] Add file preview modal component
+- [x] Support image preview (jpg, png, webp)
+- [x] Support PDF preview
+- [x] Add checkbox selection to file list
+- [x] Implement select all/deselect all
+- [x] Add bulk delete functionality
+- [x] Add bulk download functionality
+- [x] Move Reports & Analytics as Finance sub-tab
+- [x] Update sidebar navigation
+- [x] Update routes in App.tsx
+- [x] Test file preview
+- [x] Test bulk operations
+- [x] Create checkpoint

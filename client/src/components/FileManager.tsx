@@ -14,6 +14,9 @@ import {
   Edit2,
   X,
   Check,
+  Eye,
+  CheckSquare,
+  Square,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -37,6 +40,8 @@ export function FileManager() {
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editingName, setEditingName] = useState("");
+  const [previewFile, setPreviewFile] = useState<{ url: string; name: string; type: string } | null>(null);
+  const [selectedFiles, setSelectedFiles] = useState<Set<number>>(new Set());
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const utils = trpc.useUtils();
@@ -210,7 +215,7 @@ export function FileManager() {
         </CardContent>
       </Card>
 
-      {/* Search */}
+      {/* Search & Bulk Actions */}
       <div className="flex items-center gap-2">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -221,13 +226,70 @@ export function FileManager() {
             className="pl-9"
           />
         </div>
+        {selectedFiles.size > 0 && (
+          <>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                selectedFiles.forEach(id => {
+                  const file = files.find(f => f.id === id);
+                  if (file) {
+                    const a = document.createElement('a');
+                    a.href = file.fileUrl;
+                    a.download = file.originalName;
+                    a.click();
+                  }
+                });
+                toast.success(`${selectedFiles.size} ფაილი გადმოწერილია`);
+              }}
+            >
+              <Download className="h-4 w-4 mr-2" />
+              გადმოწერა ({selectedFiles.size})
+            </Button>
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => {
+                selectedFiles.forEach(id => deleteMutation.mutate({ id }));
+                setSelectedFiles(new Set());
+              }}
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              წაშლა ({selectedFiles.size})
+            </Button>
+          </>
+        )}
       </div>
 
       {/* Files List */}
       <Card>
         <CardHeader>
-          <CardTitle>ატვირთული ფაილები</CardTitle>
-          <CardDescription>{files.length} ფაილი</CardDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>ატვირთული ფაილები</CardTitle>
+              <CardDescription>{files.length} ფაილი</CardDescription>
+            </div>
+            {files.length > 0 && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  if (selectedFiles.size === files.length) {
+                    setSelectedFiles(new Set());
+                  } else {
+                    setSelectedFiles(new Set(files.map(f => f.id)));
+                  }
+                }}
+              >
+                {selectedFiles.size === files.length ? (
+                  <><CheckSquare className="h-4 w-4 mr-2" />მონიშვნის გაუქმება</>
+                ) : (
+                  <><Square className="h-4 w-4 mr-2" />ყველას მონიშვნა</>
+                )}
+              </Button>
+            )}
+          </div>
         </CardHeader>
         <CardContent>
           {isLoading ? (
@@ -242,6 +304,26 @@ export function FileManager() {
                   className="flex items-center justify-between p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
                 >
                   <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="p-0 h-auto"
+                      onClick={() => {
+                        const newSelected = new Set(selectedFiles);
+                        if (newSelected.has(file.id)) {
+                          newSelected.delete(file.id);
+                        } else {
+                          newSelected.add(file.id);
+                        }
+                        setSelectedFiles(newSelected);
+                      }}
+                    >
+                      {selectedFiles.has(file.id) ? (
+                        <CheckSquare className="h-5 w-5 text-primary" />
+                      ) : (
+                        <Square className="h-5 w-5" />
+                      )}
+                    </Button>
                     {getFileIcon(file.mimeType)}
                     {editingId === file.id ? (
                       <div className="flex items-center gap-2 flex-1">
@@ -273,6 +355,15 @@ export function FileManager() {
                     )}
                   </div>
                   <div className="flex items-center gap-2">
+                    {(file.mimeType.startsWith('image/') || file.mimeType === 'application/pdf') && (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => setPreviewFile({ url: file.fileUrl, name: file.originalName, type: file.mimeType })}
+                      >
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                    )}
                     <Button size="sm" variant="ghost" onClick={() => startRename(file)}>
                       <Edit2 className="h-4 w-4" />
                     </Button>
@@ -291,6 +382,30 @@ export function FileManager() {
           )}
         </CardContent>
       </Card>
+
+      {/* File Preview Dialog */}
+      <AlertDialog open={previewFile !== null} onOpenChange={() => setPreviewFile(null)}>
+        <AlertDialogContent className="max-w-4xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle>{previewFile?.name}</AlertDialogTitle>
+          </AlertDialogHeader>
+          <div className="max-h-[70vh] overflow-auto">
+            {previewFile?.type.startsWith('image/') ? (
+              <img src={previewFile.url} alt={previewFile.name} className="w-full h-auto" />
+            ) : previewFile?.type === 'application/pdf' ? (
+              <iframe src={previewFile.url} className="w-full h-[70vh]" title={previewFile.name} />
+            ) : null}
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel>დახურვა</AlertDialogCancel>
+            <AlertDialogAction asChild>
+              <a href={previewFile?.url || '#'} download={previewFile?.name}>
+                გადმოწერა
+              </a>
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={deleteId !== null} onOpenChange={() => setDeleteId(null)}>

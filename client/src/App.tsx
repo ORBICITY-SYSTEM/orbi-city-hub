@@ -12,7 +12,7 @@ import Reservations from "./pages/Reservations";
 import Finance from "./pages/Finance";
 import Marketing from "./pages/Marketing";
 import Logistics from "./pages/Logistics";
-import Reports from "./pages/Reports";
+
 
 function Router() {
   return (
@@ -23,7 +23,7 @@ function Router() {
         <Route path="/finance" component={Finance} />
         <Route path="/marketing" component={Marketing} />
         <Route path="/logistics" component={Logistics} />
-        <Route path="/reports" component={Reports} />
+
         <Route path="/404" component={NotFound} />
         <Route component={NotFound} />
       </Switch>

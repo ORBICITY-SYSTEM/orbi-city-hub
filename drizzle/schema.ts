@@ -44,9 +44,9 @@ export const files = mysqlTable("files", {
   tags: json("tags"), // Array of tags for search
   description: text("description"),
   
-  uploadedAt: timestamp("uploadedat").defaultNow().notNull(),
-  createdAt: timestamp("createdat").defaultNow().notNull(),
-  updatedAt: timestamp("updatedat").defaultNow().onUpdateNow().notNull(),
+  uploadedAt: timestamp("uploadedAt").defaultNow().notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
 
 export type File = typeof files.$inferSelect;
