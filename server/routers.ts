@@ -1,6 +1,7 @@
 import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
+import { googleRouter } from "./routers/google";
 import { publicProcedure, router } from "./_core/trpc";
 import { fileUploadRouter } from "./routers/fileUpload";
 import { aiRouter } from "./routers/ai";
@@ -17,6 +18,7 @@ import { financeRouter } from "./routers/finance";
 import { fileRouter } from "./fileRouter";
 
 export const appRouter = router({
+  google: googleRouter,
   fileUpload: fileUploadRouter,
   fileManager: fileManagerRouter,
   admin: adminRouter,

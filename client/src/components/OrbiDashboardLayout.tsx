@@ -12,7 +12,8 @@ import {
   LogOut,
   Loader2,
   Moon,
-  Sun
+  Sun,
+  Chrome
 } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { Link, useLocation } from "wouter";
@@ -32,6 +33,7 @@ const navItems: NavItem[] = [
   { name: "Logistics", path: "/logistics", icon: Truck },
   { name: "Reports & Analytics", path: "/reports", icon: FileText },
   { name: "Files", path: "/files", icon: FolderOpen },
+  { name: "Google", path: "/google", icon: Chrome },
 ];
 
 export default function OrbiDashboardLayout({ children }: { children: React.ReactNode }) {

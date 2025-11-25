@@ -1,9 +1,11 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { TrendingUp, TrendingDown, Users, Star, Bot, ArrowUpRight, Download } from "lucide-react";
+import { TrendingUp, TrendingDown, Users, Star, Bot, ArrowUpRight, Download, MessageCircle } from "lucide-react";
+import { trpc } from "@/lib/trpc";
 import { FileUploadManager } from "@/components/FileUploadManager";
 import { FileHistory } from "@/components/FileHistory";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { GoogleReviewsWidget } from "@/components/GoogleReviewsWidget";
 
 export default function CEODashboard() {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
@@ -111,8 +113,8 @@ export default function CEODashboard() {
         })}
       </div>
 
-      {/* Channel Performance & Quick Insights */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+      {/* Channel Performance, Quick Insights & Google Reviews */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
         {/* Revenue by Channel */}
         <div className="glass-card p-6">
           <div className="flex items-center justify-between mb-6">
@@ -145,7 +147,7 @@ export default function CEODashboard() {
         </div>
 
         {/* Quick Insights */}
-        <div className="glass-card p-6">
+        <div className="glass-card p-6 lg:col-span-1">
           <div className="flex items-center justify-between mb-6">
             <div>
               <h3 className="text-xl font-bold text-slate-900">Quick Insights</h3>
@@ -171,6 +173,9 @@ export default function CEODashboard() {
             })}
           </div>
         </div>
+
+        {/* Google Reviews */}
+        <GoogleReviewsWidget />
       </div>
 
       {/* Monthly Forecast & Top Performers */}
