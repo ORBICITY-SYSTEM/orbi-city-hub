@@ -6,6 +6,7 @@ import { aiConversations, files } from "../../drizzle/schema";
 import { eq, desc, like } from "drizzle-orm";
 import { KNOWLEDGE_BASE } from "../../shared/aiKnowledgeBase";
 import { parseExcelFromUrl, formatExcelForAI, getExcelSummary } from "../utils/excelParser";
+import { getDashboardDataForModule } from "../dashboardDataFetcher";
 
 // Get module-specific system prompt
 function getSystemPrompt(module: string): string {
@@ -63,6 +64,9 @@ export const aiRouter = router({
 
       // Build system prompt based on module
       const systemPrompt = getSystemPrompt(module);
+      
+      // Fetch dashboard data for this module
+      const dashboardData = await getDashboardDataForModule(module);
 
       // Check if user is referencing a file by name
       let referencedFile = null;
@@ -86,9 +90,15 @@ export const aiRouter = router({
         }
       }
 
-      // Build messages
+      // Build messages with dashboard data context
+      let enhancedSystemPrompt = systemPrompt;
+      
+      if (dashboardData) {
+        enhancedSystemPrompt += `\n\n## Current Dashboard Data\n${JSON.stringify(dashboardData, null, 2)}\n\nYou have access to the above real-time dashboard data. Use it to answer questions accurately and provide data-driven insights.`;
+      }
+      
       const messages: Message[] = [
-        { role: "system", content: systemPrompt },
+        { role: "system", content: enhancedSystemPrompt },
       ];
 
       // Add user message

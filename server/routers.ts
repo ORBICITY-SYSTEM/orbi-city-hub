@@ -14,6 +14,7 @@ import { gmailRouter } from "./routers/gmail";
 import { reservationsRouter } from "./routers/reservations";
 import { excelImportRouter } from "./routers/excelImport";
 import { financeRouter } from "./routers/finance";
+import { fileRouter } from "./fileRouter";
 
 export const appRouter = router({
   fileUpload: fileUploadRouter,
@@ -23,6 +24,7 @@ export const appRouter = router({
   reservations: reservationsRouter,
   excelImport: excelImportRouter,
   finance: financeRouter,
+  file: fileRouter,
   system: systemRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),

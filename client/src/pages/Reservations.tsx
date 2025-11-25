@@ -83,7 +83,7 @@ const Reservations = () => {
   const totalRevenue = mockBookings.reduce((sum, b) => sum + b.price, 0);
 
   return (
-    <div className="space-y-6">
+    <div className="p-8 min-h-screen space-y-6">
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold">ბრონირებები</h1>

@@ -94,11 +94,11 @@ export default function OrbiDashboardLayout({ children }: { children: React.Reac
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      {/* Sidebar */}
-      <aside className="fixed left-0 top-0 h-full w-64 bg-white border-r border-slate-200 flex flex-col">
+    <div className="min-h-screen">
+      {/* Sidebar with Glassmorphism */}
+      <aside className="fixed left-0 top-0 h-full w-64 glass-sidebar flex flex-col z-50">
         {/* Logo */}
-        <div className="p-6 border-b border-slate-200">
+        <div className="p-6 border-b border-white/20">
           <img 
             src={APP_LOGO} 
             alt={APP_TITLE} 
@@ -121,8 +121,8 @@ export default function OrbiDashboardLayout({ children }: { children: React.Reac
                 className={cn(
                   "flex items-center gap-3 px-4 py-3 rounded-lg transition-all",
                   isActive
-                    ? "bg-green-50 text-green-700 font-medium"
-                    : "text-slate-700 hover:bg-slate-100"
+                    ? "ocean-gradient-blue text-white font-medium shadow-lg"
+                    : "text-slate-700 hover:bg-white/20"
                 )}
               >
                 <Icon className="w-5 h-5" />
@@ -149,7 +149,7 @@ export default function OrbiDashboardLayout({ children }: { children: React.Reac
         </div>
 
         {/* User Profile */}
-        <div className="p-4 border-t border-slate-200">
+        <div className="p-4 border-t border-white/20">
           <div className="flex items-center gap-3 mb-3">
             <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-semibold">
               {user?.name?.charAt(0) || "U"}
