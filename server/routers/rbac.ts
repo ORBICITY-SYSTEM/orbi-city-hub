@@ -4,14 +4,11 @@ import { getDb } from "../db";
 import { users } from "../../drizzle/schema";
 import { eq } from "drizzle-orm";
 import {
-  hasRole,
   hasPermission,
   requireRole,
-  requirePermission,
   getAccessibleModules,
   getModulePermissions,
   PERMISSIONS,
-  type Role,
 } from "../rbac";
 
 export const rbacRouter = router({
@@ -21,14 +18,14 @@ export const rbacRouter = router({
   getMyPermissions: protectedProcedure.query(({ ctx }) => {
     const accessibleModules = getAccessibleModules(ctx.user);
     const modulePermissions: Record<string, string[]> = {};
-    
+
     for (const module of accessibleModules) {
       modulePermissions[module] = getModulePermissions(
         ctx.user,
         module as keyof typeof PERMISSIONS
       );
     }
-    
+
     return {
       role: ctx.user.role,
       accessibleModules,
@@ -40,10 +37,12 @@ export const rbacRouter = router({
    * Check if current user has specific permission
    */
   checkPermission: protectedProcedure
-    .input(z.object({
-      module: z.string(),
-      action: z.string(),
-    }))
+    .input(
+      z.object({
+        module: z.string(),
+        action: z.string(),
+      })
+    )
     .query(({ ctx, input }) => {
       return hasPermission(
         ctx.user,
@@ -57,12 +56,12 @@ export const rbacRouter = router({
    */
   listUsers: protectedProcedure.query(async ({ ctx }) => {
     requireRole(ctx.user, "admin");
-    
+
     const db = await getDb();
     if (!db) throw new Error("Database not available");
-    
+
     const allUsers = await db.select().from(users);
-    
+
     return allUsers.map(user => ({
       id: user.id,
       name: user.name,
@@ -77,26 +76,28 @@ export const rbacRouter = router({
    * Update user role (admin only)
    */
   updateUserRole: protectedProcedure
-    .input(z.object({
-      userId: z.number(),
-      role: z.enum(["admin", "manager", "staff", "guest"]),
-    }))
+    .input(
+      z.object({
+        userId: z.number(),
+        role: z.enum(["admin", "manager", "staff", "guest"]),
+      })
+    )
     .mutation(async ({ ctx, input }) => {
       requireRole(ctx.user, "admin");
-      
+
       // Prevent self-demotion
       if (ctx.user.id === input.userId && input.role !== "admin") {
         throw new Error("Cannot change your own admin role");
       }
-      
+
       const db = await getDb();
       if (!db) throw new Error("Database not available");
-      
+
       await db
         .update(users)
         .set({ role: input.role })
         .where(eq(users.id, input.userId));
-      
+
       return {
         success: true,
         message: `User role updated to ${input.role}`,
@@ -118,7 +119,8 @@ export const rbacRouter = router({
         {
           id: "manager",
           name: "Manager",
-          description: "Can view and manage most modules except system settings",
+          description:
+            "Can view and manage most modules except system settings",
           level: 2,
         },
         {
