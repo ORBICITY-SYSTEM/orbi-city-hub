@@ -818,3 +818,139 @@
 - [x] Make all charts responsive with Chart.js
 - [x] Test on mobile (375px), tablet (768px), desktop (1024px+)
 - [x] Add viewport meta tag for proper mobile rendering
+
+## 📦 Lovable Logistics Implementation v15.0 - IN PROGRESS
+- [ ] Clone GitHub repo (ORBICITY-SYSTEM/orbi-ai-nexus)
+- [ ] Analyze Lovable Logistics page structure
+- [ ] Copy Logistics page component
+- [ ] Copy Inventory management component
+- [ ] Copy Cleaning/Housekeeping component
+- [ ] Copy Technical maintenance component
+- [ ] Copy Supplies management component
+- [ ] Copy Staff management component
+- [ ] Update database schema for Logistics
+- [ ] Implement backend tRPC procedures
+- [ ] Test all Logistics features
+
+## 🏗️ Lovable Logistics Implementation v15.0 - IN PROGRESS
+- [ ] Push database schema (pnpm db:push)
+- [ ] Seed 90+ standard inventory items
+- [ ] Copy Housekeeping UI components from Lovable
+- [ ] Copy Maintenance UI components from Lovable
+- [ ] Copy Inventory UI components from Lovable
+- [ ] Create tRPC procedures for housekeeping operations
+- [ ] Create tRPC procedures for maintenance operations
+- [ ] Create tRPC procedures for inventory operations
+- [ ] Test Housekeeping module
+- [ ] Test Maintenance module
+- [ ] Test Inventory module
+- [ ] Save checkpoint v15.0
+
+
+---
+
+## 🔄 Phase 2: Logistics Module Refinements (IN PROGRESS - 2025-11-26)
+
+### Dark Mode & UI Polish
+- [x] Change to dark mode only (defaultTheme="dark" in App.tsx)
+- [x] Fix text colors for dark mode readability
+- [x] Ensure all text is visible on dark backgrounds
+
+### Remove Mock Data
+- [x] Remove housekeeping schedules mock data
+- [x] Remove maintenance issues mock data
+- [x] Remove activity log mock data
+- [x] Keep only 60 room numbers (static data) in Inventory tab
+
+### Database Setup
+- [x] Create 60 rooms in database (A 3041, C 2641, D 3418, etc.)
+- [ ] User will manually add: inventory items, housekeeping schedules, maintenance issues
+
+### Testing & Checkpoint
+- [ ] Test all Logistics tabs with empty data
+- [ ] Verify 60 room numbers display correctly
+- [ ] Save Phase 2 checkpoint
+
+
+---
+
+## 🎯 Phase 3: Inventory Management UI (Matching Lovable) - IN PROGRESS
+
+### Room Selection
+- [x] Create room dropdown with all 56 rooms from Lovable
+- [x] Add "ყველა ოთახი" (All Rooms) option
+- [x] Sort rooms alphabetically (A 1821, A 1033, A 1806...)
+
+### Inventory Table View
+- [x] Create horizontal scrolling table with room columns
+- [x] First column: "ნივთის სახელი" (Item Name)
+- [x] Second column: "სტანდარტი 1 ოთახი" (Standard per Room)
+- [x] Third column: "ნაკლული რაოდენობა" (Missing Quantity) with red badges
+- [x] Dynamic columns for each room (A 1821, A 1033, A 1806, etc.)
+- [x] Each room column has editable input fields
+- [ ] Calculate missing quantities automatically (standard - actual)
+- [ ] Red badges for missing items
+
+### Detailed Room View (Click on Room)
+- [ ] Modal or side panel when clicking a room
+- [ ] Show "ოთახი [NUMBER] - ინვენტარის მართვა"
+- [ ] List all inventory items for that room
+- [ ] Each item shows:
+  - [ ] სტანდარტი (Standard quantity) - readonly
+  - [ ] ფაქტობრივი (Actual quantity) - editable input
+  - [ ] მდგომარეობა (Condition) - dropdown (OK, დაზიანებული, ახალი საჭიროა)
+  - [ ] შენიშვნები (Notes) - textarea
+
+### Action Buttons
+- [x] "ტექსტობრივი ჩაბარება" button (Text Export)
+- [x] "ისტორია" button (History)
+- [x] "ექსპორტი Excel" button (Export to Excel)
+- [x] "შენახვა" button (Save) - prominent yellow/gold color
+
+### Data Integration
+- [ ] Load 56 rooms from database
+- [ ] Load standard inventory items from standardInventoryItems table
+- [ ] Load actual quantities from roomInventoryItems table
+- [ ] Calculate missing items dynamically
+- [ ] Save changes to database on "შენახვა" click
+
+
+---
+
+## 🎯 NEW TASK: Port Lovable Logistics Module to Manus (2025-11-26)
+
+### Phase 1: Analyze Lovable's Code Structure
+- [ ] List all Logistics components in `/tmp/orbi-ai-nexus/src/components/`
+- [ ] List all Logistics pages in `/tmp/orbi-ai-nexus/src/pages/`
+- [ ] Identify dependencies (libraries, utilities, contexts)
+- [ ] Check database schema in Lovable project
+
+### Phase 2: Copy Components to Manus
+- [ ] Copy Logistics page component
+- [ ] Copy all Logistics sub-components
+- [ ] Copy any shared utilities or helpers
+- [ ] Update import paths for Manus project structure
+
+### Phase 3: Create tRPC Backend
+- [ ] Create database schema for rooms, inventory items, schedules
+- [ ] Seed 56 rooms from GitHub list
+- [ ] Seed standard inventory items (34 items from screenshots)
+- [ ] Create tRPC procedures for inventory CRUD
+- [ ] Create tRPC procedures for housekeeping CRUD
+- [ ] Create tRPC procedures for maintenance CRUD
+
+### Phase 4: Frontend-Backend Integration
+- [ ] Replace mock data with tRPC queries
+- [ ] Implement save functionality with tRPC mutations
+- [ ] Add loading states
+- [ ] Add error handling
+
+### Phase 5: Testing
+- [ ] Test inventory management workflow
+- [ ] Test room selection and detailed view
+- [ ] Test save/export functionality
+- [ ] Fix any bugs or integration issues
+
+### Phase 6: Delivery
+- [ ] Save checkpoint
+- [ ] Present final working Logistics module to user

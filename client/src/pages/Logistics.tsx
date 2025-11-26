@@ -1,202 +1,130 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Package, Sparkles, Wrench, ShoppingCart, Users, Bot } from "lucide-react";
-import { AIChatBox } from "@/components/AIChatBox";
 import { Button } from "@/components/ui/button";
-import { FileUpload } from "@/components/FileUpload";
-import { useState } from "react";
-import { trpc } from "@/lib/trpc";
-import { LogisticsHousekeeping } from "@/components/LogisticsHousekeeping";
+import { Package, ArrowLeft, BarChart3, ClipboardList, Wrench, History } from "lucide-react";
+import { useLocation } from "wouter";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { InventoryDashboardStats } from "@/components/InventoryDashboardStats";
+import { StudioInventoryList } from "@/components/StudioInventoryList";
+import { HousekeepingModule } from "@/components/HousekeepingModule";
+import { MaintenanceModule } from "@/components/MaintenanceModule";
+import { LogisticsActivityLog } from "@/components/LogisticsActivityLog";
+import { useAuth } from "@/_core/hooks/useAuth";
+import { useEffect, useState, Suspense } from "react";
+import { Loader2 } from "lucide-react";
+
 
 const Logistics = () => {
-  const [activeTab, setActiveTab] = useState("inventory");
-  const [chatHistory, setChatHistory] = useState<Array<{ role: "user" | "assistant"; content: string }>>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [, setLocation] = useLocation();
+  const { t } = useLanguage();
+  const { isAuthenticated } = useAuth();
 
-  const chatMutation = trpc.ai.chat.useMutation();
 
-  const handleSendMessage = async (content: string) => {
-    const newMessage = { role: "user" as const, content };
-    setChatHistory(prev => [...prev, newMessage]);
-    setIsLoading(true);
-
-    try {
-      const response = await chatMutation.mutateAsync({
-        module: "Logistics",
-        userMessage: content,
-      });
-
-      setChatHistory(prev => [...prev, { role: "assistant", content: response.response }]);
-    } catch (error) {
-      console.error("Chat error:", error);
-      setChatHistory(prev => [...prev, { 
-        role: "assistant", 
-        content: "Sorry, I encountered an error. Please try again." 
-      }]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 min-h-screen">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-green-500 to-emerald-600">
-            <Package className="h-6 w-6 text-white" />
-          </div>
-          <div>
-            <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground">
-              Logistics
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              Inventory, cleaning and technical maintenance
-            </p>
+    <div className="min-h-screen bg-background">
+      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
+        <div className="container mx-auto px-6 py-4">
+          <div className="flex items-center gap-4">
+            {isAuthenticated && (
+              <Button variant="ghost" size="sm" onClick={() => setLocation("/")}>
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                {t("უკან", "Back")}
+              </Button>
+            )}
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-ai">
+                <Package className="h-6 w-6 text-primary-foreground" />
+              </div>
+              <div>
+                <h1 className="text-xl font-bold text-foreground">
+                  {t("ოთახები და დასუფთავება", "Rooms & Housekeeping")}
+                </h1>
+                <p className="text-xs text-muted-foreground">
+                  {t("სტუდიოების ინვენტარის მართვა და ანალიტიკა", "Studio inventory management and analytics")}
+                </p>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+      </header>
 
-      {/* Sub-Modules Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-6 mb-6">
-          <TabsTrigger value="inventory" className="flex items-center gap-2">
-            <Package className="h-4 w-4" />
-            Inventory
-          </TabsTrigger>
-          <TabsTrigger value="housekeeping" className="flex items-center gap-2">
-            <Sparkles className="h-4 w-4" />
-            Cleaning
-          </TabsTrigger>
-          <TabsTrigger value="maintenance" className="flex items-center gap-2">
-            <Wrench className="h-4 w-4" />
-            Technical
-          </TabsTrigger>
-          <TabsTrigger value="supplies" className="flex items-center gap-2">
-            <ShoppingCart className="h-4 w-4" />
-            Supplies
-          </TabsTrigger>
-          <TabsTrigger value="staff" className="flex items-center gap-2">
-            <Users className="h-4 w-4" />
-            Staff
-          </TabsTrigger>
-          <TabsTrigger value="ai" className="flex items-center gap-2">
-            <Bot className="h-4 w-4" />
-            🤖 AI
-          </TabsTrigger>
-        </TabsList>
+      <main className="container mx-auto px-6 py-8">
+        <Tabs defaultValue="dashboard" className="w-full">
+          <TabsList className="grid w-full grid-cols-5 mb-8">
+            <TabsTrigger value="dashboard" className="flex items-center gap-2">
+              <BarChart3 className="h-4 w-4" />
+              {t("დეშბორდი", "Dashboard")}
+            </TabsTrigger>
+            <TabsTrigger value="inventory" className="flex items-center gap-2">
+              <Package className="h-4 w-4" />
+              {t("ინვენტარი", "Inventory")}
+            </TabsTrigger>
+            <TabsTrigger value="housekeeping" className="flex items-center gap-2">
+              <ClipboardList className="h-4 w-4" />
+              {t("დასუფთავება", "Housekeeping")}
+            </TabsTrigger>
+            <TabsTrigger value="maintenance" className="flex items-center gap-2">
+              <Wrench className="h-4 w-4" />
+              {t("ტექნიკური", "Maintenance")}
+            </TabsTrigger>
+            <TabsTrigger value="activity" className="flex items-center gap-2">
+              <History className="h-4 w-4" />
+              {t("აქტივობა", "Activity")}
+            </TabsTrigger>
+          </TabsList>
 
-        <TabsContent value="inventory">
-          <Card>
-            <CardHeader>
-              <CardTitle>Inventoryს Marთვა</CardTitle>
-              <CardDescription>Suppliesს თვალყურის დევნება და Marთვა</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">
-                აქ იქნება Inventoryს სრული სისტემა - ყველა 60 studiosს Inventory, Low Marაგის შეტყობინებები, და ავტომატური შეკვეFebი.
-              </p>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="housekeeping">
-          <LogisticsHousekeeping />
-        </TabsContent>
-
-        <TabsContent value="maintenance">
-          <Card>
-            <CardHeader>
-              <CardTitle>Technical მოვლა</CardTitle>
-              <CardDescription>Track repairs and maintenance</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">
-                აქ იქნება Technical მოვლის სისტემა - პრობლემების რეგისტრაცია, რემონტის გრაფიკები, და ხარჯების აღრიცხვა.
-              </p>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="supplies">
-          <Card>
-            <CardHeader>
-              <CardTitle>Suppliesს Marთვა</CardTitle>
-              <CardDescription>Suppliesს შეკვეთა და Marთვა</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">
-                აქ იქნება Suppliesს სისტემა - ავტომატური შეკვეFebი, მომწოდებლების Marთვა, და ხარჯების ოპტიმიზაცია.
-              </p>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="staff">
-          <Card>
-            <CardHeader>
-              <CardTitle>Staffს Marთვა</CardTitle>
-              <CardDescription>Staffს გრაფიკი და დავალებები</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">
-                აქ იქნება Staffს სისტემა - Tueუშაო გრაფიკები, დავალებების განაწილება, და შესრულების თვალყურის დევნება.
-              </p>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="ai">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Bot className="h-5 w-5 text-purple-500" />
-                🤖 Logistics AI Agent
-              </CardTitle>
-              <CardDescription>
-                AI აგენტი Suppliesს ანალიზისთვის ფოტოებიდან/სიებიდან და ავტომატური შეკვეFebის რეკომენდაციებისთვის
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {/* File Upload Section */}
-              <FileUpload
-                module="logistics"
-                onUploadSuccess={(url, fileName) => {
-                  // Send uploaded file info to AI for analysis
-                  handleSendMessage(`Analyze this file: ${fileName} (${url})`);
-                }}
-              />
-
-              {/* AI Chat Interface */}
-              <AIChatBox
-                messages={chatHistory}
-                onSendMessage={handleSendMessage}
-                isLoading={isLoading}
-                placeholder="მაგ: 'რა Supplies არის Low დონეზე?' ან 'გააანალიზე ეს Inventoryს ფოტო'"
-                height={400}
-              />
-
-              {/* Quick Actions */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => handleSendMessage("რა Supplies არის Low დონეზე?")}
-                >
-                  Low Supplies
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => handleSendMessage("რა უნდა შევუკვეთო ამ Sunრაში?")}
-                >
-                  Order Recommendation
-                </Button>
+          <TabsContent value="dashboard">
+            <Suspense fallback={
+              <div className="flex items-center justify-center p-12">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
               </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+            }>
+              <InventoryDashboardStats />
+            </Suspense>
+          </TabsContent>
+
+          <TabsContent value="inventory">
+            <Suspense fallback={
+              <div className="flex items-center justify-center p-12">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              </div>
+            }>
+              <StudioInventoryList />
+            </Suspense>
+          </TabsContent>
+
+          <TabsContent value="housekeeping">
+            <Suspense fallback={
+              <div className="flex items-center justify-center p-12">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              </div>
+            }>
+              <HousekeepingModule />
+            </Suspense>
+          </TabsContent>
+
+          <TabsContent value="maintenance">
+            <Suspense fallback={
+              <div className="flex items-center justify-center p-12">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              </div>
+            }>
+              <MaintenanceModule />
+            </Suspense>
+          </TabsContent>
+
+          <TabsContent value="activity">
+            <Suspense fallback={
+              <div className="flex items-center justify-center p-12">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              </div>
+            }>
+              <LogisticsActivityLog />
+            </Suspense>
+          </TabsContent>
+        </Tabs>
+      </main>
     </div>
   );
 };

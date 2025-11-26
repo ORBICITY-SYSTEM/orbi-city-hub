@@ -11,7 +11,7 @@ import CEODashboard from "./pages/CEODashboard";
 import Reservations from "./pages/Reservations";
 import Finance from "./pages/Finance";
 import Marketing from "./pages/Marketing";
-import Logistics from "./pages/LogisticsNew";
+import Logistics from "./pages/Logistics";
 import Reports from "./pages/Reports";
 import Files from "./pages/Files";
 import Google from "./pages/Google";
@@ -62,7 +62,7 @@ function Router() {
 function App() {
   return (
     <ErrorBoundary>
-      <ThemeProvider defaultTheme="light" switchable>
+      <ThemeProvider defaultTheme="dark">
         <TooltipProvider>
           <Toaster />
           <Router />

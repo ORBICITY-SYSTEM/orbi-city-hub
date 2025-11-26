@@ -17,6 +17,7 @@ import { excelImportRouter } from "./routers/excelImport";
 import { financeRouter } from "./routers/finance";
 import { fileRouter } from "./fileRouter";
 import { socialMediaRouter } from "./routers/socialMediaRouter";
+import { logisticsRouter } from "./logisticsRouter";
 
 export const appRouter = router({
   google: googleRouter,
@@ -29,6 +30,7 @@ export const appRouter = router({
   finance: financeRouter,
   file: fileRouter,
   socialMedia: socialMediaRouter,
+  logistics: logisticsRouter,
   system: systemRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),

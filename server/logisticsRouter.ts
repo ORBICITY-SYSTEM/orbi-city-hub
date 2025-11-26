@@ -1,0 +1,321 @@
+import { z } from "zod";
+import { eq, and, desc } from "drizzle-orm";
+import { protectedProcedure, router } from "./_core/trpc";
+import { getDb } from "./db";
+import {
+  rooms,
+  standardInventoryItems,
+  roomInventoryItems,
+  roomInventoryDescriptions,
+  housekeepingSchedules,
+  maintenanceSchedules,
+  logisticsActivityLog,
+} from "../drizzle/schema";
+
+export const logisticsRouter = router({
+  // ============================================================================
+  // ROOMS
+  // ============================================================================
+  
+  rooms: router({
+    list: protectedProcedure.query(async () => {
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+      
+      return await db.select().from(rooms).orderBy(rooms.roomNumber);
+    }),
+    
+    getById: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+        
+        const [room] = await db.select().from(rooms).where(eq(rooms.id, input.id)).limit(1);
+        return room;
+      }),
+  }),
+
+  // ============================================================================
+  // STANDARD INVENTORY ITEMS
+  // ============================================================================
+  
+  standardItems: router({
+    list: protectedProcedure.query(async () => {
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+      
+      return await db
+        .select()
+        .from(standardInventoryItems)
+        .orderBy(standardInventoryItems.category, standardInventoryItems.itemName);
+    }),
+    
+    getById: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+        
+        const [item] = await db
+          .select()
+          .from(standardInventoryItems)
+          .where(eq(standardInventoryItems.id, input.id))
+          .limit(1);
+        return item;
+      }),
+  }),
+
+  // ============================================================================
+  // ROOM INVENTORY ITEMS
+  // ============================================================================
+  
+  roomInventory: router({
+    list: protectedProcedure.query(async () => {
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+      
+      return await db.select().from(roomInventoryItems);
+    }),
+    
+    getByRoomId: protectedProcedure
+      .input(z.object({ roomId: z.number() }))
+      .query(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+        
+        return await db
+          .select()
+          .from(roomInventoryItems)
+          .where(eq(roomInventoryItems.roomId, input.roomId));
+      }),
+    
+    upsert: protectedProcedure
+      .input(
+        z.object({
+          roomId: z.number(),
+          standardItemId: z.number(),
+          actualQuantity: z.number(),
+          condition: z.enum(["good", "fair", "poor", "missing"]).optional(),
+          notes: z.string().optional(),
+        })
+      )
+      .mutation(async ({ input, ctx }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+        
+        // Check if item exists
+        const [existing] = await db
+          .select()
+          .from(roomInventoryItems)
+          .where(
+            and(
+              eq(roomInventoryItems.roomId, input.roomId),
+              eq(roomInventoryItems.standardItemId, input.standardItemId)
+            )
+          )
+          .limit(1);
+        
+        if (existing) {
+          // Update
+          await db
+            .update(roomInventoryItems)
+            .set({
+              actualQuantity: input.actualQuantity,
+              condition: input.condition,
+              notes: input.notes,
+              lastChecked: new Date(),
+            })
+            .where(eq(roomInventoryItems.id, existing.id));
+          
+          return { success: true, id: existing.id };
+        } else {
+          // Insert
+          const [result] = await db
+            .insert(roomInventoryItems)
+            .values({
+              roomId: input.roomId,
+              standardItemId: input.standardItemId,
+              actualQuantity: input.actualQuantity,
+              condition: input.condition || "good",
+              notes: input.notes,
+              lastChecked: new Date(),
+            });
+          
+          return { success: true, id: result.insertId };
+        }
+      }),
+  }),
+
+  // ============================================================================
+  // HOUSEKEEPING SCHEDULES
+  // ============================================================================
+  
+  housekeeping: router({
+    list: protectedProcedure.query(async () => {
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+      
+      return await db
+        .select()
+        .from(housekeepingSchedules)
+        .orderBy(desc(housekeepingSchedules.scheduledDate));
+    }),
+    
+    create: protectedProcedure
+      .input(
+        z.object({
+          scheduledDate: z.string(),
+          rooms: z.array(z.string()),
+          totalRooms: z.number(),
+          status: z.enum(["pending", "in_progress", "completed", "cancelled"]).optional(),
+          notes: z.string().optional(),
+        })
+      )
+      .mutation(async ({ input, ctx }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+        
+        const [result] = await db.insert(housekeepingSchedules).values({
+          userId: ctx.user.id,
+          scheduledDate: input.scheduledDate,
+          rooms: input.rooms,
+          totalRooms: input.totalRooms,
+          status: input.status || "pending",
+          notes: input.notes,
+        });
+        
+        return { success: true, id: result.insertId };
+      }),
+    
+    update: protectedProcedure
+      .input(
+        z.object({
+          id: z.number(),
+          status: z.enum(["pending", "in_progress", "completed", "cancelled"]).optional(),
+          notes: z.string().optional(),
+          additionalNotes: z.string().optional(),
+          completedAt: z.date().optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+        
+        await db
+          .update(housekeepingSchedules)
+          .set({
+            status: input.status,
+            notes: input.notes,
+            additionalNotes: input.additionalNotes,
+            completedAt: input.completedAt,
+          })
+          .where(eq(housekeepingSchedules.id, input.id));
+        
+        return { success: true };
+      }),
+  }),
+
+  // ============================================================================
+  // MAINTENANCE SCHEDULES
+  // ============================================================================
+  
+  maintenance: router({
+    list: protectedProcedure.query(async () => {
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+      
+      return await db
+        .select()
+        .from(maintenanceSchedules)
+        .orderBy(desc(maintenanceSchedules.scheduledDate));
+    }),
+    
+    create: protectedProcedure
+      .input(
+        z.object({
+          roomNumber: z.string(),
+          scheduledDate: z.string(),
+          problem: z.string(),
+          notes: z.string().optional(),
+          status: z.enum(["pending", "in_progress", "completed", "cancelled"]).optional(),
+          cost: z.number().optional(),
+        })
+      )
+      .mutation(async ({ input, ctx }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+        
+        const [result] = await db.insert(maintenanceSchedules).values({
+          userId: ctx.user.id,
+          roomNumber: input.roomNumber,
+          scheduledDate: input.scheduledDate,
+          problem: input.problem,
+          notes: input.notes,
+          status: input.status || "pending",
+          cost: input.cost,
+        });
+        
+        return { success: true, id: result.insertId };
+      }),
+    
+    update: protectedProcedure
+      .input(
+        z.object({
+          id: z.number(),
+          status: z.enum(["pending", "in_progress", "completed", "cancelled"]).optional(),
+          notes: z.string().optional(),
+          additionalNotes: z.string().optional(),
+          cost: z.number().optional(),
+          solvingDate: z.string().optional(),
+          completedAt: z.date().optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+        
+        await db
+          .update(maintenanceSchedules)
+          .set({
+            status: input.status,
+            notes: input.notes,
+            additionalNotes: input.additionalNotes,
+            cost: input.cost,
+            solvingDate: input.solvingDate,
+            completedAt: input.completedAt,
+          })
+          .where(eq(maintenanceSchedules.id, input.id));
+        
+        return { success: true };
+      }),
+  }),
+
+  // ============================================================================
+  // ACTIVITY LOG
+  // ============================================================================
+  
+  activityLog: router({
+    list: protectedProcedure
+      .input(
+        z.object({
+          limit: z.number().optional(),
+        })
+      )
+      .query(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+        
+        const query = db
+          .select()
+          .from(logisticsActivityLog)
+          .orderBy(desc(logisticsActivityLog.createdAt));
+        
+        if (input.limit) {
+          return await query.limit(input.limit);
+        }
+        
+        return await query;
+      }),
+  }),
+});
