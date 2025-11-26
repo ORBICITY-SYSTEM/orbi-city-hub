@@ -122,7 +122,7 @@ export function InventoryDashboardStats() {
   const totalMaintenanceTasks = maintenanceSchedules?.length || 0;
   const completedMaintenanceTasks = maintenanceSchedules?.filter(s => s.status === 'completed').length || 0;
   const pendingMaintenanceTasks = totalMaintenanceTasks - completedMaintenanceTasks;
-  const totalMaintenanceCost = maintenanceSchedules?.reduce((sum, s) => sum + (Number(s.cost) || 0), 0) || 0;
+  const totalMaintenanceCost = maintenanceSchedules?.reduce((sum, s) => sum + (Number(s.actualCost || s.estimatedCost) || 0), 0) || 0;
 
   return (
     <div className="space-y-6">

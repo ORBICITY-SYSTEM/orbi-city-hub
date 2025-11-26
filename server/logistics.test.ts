@@ -197,11 +197,12 @@ describe("logistics.maintenance", () => {
 
     const result = await caller.logistics.maintenance.create({
       roomNumber: "A 3041",
-      scheduledDate: new Date().toISOString(),
+      scheduledDate: new Date().toISOString().split('T')[0],
       problem: "Broken AC",
       notes: "Needs urgent repair",
       status: "pending",
-      cost: 150,
+      estimatedCost: 150,
+      priority: "high",
     });
 
     expect(result).toBeDefined();

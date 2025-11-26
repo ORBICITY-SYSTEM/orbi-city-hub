@@ -1,0 +1,79 @@
+{
+  "query": "SELECT table_name FROM information_schema.tables WHERE table_schema = DATABASE()",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user c2qSkVB4gKtEmor.bc3c8c9ce52a --database VzNbWtRJAsr2zJAegEjRtX --execute SELECT table_name FROM information_schema.tables WHERE table_schema = DATABASE()",
+  "rows": [
+    {
+      "table_name": "__drizzle_migrations"
+    },
+    {
+      "table_name": "users"
+    },
+    {
+      "table_name": "aiConversations"
+    },
+    {
+      "table_name": "bookings"
+    },
+    {
+      "table_name": "campaigns"
+    },
+    {
+      "table_name": "channelPerformance"
+    },
+    {
+      "table_name": "guests"
+    },
+    {
+      "table_name": "housekeepingTasks"
+    },
+    {
+      "table_name": "inventoryItems"
+    },
+    {
+      "table_name": "systemConfig"
+    },
+    {
+      "table_name": "transactions"
+    },
+    {
+      "table_name": "files"
+    },
+    {
+      "table_name": "adminUsers"
+    },
+    {
+      "table_name": "modules"
+    },
+    {
+      "table_name": "systemSettings"
+    },
+    {
+      "table_name": "reservations"
+    },
+    {
+      "table_name": "financial_data"
+    },
+    {
+      "table_name": "standardInventoryItems"
+    },
+    {
+      "table_name": "housekeepingSchedules"
+    },
+    {
+      "table_name": "maintenanceSchedules"
+    },
+    {
+      "table_name": "rooms"
+    },
+    {
+      "table_name": "roomInventoryItems"
+    },
+    {
+      "table_name": "roomInventoryDescriptions"
+    }
+  ],
+  "messages": [],
+  "stdout": "table_name\n__drizzle_migrations\nusers\naiConversations\nbookings\ncampaigns\nchannelPerformance\nguests\nhousekeepingTasks\ninventoryItems\nsystemConfig\ntransactions\nfiles\nadminUsers\nmodules\nsystemSettings\nreservations\nfinancial_data\nstandardInventoryItems\nhousekeepingSchedules\nmaintenanceSchedules\nrooms\nroomInventoryItems\nroomInventoryDescriptions\n",
+  "stderr": "",
+  "execution_time_ms": 56
+}

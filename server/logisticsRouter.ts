@@ -239,7 +239,8 @@ export const logisticsRouter = router({
           problem: z.string(),
           notes: z.string().optional(),
           status: z.enum(["pending", "in_progress", "completed", "cancelled"]).optional(),
-          cost: z.number().optional(),
+          estimatedCost: z.number().optional(),
+          priority: z.enum(["low", "medium", "high", "urgent"]).optional(),
         })
       )
       .mutation(async ({ input, ctx }) => {
@@ -253,7 +254,8 @@ export const logisticsRouter = router({
           problem: input.problem,
           notes: input.notes,
           status: input.status || "pending",
-          cost: input.cost,
+          estimatedCost: input.estimatedCost,
+          priority: input.priority || "medium",
         });
         
         return { success: true, id: result.insertId };
@@ -265,9 +267,9 @@ export const logisticsRouter = router({
           id: z.number(),
           status: z.enum(["pending", "in_progress", "completed", "cancelled"]).optional(),
           notes: z.string().optional(),
-          additionalNotes: z.string().optional(),
-          cost: z.number().optional(),
-          solvingDate: z.string().optional(),
+          estimatedCost: z.number().optional(),
+          actualCost: z.number().optional(),
+          assignedTo: z.string().optional(),
           completedAt: z.date().optional(),
         })
       )
@@ -280,9 +282,9 @@ export const logisticsRouter = router({
           .set({
             status: input.status,
             notes: input.notes,
-            additionalNotes: input.additionalNotes,
-            cost: input.cost,
-            solvingDate: input.solvingDate,
+            estimatedCost: input.estimatedCost,
+            actualCost: input.actualCost,
+            assignedTo: input.assignedTo,
             completedAt: input.completedAt,
           })
           .where(eq(maintenanceSchedules.id, input.id));

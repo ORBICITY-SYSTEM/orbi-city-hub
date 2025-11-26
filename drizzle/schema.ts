@@ -285,13 +285,14 @@ export const maintenanceSchedules = mysqlTable("maintenanceSchedules", {
   roomNumber: varchar("roomNumber", { length: 20 }).notNull(),
   scheduledDate: varchar("scheduledDate", { length: 10 }).notNull(), // YYYY-MM-DD
   problem: text("problem").notNull(),
-  notes: text("notes"),
+  priority: mysqlEnum("priority", ["low", "medium", "high", "urgent"]).default("medium"),
   status: mysqlEnum("status", ["pending", "in_progress", "completed", "cancelled"]).default("pending").notNull(),
-  cost: int("cost"), // in tetri
-  solvingDate: varchar("solvingDate", { length: 10 }), // YYYY-MM-DD
-  additionalNotes: text("additionalNotes"),
-  mediaUrls: json("mediaUrls"), // Array of media URLs
+  estimatedCost: int("estimatedCost"), // in tetri
+  actualCost: int("actualCost"), // in tetri
+  assignedTo: varchar("assignedTo", { length: 255 }),
   completedAt: timestamp("completedAt"),
+  notes: text("notes"),
+  mediaUrls: json("mediaUrls"), // Array of media URLs
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
