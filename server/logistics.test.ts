@@ -167,7 +167,7 @@ describe("logistics.housekeeping", () => {
     const caller = appRouter.createCaller(ctx);
 
     const result = await caller.logistics.housekeeping.create({
-      scheduledDate: new Date().toISOString(),
+      scheduledDate: new Date().toISOString().split('T')[0], // YYYY-MM-DD format
       rooms: ["A 3041", "C 2641"],
       totalRooms: 2,
       status: "pending",

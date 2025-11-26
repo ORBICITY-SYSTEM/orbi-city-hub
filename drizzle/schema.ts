@@ -322,8 +322,6 @@ export const roomInventoryItems = mysqlTable("roomInventoryItems", {
   condition: mysqlEnum("condition", ["good", "fair", "poor", "missing"]).default("good"),
   lastChecked: timestamp("lastChecked").defaultNow().notNull(),
   notes: text("notes"),
-  issueDetectedAt: timestamp("issueDetectedAt"),
-  issueResolvedAt: timestamp("issueResolvedAt"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
