@@ -1,0 +1,460 @@
+{
+  "query": "SELECT category, itemName, standardQuantity FROM standardInventoryItems ORDER BY category, itemName LIMIT 100",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user c2qSkVB4gKtEmor.bc3c8c9ce52a --database VzNbWtRJAsr2zJAegEjRtX --execute SELECT category, itemName, standardQuantity FROM standardInventoryItems ORDER BY category, itemName LIMIT 100",
+  "rows": [
+    {
+      "category": "Appliances",
+      "itemName": "Air Conditioner",
+      "standardQuantity": "1"
+    },
+    {
+      "category": "Appliances",
+      "itemName": "Bedside Lamp",
+      "standardQuantity": "2"
+    },
+    {
+      "category": "Appliances",
+      "itemName": "Ceiling Light",
+      "standardQuantity": "2"
+    },
+    {
+      "category": "Appliances",
+      "itemName": "Desk Lamp",
+      "standardQuantity": "1"
+    },
+    {
+      "category": "Appliances",
+      "itemName": "Electric Kettle",
+      "standardQuantity": "1"
+    },
+    {
+      "category": "Appliances",
+      "itemName": "Hair Dryer",
+      "standardQuantity": "1"
+    },
+    {
+      "category": "Appliances",
+      "itemName": "Iron",
+      "standardQuantity": "1"
+    },
+    {
+      "category": "Appliances",
+      "itemName": "Ironing Board",
+      "standardQuantity": "1"
+    },
+    {
+      "category": "Appliances",
+      "itemName": "Microwave",
+      "standardQuantity": "1"
+    },
+    {
+      "category": "Appliances",
+      "itemName": "Refrigerator",
+      "standardQuantity": "1"
+    },
+    {
+      "category": "Appliances",
+      "itemName": "Safe Box",
+      "standardQuantity": "1"
+    },
+    {
+      "category": "Appliances",
+      "itemName": "Smart TV",
+      "standardQuantity": "1"
+    },
+    {
+      "category": "Appliances",
+      "itemName": "Vacuum Cleaner",
+      "standardQuantity": "1"
+    },
+    {
+      "category": "Appliances",
+      "itemName": "Washing Machine",
+      "standardQuantity": "1"
+    },
+    {
+      "category": "Appliances",
+      "itemName": "Wi-Fi Router",
+      "standardQuantity": "1"
+    },
+    {
+      "category": "Bathroom",
+      "itemName": "Bathroom Mirror",
+      "standardQuantity": "1"
+    },
+    {
+      "category": "Bathroom",
+      "itemName": "Bathroom Scale",
+      "standardQuantity": "1"
+    },
+    {
+      "category": "Bathroom",
+      "itemName": "Body Wash (Welcome)",
+      "standardQuantity": "2"
+    },
+    {
+      "category": "Bathroom",
+      "itemName": "Conditioner (Welcome)",
+      "standardQuantity": "2"
+    },
+    {
+      "category": "Bathroom",
+      "itemName": "Plunger",
+      "standardQuantity": "1"
+    },
+    {
+      "category": "Bathroom",
+      "itemName": "Shampoo (Welcome)",
+      "standardQuantity": "2"
+    },
+    {
+      "category": "Bathroom",
+      "itemName": "Shower Curtain",
+      "standardQuantity": "1"
+    },
+    {
+      "category": "Bathroom",
+      "itemName": "Shower Head",
+      "standardQuantity": "1"
+    },
+    {
+      "category": "Bathroom",
+      "itemName": "Soap Dispenser",
+      "standardQuantity": "1"
+    },
+    {
+      "category": "Bathroom",
+      "itemName": "Toilet Brush",
+      "standardQuantity": "1"
+    },
+    {
+      "category": "Bathroom",
+      "itemName": "Toilet Paper Holder",
+      "standardQuantity": "1"
+    },
+    {
+      "category": "Bathroom",
+      "itemName": "Toilet Paper Roll",
+      "standardQuantity": "4"
+    },
+    {
+      "category": "Bathroom",
+      "itemName": "Toothbrush Holder",
+      "standardQuantity": "1"
+    },
+    {
+      "category": "Bathroom",
+      "itemName": "Towel Rack",
+      "standardQuantity": "1"
+    },
+    {
+      "category": "Bathroom",
+      "itemName": "Waste Basket",
+      "standardQuantity": "1"
+    },
+    {
+      "category": "Furniture",
+      "itemName": "Balcony Chair",
+      "standardQuantity": "2"
+    },
+    {
+      "category": "Furniture",
+      "itemName": "Balcony Table",
+      "standardQuantity": "1"
+    },
+    {
+      "category": "Furniture",
+      "itemName": "Bedside Table",
+      "standardQuantity": "2"
+    },
+    {
+      "category": "Furniture",
+      "itemName": "Bookshelf",
+      "standardQuantity": "1"
+    },
+    {
+      "category": "Furniture",
+      "itemName": "Chair",
+      "standardQuantity": "2"
+    },
+    {
+      "category": "Furniture",
+      "itemName": "Coat Rack",
+      "standardQuantity": "1"
+    },
+    {
+      "category": "Furniture",
+      "itemName": "Coffee Table",
+      "standardQuantity": "1"
+    },
+    {
+      "category": "Furniture",
+      "itemName": "Desk",
+      "standardQuantity": "1"
+    },
+    {
+      "category": "Furniture",
+      "itemName": "Dining Chair",
+      "standardQuantity": "4"
+    },
+    {
+      "category": "Furniture",
+      "itemName": "Dining Table",
+      "standardQuantity": "1"
+    },
+    {
+      "category": "Furniture",
+      "itemName": "Double Bed",
+      "standardQuantity": "1"
+    },
+    {
+      "category": "Furniture",
+      "itemName": "Luggage Rack",
+      "standardQuantity": "1"
+    },
+    {
+      "category": "Furniture",
+      "itemName": "Mirror (Full Length)",
+      "standardQuantity": "1"
+    },
+    {
+      "category": "Furniture",
+      "itemName": "Mirror (Wall)",
+      "standardQuantity": "1"
+    },
+    {
+      "category": "Furniture",
+      "itemName": "Ottoman",
+      "standardQuantity": "1"
+    },
+    {
+      "category": "Furniture",
+      "itemName": "Shoe Rack",
+      "standardQuantity": "1"
+    },
+    {
+      "category": "Furniture",
+      "itemName": "Single Bed",
+      "standardQuantity": "0"
+    },
+    {
+      "category": "Furniture",
+      "itemName": "Sofa Bed",
+      "standardQuantity": "1"
+    },
+    {
+      "category": "Furniture",
+      "itemName": "TV Stand",
+      "standardQuantity": "1"
+    },
+    {
+      "category": "Furniture",
+      "itemName": "Wardrobe",
+      "standardQuantity": "1"
+    },
+    {
+      "category": "Kitchen",
+      "itemName": "Bowl",
+      "standardQuantity": "4"
+    },
+    {
+      "category": "Kitchen",
+      "itemName": "Can Opener",
+      "standardQuantity": "1"
+    },
+    {
+      "category": "Kitchen",
+      "itemName": "Cooking Pot (Large)",
+      "standardQuantity": "1"
+    },
+    {
+      "category": "Kitchen",
+      "itemName": "Cooking Pot (Small)",
+      "standardQuantity": "1"
+    },
+    {
+      "category": "Kitchen",
+      "itemName": "Corkscrew",
+      "standardQuantity": "1"
+    },
+    {
+      "category": "Kitchen",
+      "itemName": "Cutting Board",
+      "standardQuantity": "1"
+    },
+    {
+      "category": "Kitchen",
+      "itemName": "Dinner Plate",
+      "standardQuantity": "4"
+    },
+    {
+      "category": "Kitchen",
+      "itemName": "Fork",
+      "standardQuantity": "4"
+    },
+    {
+      "category": "Kitchen",
+      "itemName": "Frying Pan",
+      "standardQuantity": "1"
+    },
+    {
+      "category": "Kitchen",
+      "itemName": "Glass (Water)",
+      "standardQuantity": "4"
+    },
+    {
+      "category": "Kitchen",
+      "itemName": "Kitchen Knife Set",
+      "standardQuantity": "1"
+    },
+    {
+      "category": "Kitchen",
+      "itemName": "Knife",
+      "standardQuantity": "4"
+    },
+    {
+      "category": "Kitchen",
+      "itemName": "Ladle",
+      "standardQuantity": "1"
+    },
+    {
+      "category": "Kitchen",
+      "itemName": "Mug/Cup",
+      "standardQuantity": "4"
+    },
+    {
+      "category": "Kitchen",
+      "itemName": "Salad Plate",
+      "standardQuantity": "4"
+    },
+    {
+      "category": "Kitchen",
+      "itemName": "Spatula",
+      "standardQuantity": "2"
+    },
+    {
+      "category": "Kitchen",
+      "itemName": "Spoon",
+      "standardQuantity": "4"
+    },
+    {
+      "category": "Kitchen",
+      "itemName": "Teaspoon",
+      "standardQuantity": "4"
+    },
+    {
+      "category": "Kitchen",
+      "itemName": "Trash Bin",
+      "standardQuantity": "1"
+    },
+    {
+      "category": "Kitchen",
+      "itemName": "Wine Glass",
+      "standardQuantity": "4"
+    },
+    {
+      "category": "Textiles",
+      "itemName": "Bath Mat",
+      "standardQuantity": "1"
+    },
+    {
+      "category": "Textiles",
+      "itemName": "Bath Towel (Large)",
+      "standardQuantity": "4"
+    },
+    {
+      "category": "Textiles",
+      "itemName": "Bathrobe",
+      "standardQuantity": "2"
+    },
+    {
+      "category": "Textiles",
+      "itemName": "Bed Sheet (Fitted)",
+      "standardQuantity": "2"
+    },
+    {
+      "category": "Textiles",
+      "itemName": "Bed Sheet (Flat)",
+      "standardQuantity": "2"
+    },
+    {
+      "category": "Textiles",
+      "itemName": "Blackout Curtains",
+      "standardQuantity": "1"
+    },
+    {
+      "category": "Textiles",
+      "itemName": "Blanket",
+      "standardQuantity": "1"
+    },
+    {
+      "category": "Textiles",
+      "itemName": "Curtains",
+      "standardQuantity": "2"
+    },
+    {
+      "category": "Textiles",
+      "itemName": "Duvet",
+      "standardQuantity": "1"
+    },
+    {
+      "category": "Textiles",
+      "itemName": "Duvet Cover",
+      "standardQuantity": "2"
+    },
+    {
+      "category": "Textiles",
+      "itemName": "Face Towel",
+      "standardQuantity": "4"
+    },
+    {
+      "category": "Textiles",
+      "itemName": "Hand Towel",
+      "standardQuantity": "4"
+    },
+    {
+      "category": "Textiles",
+      "itemName": "Kitchen Towel",
+      "standardQuantity": "3"
+    },
+    {
+      "category": "Textiles",
+      "itemName": "Mattress",
+      "standardQuantity": "1"
+    },
+    {
+      "category": "Textiles",
+      "itemName": "Mattress Protector",
+      "standardQuantity": "1"
+    },
+    {
+      "category": "Textiles",
+      "itemName": "Pillow",
+      "standardQuantity": "4"
+    },
+    {
+      "category": "Textiles",
+      "itemName": "Pillow Case",
+      "standardQuantity": "4"
+    },
+    {
+      "category": "Textiles",
+      "itemName": "Rug (Living Area)",
+      "standardQuantity": "1"
+    },
+    {
+      "category": "Textiles",
+      "itemName": "Slippers (Disposable)",
+      "standardQuantity": "2"
+    },
+    {
+      "category": "Textiles",
+      "itemName": "Throw Pillow",
+      "standardQuantity": "3"
+    }
+  ],
+  "messages": [],
+  "stdout": "category\titemName\tstandardQuantity\nAppliances\tAir Conditioner\t1\nAppliances\tBedside Lamp\t2\nAppliances\tCeiling Light\t2\nAppliances\tDesk Lamp\t1\nAppliances\tElectric Kettle\t1\nAppliances\tHair Dryer\t1\nAppliances\tIron\t1\nAppliances\tIroning Board\t1\nAppliances\tMicrowave\t1\nAppliances\tRefrigerator\t1\nAppliances\tSafe Box\t1\nAppliances\tSmart TV\t1\nAppliances\tVacuum Cleaner\t1\nAppliances\tWashing Machine\t1\nAppliances\tWi-Fi Router\t1\nBathroom\tBathroom Mirror\t1\nBathroom\tBathroom Scale\t1\nBathroom\tBody Wash (Welcome)\t2\nBathroom\tConditioner (Welcome)\t2\nBathroom\tPlunger\t1\nBathroom\tShampoo (Welcome)\t2\nBathroom\tShower Curtain\t1\nBathroom\tShower Head\t1\nBathroom\tSoap Dispenser\t1\nBathroom\tToilet Brush\t1\nBathroom\tToilet Paper Holder\t1\nBathroom\tToilet Paper Roll\t4\nBathroom\tToothbrush Holder\t1\nBathroom\tTowel Rack\t1\nBathroom\tWaste Basket\t1\nFurniture\tBalcony Chair\t2\nFurniture\tBalcony Table\t1\nFurniture\tBedside Table\t2\nFurniture\tBookshelf\t1\nFurniture\tChair\t2\nFurniture\tCoat Rack\t1\nFurniture\tCoffee Table\t1\nFurniture\tDesk\t1\nFurniture\tDining Chair\t4\nFurniture\tDining Table\t1\nFurniture\tDouble Bed\t1\nFurniture\tLuggage Rack\t1\nFurniture\tMirror (Full Length)\t1\nFurniture\tMirror (Wall)\t1\nFurniture\tOttoman\t1\nFurniture\tShoe Rack\t1\nFurniture\tSingle Bed\t0\nFurniture\tSofa Bed\t1\nFurniture\tTV Stand\t1\nFurniture\tWardrobe\t1\nKitchen\tBowl\t4\nKitchen\tCan Opener\t1\nKitchen\tCooking Pot (Large)\t1\nKitchen\tCooking Pot (Small)\t1\nKitchen\tCorkscrew\t1\nKitchen\tCutting Board\t1\nKitchen\tDinner Plate\t4\nKitchen\tFork\t4\nKitchen\tFrying Pan\t1\nKitchen\tGlass (Water)\t4\nKitchen\tKitchen Knife Set\t1\nKitchen\tKnife\t4\nKitchen\tLadle\t1\nKitchen\tMug/Cup\t4\nKitchen\tSalad Plate\t4\nKitchen\tSpatula\t2\nKitchen\tSpoon\t4\nKitchen\tTeaspoon\t4\nKitchen\tTrash Bin\t1\nKitchen\tWine Glass\t4\nTextiles\tBath Mat\t1\nTextiles\tBath Towel (Large)\t4\nTextiles\tBathrobe\t2\nTextiles\tBed Sheet (Fitted)\t2\nTextiles\tBed Sheet (Flat)\t2\nTextiles\tBlackout Curtains\t1\nTextiles\tBlanket\t1\nTextiles\tCurtains\t2\nTextiles\tDuvet\t1\nTextiles\tDuvet Cover\t2\nTextiles\tFace Towel\t4\nTextiles\tHand Towel\t4\nTextiles\tKitchen Towel\t3\nTextiles\tMattress\t1\nTextiles\tMattress Protector\t1\nTextiles\tPillow\t4\nTextiles\tPillow Case\t4\nTextiles\tRug (Living Area)\t1\nTextiles\tSlippers (Disposable)\t2\nTextiles\tThrow Pillow\t3\n",
+  "stderr": "",
+  "execution_time_ms": 68
+}
