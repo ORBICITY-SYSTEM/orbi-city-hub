@@ -69,7 +69,7 @@ export default function SocialMedia() {
     <div className="min-h-screen p-6">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-white mb-2">
+        <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-2">
           Social Media Analytics
         </h1>
         <p className="text-white/70">
@@ -84,7 +84,7 @@ export default function SocialMedia() {
             <Users className="w-8 h-8 text-blue-400" />
             <TrendingUp className="w-5 h-5 text-green-400" />
           </div>
-          <div className="text-2xl font-bold text-white">
+          <div className="text-lg sm:text-xl lg:text-2xl font-bold text-white">
             {combinedStats?.data?.totalFollowers.toLocaleString() || "0"}
           </div>
           <div className="text-sm text-white/70">Total Followers</div>
@@ -95,7 +95,7 @@ export default function SocialMedia() {
             <Eye className="w-8 h-8 text-purple-400" />
             <TrendingUp className="w-5 h-5 text-green-400" />
           </div>
-          <div className="text-2xl font-bold text-white">
+          <div className="text-lg sm:text-xl lg:text-2xl font-bold text-white">
             {combinedStats?.data?.totalReach.toLocaleString() || "0"}
           </div>
           <div className="text-sm text-white/70">Total Reach</div>
@@ -106,7 +106,7 @@ export default function SocialMedia() {
             <Heart className="w-8 h-8 text-orange-400" />
             <TrendingUp className="w-5 h-5 text-green-400" />
           </div>
-          <div className="text-2xl font-bold text-white">
+          <div className="text-lg sm:text-xl lg:text-2xl font-bold text-white">
             {combinedStats?.data?.totalEngagement.toLocaleString() || "0"}
           </div>
           <div className="text-sm text-white/70">Total Engagement</div>
@@ -117,7 +117,7 @@ export default function SocialMedia() {
             <BarChart3 className="w-8 h-8 text-green-400" />
             <TrendingUp className="w-5 h-5 text-green-400" />
           </div>
-          <div className="text-2xl font-bold text-white">
+          <div className="text-lg sm:text-xl lg:text-2xl font-bold text-white">
             {combinedStats?.data?.avgEngagementRate.toFixed(2) || "0"}%
           </div>
           <div className="text-sm text-white/70">Engagement Rate</div>
@@ -154,7 +154,7 @@ export default function SocialMedia() {
 
         {/* Overview Tab */}
         <TabsContent value="overview">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
             {/* Facebook Overview */}
             <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6">
               <div className="flex items-center justify-between mb-4">
@@ -260,21 +260,21 @@ export default function SocialMedia() {
               <Clock className="w-6 h-6 mr-2 text-yellow-400" />
               Best Posting Times
             </h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
               <div className="text-center">
-                <div className="text-2xl font-bold text-white">15:00-18:00</div>
+                <div className="text-lg sm:text-xl lg:text-2xl font-bold text-white">15:00-18:00</div>
                 <div className="text-sm text-white/70">Peak Engagement</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-white">Friday</div>
+                <div className="text-lg sm:text-xl lg:text-2xl font-bold text-white">Friday</div>
                 <div className="text-sm text-white/70">Best Day</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-white">12:00-15:00</div>
+                <div className="text-lg sm:text-xl lg:text-2xl font-bold text-white">12:00-15:00</div>
                 <div className="text-sm text-white/70">Second Best</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-white">Weekend</div>
+                <div className="text-lg sm:text-xl lg:text-2xl font-bold text-white">Weekend</div>
                 <div className="text-sm text-white/70">High Activity</div>
               </div>
             </div>
@@ -288,19 +288,19 @@ export default function SocialMedia() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6">
                 <div className="text-sm text-white/70 mb-1">Organic Reach</div>
-                <div className="text-2xl font-bold text-white">
+                <div className="text-lg sm:text-xl lg:text-2xl font-bold text-white">
                   {fbInsights?.data?.reach.organic.toLocaleString() || "0"}
                 </div>
               </Card>
               <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6">
                 <div className="text-sm text-white/70 mb-1">Paid Reach</div>
-                <div className="text-2xl font-bold text-white">
+                <div className="text-lg sm:text-xl lg:text-2xl font-bold text-white">
                   {fbInsights?.data?.reach.paid.toLocaleString() || "0"}
                 </div>
               </Card>
               <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6">
                 <div className="text-sm text-white/70 mb-1">Impressions</div>
-                <div className="text-2xl font-bold text-white">
+                <div className="text-lg sm:text-xl lg:text-2xl font-bold text-white">
                   {fbInsights?.data?.impressions.toLocaleString() || "0"}
                 </div>
               </Card>
@@ -348,7 +348,7 @@ export default function SocialMedia() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6">
                 <div className="text-sm text-white/70 mb-1">Profile Views</div>
-                <div className="text-2xl font-bold text-white">
+                <div className="text-lg sm:text-xl lg:text-2xl font-bold text-white">
                   {igInsights?.data?.profileViews.toLocaleString() || "0"}
                 </div>
               </Card>
@@ -356,13 +356,13 @@ export default function SocialMedia() {
                 <div className="text-sm text-white/70 mb-1">
                   Website Clicks
                 </div>
-                <div className="text-2xl font-bold text-white">
+                <div className="text-lg sm:text-xl lg:text-2xl font-bold text-white">
                   {igInsights?.data?.websiteClicks.toLocaleString() || "0"}
                 </div>
               </Card>
               <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6">
                 <div className="text-sm text-white/70 mb-1">Impressions</div>
-                <div className="text-2xl font-bold text-white">
+                <div className="text-lg sm:text-xl lg:text-2xl font-bold text-white">
                   {igInsights?.data?.impressions.toLocaleString() || "0"}
                 </div>
               </Card>
@@ -417,7 +417,7 @@ export default function SocialMedia() {
                 <div className="flex items-center justify-between mb-2">
                   <Users className="w-8 h-8 text-pink-400" />
                 </div>
-                <div className="text-2xl font-bold text-white">
+                <div className="text-lg sm:text-xl lg:text-2xl font-bold text-white">
                   {ttInsights?.data?.followers.toLocaleString() || "0"}
                 </div>
                 <div className="text-sm text-white/70">Followers</div>
@@ -426,7 +426,7 @@ export default function SocialMedia() {
                 <div className="flex items-center justify-between mb-2">
                   <Eye className="w-8 h-8 text-purple-400" />
                 </div>
-                <div className="text-2xl font-bold text-white">
+                <div className="text-lg sm:text-xl lg:text-2xl font-bold text-white">
                   {ttInsights?.data?.totalViews.toLocaleString() || "0"}
                 </div>
                 <div className="text-sm text-white/70">Total Views</div>
@@ -435,7 +435,7 @@ export default function SocialMedia() {
                 <div className="flex items-center justify-between mb-2">
                   <Heart className="w-8 h-8 text-red-400" />
                 </div>
-                <div className="text-2xl font-bold text-white">
+                <div className="text-lg sm:text-xl lg:text-2xl font-bold text-white">
                   {ttInsights?.data?.avgEngagementRate.toFixed(1) || "0"}%
                 </div>
                 <div className="text-sm text-white/70">Engagement Rate</div>
@@ -611,7 +611,7 @@ export default function SocialMedia() {
 
         {/* Audience Tab */}
         <TabsContent value="audience">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
             {/* Facebook Audience */}
             <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6">
               <h3 className="text-xl font-bold text-white mb-4 flex items-center">

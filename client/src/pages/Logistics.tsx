@@ -39,7 +39,7 @@ const Logistics = () => {
   };
 
   return (
-    <div className="p-8 min-h-screen">
+    <div className="p-4 sm:p-6 lg:p-8 min-h-screen">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
@@ -47,7 +47,7 @@ const Logistics = () => {
             <Package className="h-6 w-6 text-white" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-foreground">
+            <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground">
               Logistics
             </h1>
             <p className="text-sm text-muted-foreground">
@@ -177,7 +177,7 @@ const Logistics = () => {
               />
 
               {/* Quick Actions */}
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <Button 
                   variant="outline" 
                   size="sm"

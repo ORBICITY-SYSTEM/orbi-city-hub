@@ -83,10 +83,10 @@ const Reservations = () => {
   const totalRevenue = mockBookings.reduce((sum, b) => sum + b.price, 0);
 
   return (
-    <div className="p-8 min-h-screen space-y-6">
+    <div className="p-4 sm:p-6 lg:p-8 min-h-screen space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold">Reservations</h1>
+        <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold">Reservations</h1>
         <p className="text-gray-600">Manage reservations and guests</p>
       </div>
 
@@ -96,7 +96,7 @@ const Reservations = () => {
           <div className="flex items-center justify-between">
             <div>
               <div className="text-sm text-blue-700 font-medium">Total Reservations</div>
-              <div className="text-3xl font-bold text-blue-900">{totalBookings}</div>
+              <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-blue-900">{totalBookings}</div>
               <div className="text-xs text-blue-600 mt-1 flex items-center">
                 <TrendingUp className="h-3 w-3 mr-1" />
                 +12% vs last month
@@ -110,7 +110,7 @@ const Reservations = () => {
           <div className="flex items-center justify-between">
             <div>
               <div className="text-sm text-green-700 font-medium">Check-ins Today</div>
-              <div className="text-3xl font-bold text-green-900">{checkInsToday}</div>
+              <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-green-900">{checkInsToday}</div>
               <div className="text-xs text-green-600 mt-1">{mockBookings.filter(b => b.checkIn === "2025-11-26").map(b => b.room).join(", ")}</div>
             </div>
             <CheckCircle2 className="h-10 w-10 text-green-600 opacity-50" />
@@ -121,7 +121,7 @@ const Reservations = () => {
           <div className="flex items-center justify-between">
             <div>
               <div className="text-sm text-orange-700 font-medium">Check-outs Today</div>
-              <div className="text-3xl font-bold text-orange-900">{checkOutsToday}</div>
+              <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-orange-900">{checkOutsToday}</div>
               <div className="text-xs text-orange-600 mt-1">Cleaning required</div>
             </div>
             <XCircle className="h-10 w-10 text-orange-600 opacity-50" />
@@ -132,7 +132,7 @@ const Reservations = () => {
           <div className="flex items-center justify-between">
             <div>
               <div className="text-sm text-purple-700 font-medium">occupancy</div>
-              <div className="text-3xl font-bold text-purple-900">{occupancyRate}%</div>
+              <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-purple-900">{occupancyRate}%</div>
               <div className="text-xs text-purple-600 mt-1 flex items-center">
                 <TrendingUp className="h-3 w-3 mr-1" />
                 +5% vs last month
@@ -146,7 +146,7 @@ const Reservations = () => {
           <div className="flex items-center justify-between">
             <div>
               <div className="text-sm text-yellow-700 font-medium">Revenue</div>
-              <div className="text-3xl font-bold text-yellow-900">₾{totalRevenue.toLocaleString()}</div>
+              <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-yellow-900">₾{totalRevenue.toLocaleString()}</div>
               <div className="text-xs text-yellow-600 mt-1">Current Reservations</div>
             </div>
             <DollarSign className="h-10 w-10 text-yellow-600 opacity-50" />
@@ -179,7 +179,7 @@ const Reservations = () => {
       {/* Tab Content */}
       <div className="mt-6">
         {activeTab === "calendar" && (
-          <Card className="p-6">
+          <Card className="p-4 sm:p-6">
             <h2 className="text-xl font-bold mb-4">Calendar</h2>
             <div className="bg-gradient-to-br from-gray-50 to-gray-100 p-8 rounded-lg border-2 border-dashed border-gray-300">
               <div className="text-center">
@@ -250,24 +250,24 @@ const Reservations = () => {
         )}
 
         {activeTab === "crm" && (
-          <Card className="p-6">
+          <Card className="p-4 sm:p-6">
             <h2 className="text-xl font-bold mb-4">Guest CRM</h2>
             <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-8 rounded-lg border-2 border-dashed border-purple-300">
               <div className="text-center">
                 <Users className="h-16 w-16 mx-auto text-purple-400 mb-4" />
                 <h3 className="text-lg font-semibold text-purple-700 mb-2">Guest Management</h3>
                 <p className="text-purple-600 mb-4">Guest profiles, history and preferences will appear here</p>
-                <div className="grid grid-cols-3 gap-4 max-w-xl mx-auto mt-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-xl mx-auto mt-6">
                   <Card className="p-4 bg-white">
-                    <div className="text-2xl font-bold text-purple-900">156</div>
+                    <div className="text-lg sm:text-xl lg:text-2xl font-bold text-purple-900">156</div>
                     <div className="text-xs text-purple-600">Total guests</div>
                   </Card>
                   <Card className="p-4 bg-white">
-                    <div className="text-2xl font-bold text-purple-900">42</div>
+                    <div className="text-lg sm:text-xl lg:text-2xl font-bold text-purple-900">42</div>
                     <div className="text-xs text-purple-600">VIP guests</div>
                   </Card>
                   <Card className="p-4 bg-white">
-                    <div className="text-2xl font-bold text-purple-900">89%</div>
+                    <div className="text-lg sm:text-xl lg:text-2xl font-bold text-purple-900">89%</div>
                     <div className="text-xs text-purple-600">Return Rate</div>
                   </Card>
                 </div>
@@ -277,7 +277,7 @@ const Reservations = () => {
         )}
 
         {activeTab === "mail" && (
-          <Card className="p-6">
+          <Card className="p-4 sm:p-6">
             <h2 className="text-xl font-bold mb-4">📧 Email Integration</h2>
             <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-8 rounded-lg border-2 border-dashed border-blue-300">
               <div className="text-center">

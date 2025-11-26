@@ -55,7 +55,7 @@ const Reports = () => {
   ];
 
   return (
-    <div className="p-8 min-h-screen space-y-6">
+    <div className="p-4 sm:p-6 lg:p-8 min-h-screen space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
@@ -63,7 +63,7 @@ const Reports = () => {
             <FileText className="h-6 w-6 text-white" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-foreground">Reports & Analytics</h1>
+            <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground">Reports & Analytics</h1>
             <p className="text-sm text-muted-foreground">Business intelligence and data analytics</p>
           </div>
         </div>
@@ -76,7 +76,7 @@ const Reports = () => {
             <div className="flex items-center justify-between">
               <div>
                 <div className="text-sm text-blue-700 font-medium">Yearly Revenue</div>
-                <div className="text-3xl font-bold text-blue-900">₾648K</div>
+                <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-blue-900">₾648K</div>
                 <div className="text-xs text-blue-600 mt-1 flex items-center">
                   <ArrowUp className="h-3 w-3 mr-1" />
                   +18.2% vs 2024
@@ -92,7 +92,7 @@ const Reports = () => {
             <div className="flex items-center justify-between">
               <div>
                 <div className="text-sm text-green-700 font-medium">საშუალო occupancy</div>
-                <div className="text-3xl font-bold text-green-900">85%</div>
+                <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-green-900">85%</div>
                 <div className="text-xs text-green-600 mt-1 flex items-center">
                   <ArrowUp className="h-3 w-3 mr-1" />
                   +3.7% vs 2024
@@ -108,7 +108,7 @@ const Reports = () => {
             <div className="flex items-center justify-between">
               <div>
                 <div className="text-sm text-purple-700 font-medium">Total Bookings</div>
-                <div className="text-3xl font-bold text-purple-900">2,098</div>
+                <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-purple-900">2,098</div>
                 <div className="text-xs text-purple-600 mt-1 flex items-center">
                   <ArrowUp className="h-3 w-3 mr-1" />
                   +15.4% vs 2024
@@ -124,7 +124,7 @@ const Reports = () => {
             <div className="flex items-center justify-between">
               <div>
                 <div className="text-sm text-yellow-700 font-medium">Average Rating</div>
-                <div className="text-3xl font-bold text-yellow-900">9.2/10</div>
+                <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-yellow-900">9.2/10</div>
                 <div className="text-xs text-yellow-600 mt-1 flex items-center">
                   <ArrowUp className="h-3 w-3 mr-1" />
                   +0.4 vs 2024
@@ -190,25 +190,25 @@ const Reports = () => {
                   </div>
 
                   {/* Key Metrics Grid */}
-                  <div className="grid grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     <Card className="bg-blue-50 border-blue-200">
                       <CardContent className="p-4">
                         <div className="text-sm text-blue-700">საშუალო ღამის Price</div>
-                        <div className="text-2xl font-bold text-blue-900">₾102</div>
+                        <div className="text-lg sm:text-xl lg:text-2xl font-bold text-blue-900">₾102</div>
                         <div className="text-xs text-blue-600">+8.5% vs 2024</div>
                       </CardContent>
                     </Card>
                     <Card className="bg-green-50 border-green-200">
                       <CardContent className="p-4">
                         <div className="text-sm text-green-700">RevPAR</div>
-                        <div className="text-2xl font-bold text-green-900">₾87</div>
+                        <div className="text-lg sm:text-xl lg:text-2xl font-bold text-green-900">₾87</div>
                         <div className="text-xs text-green-600">+12.3% vs 2024</div>
                       </CardContent>
                     </Card>
                     <Card className="bg-purple-50 border-purple-200">
                       <CardContent className="p-4">
                         <div className="text-sm text-purple-700">Average Stay</div>
-                        <div className="text-2xl font-bold text-purple-900">3.2 nights</div>
+                        <div className="text-lg sm:text-xl lg:text-2xl font-bold text-purple-900">3.2 nights</div>
                         <div className="text-xs text-purple-600">+0.3 vs 2024</div>
                       </CardContent>
                     </Card>
@@ -242,7 +242,7 @@ const Reports = () => {
                             <span className="text-purple-600">₾{year.avgPrice}</span>
                           </div>
                         </div>
-                        <div className="grid grid-cols-3 gap-2">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
                           <div className="bg-blue-200 rounded-full h-3 overflow-hidden">
                             <div 
                               className="bg-blue-600 h-full"
@@ -268,25 +268,25 @@ const Reports = () => {
                 </div>
 
                 {/* Growth Metrics */}
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
                     <CardContent className="p-4">
                       <div className="text-sm text-green-700">Revenue Growth</div>
-                      <div className="text-3xl font-bold text-green-900">+33.6%</div>
+                      <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-green-900">+33.6%</div>
                       <div className="text-xs text-green-600">2023 → 2025</div>
                     </CardContent>
                   </Card>
                   <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
                     <CardContent className="p-4">
                       <div className="text-sm text-blue-700">Occupancy Growth</div>
-                      <div className="text-3xl font-bold text-blue-900">+9%</div>
+                      <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-blue-900">+9%</div>
                       <div className="text-xs text-blue-600">2023 → 2025</div>
                     </CardContent>
                   </Card>
                   <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
                     <CardContent className="p-4">
                       <div className="text-sm text-purple-700">Priceს ზრდა</div>
-                      <div className="text-3xl font-bold text-purple-900">+17.2%</div>
+                      <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-purple-900">+17.2%</div>
                       <div className="text-xs text-purple-600">2023 → 2025</div>
                     </CardContent>
                   </Card>
@@ -345,7 +345,7 @@ const Reports = () => {
                   </div>
 
                   {/* Seasonal Insights */}
-                  <div className="grid grid-cols-2 gap-4 mt-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
                     <Card className="bg-red-50 border-red-200">
                       <CardContent className="p-4">
                         <div className="text-sm text-red-700 font-medium">Peak Season</div>
@@ -375,9 +375,9 @@ const Reports = () => {
               <CardDescription>Download all data (CSV/Excel)</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 cursor-pointer hover:shadow-lg transition-shadow">
-                  <CardContent className="p-6">
+                  <CardContent className="p-4 sm:p-6">
                     <FileDown className="h-10 w-10 text-green-600 mb-3" />
                     <h3 className="font-semibold text-green-900 mb-2">Financial Data</h3>
                     <p className="text-sm text-green-700 mb-4">ყველა ტრანზაქცია, Revenue, ხარჯები</p>
@@ -388,7 +388,7 @@ const Reports = () => {
                 </Card>
 
                 <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 cursor-pointer hover:shadow-lg transition-shadow">
-                  <CardContent className="p-6">
+                  <CardContent className="p-4 sm:p-6">
                     <FileDown className="h-10 w-10 text-blue-600 mb-3" />
                     <h3 className="font-semibold text-blue-900 mb-2">Bookings</h3>
                     <p className="text-sm text-blue-700 mb-4">All Bookings, guests, Channel</p>
@@ -399,7 +399,7 @@ const Reports = () => {
                 </Card>
 
                 <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 cursor-pointer hover:shadow-lg transition-shadow">
-                  <CardContent className="p-6">
+                  <CardContent className="p-4 sm:p-6">
                     <FileDown className="h-10 w-10 text-purple-600 mb-3" />
                     <h3 className="font-semibold text-purple-900 mb-2">Marკეტინგული მონაცემები</h3>
                     <p className="text-sm text-purple-700 mb-4">Channels, Campaigns, ROI</p>
@@ -410,7 +410,7 @@ const Reports = () => {
                 </Card>
 
                 <Card className="bg-gradient-to-br from-yellow-50 to-yellow-100 border-yellow-200 cursor-pointer hover:shadow-lg transition-shadow">
-                  <CardContent className="p-6">
+                  <CardContent className="p-4 sm:p-6">
                     <FileDown className="h-10 w-10 text-yellow-600 mb-3" />
                     <h3 className="font-semibold text-yellow-900 mb-2">Operational Data</h3>
                     <p className="text-sm text-yellow-700 mb-4">Cleaning, Inventory, Staff</p>
@@ -442,7 +442,7 @@ const Reports = () => {
                 placeholder="e.g. 'Find hidden patterns' or 'Forecast next month'" 
                 height={400} 
               />
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <Button variant="outline" size="sm" onClick={() => handleSendMessage("Find hidden patterns in bookings")}>
                   Pattern Search
                 </Button>

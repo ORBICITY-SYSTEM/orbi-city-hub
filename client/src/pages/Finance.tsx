@@ -37,14 +37,14 @@ const Finance = () => {
   };
 
   return (
-    <div className="p-8 min-h-screen">
+    <div className="p-4 sm:p-6 lg:p-8 min-h-screen">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600">
             <Receipt className="h-6 w-6 text-white" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-foreground">Finance</h1>
+            <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground">Finance</h1>
             <p className="text-sm text-muted-foreground">Financial management and reporting</p>
           </div>
         </div>
@@ -93,7 +93,7 @@ const Finance = () => {
               }}
             />
             <AIChatBox messages={chatHistory} onSendMessage={handleSendMessage} isLoading={isLoading} placeholder="e.g. 'What is our biggest expense?' or 'Analyze this P&L report'" height={400} />
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <Button variant="outline" size="sm" onClick={() => handleSendMessage("რა არის ჩვენი Biggest Expense?")}>Biggest Expense</Button>
               <Button variant="outline" size="sm" onClick={() => handleSendMessage("How to increase profit?")}>Profit Optimization</Button>
             </div>
