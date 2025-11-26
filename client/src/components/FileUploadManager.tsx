@@ -41,11 +41,11 @@ export function FileUploadManager({ module = "CEO", onUploadSuccess }: FileUploa
 
   const uploadMutation = trpc.fileManager.upload.useMutation({
     onSuccess: () => {
-      toast.success("ფაილი წარმატებით აიტვირთა");
+      toast.success("File uploaded successfully");
       onUploadSuccess?.();
     },
     onError: (error) => {
-      toast.error(error.message || "ფაილის Upload ვერ მოხერხდა");
+      toast.error(error.message || "File upload failed");
     },
   });
 
@@ -59,7 +59,7 @@ export function FileUploadManager({ module = "CEO", onUploadSuccess }: FileUploa
     // Validate file type
     const acceptedTypes = Object.keys(ACCEPTED_FILE_TYPES);
     if (!acceptedTypes.includes(file.type)) {
-      toast.error("ფაილის ტიპი არ არის მხარდაჭერილი");
+      toast.error("File type not supported");
       return;
     }
 
@@ -82,7 +82,7 @@ export function FileUploadManager({ module = "CEO", onUploadSuccess }: FileUploa
         setIsUploading(false);
       };
       reader.onerror = () => {
-        toast.error("ფაილის წაკითხვა ვერ მოხერხდა");
+        toast.error("Failed to read file");
         setIsUploading(false);
       };
       reader.readAsDataURL(file);
@@ -149,9 +149,9 @@ export function FileUploadManager({ module = "CEO", onUploadSuccess }: FileUploa
           <>
             <Loader2 className="h-12 w-12 text-primary animate-spin" />
             <div>
-              <p className="text-lg font-medium">ფაილი იტვირთება...</p>
+              <p className="text-lg font-medium">ფაილი Uploading...</p>
               <p className="text-sm text-muted-foreground mt-1">
-                გთხოვთ დაელოდოთ
+                Please wait
               </p>
             </div>
           </>
@@ -160,10 +160,10 @@ export function FileUploadManager({ module = "CEO", onUploadSuccess }: FileUploa
             <Upload className="h-12 w-12 text-muted-foreground" />
             <div>
               <p className="text-lg font-medium">
-                ჩააგდეთ ფაილი აქ ან დააჭირეთ ასარჩევად
+                Drop file here or click to select
               </p>
               <p className="text-sm text-muted-foreground mt-2">
-                Supported formats: Excel (.xlsx, .xls), CSV, PDF, სურათები (JPG, PNG, WEBP), Word, PowerPoint
+                Supported formats: Excel (.xlsx, .xls), CSV, PDF, სურაFebი (JPG, PNG, WEBP), Word, PowerPoint
               </p>
               <p className="text-xs text-muted-foreground mt-1">
                 Maximum size: 10MB
@@ -171,7 +171,7 @@ export function FileUploadManager({ module = "CEO", onUploadSuccess }: FileUploa
             </div>
             <Button variant="outline" className="mt-2">
               <Upload className="h-4 w-4 mr-2" />
-              აირჩიეთ ფაილი
+              Select File
             </Button>
           </>
         )}

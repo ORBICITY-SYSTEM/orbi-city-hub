@@ -21,13 +21,13 @@ interface ScheduleEntry {
 
 // Mock data from ORBI City apartments
 const mockSchedules: ScheduleEntry[] = [
-  { id: "SCH-001", date: "2025-11-26", rooms: ["A 3041", "A 2441", "A 1833"], status: "in_progress", notes: "Deep cleaning required", assignedTo: "მარიამ გელაშვილი", completedAt: undefined },
-  { id: "SCH-002", date: "2025-11-26", rooms: ["C 2641", "C 2547"], status: "pending", notes: "Standard cleaning", assignedTo: "ნინო ბერიძე", completedAt: undefined },
-  { id: "SCH-003", date: "2025-11-25", rooms: ["A 3041", "C 2641", "A 2441", "A 1833"], status: "completed", notes: "Checkout cleaning", assignedTo: "მარიამ გელაშვილი", completedAt: "2025-11-25 18:30" },
-  { id: "SCH-004", date: "2025-11-25", rooms: ["C 4706", "A 4027"], status: "completed", notes: "Standard cleaning", assignedTo: "ნინო ბერიძე", completedAt: "2025-11-25 17:45" },
-  { id: "SCH-005", date: "2025-11-24", rooms: ["A 4029", "D 3418", "D 3414"], status: "completed", notes: "Deep cleaning + linen change", assignedTo: "მარიამ გელაშვილი", completedAt: "2025-11-24 19:15" },
-  { id: "SCH-006", date: "2025-11-24", rooms: ["D 3416", "C 2847"], status: "completed", notes: "Standard cleaning", assignedTo: "ნინო ბერიძე", completedAt: "2025-11-24 16:30" },
-  { id: "SCH-007", date: "2025-11-23", rooms: ["C 1256", "C 2524", "C 2961"], status: "completed", notes: "Checkout cleaning", assignedTo: "მარიამ გელაშვილი", completedAt: "2025-11-23 18:00" },
+  { id: "SCH-001", date: "2025-11-26", rooms: ["A 3041", "A 2441", "A 1833"], status: "in_progress", notes: "Deep cleaning required", assignedTo: "Mariam Gelashvili", completedAt: undefined },
+  { id: "SCH-002", date: "2025-11-26", rooms: ["C 2641", "C 2547"], status: "pending", notes: "Standard cleaning", assignedTo: "Nino Beridze", completedAt: undefined },
+  { id: "SCH-003", date: "2025-11-25", rooms: ["A 3041", "C 2641", "A 2441", "A 1833"], status: "completed", notes: "Checkout cleaning", assignedTo: "Mariam Gelashvili", completedAt: "2025-11-25 18:30" },
+  { id: "SCH-004", date: "2025-11-25", rooms: ["C 4706", "A 4027"], status: "completed", notes: "Standard cleaning", assignedTo: "Nino Beridze", completedAt: "2025-11-25 17:45" },
+  { id: "SCH-005", date: "2025-11-24", rooms: ["A 4029", "D 3418", "D 3414"], status: "completed", notes: "Deep cleaning + linen change", assignedTo: "Mariam Gelashvili", completedAt: "2025-11-24 19:15" },
+  { id: "SCH-006", date: "2025-11-24", rooms: ["D 3416", "C 2847"], status: "completed", notes: "Standard cleaning", assignedTo: "Nino Beridze", completedAt: "2025-11-24 16:30" },
+  { id: "SCH-007", date: "2025-11-23", rooms: ["C 1256", "C 2524", "C 2961"], status: "completed", notes: "Checkout cleaning", assignedTo: "Mariam Gelashvili", completedAt: "2025-11-23 18:00" },
 ];
 
 const availableRooms = [
@@ -36,7 +36,7 @@ const availableRooms = [
   "C 2520", "C 3428", "C 2921", "A 3035"
 ];
 
-const cleaningStaff = ["მარიამ გელაშვილი", "ნინო ბერიძე", "თამარ მახარაძე"];
+const cleaningStaff = ["Mariam Gelashvili", "Nino Beridze", "Tamar Makharadze"];
 
 export function LogisticsHousekeeping() {
   const [schedules, setSchedules] = useState<ScheduleEntry[]>(mockSchedules);

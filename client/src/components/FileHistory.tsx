@@ -50,11 +50,11 @@ export function FileHistory({ module, refreshTrigger }: FileHistoryProps) {
 
   const deleteMutation = trpc.fileManager.delete.useMutation({
     onSuccess: () => {
-      toast.success("ფაილი წარმატებით წაიშალა");
+      toast.success("File deleted successfully");
       refetch();
     },
     onError: (error) => {
-      toast.error(error.message || "ფაილის Delete ვერ მოხერხდა");
+      toast.error(error.message || "File deletion failed");
     },
   });
 
@@ -98,7 +98,7 @@ export function FileHistory({ module, refreshTrigger }: FileHistoryProps) {
         type: file.mimeType,
       });
     } else {
-      toast.info("ამ ტიპის ფაილის preview არ არის ხელმისაწვდომი");
+      toast.info("Preview not available for this file type");
     }
   };
 
@@ -110,11 +110,11 @@ export function FileHistory({ module, refreshTrigger }: FileHistoryProps) {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    toast.success("ფაილი იწერება...");
+    toast.success("File is being saved...");
   };
 
   const handleDelete = async (fileId: number) => {
-    if (confirm("დარწმუნებული ხართ რომ გსურთ ფაილის Delete?")) {
+    if (confirm("Are you sure you want to delete this file?")) {
       await deleteMutation.mutateAsync({ fileId });
     }
   };
@@ -128,7 +128,7 @@ export function FileHistory({ module, refreshTrigger }: FileHistoryProps) {
       <Card className="p-8">
         <div className="flex items-center justify-center gap-2">
           <Loader2 className="h-5 w-5 animate-spin" />
-          <span>იტვირთება...</span>
+          <span>Uploading...</span>
         </div>
       </Card>
     );
@@ -138,12 +138,12 @@ export function FileHistory({ module, refreshTrigger }: FileHistoryProps) {
     <>
       <Card className="p-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold">ატვირთული ფაილები</h3>
+          <h3 className="text-lg font-semibold">Uploaded Files</h3>
           <div className="flex items-center gap-2">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="ძებნა..."
+                placeholder="Search..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-9 w-64"
@@ -155,7 +155,7 @@ export function FileHistory({ module, refreshTrigger }: FileHistoryProps) {
         {!filteredFiles || filteredFiles.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">
             <FileIcon className="h-12 w-12 mx-auto mb-2 opacity-50" />
-            <p>ფაილები არ მოიძებნა</p>
+            <p>No files found</p>
           </div>
         ) : (
           <div className="space-y-2">

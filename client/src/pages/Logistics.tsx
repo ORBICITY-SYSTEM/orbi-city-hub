@@ -48,10 +48,10 @@ const Logistics = () => {
           </div>
           <div>
             <h1 className="text-2xl font-bold text-foreground">
-              ლოგისტიკა
+              Logistics
             </h1>
             <p className="text-sm text-muted-foreground">
-              ინვენტარი, დასუფთავება და ტექნიკური მოვლა
+              Inventory, cleaning and technical maintenance
             </p>
           </div>
         </div>
@@ -62,23 +62,23 @@ const Logistics = () => {
         <TabsList className="grid w-full grid-cols-6 mb-6">
           <TabsTrigger value="inventory" className="flex items-center gap-2">
             <Package className="h-4 w-4" />
-            ინვენტარი
+            Inventory
           </TabsTrigger>
           <TabsTrigger value="housekeeping" className="flex items-center gap-2">
             <Sparkles className="h-4 w-4" />
-            დასუფთავება
+            Cleaning
           </TabsTrigger>
           <TabsTrigger value="maintenance" className="flex items-center gap-2">
             <Wrench className="h-4 w-4" />
-            ტექნიკური
+            Technical
           </TabsTrigger>
           <TabsTrigger value="supplies" className="flex items-center gap-2">
             <ShoppingCart className="h-4 w-4" />
-            მარაგები
+            Supplies
           </TabsTrigger>
           <TabsTrigger value="staff" className="flex items-center gap-2">
             <Users className="h-4 w-4" />
-            პერსონალი
+            Staff
           </TabsTrigger>
           <TabsTrigger value="ai" className="flex items-center gap-2">
             <Bot className="h-4 w-4" />
@@ -89,12 +89,12 @@ const Logistics = () => {
         <TabsContent value="inventory">
           <Card>
             <CardHeader>
-              <CardTitle>ინვენტარის მართვა</CardTitle>
-              <CardDescription>მარაგების თვალყურის დევნება და მართვა</CardDescription>
+              <CardTitle>Inventoryს Marთვა</CardTitle>
+              <CardDescription>Suppliesს თვალყურის დევნება და Marთვა</CardDescription>
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground">
-                აქ იქნება ინვენტარის სრული სისტემა - ყველა 60 სტუდიოს ინვენტარი, დაბალი მარაგის შეტყობინებები, და ავტომატური შეკვეთები.
+                აქ იქნება Inventoryს სრული სისტემა - ყველა 60 studiosს Inventory, Low Marაგის შეტყობინებები, და ავტომატური შეკვეFebი.
               </p>
             </CardContent>
           </Card>
@@ -107,12 +107,12 @@ const Logistics = () => {
         <TabsContent value="maintenance">
           <Card>
             <CardHeader>
-              <CardTitle>ტექნიკური მოვლა</CardTitle>
-              <CardDescription>რემონტისა და მოვლის თვალყურის დევნება</CardDescription>
+              <CardTitle>Technical მოვლა</CardTitle>
+              <CardDescription>Track repairs and maintenance</CardDescription>
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground">
-                აქ იქნება ტექნიკური მოვლის სისტემა - პრობლემების რეგისტრაცია, რემონტის გრაფიკები, და ხარჯების აღრიცხვა.
+                აქ იქნება Technical მოვლის სისტემა - პრობლემების რეგისტრაცია, რემონტის გრაფიკები, და ხარჯების აღრიცხვა.
               </p>
             </CardContent>
           </Card>
@@ -121,12 +121,12 @@ const Logistics = () => {
         <TabsContent value="supplies">
           <Card>
             <CardHeader>
-              <CardTitle>მარაგების მართვა</CardTitle>
-              <CardDescription>მარაგების შეკვეთა და მართვა</CardDescription>
+              <CardTitle>Suppliesს Marთვა</CardTitle>
+              <CardDescription>Suppliesს შეკვეთა და Marთვა</CardDescription>
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground">
-                აქ იქნება მარაგების სისტემა - ავტომატური შეკვეთები, მომწოდებლების მართვა, და ხარჯების ოპტიმიზაცია.
+                აქ იქნება Suppliesს სისტემა - ავტომატური შეკვეFebი, მომწოდებლების Marთვა, და ხარჯების ოპტიმიზაცია.
               </p>
             </CardContent>
           </Card>
@@ -135,12 +135,12 @@ const Logistics = () => {
         <TabsContent value="staff">
           <Card>
             <CardHeader>
-              <CardTitle>პერსონალის მართვა</CardTitle>
-              <CardDescription>პერსონალის გრაფიკი და დავალებები</CardDescription>
+              <CardTitle>Staffს Marთვა</CardTitle>
+              <CardDescription>Staffს გრაფიკი და დავალებები</CardDescription>
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground">
-                აქ იქნება პერსონალის სისტემა - სამუშაო გრაფიკები, დავალებების განაწილება, და შესრულების თვალყურის დევნება.
+                აქ იქნება Staffს სისტემა - Tueუშაო გრაფიკები, დავალებების განაწილება, და შესრულების თვალყურის დევნება.
               </p>
             </CardContent>
           </Card>
@@ -154,7 +154,7 @@ const Logistics = () => {
                 🤖 Logistics AI Agent
               </CardTitle>
               <CardDescription>
-                AI აგენტი მარაგების ანალიზისთვის ფოტოებიდან/სიებიდან და ავტომატური შეკვეთების რეკომენდაციებისთვის
+                AI აგენტი Suppliesს ანალიზისთვის ფოტოებიდან/სიებიდან და ავტომატური შეკვეFebის რეკომენდაციებისთვის
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -163,7 +163,7 @@ const Logistics = () => {
                 module="logistics"
                 onUploadSuccess={(url, fileName) => {
                   // Send uploaded file info to AI for analysis
-                  handleSendMessage(`გააანალიზე ეს ფაილი: ${fileName} (${url})`);
+                  handleSendMessage(`Analyze this file: ${fileName} (${url})`);
                 }}
               />
 
@@ -172,7 +172,7 @@ const Logistics = () => {
                 messages={chatHistory}
                 onSendMessage={handleSendMessage}
                 isLoading={isLoading}
-                placeholder="მაგ: 'რა მარაგები არის დაბალი დონეზე?' ან 'გააანალიზე ეს ინვენტარის ფოტო'"
+                placeholder="მაგ: 'რა Supplies არის Low დონეზე?' ან 'გააანალიზე ეს Inventoryს ფოტო'"
                 height={400}
               />
 
@@ -181,16 +181,16 @@ const Logistics = () => {
                 <Button 
                   variant="outline" 
                   size="sm"
-                  onClick={() => handleSendMessage("რა მარაგები არის დაბალი დონეზე?")}
+                  onClick={() => handleSendMessage("რა Supplies არის Low დონეზე?")}
                 >
-                  დაბალი მარაგები
+                  Low Supplies
                 </Button>
                 <Button 
                   variant="outline" 
                   size="sm"
-                  onClick={() => handleSendMessage("რა უნდა შევუკვეთო ამ კვირაში?")}
+                  onClick={() => handleSendMessage("რა უნდა შევუკვეთო ამ Sunრაში?")}
                 >
-                  შეკვეთის რეკომენდაცია
+                  Order Recommendation
                 </Button>
               </div>
             </CardContent>

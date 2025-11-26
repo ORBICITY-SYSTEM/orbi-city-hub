@@ -34,18 +34,18 @@ const Reports = () => {
 
   // Mock data for charts
   const monthlyData = [
-    { month: "იანვარი", revenue: 42500, occupancy: 78, bookings: 145 },
-    { month: "თებერვალი", revenue: 38900, occupancy: 72, bookings: 132 },
-    { month: "მარტი", revenue: 51200, occupancy: 85, bookings: 168 },
-    { month: "აპრილი", revenue: 48700, occupancy: 82, bookings: 159 },
-    { month: "მაისი", revenue: 56300, occupancy: 89, bookings: 182 },
-    { month: "ივნისი", revenue: 62100, occupancy: 92, bookings: 198 },
-    { month: "ივლისი", revenue: 68900, occupancy: 95, bookings: 215 },
-    { month: "აგვისტო", revenue: 71500, occupancy: 96, bookings: 223 },
-    { month: "სექტემბერი", revenue: 59800, occupancy: 88, bookings: 187 },
-    { month: "ოქტომბერი", revenue: 53400, occupancy: 84, bookings: 174 },
-    { month: "ნოემბერი", revenue: 45200, occupancy: 79, bookings: 152 },
-    { month: "დეკემბერი", revenue: 49600, occupancy: 81, bookings: 163 },
+    { month: "Janვარი", revenue: 42500, occupancy: 78, bookings: 145 },
+    { month: "Febერვალი", revenue: 38900, occupancy: 72, bookings: 132 },
+    { month: "Marტი", revenue: 51200, occupancy: 85, bookings: 168 },
+    { month: "Aprილი", revenue: 48700, occupancy: 82, bookings: 159 },
+    { month: "Mayსი", revenue: 56300, occupancy: 89, bookings: 182 },
+    { month: "Junისი", revenue: 62100, occupancy: 92, bookings: 198 },
+    { month: "Julისი", revenue: 68900, occupancy: 95, bookings: 215 },
+    { month: "Augისტო", revenue: 71500, occupancy: 96, bookings: 223 },
+    { month: "Sepტემბერი", revenue: 59800, occupancy: 88, bookings: 187 },
+    { month: "Octომბერი", revenue: 53400, occupancy: 84, bookings: 174 },
+    { month: "Novმბერი", revenue: 45200, occupancy: 79, bookings: 152 },
+    { month: "Decემბერი", revenue: 49600, occupancy: 81, bookings: 163 },
   ];
 
   const yearlyComparison = [
@@ -63,8 +63,8 @@ const Reports = () => {
             <FileText className="h-6 w-6 text-white" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-foreground">რეპორტები და ანალიტიკა</h1>
-            <p className="text-sm text-muted-foreground">ბიზნეს ინტელექტი და მონაცემთა ანალიტიკა</p>
+            <h1 className="text-2xl font-bold text-foreground">Reports & Analytics</h1>
+            <p className="text-sm text-muted-foreground">Business intelligence and data analytics</p>
           </div>
         </div>
       </div>
@@ -75,7 +75,7 @@ const Reports = () => {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-sm text-blue-700 font-medium">წლიური შემოსავალი</div>
+                <div className="text-sm text-blue-700 font-medium">Yearly Revenue</div>
                 <div className="text-3xl font-bold text-blue-900">₾648K</div>
                 <div className="text-xs text-blue-600 mt-1 flex items-center">
                   <ArrowUp className="h-3 w-3 mr-1" />
@@ -91,7 +91,7 @@ const Reports = () => {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-sm text-green-700 font-medium">საშუალო დაკავებულობა</div>
+                <div className="text-sm text-green-700 font-medium">საშუალო occupancy</div>
                 <div className="text-3xl font-bold text-green-900">85%</div>
                 <div className="text-xs text-green-600 mt-1 flex items-center">
                   <ArrowUp className="h-3 w-3 mr-1" />
@@ -107,7 +107,7 @@ const Reports = () => {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-sm text-purple-700 font-medium">სულ ბრონირებები</div>
+                <div className="text-sm text-purple-700 font-medium">Total Bookings</div>
                 <div className="text-3xl font-bold text-purple-900">2,098</div>
                 <div className="text-xs text-purple-600 mt-1 flex items-center">
                   <ArrowUp className="h-3 w-3 mr-1" />
@@ -123,7 +123,7 @@ const Reports = () => {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-sm text-yellow-700 font-medium">საშუალო რეიტინგი</div>
+                <div className="text-sm text-yellow-700 font-medium">Average Rating</div>
                 <div className="text-3xl font-bold text-yellow-900">9.2/10</div>
                 <div className="text-xs text-yellow-600 mt-1 flex items-center">
                   <ArrowUp className="h-3 w-3 mr-1" />
@@ -139,10 +139,10 @@ const Reports = () => {
       {/* Tabs */}
       <Tabs defaultValue="monthly" className="w-full">
         <TabsList className="grid w-full grid-cols-5 mb-6">
-          <TabsTrigger value="monthly"><FileText className="h-4 w-4 mr-2" />თვიური</TabsTrigger>
-          <TabsTrigger value="yearly"><TrendingUp className="h-4 w-4 mr-2" />წლიური</TabsTrigger>
+          <TabsTrigger value="monthly"><FileText className="h-4 w-4 mr-2" />Monthly</TabsTrigger>
+          <TabsTrigger value="yearly"><TrendingUp className="h-4 w-4 mr-2" />Yearly</TabsTrigger>
           <TabsTrigger value="heatmap"><Activity className="h-4 w-4 mr-2" />Heatmap</TabsTrigger>
-          <TabsTrigger value="export"><Download className="h-4 w-4 mr-2" />ექსპორტი</TabsTrigger>
+          <TabsTrigger value="export"><Download className="h-4 w-4 mr-2" />Export</TabsTrigger>
           <TabsTrigger value="ai"><Bot className="h-4 w-4 mr-2" />🤖 AI</TabsTrigger>
         </TabsList>
 
@@ -153,12 +153,12 @@ const Reports = () => {
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle>თვიური მიმოხილვა</CardTitle>
-                    <CardDescription>მაღალი დონის PDF რეპორტი CEO-სთვის</CardDescription>
+                    <CardTitle>Monthly Overview</CardTitle>
+                    <CardDescription>High-level PDF report for CEO</CardDescription>
                   </div>
                   <Button>
                     <FileDown className="h-4 w-4 mr-2" />
-                    გადმოწერე PDF
+                    Download PDF
                   </Button>
                 </div>
               </CardHeader>
@@ -166,7 +166,7 @@ const Reports = () => {
                 <div className="space-y-4">
                   {/* Monthly Performance Chart */}
                   <div className="bg-gradient-to-br from-gray-50 to-gray-100 p-6 rounded-lg border">
-                    <h3 className="text-lg font-semibold mb-4">თვიური შემოსავალი და დაკავებულობა</h3>
+                    <h3 className="text-lg font-semibold mb-4">Monthly Revenue და occupancy</h3>
                     <div className="space-y-2">
                       {monthlyData.slice(-6).map((month, i) => (
                         <div key={i} className="flex items-center gap-4">
@@ -193,7 +193,7 @@ const Reports = () => {
                   <div className="grid grid-cols-3 gap-4">
                     <Card className="bg-blue-50 border-blue-200">
                       <CardContent className="p-4">
-                        <div className="text-sm text-blue-700">საშუალო ღამის ფასი</div>
+                        <div className="text-sm text-blue-700">საშუალო ღამის Price</div>
                         <div className="text-2xl font-bold text-blue-900">₾102</div>
                         <div className="text-xs text-blue-600">+8.5% vs 2024</div>
                       </CardContent>
@@ -207,8 +207,8 @@ const Reports = () => {
                     </Card>
                     <Card className="bg-purple-50 border-purple-200">
                       <CardContent className="p-4">
-                        <div className="text-sm text-purple-700">საშუალო ყოფნა</div>
-                        <div className="text-2xl font-bold text-purple-900">3.2 ღამე</div>
+                        <div className="text-sm text-purple-700">Average Stay</div>
+                        <div className="text-2xl font-bold text-purple-900">3.2 nights</div>
                         <div className="text-xs text-purple-600">+0.3 vs 2024</div>
                       </CardContent>
                     </Card>
@@ -223,14 +223,14 @@ const Reports = () => {
         <TabsContent value="yearly">
           <Card>
             <CardHeader>
-              <CardTitle>წლიური ზრდა</CardTitle>
-              <CardDescription>წლიური შედარების დიაგრამები</CardDescription>
+              <CardTitle>Yearly ზრდა</CardTitle>
+              <CardDescription>Yearly შედარების დიაგრამები</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
                 {/* Year-over-Year Comparison */}
                 <div className="bg-gradient-to-br from-gray-50 to-gray-100 p-6 rounded-lg border">
-                  <h3 className="text-lg font-semibold mb-4">Year-over-Year შედარება</h3>
+                  <h3 className="text-lg font-semibold mb-4">Year-over-Year Comparison</h3>
                   <div className="space-y-4">
                     {yearlyComparison.map((year, i) => (
                       <div key={i} className="space-y-2">
@@ -271,21 +271,21 @@ const Reports = () => {
                 <div className="grid grid-cols-3 gap-4">
                   <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
                     <CardContent className="p-4">
-                      <div className="text-sm text-green-700">შემოსავლის ზრდა</div>
+                      <div className="text-sm text-green-700">Revenue Growth</div>
                       <div className="text-3xl font-bold text-green-900">+33.6%</div>
                       <div className="text-xs text-green-600">2023 → 2025</div>
                     </CardContent>
                   </Card>
                   <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
                     <CardContent className="p-4">
-                      <div className="text-sm text-blue-700">დაკავებულობის ზრდა</div>
+                      <div className="text-sm text-blue-700">Occupancy Growth</div>
                       <div className="text-3xl font-bold text-blue-900">+9%</div>
                       <div className="text-xs text-blue-600">2023 → 2025</div>
                     </CardContent>
                   </Card>
                   <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
                     <CardContent className="p-4">
-                      <div className="text-sm text-purple-700">ფასის ზრდა</div>
+                      <div className="text-sm text-purple-700">Priceს ზრდა</div>
                       <div className="text-3xl font-bold text-purple-900">+17.2%</div>
                       <div className="text-xs text-purple-600">2023 → 2025</div>
                     </CardContent>
@@ -300,16 +300,16 @@ const Reports = () => {
         <TabsContent value="heatmap">
           <Card>
             <CardHeader>
-              <CardTitle>დაკავების თერმული რუკა</CardTitle>
-              <CardDescription>პიკური თარიღების და დაბალი სეზონის ვიზუალიზაცია</CardDescription>
+              <CardTitle>Booking Heatmap</CardTitle>
+              <CardDescription>Peak dates and low season visualization</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="bg-gradient-to-br from-gray-50 to-gray-100 p-6 rounded-lg border">
                 <div className="space-y-4">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold">2025 წლის დაკავებულობა</h3>
+                    <h3 className="text-lg font-semibold">2025 წლის occupancy</h3>
                     <div className="flex items-center gap-2 text-xs">
-                      <span>დაბალი</span>
+                      <span>Low</span>
                       <div className="flex gap-1">
                         <div className="w-4 h-4 bg-blue-100 border"></div>
                         <div className="w-4 h-4 bg-blue-200 border"></div>
@@ -317,13 +317,13 @@ const Reports = () => {
                         <div className="w-4 h-4 bg-blue-600 border"></div>
                         <div className="w-4 h-4 bg-blue-800 border"></div>
                       </div>
-                      <span>მაღალი</span>
+                      <span>High</span>
                     </div>
                   </div>
                   
                   {/* Heatmap Grid */}
                   <div className="grid grid-cols-12 gap-1">
-                    {["იან", "თებ", "მარ", "აპრ", "მაი", "ივნ", "ივლ", "აგვ", "სექ", "ოქტ", "ნოე", "დეკ"].map((month, i) => (
+                    {["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"].map((month, i) => (
                       <div key={i} className="text-center">
                         <div className="text-xs font-semibold mb-1">{month}</div>
                         <div className="space-y-1">
@@ -335,7 +335,7 @@ const Reports = () => {
                               <div 
                                 key={week} 
                                 className={cn("h-6 rounded border border-gray-300", colors[intensity - 1] || "bg-blue-100")}
-                                title={`${month} კვირა ${week + 1}: ${occupancy}%`}
+                                title={`${month} Sunრა ${week + 1}: ${occupancy}%`}
                               />
                             );
                           })}
@@ -348,16 +348,16 @@ const Reports = () => {
                   <div className="grid grid-cols-2 gap-4 mt-6">
                     <Card className="bg-red-50 border-red-200">
                       <CardContent className="p-4">
-                        <div className="text-sm text-red-700 font-medium">პიკური სეზონი</div>
-                        <div className="text-lg font-bold text-red-900">ივლისი-აგვისტო</div>
-                        <div className="text-xs text-red-600">95-96% დაკავებულობა</div>
+                        <div className="text-sm text-red-700 font-medium">Peak Season</div>
+                        <div className="text-lg font-bold text-red-900">Julისი-Augისტო</div>
+                        <div className="text-xs text-red-600">95-96% occupancy</div>
                       </CardContent>
                     </Card>
                     <Card className="bg-blue-50 border-blue-200">
                       <CardContent className="p-4">
-                        <div className="text-sm text-blue-700 font-medium">დაბალი სეზონი</div>
-                        <div className="text-lg font-bold text-blue-900">თებერვალი</div>
-                        <div className="text-xs text-blue-600">72% დაკავებულობა</div>
+                        <div className="text-sm text-blue-700 font-medium">Low სეზონი</div>
+                        <div className="text-lg font-bold text-blue-900">Febერვალი</div>
+                        <div className="text-xs text-blue-600">72% occupancy</div>
                       </CardContent>
                     </Card>
                   </div>
@@ -371,18 +371,18 @@ const Reports = () => {
         <TabsContent value="export">
           <Card>
             <CardHeader>
-              <CardTitle>ექსპორტის ცენტრი</CardTitle>
-              <CardDescription>ყველა მონაცემის ჩამოტვირთვა (CSV/Excel)</CardDescription>
+              <CardTitle>Exportს ცენტრი</CardTitle>
+              <CardDescription>Download all data (CSV/Excel)</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 gap-4">
                 <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 cursor-pointer hover:shadow-lg transition-shadow">
                   <CardContent className="p-6">
                     <FileDown className="h-10 w-10 text-green-600 mb-3" />
-                    <h3 className="font-semibold text-green-900 mb-2">ფინანსური მონაცემები</h3>
-                    <p className="text-sm text-green-700 mb-4">ყველა ტრანზაქცია, შემოსავალი, ხარჯები</p>
+                    <h3 className="font-semibold text-green-900 mb-2">Financial Data</h3>
+                    <p className="text-sm text-green-700 mb-4">ყველა ტრანზაქცია, Revenue, ხარჯები</p>
                     <Button className="w-full" variant="outline">
-                      გადმოწერე Excel
+                      Download Excel
                     </Button>
                   </CardContent>
                 </Card>
@@ -390,10 +390,10 @@ const Reports = () => {
                 <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 cursor-pointer hover:shadow-lg transition-shadow">
                   <CardContent className="p-6">
                     <FileDown className="h-10 w-10 text-blue-600 mb-3" />
-                    <h3 className="font-semibold text-blue-900 mb-2">ბრონირებები</h3>
-                    <p className="text-sm text-blue-700 mb-4">ყველა ბრონირება, სტუმარი, არხი</p>
+                    <h3 className="font-semibold text-blue-900 mb-2">Bookings</h3>
+                    <p className="text-sm text-blue-700 mb-4">All Bookings, guests, Channel</p>
                     <Button className="w-full" variant="outline">
-                      გადმოწერე CSV
+                      Download CSV
                     </Button>
                   </CardContent>
                 </Card>
@@ -401,10 +401,10 @@ const Reports = () => {
                 <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 cursor-pointer hover:shadow-lg transition-shadow">
                   <CardContent className="p-6">
                     <FileDown className="h-10 w-10 text-purple-600 mb-3" />
-                    <h3 className="font-semibold text-purple-900 mb-2">მარკეტინგული მონაცემები</h3>
-                    <p className="text-sm text-purple-700 mb-4">არხები, კამპანიები, ROI</p>
+                    <h3 className="font-semibold text-purple-900 mb-2">Marკეტინგული მონაცემები</h3>
+                    <p className="text-sm text-purple-700 mb-4">Channels, Campaigns, ROI</p>
                     <Button className="w-full" variant="outline">
-                      გადმოწერე Excel
+                      Download Excel
                     </Button>
                   </CardContent>
                 </Card>
@@ -412,10 +412,10 @@ const Reports = () => {
                 <Card className="bg-gradient-to-br from-yellow-50 to-yellow-100 border-yellow-200 cursor-pointer hover:shadow-lg transition-shadow">
                   <CardContent className="p-6">
                     <FileDown className="h-10 w-10 text-yellow-600 mb-3" />
-                    <h3 className="font-semibold text-yellow-900 mb-2">ოპერაციული მონაცემები</h3>
-                    <p className="text-sm text-yellow-700 mb-4">დასუფთავება, ინვენტარი, პერსონალი</p>
+                    <h3 className="font-semibold text-yellow-900 mb-2">Operational Data</h3>
+                    <p className="text-sm text-yellow-700 mb-4">Cleaning, Inventory, Staff</p>
                     <Button className="w-full" variant="outline">
-                      გადმოწერე CSV
+                      Download CSV
                     </Button>
                   </CardContent>
                 </Card>
@@ -432,22 +432,22 @@ const Reports = () => {
                 <Bot className="h-5 w-5 text-purple-500" />
                 🤖 Data Scientist AI Agent
               </CardTitle>
-              <CardDescription>AI აგენტი დამალული პატერნების საპოვნელად</CardDescription>
+              <CardDescription>AI agent to find hidden patterns</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <AIChatBox 
                 messages={chatHistory} 
                 onSendMessage={handleSendMessage} 
                 isLoading={isLoading} 
-                placeholder="მაგ: 'იპოვე დამალული პატერნები' ან 'პროგნოზი შემდეგი თვისთვის'" 
+                placeholder="e.g. 'Find hidden patterns' or 'Forecast next month'" 
                 height={400} 
               />
               <div className="grid grid-cols-2 gap-2">
-                <Button variant="outline" size="sm" onClick={() => handleSendMessage("იპოვე დამალული პატერნები ბრონირებებში")}>
-                  პატერნების ძიება
+                <Button variant="outline" size="sm" onClick={() => handleSendMessage("Find hidden patterns in bookings")}>
+                  Pattern Search
                 </Button>
-                <Button variant="outline" size="sm" onClick={() => handleSendMessage("პროგნოზი შემდეგი 3 თვისთვის")}>
-                  პროგნოზი
+                <Button variant="outline" size="sm" onClick={() => handleSendMessage("Forecast შემდეგი 3 თვისთვის")}>
+                  Forecast
                 </Button>
               </div>
             </CardContent>

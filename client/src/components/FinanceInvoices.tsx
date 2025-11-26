@@ -9,26 +9,26 @@ import { useState } from "react";
 
 // Mock invoice data from August 2025 owner reports
 const mockInvoices = [
-  { id: "INV-2025-08-001", date: "2025-08-31", owner: "ალექსანდრე მახარაშვილი", apartment: "A 3041", revenue: 4595.5, commission: 800, expenses: 200, netPayable: 3595.5, status: "paid", paidDate: "2025-09-05" },
-  { id: "INV-2025-08-002", date: "2025-08-31", owner: "არჩილ ფიროსმანაშვილი", apartment: "C 2641", revenue: 3854.69, commission: 650, expenses: 180, netPayable: 3024.69, status: "paid", paidDate: "2025-09-05" },
-  { id: "INV-2025-08-003", date: "2025-08-31", owner: "ბაჩუკი წიქარიშვილი", apartment: "A 2441", revenue: 4040.81, commission: 700, expenses: 190, netPayable: 3150.81, status: "paid", paidDate: "2025-09-06" },
-  { id: "INV-2025-08-004", date: "2025-08-31", owner: "ბელა ჯინჭარაძე", apartment: "A 1833", revenue: 4267.34, commission: 750, expenses: 200, netPayable: 3317.34, status: "paid", paidDate: "2025-09-06" },
-  { id: "INV-2025-08-005", date: "2025-08-31", owner: "გულნაზი ერკომაიშვილი", apartment: "C 2547", revenue: 3946, commission: 680, expenses: 175, netPayable: 3091, status: "paid", paidDate: "2025-09-07" },
-  { id: "INV-2025-08-006", date: "2025-08-31", owner: "დავით ფიროსმანაშვილი", apartment: "C 4706", revenue: 4720.36, commission: 820, expenses: 210, netPayable: 3690.36, status: "paid", paidDate: "2025-09-07" },
-  { id: "INV-2025-08-007", date: "2025-08-31", owner: "დავით ფიროსმანაშვილი", apartment: "A 4027", revenue: 4327.77, commission: 750, expenses: 195, netPayable: 3382.77, status: "paid", paidDate: "2025-09-07" },
-  { id: "INV-2025-08-008", date: "2025-08-31", owner: "დავით ფიროსმანაშვილი", apartment: "A 4029", revenue: 4485.05, commission: 780, expenses: 200, netPayable: 3505.05, status: "paid", paidDate: "2025-09-07" },
-  { id: "INV-2025-08-009", date: "2025-08-31", owner: "თათია ხუციშვილი/თემო", apartment: "D 3418", revenue: 3575.05, commission: 620, expenses: 165, netPayable: 2790.05, status: "pending", paidDate: null },
-  { id: "INV-2025-08-010", date: "2025-08-31", owner: "თათია ხუციშვილი/თემო", apartment: "D 3414", revenue: 3579.05, commission: 620, expenses: 165, netPayable: 2794.05, status: "pending", paidDate: null },
-  { id: "INV-2025-08-011", date: "2025-08-31", owner: "თათია ხუციშვილი/თემო", apartment: "D 3416", revenue: 4294.25, commission: 745, expenses: 190, netPayable: 3359.25, status: "pending", paidDate: null },
-  { id: "INV-2025-08-012", date: "2025-08-31", owner: "თინათინ ჯავახიძე", apartment: "C 2847", revenue: 4107.03, commission: 710, expenses: 185, netPayable: 3212.03, status: "sent", paidDate: null },
-  { id: "INV-2025-08-013", date: "2025-08-31", owner: "ია მაისაია", apartment: "C 1256", revenue: 3470, commission: 600, expenses: 160, netPayable: 2710, status: "sent", paidDate: null },
-  { id: "INV-2025-08-014", date: "2025-08-31", owner: "ირაკლი ხუბუტია", apartment: "C 2524", revenue: 3623.47, commission: 630, expenses: 170, netPayable: 2823.47, status: "sent", paidDate: null },
-  { id: "INV-2025-08-015", date: "2025-08-31", owner: "ლეონიდას პარატიდის", apartment: "C 2961", revenue: 5123.86, commission: 890, expenses: 225, netPayable: 4008.86, status: "draft", paidDate: null },
-  { id: "INV-2025-08-016", date: "2025-08-31", owner: "მიშო ჯანიბეგაშვილი", apartment: "C 2861", revenue: 4196.49, commission: 730, expenses: 190, netPayable: 3276.49, status: "draft", paidDate: null },
-  { id: "INV-2025-08-017", date: "2025-08-31", owner: "მოსე თოიძე", apartment: "C 2520", revenue: 3165.2, commission: 550, expenses: 150, netPayable: 2465.2, status: "draft", paidDate: null },
-  { id: "INV-2025-08-018", date: "2025-08-31", owner: "ნიკა გოგოლაძე/კაპანაძე", apartment: "C 3428", revenue: 4262.82, commission: 740, expenses: 195, netPayable: 3327.82, status: "draft", paidDate: null },
-  { id: "INV-2025-08-019", date: "2025-08-31", owner: "ნინი/ნიკა კალანდაძე", apartment: "C 2921", revenue: 4840.09, commission: 840, expenses: 215, netPayable: 3785.09, status: "draft", paidDate: null },
-  { id: "INV-2025-08-020", date: "2025-08-31", owner: "ნინო მახარაშვილი", apartment: "A 3035", revenue: 4191, commission: 730, expenses: 190, netPayable: 3271, status: "draft", paidDate: null },
+  { id: "INV-2025-08-001", date: "2025-08-31", owner: "Aleksandre Makharashvili", apartment: "A 3041", revenue: 4595.5, commission: 800, expenses: 200, netPayable: 3595.5, status: "paid", paidDate: "2025-09-05" },
+  { id: "INV-2025-08-002", date: "2025-08-31", owner: "Archil Pirosmanashvili", apartment: "C 2641", revenue: 3854.69, commission: 650, expenses: 180, netPayable: 3024.69, status: "paid", paidDate: "2025-09-05" },
+  { id: "INV-2025-08-003", date: "2025-08-31", owner: "Bachuki Tsikarishvili", apartment: "A 2441", revenue: 4040.81, commission: 700, expenses: 190, netPayable: 3150.81, status: "paid", paidDate: "2025-09-06" },
+  { id: "INV-2025-08-004", date: "2025-08-31", owner: "Bela Jincharadze", apartment: "A 1833", revenue: 4267.34, commission: 750, expenses: 200, netPayable: 3317.34, status: "paid", paidDate: "2025-09-06" },
+  { id: "INV-2025-08-005", date: "2025-08-31", owner: "Gulnazi Erkomaishvili", apartment: "C 2547", revenue: 3946, commission: 680, expenses: 175, netPayable: 3091, status: "paid", paidDate: "2025-09-07" },
+  { id: "INV-2025-08-006", date: "2025-08-31", owner: "Davit Pirosmanashvili", apartment: "C 4706", revenue: 4720.36, commission: 820, expenses: 210, netPayable: 3690.36, status: "paid", paidDate: "2025-09-07" },
+  { id: "INV-2025-08-007", date: "2025-08-31", owner: "Davit Pirosmanashvili", apartment: "A 4027", revenue: 4327.77, commission: 750, expenses: 195, netPayable: 3382.77, status: "paid", paidDate: "2025-09-07" },
+  { id: "INV-2025-08-008", date: "2025-08-31", owner: "Davit Pirosmanashvili", apartment: "A 4029", revenue: 4485.05, commission: 780, expenses: 200, netPayable: 3505.05, status: "paid", paidDate: "2025-09-07" },
+  { id: "INV-2025-08-009", date: "2025-08-31", owner: "Tatia Khutsishvili/Temo", apartment: "D 3418", revenue: 3575.05, commission: 620, expenses: 165, netPayable: 2790.05, status: "pending", paidDate: null },
+  { id: "INV-2025-08-010", date: "2025-08-31", owner: "Tatia Khutsishvili/Temo", apartment: "D 3414", revenue: 3579.05, commission: 620, expenses: 165, netPayable: 2794.05, status: "pending", paidDate: null },
+  { id: "INV-2025-08-011", date: "2025-08-31", owner: "Tatia Khutsishvili/Temo", apartment: "D 3416", revenue: 4294.25, commission: 745, expenses: 190, netPayable: 3359.25, status: "pending", paidDate: null },
+  { id: "INV-2025-08-012", date: "2025-08-31", owner: "Tinatin Javakhidze", apartment: "C 2847", revenue: 4107.03, commission: 710, expenses: 185, netPayable: 3212.03, status: "sent", paidDate: null },
+  { id: "INV-2025-08-013", date: "2025-08-31", owner: "Ia Maisaia", apartment: "C 1256", revenue: 3470, commission: 600, expenses: 160, netPayable: 2710, status: "sent", paidDate: null },
+  { id: "INV-2025-08-014", date: "2025-08-31", owner: "Irakli Khubutia", apartment: "C 2524", revenue: 3623.47, commission: 630, expenses: 170, netPayable: 2823.47, status: "sent", paidDate: null },
+  { id: "INV-2025-08-015", date: "2025-08-31", owner: "Leonidas Paratidis", apartment: "C 2961", revenue: 5123.86, commission: 890, expenses: 225, netPayable: 4008.86, status: "draft", paidDate: null },
+  { id: "INV-2025-08-016", date: "2025-08-31", owner: "Misho Janibegashvili", apartment: "C 2861", revenue: 4196.49, commission: 730, expenses: 190, netPayable: 3276.49, status: "draft", paidDate: null },
+  { id: "INV-2025-08-017", date: "2025-08-31", owner: "Mose Toidze", apartment: "C 2520", revenue: 3165.2, commission: 550, expenses: 150, netPayable: 2465.2, status: "draft", paidDate: null },
+  { id: "INV-2025-08-018", date: "2025-08-31", owner: "Nika Gogoladze/Kapanadze", apartment: "C 3428", revenue: 4262.82, commission: 740, expenses: 195, netPayable: 3327.82, status: "draft", paidDate: null },
+  { id: "INV-2025-08-019", date: "2025-08-31", owner: "Nini/Nika Kalandadze", apartment: "C 2921", revenue: 4840.09, commission: 840, expenses: 215, netPayable: 3785.09, status: "draft", paidDate: null },
+  { id: "INV-2025-08-020", date: "2025-08-31", owner: "Nino Makharashvili", apartment: "A 3035", revenue: 4191, commission: 730, expenses: 190, netPayable: 3271, status: "draft", paidDate: null },
 ];
 
 export function FinanceInvoices() {
@@ -74,8 +74,8 @@ export function FinanceInvoices() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold">ინვოისები</h2>
-          <p className="text-sm text-gray-600">მესაკუთრეთა ანგარიშსწორება - აგვისტო 2025</p>
+          <h2 className="text-2xl font-bold">Invoices</h2>
+          <p className="text-sm text-gray-600">მესაკუთრეთა Settlements - Augისტო 2025</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline">

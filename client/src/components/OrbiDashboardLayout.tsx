@@ -103,16 +103,7 @@ export default function OrbiDashboardLayout({ children }: { children: React.Reac
     <div className="min-h-screen">
       {/* Sidebar with Glassmorphism */}
       <aside className="fixed left-0 top-0 h-full w-64 glass-sidebar flex flex-col z-50">
-        {/* Logo */}
-        <div className="p-6 border-b border-white/20">
-          <img 
-            src={APP_LOGO} 
-            alt={APP_TITLE} 
-            className="h-12 mb-2"
-          />
-          <h2 className="text-lg font-bold text-slate-900">{APP_TITLE}</h2>
-          <p className="text-xs text-slate-500">Powered by Manus AI</p>
-        </div>
+        {/* Logo - Removed as per user request */}
 
         {/* Navigation */}
         <nav className="flex-1 p-4 space-y-1">

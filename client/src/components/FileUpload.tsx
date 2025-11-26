@@ -23,7 +23,7 @@ export function FileUpload({
 
   const uploadMutation = trpc.fileUpload.uploadFile.useMutation({
     onSuccess: (data) => {
-      toast.success(`ფაილი წარმატებით აიტვირთა: ${data.fileName}`);
+      toast.success(`File uploaded successfully: ${data.fileName}`);
       setSelectedFile(null);
       setIsUploading(false);
       if (fileInputRef.current) {
@@ -32,7 +32,7 @@ export function FileUpload({
       onUploadSuccess?.(data.url, data.fileName);
     },
     onError: (error) => {
-      toast.error(`შეცდომა: ${error.message}`);
+      toast.error(`Error: ${error.message}`);
       setIsUploading(false);
     },
   });
@@ -44,7 +44,7 @@ export function FileUpload({
     // Validate file size
     const fileSizeMB = file.size / (1024 * 1024);
     if (fileSizeMB > maxSizeMB) {
-      toast.error(`ფაილის ზომა არ უნდა აღემატებოდეს ${maxSizeMB}MB-ს`);
+      toast.error(`File size must not exceed ${maxSizeMB}MB-ს`);
       return;
     }
 
@@ -117,15 +117,15 @@ export function FileUpload({
         >
           <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
           <p className="text-sm text-muted-foreground mb-2">
-            {module === "finance" && "ატვირთეთ Excel/CSV ფინანსური რეპორტები ანალიზისთვის"}
-            {module === "marketing" && "ატვირთეთ რევიუები ან analytics რეპორტები ანალიზისთვის"}
-            {module === "logistics" && "ატვირთეთ ფოტოები ან Excel ფაილები ინვენტარის ანალიზისთვის"}
-            {module === "reservations" && "ატვირთეთ ვაუჩერები, ბრონირების ფაილები, ან Excel რეპორტები ანალიზისთვის"}
-            {module === "reports" && "ატვირთეთ ისტორიული მონაცემები პატერნების ანალიზისთვის"}
+            {module === "finance" && "Upload Excel/CSV financial reports for analysis"}
+            {module === "marketing" && "Upload reviews or analytics reports for analysis"}
+            {module === "logistics" && "Upload photos or Excel files for inventory analysis"}
+            {module === "reservations" && "Upload vouchers, booking files, or Excel reports for analysis"}
+            {module === "reports" && "Upload historical data for pattern analysis"}
           </p>
           <Button variant="outline" size="sm" type="button">
             <Upload className="h-4 w-4 mr-2" />
-            აირჩიეთ ფაილები
+            Select Files
           </Button>
         </label>
       ) : (
@@ -147,7 +147,7 @@ export function FileUpload({
                 onClick={handleUpload}
                 disabled={isUploading}
               >
-                {isUploading ? "იტვირთება..." : "Upload"}
+                {isUploading ? "Uploading..." : "Upload"}
               </Button>
               <Button
                 variant="ghost"

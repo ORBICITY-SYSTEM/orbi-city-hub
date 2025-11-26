@@ -19,6 +19,7 @@ import SocialMedia from "./pages/SocialMedia";
 import AdminLogin from "./pages/AdminLogin";
 import FinanceDashboard from "./pages/FinanceDashboard";
 import Admin from "./pages/Admin";
+import ChannelDetail from "./pages/ChannelDetail";
 
 function Router() {
   const [location] = useLocation();
@@ -45,6 +46,7 @@ function Router() {
         <Route path="/finance" component={Finance} />
         <Route path="/finance-dashboard" component={FinanceDashboard} />
         <Route path="/marketing" component={Marketing} />
+        <Route path="/marketing/channels/:id" component={ChannelDetail} />
         <Route path="/logistics" component={Logistics} />
         <Route path="/reports" component={Reports} />
         <Route path="/files" component={Files} />

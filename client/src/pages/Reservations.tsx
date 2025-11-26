@@ -11,12 +11,12 @@ import { cn } from "@/lib/utils";
 // Mock data for demonstration
 const mockBookings = [
   { id: "BK-001", guest: "John Smith", room: "A 3041", checkIn: "2025-11-26", checkOut: "2025-11-30", status: "confirmed", channel: "Booking.com", price: 450, nights: 4 },
-  { id: "BK-002", guest: "მარიამ გელაშვილი", room: "C 2641", checkIn: "2025-11-27", checkOut: "2025-12-02", status: "confirmed", channel: "Airbnb", price: 520, nights: 5 },
+  { id: "BK-002", guest: "Mariam Gelashvili", room: "C 2641", checkIn: "2025-11-27", checkOut: "2025-12-02", status: "confirmed", channel: "Airbnb", price: 520, nights: 5 },
   { id: "BK-003", guest: "David Brown", room: "D 3418", checkIn: "2025-11-26", checkOut: "2025-11-28", status: "checked-in", channel: "Expedia", price: 280, nights: 2 },
   { id: "BK-004", guest: "Anna Müller", room: "A 2441", checkIn: "2025-11-28", checkOut: "2025-12-05", status: "pending", channel: "Booking.com", price: 780, nights: 7 },
-  { id: "BK-005", guest: "ნინო ბერიძე", room: "C 2547", checkIn: "2025-11-26", checkOut: "2025-11-29", status: "checked-in", channel: "Direct", price: 360, nights: 3 },
+  { id: "BK-005", guest: "Nino Beridze", room: "C 2547", checkIn: "2025-11-26", checkOut: "2025-11-29", status: "checked-in", channel: "Direct", price: 360, nights: 3 },
   { id: "BK-006", guest: "Michael Johnson", room: "A 1833", checkIn: "2025-11-29", checkOut: "2025-12-03", status: "confirmed", channel: "Airbnb", price: 520, nights: 4 },
-  { id: "BK-007", guest: "თამარ მახარაძე", room: "C 4706", checkIn: "2025-11-27", checkOut: "2025-12-01", status: "confirmed", channel: "Agoda", price: 450, nights: 4 },
+  { id: "BK-007", guest: "Tamar Makharadze", room: "C 4706", checkIn: "2025-11-27", checkOut: "2025-12-01", status: "confirmed", channel: "Agoda", price: 450, nights: 4 },
   { id: "BK-008", guest: "Sophie Martin", room: "A 4027", checkIn: "2025-11-30", checkOut: "2025-12-07", status: "pending", channel: "Booking.com", price: 890, nights: 7 },
 ];
 
@@ -51,19 +51,19 @@ const Reservations = () => {
   };
 
   const tabs = [
-    { id: "calendar", label: "კალენდარი", icon: CalendarDays },
+    { id: "calendar", label: "Calendar", icon: CalendarDays },
     { id: "bookings", label: "Reservations", icon: List },
     { id: "crm", label: "CRM", icon: Users },
-    { id: "mail", label: "📧 ელფოსტა", icon: Mail },
+    { id: "mail", label: "📧 Email", icon: Mail },
     { id: "ai", label: "🤖 AI", icon: Bot },
   ];
 
   const getStatusBadge = (status: string) => {
     const variants: Record<string, { variant: "default" | "secondary" | "destructive" | "outline"; label: string; icon: any }> = {
-      "confirmed": { variant: "default", label: "დადასტურებული", icon: CheckCircle2 },
-      "checked-in": { variant: "secondary", label: "ჩასახლებული", icon: Calendar },
-      "pending": { variant: "outline", label: "მოლოდინში", icon: Clock },
-      "cancelled": { variant: "destructive", label: "გაუქმებული", icon: XCircle },
+      "confirmed": { variant: "default", label: "Confirmed", icon: CheckCircle2 },
+      "checked-in": { variant: "secondary", label: "Checked In", icon: Calendar },
+      "pending": { variant: "outline", label: "Pending", icon: Clock },
+      "cancelled": { variant: "destructive", label: "Cancelled", icon: XCircle },
     };
     const config = variants[status] || variants.pending;
     const Icon = config.icon;
@@ -87,7 +87,7 @@ const Reservations = () => {
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold">Reservations</h1>
-        <p className="text-gray-600">მართეთ Reservations და სტუმრები</p>
+        <p className="text-gray-600">Manage reservations and guests</p>
       </div>
 
       {/* KPI Cards */}
@@ -95,11 +95,11 @@ const Reservations = () => {
         <Card className="p-4 bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
           <div className="flex items-center justify-between">
             <div>
-              <div className="text-sm text-blue-700 font-medium">სულ Reservations</div>
+              <div className="text-sm text-blue-700 font-medium">Total Reservations</div>
               <div className="text-3xl font-bold text-blue-900">{totalBookings}</div>
               <div className="text-xs text-blue-600 mt-1 flex items-center">
                 <TrendingUp className="h-3 w-3 mr-1" />
-                +12% vs ბოლო თვე
+                +12% vs last month
               </div>
             </div>
             <Calendar className="h-10 w-10 text-blue-600 opacity-50" />
@@ -109,7 +109,7 @@ const Reservations = () => {
         <Card className="p-4 bg-gradient-to-br from-green-50 to-green-100 border-green-200">
           <div className="flex items-center justify-between">
             <div>
-              <div className="text-sm text-green-700 font-medium">ჩასახლება დღეს</div>
+              <div className="text-sm text-green-700 font-medium">Check-ins Today</div>
               <div className="text-3xl font-bold text-green-900">{checkInsToday}</div>
               <div className="text-xs text-green-600 mt-1">{mockBookings.filter(b => b.checkIn === "2025-11-26").map(b => b.room).join(", ")}</div>
             </div>
@@ -120,9 +120,9 @@ const Reservations = () => {
         <Card className="p-4 bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200">
           <div className="flex items-center justify-between">
             <div>
-              <div className="text-sm text-orange-700 font-medium">გასახლება დღეს</div>
+              <div className="text-sm text-orange-700 font-medium">Check-outs Today</div>
               <div className="text-3xl font-bold text-orange-900">{checkOutsToday}</div>
-              <div className="text-xs text-orange-600 mt-1">დასუფთავება საჭიროა</div>
+              <div className="text-xs text-orange-600 mt-1">Cleaning required</div>
             </div>
             <XCircle className="h-10 w-10 text-orange-600 opacity-50" />
           </div>
@@ -131,11 +131,11 @@ const Reservations = () => {
         <Card className="p-4 bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
           <div className="flex items-center justify-between">
             <div>
-              <div className="text-sm text-purple-700 font-medium">დაკავებულობა</div>
+              <div className="text-sm text-purple-700 font-medium">occupancy</div>
               <div className="text-3xl font-bold text-purple-900">{occupancyRate}%</div>
               <div className="text-xs text-purple-600 mt-1 flex items-center">
                 <TrendingUp className="h-3 w-3 mr-1" />
-                +5% vs ბოლო თვე
+                +5% vs last month
               </div>
             </div>
             <Star className="h-10 w-10 text-purple-600 opacity-50" />
@@ -145,9 +145,9 @@ const Reservations = () => {
         <Card className="p-4 bg-gradient-to-br from-yellow-50 to-yellow-100 border-yellow-200">
           <div className="flex items-center justify-between">
             <div>
-              <div className="text-sm text-yellow-700 font-medium">შემოსავალი</div>
+              <div className="text-sm text-yellow-700 font-medium">Revenue</div>
               <div className="text-3xl font-bold text-yellow-900">₾{totalRevenue.toLocaleString()}</div>
-              <div className="text-xs text-yellow-600 mt-1">მიმდინარე Reservations</div>
+              <div className="text-xs text-yellow-600 mt-1">Current Reservations</div>
             </div>
             <DollarSign className="h-10 w-10 text-yellow-600 opacity-50" />
           </div>
@@ -180,14 +180,14 @@ const Reservations = () => {
       <div className="mt-6">
         {activeTab === "calendar" && (
           <Card className="p-6">
-            <h2 className="text-xl font-bold mb-4">კალენდარი</h2>
+            <h2 className="text-xl font-bold mb-4">Calendar</h2>
             <div className="bg-gradient-to-br from-gray-50 to-gray-100 p-8 rounded-lg border-2 border-dashed border-gray-300">
               <div className="text-center">
                 <CalendarDays className="h-16 w-16 mx-auto text-gray-400 mb-4" />
-                <h3 className="text-lg font-semibold text-gray-700 mb-2">კალენდარის ვიზუალიზაცია</h3>
-                <p className="text-gray-600 mb-4">აქ გამოჩნდება ინტერაქტიული კალენდარი ყველა ბრონირებით</p>
+                <h3 className="text-lg font-semibold text-gray-700 mb-2">Calendarს ვიზუალიზაცია</h3>
+                <p className="text-gray-600 mb-4">აქ გამოჩნდება ინტერაქტიული Calendar ყველა ბრონირებით</p>
                 <div className="grid grid-cols-7 gap-2 max-w-2xl mx-auto">
-                  {["ორშ", "სამ", "ოთხ", "ხუთ", "პარ", "შაბ", "კვი"].map((day, i) => (
+                  {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day, i) => (
                     <div key={i} className="text-xs font-semibold text-gray-500">{day}</div>
                   ))}
                   {Array.from({ length: 35 }).map((_, i) => (
@@ -211,21 +211,21 @@ const Reservations = () => {
         {activeTab === "bookings" && (
           <Card>
             <div className="p-4 border-b">
-              <h2 className="text-xl font-bold">ყველა ბრონირება</h2>
-              <p className="text-sm text-gray-600">სულ {totalBookings} აქტიური ბრონირება</p>
+              <h2 className="text-xl font-bold">All Bookings</h2>
+              <p className="text-sm text-gray-600">Total {totalBookings} active bookings</p>
             </div>
             <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>ID</TableHead>
-                  <TableHead>სტუმარი</TableHead>
-                  <TableHead>ოთახი</TableHead>
-                  <TableHead>ჩასახლება</TableHead>
-                  <TableHead>გასახლება</TableHead>
-                  <TableHead>ღამეები</TableHead>
-                  <TableHead>სტატუსი</TableHead>
-                  <TableHead>არხი</TableHead>
-                  <TableHead className="text-right">ფასი</TableHead>
+                  <TableHead>guests</TableHead>
+                  <TableHead>Room</TableHead>
+                  <TableHead>Check-in</TableHead>
+                  <TableHead>Check-out</TableHead>
+                  <TableHead>Nights</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Channel</TableHead>
+                  <TableHead className="text-right">Price</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -251,24 +251,24 @@ const Reservations = () => {
 
         {activeTab === "crm" && (
           <Card className="p-6">
-            <h2 className="text-xl font-bold mb-4">სტუმრების CRM</h2>
+            <h2 className="text-xl font-bold mb-4">Guest CRM</h2>
             <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-8 rounded-lg border-2 border-dashed border-purple-300">
               <div className="text-center">
                 <Users className="h-16 w-16 mx-auto text-purple-400 mb-4" />
-                <h3 className="text-lg font-semibold text-purple-700 mb-2">სტუმრების მართვა</h3>
-                <p className="text-purple-600 mb-4">აქ გამოჩნდება სტუმრების პროფილები, ისტორია და პრეფერენციები</p>
+                <h3 className="text-lg font-semibold text-purple-700 mb-2">Guest Management</h3>
+                <p className="text-purple-600 mb-4">Guest profiles, history and preferences will appear here</p>
                 <div className="grid grid-cols-3 gap-4 max-w-xl mx-auto mt-6">
                   <Card className="p-4 bg-white">
                     <div className="text-2xl font-bold text-purple-900">156</div>
-                    <div className="text-xs text-purple-600">სულ სტუმარი</div>
+                    <div className="text-xs text-purple-600">Total guests</div>
                   </Card>
                   <Card className="p-4 bg-white">
                     <div className="text-2xl font-bold text-purple-900">42</div>
-                    <div className="text-xs text-purple-600">VIP სტუმარი</div>
+                    <div className="text-xs text-purple-600">VIP guests</div>
                   </Card>
                   <Card className="p-4 bg-white">
                     <div className="text-2xl font-bold text-purple-900">89%</div>
-                    <div className="text-xs text-purple-600">დაბრუნების %</div>
+                    <div className="text-xs text-purple-600">Return Rate</div>
                   </Card>
                 </div>
               </div>
@@ -278,15 +278,15 @@ const Reservations = () => {
 
         {activeTab === "mail" && (
           <Card className="p-6">
-            <h2 className="text-xl font-bold mb-4">📧 ელფოსტის ინტეგრაცია</h2>
+            <h2 className="text-xl font-bold mb-4">📧 Email Integration</h2>
             <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-8 rounded-lg border-2 border-dashed border-blue-300">
               <div className="text-center">
                 <Mail className="h-16 w-16 mx-auto text-blue-400 mb-4" />
-                <h3 className="text-lg font-semibold text-blue-700 mb-2">Gmail სინქრონიზაცია</h3>
-                <p className="text-blue-600 mb-4">ავტომატური ბრონირების ამოღება Booking.com, Airbnb და სხვა არხებიდან</p>
+                <h3 className="text-lg font-semibold text-blue-700 mb-2">Gmail Sync</h3>
+                <p className="text-blue-600 mb-4">Automatic booking extraction from Booking.com, Airbnb and other channels</p>
                 <Button className="mt-4">
                   <Mail className="h-4 w-4 mr-2" />
-                  დააკავშირე Gmail
+                  Connect Gmail
                 </Button>
               </div>
             </div>

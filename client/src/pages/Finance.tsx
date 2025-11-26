@@ -53,10 +53,10 @@ const Finance = () => {
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-6 mb-6">
           <TabsTrigger value="dashboard"><BarChart3 className="h-4 w-4 mr-2" />Dashboard</TabsTrigger>
-          <TabsTrigger value="transactions"><Receipt className="h-4 w-4 mr-2" />ტრანზაქციები</TabsTrigger>
+          <TabsTrigger value="transactions"><Receipt className="h-4 w-4 mr-2" />transactions</TabsTrigger>
           <TabsTrigger value="pl"><TrendingUp className="h-4 w-4 mr-2" />P&L</TabsTrigger>
-          <TabsTrigger value="settlements"><Users className="h-4 w-4 mr-2" />ანგარიშსწორება</TabsTrigger>
-          <TabsTrigger value="invoices"><FileText className="h-4 w-4 mr-2" />ინვოისები</TabsTrigger>
+          <TabsTrigger value="settlements"><Users className="h-4 w-4 mr-2" />Settlements</TabsTrigger>
+          <TabsTrigger value="invoices"><FileText className="h-4 w-4 mr-2" />Invoices</TabsTrigger>
           <TabsTrigger value="ai"><Bot className="h-4 w-4 mr-2" />🤖 AI</TabsTrigger>
         </TabsList>
 
@@ -73,8 +73,8 @@ const Finance = () => {
         </TabsContent>
 
         <TabsContent value="settlements">
-          <Card><CardHeader><CardTitle>მესაკუთრეების ანგარიშსწორება</CardTitle><CardDescription>მოგების გაყოფის კალკულატორი და რეპორტები</CardDescription></CardHeader>
-          <CardContent><p className="text-muted-foreground">აქ იქნება ანგარიშსწორების სისტემა - 80/20 მოგების გაყოფა, ავტომატური რეპორტები, და გადახდების თვალყურის დევნება.</p></CardContent></Card>
+          <Card><CardHeader><CardTitle>მესაკუთრეების Settlements</CardTitle><CardDescription>Profit sharing calculator and reports</CardDescription></CardHeader>
+          <CardContent><p className="text-muted-foreground">Settlement system will be here - 80/20 profit split, automatic reports, and payment tracking.</p></CardContent></Card>
         </TabsContent>
 
         <TabsContent value="invoices">
@@ -89,13 +89,13 @@ const Finance = () => {
               module="finance"
               onUploadSuccess={(url, fileName) => {
                 // Send uploaded file info to AI for analysis
-                handleSendMessage(`გააანალიზე ეს ფაილი: ${fileName} (${url})`);
+                handleSendMessage(`Analyze this file: ${fileName} (${url})`);
               }}
             />
-            <AIChatBox messages={chatHistory} onSendMessage={handleSendMessage} isLoading={isLoading} placeholder="მაგ: 'რა არის ჩვენი უდიდესი ხარჯი?' ან 'გააანალიზე ეს P&L რეპორტი'" height={400} />
+            <AIChatBox messages={chatHistory} onSendMessage={handleSendMessage} isLoading={isLoading} placeholder="e.g. 'What is our biggest expense?' or 'Analyze this P&L report'" height={400} />
             <div className="grid grid-cols-2 gap-2">
-              <Button variant="outline" size="sm" onClick={() => handleSendMessage("რა არის ჩვენი უდიდესი ხარჯი?")}>უდიდესი ხარჯი</Button>
-              <Button variant="outline" size="sm" onClick={() => handleSendMessage("როგორ ავამაღლო მოგება?")}>მოგების ოპტიმიზაცია</Button>
+              <Button variant="outline" size="sm" onClick={() => handleSendMessage("რა არის ჩვენი Biggest Expense?")}>Biggest Expense</Button>
+              <Button variant="outline" size="sm" onClick={() => handleSendMessage("How to increase profit?")}>Profit Optimization</Button>
             </div>
           </CardContent></Card>
         </TabsContent>

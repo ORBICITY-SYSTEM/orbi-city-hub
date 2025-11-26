@@ -7,6 +7,9 @@ import { FileUpload } from "@/components/FileUpload";
 import { useState } from "react";
 import { trpc } from "@/lib/trpc";
 import { MarketingDashboard } from "@/components/MarketingDashboard";
+import ChannelsGrid from "@/components/ChannelsGrid";
+import ChannelComparison from "@/components/ChannelComparison";
+import { CHANNELS, COMING_SOON_CHANNELS } from "@/../../shared/channelsData";
 
 const Marketing = () => {
   const [chatHistory, setChatHistory] = useState<Array<{ role: "user" | "assistant"; content: string }>>([]);
@@ -47,12 +50,13 @@ const Marketing = () => {
       </div>
 
       <Tabs defaultValue="dashboard" className="w-full">
-        <TabsList className="grid w-full grid-cols-6 mb-6">
+        <TabsList className="grid w-full grid-cols-7 mb-6">
           <TabsTrigger value="dashboard"><BarChart3 className="h-4 w-4 mr-2" />Dashboard</TabsTrigger>
-          <TabsTrigger value="channels"><BarChart3 className="h-4 w-4 mr-2" />არხები</TabsTrigger>
-          <TabsTrigger value="reputation"><Star className="h-4 w-4 mr-2" />რეპუტაცია</TabsTrigger>
-          <TabsTrigger value="campaigns"><Send className="h-4 w-4 mr-2" />კამპანიები</TabsTrigger>
-          <TabsTrigger value="social"><Instagram className="h-4 w-4 mr-2" />სოც. მედია</TabsTrigger>
+          <TabsTrigger value="channels"><BarChart3 className="h-4 w-4 mr-2" />Channels</TabsTrigger>
+          <TabsTrigger value="comparison"><BarChart3 className="h-4 w-4 mr-2" />Comparison</TabsTrigger>
+          <TabsTrigger value="reputation"><Star className="h-4 w-4 mr-2" />Reputation</TabsTrigger>
+          <TabsTrigger value="campaigns"><Send className="h-4 w-4 mr-2" />Campaigns</TabsTrigger>
+          <TabsTrigger value="social"><Instagram className="h-4 w-4 mr-2" />Social Media</TabsTrigger>
           <TabsTrigger value="ai"><Bot className="h-4 w-4 mr-2" />🤖 AI</TabsTrigger>
         </TabsList>
 
@@ -61,23 +65,26 @@ const Marketing = () => {
         </TabsContent>
 
         <TabsContent value="channels">
-          <Card><CardHeader><CardTitle>არხების შესრულება</CardTitle><CardDescription>ანალიტიკა რომელი OTA მეტ შემოსავალს იძლევა</CardDescription></CardHeader>
-          <CardContent><p className="text-muted-foreground">აქ იქნება არხების ანალიზი - Booking.com vs Airbnb vs Expedia შემოსავლები, კონვერსია, და ROI.</p></CardContent></Card>
+          <ChannelsGrid channels={CHANNELS} comingSoonChannels={COMING_SOON_CHANNELS} />
+        </TabsContent>
+
+        <TabsContent value="comparison">
+          <ChannelComparison channels={CHANNELS} />
         </TabsContent>
 
         <TabsContent value="reputation">
-          <Card><CardHeader><CardTitle>რეპუტაციის მენეჯერი</CardTitle><CardDescription>სტუმრების რევიუების წაკითხვა და პასუხი</CardDescription></CardHeader>
-          <CardContent><p className="text-muted-foreground">აქ იქნება რევიუების სისტემა - ყველა OTA-დან რევიუების აგრეგაცია, sentiment ანალიზი, და ავტომატური პასუხები.</p></CardContent></Card>
+          <Card><CardHeader><CardTitle>Reputation Manager</CardTitle><CardDescription>Read and respond to guest reviews</CardDescription></CardHeader>
+          <CardContent><p className="text-muted-foreground">Review system will be here - review aggregation from all OTAs, sentiment analysis, and automatic responses.</p></CardContent></Card>
         </TabsContent>
 
         <TabsContent value="campaigns">
-          <Card><CardHeader><CardTitle>კამპანიების შემქმნელი</CardTitle><CardDescription>ელფოსტა/SMS კამპანიების შედგენა</CardDescription></CardHeader>
-          <CardContent><p className="text-muted-foreground">აქ იქნება კამპანიების სისტემა - email/SMS blasts, segmentation, A/B testing, და analytics.</p></CardContent></Card>
+          <Card><CardHeader><CardTitle>Campaignsს შემქმნელი</CardTitle><CardDescription>Email/SMS Campaignsს შედგენა</CardDescription></CardHeader>
+          <CardContent><p className="text-muted-foreground">აქ იქნება Campaignsს სისტემა - email/SMS blasts, segmentation, A/B testing, და analytics.</p></CardContent></Card>
         </TabsContent>
 
         <TabsContent value="social">
-          <Card><CardHeader><CardTitle>სოციალური მედია პლანერი</CardTitle><CardDescription>Instagram/TikTok პოსტების კალენდარი</CardDescription></CardHeader>
-          <CardContent><p className="text-muted-foreground">აქ იქნება სოციალური მედიის სისტემა - პოსტების დაგეგმვა, კონტენტის ბიბლიოთეკა, და engagement analytics.</p></CardContent></Card>
+          <Card><CardHeader><CardTitle>Social Media Planner</CardTitle><CardDescription>Instagram/TikTok პოსტების Calendar</CardDescription></CardHeader>
+          <CardContent><p className="text-muted-foreground">Social media system will be here - post scheduling, content library, and engagement analytics.</p></CardContent></Card>
         </TabsContent>
 
         <TabsContent value="ai">
@@ -87,13 +94,13 @@ const Marketing = () => {
             <FileUpload
               module="marketing"
               onUploadSuccess={(url, fileName) => {
-                handleSendMessage(`გააანალიზე ეს ფაილი: ${fileName} (${url})`);
+                handleSendMessage(`Analyze this file: ${fileName} (${url})`);
               }}
             />
-            <AIChatBox messages={chatHistory} onSendMessage={handleSendMessage} isLoading={isLoading} placeholder="მაგ: 'დაწერე Instagram პოსტი' ან 'გააანალიზე რევიუების sentiment'" height={400} />
+            <AIChatBox messages={chatHistory} onSendMessage={handleSendMessage} isLoading={isLoading} placeholder="მაგ: 'Write Instagram post' ან 'Analyze review sentiment'" height={400} />
             <div className="grid grid-cols-2 gap-2">
-              <Button variant="outline" size="sm" onClick={() => handleSendMessage("დაწერე Instagram პოსტი ზაფხულის სეზონისთვის")}>Instagram პოსტი</Button>
-              <Button variant="outline" size="sm" onClick={() => handleSendMessage("გააანალიზე რევიუების sentiment")}>Sentiment ანალიზი</Button>
+              <Button variant="outline" size="sm" onClick={() => handleSendMessage("Write Instagram post ზაფხულის სეზონისთვის")}>Instagram პოსტი</Button>
+              <Button variant="outline" size="sm" onClick={() => handleSendMessage("Analyze review sentiment")}>Sentiment Analysis</Button>
             </div>
           </CardContent></Card>
         </TabsContent>
