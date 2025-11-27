@@ -3,6 +3,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
 import { Route, Switch, useLocation } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
+import { FeedbackWidget } from "./components/FeedbackWidget";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import OrbiDashboardLayout from "./components/OrbiDashboardLayout";
 
@@ -66,6 +67,7 @@ function App() {
         <TooltipProvider>
           <Toaster />
           <Router />
+          <FeedbackWidget />
         </TooltipProvider>
       </ThemeProvider>
     </ErrorBoundary>

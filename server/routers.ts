@@ -18,6 +18,8 @@ import { financeRouter } from "./routers/finance";
 import { fileRouter } from "./fileRouter";
 import { socialMediaRouter } from "./routers/socialMediaRouter";
 import { logisticsRouter } from "./logisticsRouter";
+import { feedbackRouter } from "./feedbackRouter";
+import { healthCheckRouter } from "./routers/healthCheck";
 
 export const appRouter = router({
   google: googleRouter,
@@ -31,6 +33,8 @@ export const appRouter = router({
   file: fileRouter,
   socialMedia: socialMediaRouter,
   logistics: logisticsRouter,
+  feedback: feedbackRouter,
+  healthCheck: healthCheckRouter,
   system: systemRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),

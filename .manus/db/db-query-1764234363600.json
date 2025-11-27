@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS errorLogs (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  level ENUM('error', 'warning', 'info') NOT NULL,\n  message TEXT NOT NULL,\n  stack TEXT,\n  context TEXT,\n  userId INT,\n  userEmail VARCHAR(320),\n  url TEXT,\n  userAgent TEXT,\n  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL\n)",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user c2qSkVB4gKtEmor.bc3c8c9ce52a --database VzNbWtRJAsr2zJAegEjRtX --execute CREATE TABLE IF NOT EXISTS errorLogs (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  level ENUM('error', 'warning', 'info') NOT NULL,\n  message TEXT NOT NULL,\n  stack TEXT,\n  context TEXT,\n  userId INT,\n  userEmail VARCHAR(320),\n  url TEXT,\n  userAgent TEXT,\n  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL\n)",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 2002
+}

@@ -24,6 +24,23 @@ export const users = mysqlTable("users", {
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 
+// Error logs table
+export const errorLogs = mysqlTable("errorLogs", {
+  id: int("id").autoincrement().primaryKey(),
+  level: mysqlEnum("level", ["error", "warning", "info"]).notNull(),
+  message: text("message").notNull(),
+  stack: text("stack"),
+  context: text("context"), // JSON string
+  userId: int("userId"),
+  userEmail: varchar("userEmail", { length: 320 }),
+  url: text("url"),
+  userAgent: text("userAgent"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type ErrorLog = typeof errorLogs.$inferSelect;
+export type InsertErrorLog = typeof errorLogs.$inferInsert;
+
 // ============================================================================
 // RESERVATIONS & GUESTS
 // ============================================================================
