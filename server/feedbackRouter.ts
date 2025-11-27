@@ -81,4 +81,79 @@ export const feedbackRouter = router({
 
       return { success: true };
     }),
+
+  /**
+   * Delete feedback (admin only)
+   */
+  delete: publicProcedure
+    .input(
+      z.object({
+        id: z.number(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      // Only allow admin users
+      if (ctx.user?.role !== "admin") {
+        throw new Error("Unauthorized");
+      }
+
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+
+      await db.execute(sql`
+        DELETE FROM userFeedback
+        WHERE id = ${input.id}
+      `);
+
+      return { success: true };
+    }),
+
+  /**
+   * Get feedback statistics (admin only)
+   */
+  getStats: publicProcedure.query(async ({ ctx }) => {
+    // Only allow admin users
+    if (ctx.user?.role !== "admin") {
+      throw new Error("Unauthorized");
+    }
+
+    const db = await getDb();
+    if (!db) {
+      return {
+        total: 0,
+        byType: { bug: 0, feature: 0, feedback: 0 },
+        byStatus: { new: 0, in_progress: 0, resolved: 0, closed: 0 },
+      };
+    }
+
+    const result = await db.execute(sql`
+      SELECT 
+        COUNT(*) as total,
+        SUM(CASE WHEN type = 'bug' THEN 1 ELSE 0 END) as bugs,
+        SUM(CASE WHEN type = 'feature' THEN 1 ELSE 0 END) as features,
+        SUM(CASE WHEN type = 'feedback' THEN 1 ELSE 0 END) as feedback,
+        SUM(CASE WHEN status = 'new' THEN 1 ELSE 0 END) as new_count,
+        SUM(CASE WHEN status = 'in_progress' THEN 1 ELSE 0 END) as in_progress_count,
+        SUM(CASE WHEN status = 'resolved' THEN 1 ELSE 0 END) as resolved_count,
+        SUM(CASE WHEN status = 'closed' THEN 1 ELSE 0 END) as closed_count
+      FROM userFeedback
+    `);
+
+    const row = result[0]?.[0] as any;
+
+    return {
+      total: Number(row?.total || 0),
+      byType: {
+        bug: Number(row?.bugs || 0),
+        feature: Number(row?.features || 0),
+        feedback: Number(row?.feedback || 0),
+      },
+      byStatus: {
+        new: Number(row?.new_count || 0),
+        in_progress: Number(row?.in_progress_count || 0),
+        resolved: Number(row?.resolved_count || 0),
+        closed: Number(row?.closed_count || 0),
+      },
+    };
+  }),
 });

@@ -20,6 +20,7 @@ import SocialMedia from "./pages/SocialMedia";
 import AdminLogin from "./pages/AdminLogin";
 import FinanceDashboard from "./pages/FinanceDashboard";
 import Admin from "./pages/Admin";
+import AdminFeedback from "./pages/AdminFeedback";
 import ChannelDetail from "./pages/ChannelDetail";
 
 function Router() {
@@ -31,6 +32,7 @@ function Router() {
     return (
       <Switch>
         <Route path="/admin/login" component={AdminLogin} />
+        <Route path="/admin/feedback" component={AdminFeedback} />
         <Route path="/admin" component={Admin} />
         <Route path="/404" component={NotFound} />
         <Route component={NotFound} />
