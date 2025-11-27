@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS gdprConsents (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  userId INT NOT NULL,\n  consentType ENUM('privacy_policy', 'terms_of_service', 'marketing', 'analytics') NOT NULL,\n  consentGiven BOOLEAN NOT NULL,\n  consentDate TIMESTAMP NOT NULL,\n  ipAddress VARCHAR(45),\n  userAgent TEXT,\n  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n  INDEX idx_userId (userId),\n  INDEX idx_consentType (consentType),\n  FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE\n)",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user c2qSkVB4gKtEmor.bc3c8c9ce52a --database VzNbWtRJAsr2zJAegEjRtX --execute CREATE TABLE IF NOT EXISTS gdprConsents (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  userId INT NOT NULL,\n  consentType ENUM('privacy_policy', 'terms_of_service', 'marketing', 'analytics') NOT NULL,\n  consentGiven BOOLEAN NOT NULL,\n  consentDate TIMESTAMP NOT NULL,\n  ipAddress VARCHAR(45),\n  userAgent TEXT,\n  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n  INDEX idx_userId (userId),\n  INDEX idx_consentType (consentType),\n  FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE\n)",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 343
+}

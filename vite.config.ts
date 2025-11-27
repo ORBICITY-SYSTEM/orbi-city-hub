@@ -24,6 +24,28 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
+    // Code splitting configuration
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Vendor chunks
+          'react-vendor': ['react', 'react-dom', 'react/jsx-runtime'],
+          'router-vendor': ['wouter'],
+          'trpc-vendor': ['@trpc/client', '@trpc/react-query', '@tanstack/react-query'],
+          'ui-vendor': ['lucide-react', 'streamdown'],
+          // Feature chunks
+          'chart-libs': ['chart.js', 'react-chartjs-2'],
+        },
+      },
+    },
+    // Optimize chunk size
+    chunkSizeWarningLimit: 1000,
+    // Minification
+    minify: 'esbuild',
+    // Source maps for production debugging
+    sourcemap: false,
+    // CSS code splitting
+    cssCodeSplit: true,
   },
   server: {
     host: true,

@@ -2,6 +2,7 @@ import "dotenv/config";
 import express from "express";
 import { errorLoggerMiddleware } from "./errorLogger";
 import { apiLimiter, authLimiter } from "./rateLimiter";
+import { securityHeadersMiddleware } from "../security";
 import { startBackupSchedule } from "../backupScheduler";
 import { initRedis } from "./cache";
 import { createServer } from "http";
@@ -35,7 +36,11 @@ async function startServer() {
   const app = express();
   const server = createServer(app);
   
-
+  // Security headers (Helmet)
+  app.use(securityHeadersMiddleware());
+  
+  // Trust proxy (for rate limiting behind reverse proxy)
+  app.set("trust proxy", 1);
   
   // Configure body parser with larger size limit for file uploads
   app.use(express.json({ limit: "50mb" }));

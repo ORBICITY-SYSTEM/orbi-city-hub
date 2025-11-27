@@ -23,6 +23,10 @@ import { healthCheckRouter } from "./routers/healthCheck";
 import { cacheRouter } from "./routers/cache";
 import { performanceRouter } from "./routers/performanceRouter";
 import { alertsRouter } from "./routers/alertsRouter";
+import { securityRouter } from "./routers/securityRouter";
+import { gdprRouter } from "./routers/gdprRouter";
+import { databaseRouter } from "./routers/databaseRouter";
+import { uptimeRouter } from "./routers/uptimeRouter";
 
 export const appRouter = router({
   google: googleRouter,
@@ -41,6 +45,10 @@ export const appRouter = router({
   cache: cacheRouter,
   performance: performanceRouter,
   alerts: alertsRouter,
+  security: securityRouter,
+  gdpr: gdprRouter,
+  database: databaseRouter,
+  uptime: uptimeRouter,
   system: systemRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
