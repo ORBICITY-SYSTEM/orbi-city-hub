@@ -21,6 +21,8 @@ import { logisticsRouter } from "./logisticsRouter";
 import { feedbackRouter } from "./feedbackRouter";
 import { healthCheckRouter } from "./routers/healthCheck";
 import { cacheRouter } from "./routers/cache";
+import { performanceRouter } from "./routers/performanceRouter";
+import { alertsRouter } from "./routers/alertsRouter";
 
 export const appRouter = router({
   google: googleRouter,
@@ -37,6 +39,8 @@ export const appRouter = router({
   feedback: feedbackRouter,
   healthCheck: healthCheckRouter,
   cache: cacheRouter,
+  performance: performanceRouter,
+  alerts: alertsRouter,
   system: systemRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),

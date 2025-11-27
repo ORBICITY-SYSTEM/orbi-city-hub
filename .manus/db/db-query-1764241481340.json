@@ -1,0 +1,16 @@
+{
+  "query": "SELECT \n  (SELECT COUNT(*) FROM rooms) as total_rooms,\n  (SELECT COUNT(*) FROM standardInventoryItems) as total_standard_items,\n  (SELECT COUNT(*) FROM roomInventoryItems) as total_room_inventory,\n  (SELECT COUNT(*) FROM rooms) * (SELECT COUNT(*) FROM standardInventoryItems) as expected_records;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user c2qSkVB4gKtEmor.bc3c8c9ce52a --database VzNbWtRJAsr2zJAegEjRtX --execute SELECT \n  (SELECT COUNT(*) FROM rooms) as total_rooms,\n  (SELECT COUNT(*) FROM standardInventoryItems) as total_standard_items,\n  (SELECT COUNT(*) FROM roomInventoryItems) as total_room_inventory,\n  (SELECT COUNT(*) FROM rooms) * (SELECT COUNT(*) FROM standardInventoryItems) as expected_records;",
+  "rows": [
+    {
+      "total_rooms": "56",
+      "total_standard_items": "16",
+      "total_room_inventory": "1",
+      "expected_records": "896"
+    }
+  ],
+  "messages": [],
+  "stdout": "total_rooms\ttotal_standard_items\ttotal_room_inventory\texpected_records\n56\t16\t1\t896\n",
+  "stderr": "",
+  "execution_time_ms": 76
+}

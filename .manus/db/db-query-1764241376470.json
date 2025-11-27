@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS performanceMetrics (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  endpoint VARCHAR(255) NOT NULL,\n  method VARCHAR(10) NOT NULL,\n  responseTime INT NOT NULL,\n  statusCode INT NOT NULL,\n  userId INT NULL,\n  userAgent TEXT NULL,\n  ipAddress VARCHAR(45) NULL,\n  timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  INDEX idx_endpoint (endpoint),\n  INDEX idx_timestamp (timestamp),\n  INDEX idx_userId (userId)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user c2qSkVB4gKtEmor.bc3c8c9ce52a --database VzNbWtRJAsr2zJAegEjRtX --execute CREATE TABLE IF NOT EXISTS performanceMetrics (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  endpoint VARCHAR(255) NOT NULL,\n  method VARCHAR(10) NOT NULL,\n  responseTime INT NOT NULL,\n  statusCode INT NOT NULL,\n  userId INT NULL,\n  userAgent TEXT NULL,\n  ipAddress VARCHAR(45) NULL,\n  timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  INDEX idx_endpoint (endpoint),\n  INDEX idx_timestamp (timestamp),\n  INDEX idx_userId (userId)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 237
+}

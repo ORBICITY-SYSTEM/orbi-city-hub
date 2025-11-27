@@ -1,0 +1,19 @@
+{
+  "query": "SELECT COUNT(*) as count FROM rooms UNION ALL SELECT COUNT(*) FROM standardInventoryItems UNION ALL SELECT COUNT(*) FROM roomInventoryItems;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user c2qSkVB4gKtEmor.bc3c8c9ce52a --database VzNbWtRJAsr2zJAegEjRtX --execute SELECT COUNT(*) as count FROM rooms UNION ALL SELECT COUNT(*) FROM standardInventoryItems UNION ALL SELECT COUNT(*) FROM roomInventoryItems;",
+  "rows": [
+    {
+      "count": "56"
+    },
+    {
+      "count": "16"
+    },
+    {
+      "count": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "count\n56\n16\n1\n",
+  "stderr": "",
+  "execution_time_ms": 63
+}
