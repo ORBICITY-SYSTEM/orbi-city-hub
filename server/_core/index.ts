@@ -1,6 +1,9 @@
 import "dotenv/config";
 import express from "express";
 import { errorLoggerMiddleware } from "./errorLogger";
+import { apiLimiter, authLimiter } from "./rateLimiter";
+import { startBackupSchedule } from "../backupScheduler";
+import { initRedis } from "./cache";
 import { createServer } from "http";
 import net from "net";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
@@ -37,6 +40,12 @@ async function startServer() {
   // Configure body parser with larger size limit for file uploads
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
+  
+  // Apply rate limiting to all API routes
+  app.use("/api/", apiLimiter);
+  
+  // Stricter rate limiting for OAuth/auth routes
+  app.use("/api/oauth/", authLimiter);
   // OAuth callback under /api/oauth/callback
   registerOAuthRoutes(app);
   // tRPC API
@@ -66,6 +75,17 @@ async function startServer() {
 
   server.listen(port, () => {
     console.log(`Server running on http://localhost:${port}/`);
+    
+    // Initialize Redis cache
+    initRedis();
+    
+    // Start automated backup schedule
+    if (process.env.NODE_ENV === "production") {
+      startBackupSchedule();
+      console.log("[Backup] Automated backup schedule started");
+    } else {
+      console.log("[Backup] Automated backups disabled in development mode");
+    }
   });
 }
 
