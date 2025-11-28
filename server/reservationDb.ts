@@ -1,4 +1,4 @@
-import { eq, and, gte, lte, like, or, desc } from "drizzle-orm";
+import { eq, and, gte, lte, like, or, desc, sql, count } from "drizzle-orm";
 import { getDb } from "./db";
 import { reservations, InsertReservation, Reservation } from "../drizzle/schema";
 
@@ -195,7 +195,7 @@ export async function getReservationsByDateRange(startDate: Date, endDate: Date)
   return result;
 }
 
-// Get statistics
+// Get statistics - optimized to use SQL COUNT queries instead of fetching all records
 export async function getReservationStats(): Promise<{
   total: number;
   confirmed: number;
@@ -216,21 +216,54 @@ export async function getReservationStats(): Promise<{
     };
   }
 
-  const all = await db.select().from(reservations);
-  
-  const confirmed = all.filter(r => r.status === "confirmed").length;
-  const pending = all.filter(r => r.status === "pending").length;
-  const cancelled = all.filter(r => r.status === "cancelled").length;
+  const today = new Date();
+  const futureDate = new Date();
+  futureDate.setDate(futureDate.getDate() + 7);
 
-  const currentGuests = await getCurrentGuests();
-  const upcomingCheckIns = await getUpcomingCheckIns(7);
+  // Use a single query with conditional counts for better performance
+  // This avoids fetching all records and filtering in JavaScript
+  const [statsResult] = await db
+    .select({
+      total: count(),
+      confirmed: count(sql`CASE WHEN ${reservations.status} = 'confirmed' THEN 1 END`),
+      pending: count(sql`CASE WHEN ${reservations.status} = 'pending' THEN 1 END`),
+      cancelled: count(sql`CASE WHEN ${reservations.status} = 'cancelled' THEN 1 END`),
+    })
+    .from(reservations);
+
+  // Count current guests (checked-in or confirmed with check-in <= today and check-out >= today)
+  const [currentGuestsResult] = await db
+    .select({ count: count() })
+    .from(reservations)
+    .where(
+      and(
+        lte(reservations.checkIn, today),
+        gte(reservations.checkOut, today),
+        or(
+          eq(reservations.status, "confirmed"),
+          eq(reservations.status, "checked-in")
+        )
+      )
+    );
+
+  // Count upcoming check-ins (next 7 days, confirmed status)
+  const [upcomingResult] = await db
+    .select({ count: count() })
+    .from(reservations)
+    .where(
+      and(
+        gte(reservations.checkIn, today),
+        lte(reservations.checkIn, futureDate),
+        eq(reservations.status, "confirmed")
+      )
+    );
 
   return {
-    total: all.length,
-    confirmed,
-    pending,
-    cancelled,
-    currentGuests: currentGuests.length,
-    upcomingCheckIns: upcomingCheckIns.length,
+    total: Number(statsResult?.total ?? 0),
+    confirmed: Number(statsResult?.confirmed ?? 0),
+    pending: Number(statsResult?.pending ?? 0),
+    cancelled: Number(statsResult?.cancelled ?? 0),
+    currentGuests: Number(currentGuestsResult?.count ?? 0),
+    upcomingCheckIns: Number(upcomingResult?.count ?? 0),
   };
 }
