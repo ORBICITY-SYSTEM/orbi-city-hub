@@ -540,3 +540,48 @@ export const reservations = mysqlTable("reservations", {
 
 export type Reservation = typeof reservations.$inferSelect;
 export type InsertReservation = typeof reservations.$inferInsert;
+
+// ============================================================================
+// OTELMS INTEGRATION
+// ============================================================================
+
+/**
+ * OTELMS Daily Reports
+ * Stores parsed data from OTELMS daily email reports
+ */
+export const otelmsDailyReports = mysqlTable("otelmsDailyReports", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // Report date
+  reportDate: timestamp("reportDate").notNull().unique(), // Date of the report
+  
+  // Booking statistics
+  checkIns: int("checkIns").default(0).notNull(), // შესვლა
+  checkOuts: int("checkOuts").default(0).notNull(), // გასვლა
+  cancellations: int("cancellations").default(0).notNull(), // გაუქმებები
+  
+  // Revenue statistics (in tetri - GEL * 100)
+  totalRevenue: int("totalRevenue").default(0).notNull(), // შემოსავლები
+  adr: int("adr").default(0).notNull(), // Average Daily Rate (in tetri)
+  occupancyRate: int("occupancyRate").default(0).notNull(), // დატვირთულობა % (stored as percentage * 100)
+  revPAR: int("revPAR").default(0).notNull(), // Revenue Per Available Room (in tetri)
+  
+  // Guest statistics
+  totalGuests: int("totalGuests").default(0).notNull(), // სტუმრების საერთო რაოდენობა
+  totalChildren: int("totalChildren").default(0).notNull(), // ბავშვების საერთო რაოდენობა
+  roomsOccupied: int("roomsOccupied").default(0).notNull(), // დაკავებული ნომრები
+  carsParked: int("carsParked").default(0).notNull(), // გაჩერებული ავტომობილები
+  
+  // Channel performance (stored as JSON)
+  channelData: json("channelData"), // { "Direct": { count: 43, revenue: 1113258 }, "Booking": { count: 1, revenue: 100630 }, ... }
+  
+  // Metadata
+  emailId: varchar("emailId", { length: 255 }), // Reference to original email
+  rawContent: text("rawContent"), // Store first 500 chars of original email for reference
+  
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type OtelmsDailyReport = typeof otelmsDailyReports.$inferSelect;
+export type InsertOtelmsDailyReport = typeof otelmsDailyReports.$inferInsert;

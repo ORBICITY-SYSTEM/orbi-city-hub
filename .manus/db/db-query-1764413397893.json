@@ -1,0 +1,30 @@
+{
+  "query": "SELECT * FROM `otelmsDailyReports` ORDER BY `reportDate` DESC LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user c2qSkVB4gKtEmor.bc3c8c9ce52a --database VzNbWtRJAsr2zJAegEjRtX --execute SELECT * FROM `otelmsDailyReports` ORDER BY `reportDate` DESC LIMIT 5;",
+  "rows": [
+    {
+      "id": "1",
+      "reportDate": "2025-11-29 00:00:00",
+      "checkIns": "10",
+      "checkOuts": "5",
+      "cancellations": "22",
+      "totalRevenue": "153984",
+      "adr": "3581",
+      "occupancyRate": "6000",
+      "revPAR": "2139",
+      "totalGuests": "98",
+      "totalChildren": "0",
+      "roomsOccupied": "44",
+      "carsParked": "0",
+      "channelData": "{\"Booking\": {\"count\": 1, \"revenue\": 100630}, \"Direct\": {\"count\": 43, \"revenue\": 1113258}, \"Expedia\": {\"count\": 4, \"revenue\": 77040}}",
+      "emailId": "otelms-2025-11-29",
+      "rawContent": "დღიური ანგარიში 29/11/2025 - შესვლა: 10, გასვლა: 5, გაუქმებები: 22",
+      "createdAt": "2025-11-29 10:49:51",
+      "updatedAt": "2025-11-29 10:49:51"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\treportDate\tcheckIns\tcheckOuts\tcancellations\ttotalRevenue\tadr\toccupancyRate\trevPAR\ttotalGuests\ttotalChildren\troomsOccupied\tcarsParked\tchannelData\temailId\trawContent\tcreatedAt\tupdatedAt\n1\t2025-11-29 00:00:00\t10\t5\t22\t153984\t3581\t6000\t2139\t98\t0\t44\t0\t{\"Booking\": {\"count\": 1, \"revenue\": 100630}, \"Direct\": {\"count\": 43, \"revenue\": 1113258}, \"Expedia\": {\"count\": 4, \"revenue\": 77040}}\totelms-2025-11-29\tდღიური ანგარიში 29/11/2025 - შესვლა: 10, გასვლა: 5, გაუქმებები: 22\t2025-11-29 10:49:51\t2025-11-29 10:49:51\n",
+  "stderr": "",
+  "execution_time_ms": 59
+}

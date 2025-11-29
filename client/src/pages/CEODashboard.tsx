@@ -7,6 +7,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { GoogleReviewsWidget } from "@/components/GoogleReviewsWidget";
 import { GA4RealTimeWidget } from "@/components/GA4RealTimeWidget";
+import { OTELMSSummaryWidget } from "@/components/OTELMSSummaryWidget";
 
 export default function CEODashboard() {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
@@ -182,6 +183,11 @@ export default function CEODashboard() {
 
         {/* Google Reviews */}
         <GoogleReviewsWidget />
+      </div>
+
+      {/* OTELMS Summary Widget */}
+      <div className="mb-8">
+        <OTELMSSummaryWidget />
       </div>
 
       {/* Monthly Forecast & Top Performers */}

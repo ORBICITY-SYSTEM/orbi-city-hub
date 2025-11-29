@@ -22,6 +22,7 @@ import FinanceDashboard from "./pages/FinanceDashboard";
 import Admin from "./pages/Admin";
 import AdminFeedback from "./pages/AdminFeedback";
 import ChannelDetail from "./pages/ChannelDetail";
+import OTELMSAnalytics from "./pages/OTELMSAnalytics";
 
 function Router() {
   const [location] = useLocation();
@@ -52,6 +53,7 @@ function Router() {
         <Route path="/marketing/channels/:id" component={ChannelDetail} />
         <Route path="/logistics" component={Logistics} />
         <Route path="/reports" component={Reports} />
+        <Route path="/otelms-analytics" component={OTELMSAnalytics} />
         <Route path="/files" component={Files} />
       <Route path="/google" component={Google} />
         <Route path="/social-media" component={SocialMedia} />

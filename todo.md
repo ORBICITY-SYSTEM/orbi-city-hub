@@ -1150,3 +1150,98 @@
 - [x] Comprehensive testing
 - [x] Documentation update
 - [x] Create final production checkpoint
+
+
+---
+
+## Phase 35: OTELMS Email Integration (Automated) - IN PROGRESS
+
+### Gmail MCP Integration
+- [ ] Configure Gmail MCP to fetch OTELMS emails from info@orbicitybatumi.com
+- [ ] Search for emails with keyword "HMS OtelMS" or "Otelms.com"
+- [ ] Fetch emails from January 2024 to present
+- [ ] Store raw email content for processing
+
+### AI-Powered Georgian Text Parser
+- [ ] Create OTELMS email parser with AI (Gemini/OpenAI)
+- [ ] Extract Georgian text: შესვლა (Check-in), გასვლა (Check-out), გაუქმებული (Cancelled)
+- [ ] Extract revenue, room numbers, guest names
+- [ ] Handle HTML email format and tables
+- [ ] Parse date and statistics
+
+### Database Schema
+- [ ] Create otelms_daily_reports table
+- [ ] Add fields: date, check_ins, check_outs, cancellations, revenue, raw_data
+- [ ] Link to existing reservations and channelPerformance tables
+- [ ] Add indexes for performance
+
+### Data Population
+- [ ] Parse all historical OTELMS emails (Jan 2024 - Present)
+- [ ] Bulk insert into database
+- [ ] Data validation and deduplication
+- [ ] Update channelPerformance with real data
+
+### Dashboard Integration
+- [ ] Update CEO Dashboard with real OTELMS KPIs
+- [ ] Update Finance Dashboard with revenue from OTELMS
+- [ ] Update Reservations Calendar with check-ins/check-outs
+- [ ] Add OTELMS data source indicator
+
+### Automated Daily Sync
+- [ ] Create tRPC endpoint for OTELMS sync
+- [ ] Schedule daily sync (8 AM Georgian time)
+- [ ] Error handling and notifications
+- [ ] Sync status monitoring
+
+
+---
+
+## Phase 35: OTELMS Email Integration (IN PROGRESS - 2025-11-29)
+
+### Email Parsing & Data Extraction
+- [x] Create Python OTELMS parser for Georgian text
+- [x] Extract booking statistics (შესვლა, გასვლა, გაუქმებები)
+- [x] Extract revenue statistics (შემოსავლები, ADR, დატვირთულობა, RevPAR)
+- [x] Extract guest statistics (სტუმრები, ბავშვები, ნომრები)
+- [x] Extract channel performance (Direct, Booking, Expedia, Agoda)
+- [x] Test parser with sample OTELMS email
+
+### Database Schema
+- [x] Create otelmsDailyReports table (SQL)
+- [x] Add fields: reportDate, checkIns, checkOuts, cancellations, totalRevenue, adr, occupancyRate, revPAR
+- [x] Add fields: totalGuests, totalChildren, roomsOccupied, carsParked
+- [x] Add channelData JSON field for channel performance
+- [x] Insert sample data (Nov 29, 2025)
+- [x] Verify data insertion
+
+### Backend API
+- [x] Create otelmsDb.ts with database helpers
+- [x] Create tRPC otelms router
+- [x] Add procedures: getAll, getLatest, getByDate, getByDateRange, getStatistics, getDashboardSummary
+- [x] Register otelms router in main routers.ts
+- [x] Test API endpoints
+
+### Dashboard Integration
+- [x] Create OTELMS Analytics page
+- [x] Add OTELMS KPIs (Check-ins, Check-outs, Revenue, Occupancy)
+- [x] Add channel performance charts
+- [x] Display guest statistics
+- [x] Display revenue metrics
+- [x] Add recent reports table
+- [x] Create OTELMS Summary Widget for CEO Dashboard
+- [x] Add "View Full Report" button to navigate to analytics page
+- [x] Add route /otelms-analytics to App.tsx
+
+### Automated Sync
+- [ ] Create Gmail MCP integration for OTELMS emails
+- [ ] Set up auto-forward from Yahoo to Gmail
+- [ ] Create daily sync cron job
+- [ ] Add error handling and logging
+- [ ] Test automated sync
+
+### Testing & Checkpoint
+- [x] Test all OTELMS API endpoints
+- [x] Test dashboard integration
+- [x] Write vitest tests (11/11 passed)
+- [x] Save Phase 35 checkpoint
+- [ ] Test automated sync (Phase 2 - Devin)

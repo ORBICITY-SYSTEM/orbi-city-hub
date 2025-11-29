@@ -27,6 +27,7 @@ import { securityRouter } from "./routers/securityRouter";
 import { gdprRouter } from "./routers/gdprRouter";
 import { databaseRouter } from "./routers/databaseRouter";
 import { uptimeRouter } from "./routers/uptimeRouter";
+import { otelmsRouter } from "./routers/otelms";
 
 export const appRouter = router({
   google: googleRouter,
@@ -49,6 +50,7 @@ export const appRouter = router({
   gdpr: gdprRouter,
   database: databaseRouter,
   uptime: uptimeRouter,
+  otelms: otelmsRouter,
   system: systemRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
