@@ -32,6 +32,7 @@ import { integrationsRouter } from "./routers/integrationsRouter";
 import { googleAnalyticsRouter } from "./routers/googleAnalytics";
 import { googleBusinessRouter } from "./routers/googleBusiness";
 import { gmailOtelmsRouter } from "./routers/gmailOtelms";
+import { emailCategorizationRouter } from "./routers/emailCategorizationRouter";
 
 export const appRouter = router({
   google: googleRouter,
@@ -59,6 +60,7 @@ export const appRouter = router({
   googleAnalytics: googleAnalyticsRouter,
   googleBusiness: googleBusinessRouter,
   gmailOtelms: gmailOtelmsRouter,
+  emailCategorization: emailCategorizationRouter,
   system: systemRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),

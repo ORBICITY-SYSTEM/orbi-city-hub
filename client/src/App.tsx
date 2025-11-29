@@ -24,6 +24,7 @@ import AdminFeedback from "./pages/AdminFeedback";
 import ChannelDetail from "./pages/ChannelDetail";
 import OTELMSAnalytics from "./pages/OTELMSAnalytics";
 import AdminIntegrations from "./pages/AdminIntegrations";
+import EmailInbox from "./pages/EmailInbox";
 
 function Router() {
   const [location] = useLocation();
@@ -59,6 +60,7 @@ function Router() {
         <Route path="/files" component={Files} />
       <Route path="/google" component={Google} />
         <Route path="/social-media" component={SocialMedia} />
+        <Route path="/email-inbox" component={EmailInbox} />
         <Route path="/404" component={NotFound} />
         <Route component={NotFound} />
       </Switch>

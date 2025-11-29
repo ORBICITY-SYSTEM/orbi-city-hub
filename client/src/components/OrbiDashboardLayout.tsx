@@ -16,7 +16,8 @@ import {
   Chrome,
   Share2,
   Menu,
-  X
+  X,
+  Mail
 } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { Link, useLocation } from "wouter";
@@ -39,6 +40,7 @@ const navItems: NavItem[] = [
   { name: "Files", path: "/files", icon: FolderOpen },
   { name: "Google", path: "/google", icon: Chrome },
   { name: "Social Media", path: "/social-media", icon: Share2 },
+  { name: "Email Inbox", path: "/email-inbox", icon: Mail },
 ];
 
 export default function OrbiDashboardLayout({ children }: { children: React.ReactNode }) {

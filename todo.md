@@ -1422,3 +1422,125 @@
 - [ ] Predictive analytics engine
 - [ ] AI-powered recommendations
 - [ ] CHECKPOINT 4 - Final delivery
+
+---
+
+## 🤖 Phase C: AI Email Agent (Universal Email Management) - IN PROGRESS
+
+### 1. Email Categorization System
+- [ ] Create email categories enum (Bookings, Finance, Marketing, Spam, Important, General)
+- [ ] Add emailCategories table to database schema
+- [ ] Create AI categorization function using LLM (invokeLLM)
+- [ ] Build email categorization router (tRPC)
+- [ ] Add batch categorization for existing emails
+- [ ] Test categorization accuracy with real OTELMS emails
+
+### 2. Smart Unsubscribe Detection
+- [ ] Create unsubscribe pattern detection algorithm (regex + AI)
+- [ ] Add unsubscribeSuggestions table to schema
+- [ ] Build unsubscribe suggestion router (tRPC)
+- [ ] Create UI component for unsubscribe suggestions
+- [ ] Add auto-unsubscribe feature (with user confirmation)
+- [ ] Test with marketing emails
+
+### 3. Email Summarization
+- [ ] Create email summary generator using LLM
+- [ ] Add emailSummaries table to schema
+- [ ] Build summarization router (tRPC)
+- [ ] Create summary display component
+- [ ] Add batch summarization for inbox
+- [ ] Test summary quality with long emails
+
+### 4. Natural Language Search
+- [ ] Implement semantic search using LLM embeddings
+- [ ] Add emailEmbeddings table for vector storage
+- [ ] Create search router with NLP support
+- [ ] Build search UI with natural language input
+- [ ] Add search filters (date, sender, category)
+- [ ] Add search history and suggestions
+- [ ] Test search accuracy ("find booking emails from last week")
+
+### 5. Email Management UI
+- [ ] Create EmailInbox page component (/email-inbox)
+- [ ] Add category filters (tabs for each category)
+- [ ] Create email list component with previews
+- [ ] Add bulk actions (mark as read, delete, categorize)
+- [ ] Create email detail view modal
+- [ ] Add reply/forward functionality (optional)
+- [ ] Integrate with Gmail MCP for real-time sync
+
+### 6. Testing & Optimization
+- [ ] Write vitest tests for all email features
+- [ ] Test with real Gmail OTELMS emails
+- [ ] Optimize LLM prompts for accuracy
+- [ ] Add error handling and fallbacks
+- [ ] Performance testing (categorize 1000+ emails)
+- [ ] Save Phase C checkpoint
+
+---
+
+## 📊 Phase D: Advanced CEO Dashboard Analytics - PENDING
+
+### 1. Date Range Filters
+- [ ] Create DateRangePicker component (shadcn/ui)
+- [ ] Add date filter state management (useState)
+- [ ] Update all widgets to support date filtering
+- [ ] Add preset ranges (Today, Week, Month, Quarter, Year, Custom)
+- [ ] Add "Compare to previous period" toggle
+- [ ] Save user's preferred date range
+
+### 2. Power BI-Style Charts
+- [ ] Install Recharts library (Chart.js already installed)
+- [ ] Create RevenueChart component (line chart with trends)
+- [ ] Create BookingsChart component (bar chart by source)
+- [ ] Create OccupancyChart component (area chart)
+- [ ] Create TrafficSourcesChart (donut chart)
+- [ ] Create ChannelPerformanceChart (stacked bar)
+- [ ] Add chart export (PNG, PDF, Excel)
+- [ ] Add chart customization (colors, labels, tooltips)
+
+### 3. Predictive Analytics
+- [ ] Create revenue forecasting algorithm (linear regression)
+- [ ] Add booking prediction model (based on historical data)
+- [ ] Create occupancy prediction (seasonal trends)
+- [ ] Build PredictiveInsights component
+- [ ] Add trend indicators (up/down arrows with percentages)
+- [ ] Add confidence scores for predictions
+- [ ] Test prediction accuracy with historical data
+
+### 4. AI-Powered Recommendations
+- [ ] Create recommendation engine using LLM
+- [ ] Add AIRecommendations widget to dashboard
+- [ ] Implement action items based on data analysis
+- [ ] Add recommendation categories (Revenue, Marketing, Operations)
+- [ ] Create recommendation history tracking
+- [ ] Add "Mark as Done" functionality
+- [ ] Test recommendation quality
+
+### 5. Dashboard Enhancements
+- [ ] Add dashboard customization (drag-and-drop widgets)
+- [ ] Create dashboard templates (CEO, Finance, Operations)
+- [ ] Add export dashboard as PDF report
+- [ ] Implement real-time notifications for critical metrics
+- [ ] Add dashboard sharing (generate public link)
+- [ ] Create mobile-optimized dashboard view
+
+### 6. Testing & Optimization
+- [ ] Write vitest tests for all dashboard features
+- [ ] Test with real production data
+- [ ] Optimize chart rendering performance
+- [ ] Add loading states for all widgets
+- [ ] Performance testing (dashboard load time < 2s)
+- [ ] Save Phase D checkpoint
+
+---
+
+## ✅ Final Testing & Publish to team.orbicitybatumi.com
+- [ ] Test all AI Email Agent features end-to-end
+- [ ] Test all Dashboard analytics with real data
+- [ ] Verify all integrations working
+- [ ] Performance testing and optimization
+- [ ] Create user documentation
+- [ ] Save final checkpoint
+- [ ] Publish via Manus Publish button
+- [ ] Verify production deployment

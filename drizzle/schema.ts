@@ -616,3 +616,130 @@ export const integrations = mysqlTable("integrations", {
 
 export type Integration = typeof integrations.$inferSelect;
 export type InsertIntegration = typeof integrations.$inferInsert;
+
+// ============================================================================
+// EMAIL MANAGEMENT & AI CATEGORIZATION
+// ============================================================================
+
+/**
+ * Email Categories
+ * AI-powered email categorization system
+ */
+export const emailCategories = mysqlTable("emailCategories", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // Email reference
+  emailId: varchar("emailId", { length: 255 }).notNull().unique(), // Gmail message ID
+  emailSubject: text("emailSubject"),
+  emailFrom: varchar("emailFrom", { length: 320 }),
+  emailDate: timestamp("emailDate"),
+  
+  // AI categorization
+  category: mysqlEnum("category", [
+    "bookings",      // Booking confirmations, modifications
+    "finance",       // Invoices, payments, financial reports
+    "marketing",     // Newsletters, promotions, campaigns
+    "spam",          // Spam, unwanted emails
+    "important",     // Urgent, important emails
+    "general"        // General correspondence
+  ]).notNull(),
+  
+  // Confidence score (0-100)
+  confidence: int("confidence").default(0).notNull(),
+  
+  // AI reasoning
+  aiReasoning: text("aiReasoning"), // Why AI chose this category
+  
+  // Manual override
+  manualCategory: mysqlEnum("manualCategory", [
+    "bookings",
+    "finance",
+    "marketing",
+    "spam",
+    "important",
+    "general"
+  ]),
+  manuallyOverridden: boolean("manuallyOverridden").default(false),
+  
+  // Metadata
+  userId: int("userId"), // User who manually categorized (if any)
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type EmailCategory = typeof emailCategories.$inferSelect;
+export type InsertEmailCategory = typeof emailCategories.$inferInsert;
+
+/**
+ * Unsubscribe Suggestions
+ * AI-detected unsubscribe opportunities
+ */
+export const unsubscribeSuggestions = mysqlTable("unsubscribeSuggestions", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // Email reference
+  emailId: varchar("emailId", { length: 255 }).notNull(),
+  emailFrom: varchar("emailFrom", { length: 320 }).notNull(),
+  emailSubject: text("emailSubject"),
+  
+  // Detection
+  detectionMethod: mysqlEnum("detectionMethod", [
+    "unsubscribe_link",  // Found unsubscribe link in email
+    "list_unsubscribe",  // List-Unsubscribe header detected
+    "pattern_match",     // Matched marketing email pattern
+    "ai_detection"       // AI detected as unwanted
+  ]).notNull(),
+  
+  unsubscribeUrl: varchar("unsubscribeUrl", { length: 500 }),
+  
+  // Frequency analysis
+  senderEmailCount: int("senderEmailCount").default(1).notNull(), // How many emails from this sender
+  lastEmailDate: timestamp("lastEmailDate"),
+  
+  // User action
+  status: mysqlEnum("status", [
+    "suggested",     // AI suggested, user hasn't acted
+    "dismissed",     // User dismissed suggestion
+    "unsubscribed",  // User unsubscribed
+    "kept"           // User wants to keep receiving
+  ]).default("suggested").notNull(),
+  
+  actionDate: timestamp("actionDate"),
+  
+  // Metadata
+  userId: int("userId"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type UnsubscribeSuggestion = typeof unsubscribeSuggestions.$inferSelect;
+export type InsertUnsubscribeSuggestion = typeof unsubscribeSuggestions.$inferInsert;
+
+/**
+ * Email Summaries
+ * AI-generated summaries for long emails
+ */
+export const emailSummaries = mysqlTable("emailSummaries", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // Email reference
+  emailId: varchar("emailId", { length: 255 }).notNull().unique(),
+  
+  // Summary
+  shortSummary: varchar("shortSummary", { length: 500 }).notNull(), // 1-2 sentences
+  keyPoints: json("keyPoints"), // Array of key points
+  actionItems: json("actionItems"), // Array of action items extracted
+  
+  // Sentiment analysis
+  sentiment: mysqlEnum("sentiment", ["positive", "neutral", "negative", "urgent"]),
+  
+  // Metadata
+  wordCount: int("wordCount").default(0),
+  generatedAt: timestamp("generatedAt").defaultNow().notNull(),
+  userId: int("userId"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type EmailSummary = typeof emailSummaries.$inferSelect;
+export type InsertEmailSummary = typeof emailSummaries.$inferInsert;
