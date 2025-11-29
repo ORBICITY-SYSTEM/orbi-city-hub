@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { GoogleReviewsWidget } from "@/components/GoogleReviewsWidget";
 import { GA4RealTimeWidget } from "@/components/GA4RealTimeWidget";
 import { OTELMSSummaryWidget } from "@/components/OTELMSSummaryWidget";
+import { LiveVisitorsWidget } from "@/components/LiveVisitorsWidget";
+import { RecentReviewsWidget } from "@/components/RecentReviewsWidget";
 
 export default function CEODashboard() {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
@@ -115,9 +117,10 @@ export default function CEODashboard() {
         })}
       </div>
 
-      {/* GA4 Real-time Traffic */}
-      <div className="mb-8">
-        <GA4RealTimeWidget />
+      {/* Live Analytics Widgets */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <LiveVisitorsWidget />
+        <RecentReviewsWidget />
       </div>
 
       {/* Channel Performance, Quick Insights & Google Reviews */}

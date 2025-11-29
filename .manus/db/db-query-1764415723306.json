@@ -1,0 +1,37 @@
+{
+  "query": "SHOW CREATE TABLE otelmsDailyReports;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user c2qSkVB4gKtEmor.bc3c8c9ce52a --database VzNbWtRJAsr2zJAegEjRtX --execute SHOW CREATE TABLE otelmsDailyReports;",
+  "rows": [
+    {
+      "Table": "otelmsDailyReports",
+      "Create Table": "CREATE TABLE `otelmsDailyReports` ("
+    }
+  ],
+  "messages": [
+    "  `id` int(11) NOT NULL AUTO_INCREMENT,",
+    "  `reportDate` timestamp NOT NULL,",
+    "  `checkIns` int(11) NOT NULL DEFAULT '0',",
+    "  `checkOuts` int(11) NOT NULL DEFAULT '0',",
+    "  `cancellations` int(11) NOT NULL DEFAULT '0',",
+    "  `totalRevenue` int(11) NOT NULL DEFAULT '0',",
+    "  `adr` int(11) NOT NULL DEFAULT '0',",
+    "  `occupancyRate` int(11) NOT NULL DEFAULT '0',",
+    "  `revPAR` int(11) NOT NULL DEFAULT '0',",
+    "  `totalGuests` int(11) NOT NULL DEFAULT '0',",
+    "  `totalChildren` int(11) NOT NULL DEFAULT '0',",
+    "  `roomsOccupied` int(11) NOT NULL DEFAULT '0',",
+    "  `carsParked` int(11) NOT NULL DEFAULT '0',",
+    "  `channelData` json DEFAULT NULL,",
+    "  `emailId` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `rawContent` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,",
+    "  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,",
+    "  PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */,",
+    "  KEY `idx_reportDate` (`reportDate`),",
+    "  UNIQUE KEY `reportDate` (`reportDate`)",
+    ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci AUTO_INCREMENT=30001"
+  ],
+  "stdout": "Table\tCreate Table\notelmsDailyReports\tCREATE TABLE `otelmsDailyReports` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `reportDate` timestamp NOT NULL,\n  `checkIns` int(11) NOT NULL DEFAULT '0',\n  `checkOuts` int(11) NOT NULL DEFAULT '0',\n  `cancellations` int(11) NOT NULL DEFAULT '0',\n  `totalRevenue` int(11) NOT NULL DEFAULT '0',\n  `adr` int(11) NOT NULL DEFAULT '0',\n  `occupancyRate` int(11) NOT NULL DEFAULT '0',\n  `revPAR` int(11) NOT NULL DEFAULT '0',\n  `totalGuests` int(11) NOT NULL DEFAULT '0',\n  `totalChildren` int(11) NOT NULL DEFAULT '0',\n  `roomsOccupied` int(11) NOT NULL DEFAULT '0',\n  `carsParked` int(11) NOT NULL DEFAULT '0',\n  `channelData` json DEFAULT NULL,\n  `emailId` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `rawContent` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */,\n  KEY `idx_reportDate` (`reportDate`),\n  UNIQUE KEY `reportDate` (`reportDate`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci AUTO_INCREMENT=30001\n",
+  "stderr": "",
+  "execution_time_ms": 56
+}

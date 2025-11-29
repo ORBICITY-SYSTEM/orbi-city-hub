@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS integrations (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  service VARCHAR(100) NOT NULL UNIQUE,\n  credentials TEXT NOT NULL,\n  status ENUM('pending', 'connected', 'error') DEFAULT 'pending' NOT NULL,\n  lastSync TIMESTAMP NULL,\n  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,\n  updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user c2qSkVB4gKtEmor.bc3c8c9ce52a --database VzNbWtRJAsr2zJAegEjRtX --execute CREATE TABLE IF NOT EXISTS integrations (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  service VARCHAR(100) NOT NULL UNIQUE,\n  credentials TEXT NOT NULL,\n  status ENUM('pending', 'connected', 'error') DEFAULT 'pending' NOT NULL,\n  lastSync TIMESTAMP NULL,\n  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,\n  updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1492
+}

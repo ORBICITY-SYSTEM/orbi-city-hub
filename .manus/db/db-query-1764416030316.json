@@ -1,0 +1,16 @@
+{
+  "query": "SELECT COUNT(*) as total, MIN(reportDate) as earliest, MAX(reportDate) as latest, SUM(totalRevenue)/100 as total_revenue FROM otelmsDailyReports;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user c2qSkVB4gKtEmor.bc3c8c9ce52a --database VzNbWtRJAsr2zJAegEjRtX --execute SELECT COUNT(*) as total, MIN(reportDate) as earliest, MAX(reportDate) as latest, SUM(totalRevenue)/100 as total_revenue FROM otelmsDailyReports;",
+  "rows": [
+    {
+      "total": "333",
+      "earliest": "2025-01-01 00:00:00",
+      "latest": "2025-11-29 00:00:00",
+      "total_revenue": "438004.7900"
+    }
+  ],
+  "messages": [],
+  "stdout": "total\tearliest\tlatest\ttotal_revenue\n333\t2025-01-01 00:00:00\t2025-11-29 00:00:00\t438004.7900\n",
+  "stderr": "",
+  "execution_time_ms": 51
+}

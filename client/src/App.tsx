@@ -23,6 +23,7 @@ import Admin from "./pages/Admin";
 import AdminFeedback from "./pages/AdminFeedback";
 import ChannelDetail from "./pages/ChannelDetail";
 import OTELMSAnalytics from "./pages/OTELMSAnalytics";
+import AdminIntegrations from "./pages/AdminIntegrations";
 
 function Router() {
   const [location] = useLocation();
@@ -34,6 +35,7 @@ function Router() {
       <Switch>
         <Route path="/admin/login" component={AdminLogin} />
         <Route path="/admin/feedback" component={AdminFeedback} />
+        <Route path="/admin/integrations" component={AdminIntegrations} />
         <Route path="/admin" component={Admin} />
         <Route path="/404" component={NotFound} />
         <Route component={NotFound} />

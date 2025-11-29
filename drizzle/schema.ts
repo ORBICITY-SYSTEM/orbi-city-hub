@@ -585,3 +585,34 @@ export const otelmsDailyReports = mysqlTable("otelmsDailyReports", {
 
 export type OtelmsDailyReport = typeof otelmsDailyReports.$inferSelect;
 export type InsertOtelmsDailyReport = typeof otelmsDailyReports.$inferInsert;
+
+// ============================================================================
+// API INTEGRATIONS
+// ============================================================================
+
+/**
+ * API Integrations
+ * Stores encrypted credentials and status for external API integrations
+ */
+export const integrations = mysqlTable("integrations", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // Service name
+  service: varchar("service", { length: 100 }).notNull().unique(), // otelms, google_analytics, google_business, etc.
+  
+  // Encrypted credentials (AES-256)
+  credentials: text("credentials").notNull(), // Encrypted JSON string
+  
+  // Connection status
+  status: mysqlEnum("status", ["pending", "connected", "error"]).default("pending").notNull(),
+  
+  // Last sync timestamp
+  lastSync: timestamp("lastSync"),
+  
+  // Metadata
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Integration = typeof integrations.$inferSelect;
+export type InsertIntegration = typeof integrations.$inferInsert;

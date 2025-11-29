@@ -1245,3 +1245,180 @@
 - [x] Write vitest tests (11/11 passed)
 - [x] Save Phase 35 checkpoint
 - [ ] Test automated sync (Phase 2 - Devin)
+
+
+---
+
+## 🚨 Phase 36: Production Deployment Fix (Nov 29, 2025 - URGENT)
+
+### Deployment Error Resolution
+- [ ] Investigate Docker build failure (PrepareImageActivity error)
+- [ ] Check build logs for specific error details
+- [ ] Rollback to Checkpoint 24 (c9834157) - stable version with OTELMS
+- [ ] Verify rollback successful
+- [ ] Re-attempt publish to production
+- [ ] Verify production deployment working
+- [ ] Test OTELMS dashboard on production URL
+- [ ] Confirm all 333 daily reports visible on production
+
+### Alternative Solutions if Rollback Fails
+- [ ] Try publishing without rollback (fix current state)
+- [ ] Check Docker configuration files
+- [ ] Verify all dependencies are production-ready
+- [ ] Check for any missing environment variables
+- [ ] Contact Manus support if issue persists
+
+
+---
+
+## 🔗 Phase 37: Admin Integrations Page - Live API Connections (Nov 29, 2025)
+
+### UI Implementation
+- [ ] Create `/admin/integrations` page route
+- [ ] Design integration cards layout (3 cards: OTELMS, GA4, Google Business)
+- [ ] Add OTELMS Email Sync card with Yahoo Mail credentials form
+- [ ] Add Google Analytics card with JSON upload and Property ID input
+- [ ] Add Google Business Profile card with OAuth button
+- [ ] Add connection status indicators (Connected/Not Connected)
+- [ ] Add "Test Connection" buttons for each integration
+- [ ] Add success/error toast notifications
+
+### Backend API Endpoints
+- [ ] Create `integrations` tRPC router
+- [ ] Add `saveOtelmsCredentials` procedure (email, app password)
+- [ ] Add `saveGoogleAnalytics` procedure (JSON file, property ID)
+- [ ] Add `saveGoogleBusiness` procedure (OAuth token, location ID)
+- [ ] Add `testOtelmsConnection` procedure (verify Yahoo IMAP)
+- [ ] Add `testGoogleAnalytics` procedure (verify GA4 API)
+- [ ] Add `testGoogleBusiness` procedure (verify GBP API)
+- [ ] Add `getIntegrationStatus` procedure (return all connection statuses)
+
+### Database Schema
+- [ ] Create `integrations` table (service, credentials, status, lastSync)
+- [ ] Encrypt sensitive credentials (AES-256)
+- [ ] Add indexes for performance
+
+### Automated Sync System
+- [ ] Create OTELMS email sync cron job (daily 10:00 AM)
+- [ ] Create Google Analytics sync cron job (every 30 minutes)
+- [ ] Create Google Business Profile sync cron job (daily)
+- [ ] Add error handling and retry logic
+- [ ] Add sync logs table for debugging
+
+### Testing
+- [ ] Test Yahoo Mail IMAP connection
+- [ ] Test Google Analytics API calls
+- [ ] Test Google Business Profile API calls
+- [ ] Test automated sync jobs
+- [ ] Verify live data appears on CEO Dashboard
+- [ ] Write vitest tests for all integration endpoints
+
+
+---
+
+## 🚀 Phase 35: Workload Identity Federation + Live API Integrations (IN PROGRESS - 2025-11-29)
+
+### Workload Identity Federation Setup
+- [x] Enable IAM Credentials API in Google Cloud
+- [x] Enable Security Token Service API in Google Cloud
+- [x] Enable Google Analytics Data API in Google Cloud
+- [x] Enable Google Business Profile API in Google Cloud
+- [x] Enable Gmail API in Google Cloud
+- [x] Create Workload Identity Pool (orbi-pool)
+- [x] Create Workload Identity Provider (manus-provider)
+- [x] Grant Service Account Permissions
+- [x] Verify Workload Identity configuration
+
+### Backend Integration - Google Auth
+- [ ] Create server/googleAuth.ts with Workload Identity token exchange
+- [ ] Implement Google API client factory
+- [ ] Add token refresh logic
+- [ ] Test authentication flow
+
+### Backend Integration - Google Analytics 4
+- [ ] Create server/routers/googleAnalytics.ts
+- [ ] Add getRealTimeUsers procedure
+- [ ] Add getRealTimeSessions procedure
+- [ ] Add getPageViews procedure
+- [ ] Add getTrafficSources procedure
+- [ ] Add getDashboardMetrics procedure (combined)
+- [ ] Test all GA4 procedures
+
+### Backend Integration - Google Business Profile
+- [ ] Create server/routers/googleBusiness.ts
+- [ ] Add getReviews procedure
+- [ ] Add getReviewStats procedure
+- [ ] Add getRecentReviews procedure
+- [ ] Add respondToReview procedure
+- [ ] Test all Business Profile procedures
+
+### Frontend Integration - CEO Dashboard
+- [ ] Create LiveVisitors widget component
+- [ ] Create RecentReviews widget component
+- [ ] Add auto-refresh logic (30s intervals)
+- [ ] Integrate tRPC queries
+- [ ] Test real-time data display
+
+### Frontend Integration - Admin Integrations Page
+- [ ] Add Workload Identity connection status
+- [ ] Add GA4 connection test button
+- [ ] Add Business Profile connection test button
+- [ ] Add Gmail connection test button
+- [ ] Display last sync timestamps
+- [ ] Add manual sync triggers
+
+### Gmail Integration for OTELMS
+- [ ] Guide user to configure Yahoo Mail forwarding
+- [ ] Create server/routers/gmail.ts
+- [ ] Add fetchOTELMSEmails procedure
+- [ ] Add parseOTELMSReport procedure (Georgian text)
+- [ ] Add saveDailyReport procedure
+- [ ] Add syncHistoricalData procedure
+- [ ] Create otelmsDailyReports database table
+- [ ] Set up automated daily sync (10:00 AM cron)
+- [ ] Test email fetching and parsing
+
+### Testing & Documentation
+- [ ] Test GA4 real-time metrics
+- [ ] Test Business Profile reviews
+- [ ] Test Gmail OTELMS automation
+- [ ] Test all dashboard widgets
+- [ ] Test admin integrations page
+- [ ] Write integration documentation
+- [ ] Save final checkpoint
+
+
+---
+
+## 🚀 Phase A: Gmail OTELMS Integration (CHECKPOINT 1)
+
+- [x] Add otelmsDailyReports table to database schema
+- [x] Create OTELMS email parser (Georgian text)
+- [x] Create Gmail router with email reading functions
+- [x] Add manual sync button to Admin Integrations
+- [ ] Test email syncing with real data
+- [ ] CHECKPOINT 1 - Save progress
+
+## 🚀 Phase B: Deploy to Cloud Run (CHECKPOINT 2)
+
+- [ ] Create Dockerfile for production
+- [ ] Configure Cloud Build
+- [ ] Deploy to Cloud Run
+- [ ] Test live deployment
+- [ ] CHECKPOINT 2 - Save progress
+
+## 🚀 Phase C: AI Email Agent (CHECKPOINT 3)
+
+- [ ] Email categorization system (Bookings, Finance, Spam)
+- [ ] Smart unsubscribe detection
+- [ ] Email summarization with LLM
+- [ ] Natural language search interface
+- [ ] CHECKPOINT 3 - Save progress
+
+## 🚀 Phase D: Advanced Dashboard (CHECKPOINT 4)
+
+- [ ] Date range filter component
+- [ ] Power BI-style charts (Chart.js/D3.js)
+- [ ] Predictive analytics engine
+- [ ] AI-powered recommendations
+- [ ] CHECKPOINT 4 - Final delivery

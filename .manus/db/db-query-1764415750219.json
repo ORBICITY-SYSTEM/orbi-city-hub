@@ -1,0 +1,9 @@
+{
+  "query": "INSERT INTO otelmsDailyReports (reportDate, checkIns, checkOuts, cancellations, totalRevenue, adr, occupancyRate, revPAR, totalGuests, roomsOccupied, channelData, createdAt, updatedAt) VALUES ('2025-01-01', 4, 2, 7, 68956, 3831, 25, 958, 42, 18, '{\"Direct\": {\"bookings\": 6, \"revenue\": 210.5}, \"Booking.com\": {\"bookings\": 2, \"revenue\": 64.03}, \"Expedia\": {\"bookings\": 1, \"revenue\": 37.87}, \"Agoda\": {\"bookings\": 0, \"revenue\": 0.0}}', NOW(), NOW()) ON DUPLICATE KEY UPDATE checkIns=VALUES(checkIns), checkOuts=VALUES(checkOuts), cancellations=VALUES(cancellations), totalRevenue=VALUES(totalRevenue), adr=VALUES(adr), occupancyRate=VALUES(occupancyRate), revPAR=VALUES(revPAR), totalGuests=VALUES(totalGuests), roomsOccupied=VALUES(roomsOccupied), channelData=VALUES(channelData), updatedAt=NOW();",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user c2qSkVB4gKtEmor.bc3c8c9ce52a --database VzNbWtRJAsr2zJAegEjRtX --execute INSERT INTO otelmsDailyReports (reportDate, checkIns, checkOuts, cancellations, totalRevenue, adr, occupancyRate, revPAR, totalGuests, roomsOccupied, channelData, createdAt, updatedAt) VALUES ('2025-01-01', 4, 2, 7, 68956, 3831, 25, 958, 42, 18, '{\"Direct\": {\"bookings\": 6, \"revenue\": 210.5}, \"Booking.com\": {\"bookings\": 2, \"revenue\": 64.03}, \"Expedia\": {\"bookings\": 1, \"revenue\": 37.87}, \"Agoda\": {\"bookings\": 0, \"revenue\": 0.0}}', NOW(), NOW()) ON DUPLICATE KEY UPDATE checkIns=VALUES(checkIns), checkOuts=VALUES(checkOuts), cancellations=VALUES(cancellations), totalRevenue=VALUES(totalRevenue), adr=VALUES(adr), occupancyRate=VALUES(occupancyRate), revPAR=VALUES(revPAR), totalGuests=VALUES(totalGuests), roomsOccupied=VALUES(roomsOccupied), channelData=VALUES(channelData), updatedAt=NOW();",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 56
+}
