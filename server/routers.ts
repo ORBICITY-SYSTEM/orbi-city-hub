@@ -35,8 +35,10 @@ import { gmailOtelmsRouter } from "./routers/gmailOtelms";
 import { emailCategorizationRouter } from "./routers/emailCategorizationRouter";
 import { butlerRouter } from "./butlerRouter";
 import { aiAnalyzerRouter } from "./aiAnalyzerRouter";
+import { realFinanceRouter } from "./realFinanceRouter";
 
 export const appRouter = router({
+  realFinance: realFinanceRouter,
   aiAnalyzer: aiAnalyzerRouter,
   butler: butlerRouter,
   google: googleRouter,

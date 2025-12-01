@@ -14,6 +14,7 @@ import Home from "./pages/Home";
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Finance Module - Lazy
+const RealFinanceDashboard = lazy(() => import("./pages/RealFinanceDashboard"));
 const FinanceDashboard = lazy(() => import("./pages/finance/FinanceDashboard"));
 const FinanceAnalytics = lazy(() => import("./pages/finance/FinanceAnalytics"));
 const FinanceMonthlyReports = lazy(() => import("./pages/finance/FinanceMonthlyReports"));
@@ -59,7 +60,8 @@ function RouterContent() {
     <ModularLayout>
       <Switch>
         {/* Home */}
-        <Route path="/" component={Home} />
+        <Route path={"/"} component={Home} />
+        <Route path={"/real-finance"} component={RealFinanceDashboard} />
 
         {/* Finance Module */}
         <Route path="/finance" component={FinanceDashboard} />

@@ -53,6 +53,25 @@ export default function Home() {
         <p className="text-gray-400 text-lg">Enterprise Management Platform</p>
       </div>
 
+      {/* Real Finance Dashboard Link */}
+      <Link href="/real-finance">
+        <div className="bg-gradient-to-r from-green-900/50 to-blue-900/50 border-2 border-green-500 rounded-xl p-6 hover:border-green-400 transition-all cursor-pointer">
+          <div className="flex items-center gap-4">
+            <div className="text-6xl">💰</div>
+            <div className="flex-1">
+              <h2 className="text-2xl font-bold text-white mb-2">Real Finance Dashboard</h2>
+              <p className="text-gray-300">View actual financial data from ORBI City Financial Report (Oct 2024 - Sep 2025)</p>
+              <div className="flex gap-4 mt-3 text-sm">
+                <span className="text-green-400 font-semibold">₾920,505 Revenue</span>
+                <span className="text-blue-400 font-semibold">₾720,186 Profit</span>
+                <span className="text-purple-400 font-semibold">12 Months Data</span>
+              </div>
+            </div>
+            <div className="text-green-400 text-xl">→</div>
+          </div>
+        </div>
+      </Link>
+
       {/* Main AI Agent */}
       <MainAIAgent />
 

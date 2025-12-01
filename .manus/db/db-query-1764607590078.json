@@ -1,0 +1,9 @@
+{
+  "query": "INSERT INTO financial_summary (period_start, period_end, total_revenue, total_expenses, total_profit, company_profit, owners_profit, profit_margin)\nVALUES ('2024-10-01', '2025-09-30', 920505, 200319, 720186, 110477, 609709, 0);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user c2qSkVB4gKtEmor.bc3c8c9ce52a --database VzNbWtRJAsr2zJAegEjRtX --execute INSERT INTO financial_summary (period_start, period_end, total_revenue, total_expenses, total_profit, company_profit, owners_profit, profit_margin)\nVALUES ('2024-10-01', '2025-09-30', 920505, 200319, 720186, 110477, 609709, 0);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 68
+}
