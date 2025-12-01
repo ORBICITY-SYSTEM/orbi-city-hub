@@ -1,224 +1,373 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Download, Plus, Settings } from "lucide-react";
+import { Download, Calendar as CalendarIcon, Filter, TrendingUp } from "lucide-react";
 import { trpc } from "@/lib/trpc";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function FinanceDashboard() {
-  const { data: summary, isLoading } = trpc.finance.getSummary.useQuery();
-  const { data: monthlyData } = trpc.finance.getMonthlyData.useQuery();
+  const { data: summary, isLoading } = trpc.realFinance.getSummary.useQuery();
+  const { data: monthlyData } = trpc.realFinance.getMonthlyData.useQuery();
+
+  // State for filters
+  const [selectedMonth, setSelectedMonth] = useState<string>("all");
+  const [selectedPeriod, setSelectedPeriod] = useState<string>("all");
+
+  // All months including Coming Soon
+  const allMonths = useMemo(() => {
+    const data = [
+      ...(monthlyData || []),
+      { month: "November 2025", comingSoon: true },
+      { month: "December 2025", comingSoon: true }
+    ];
+    return data;
+  }, [monthlyData]);
+
+  // Filter data based on selected filters
+  const filteredMonths = useMemo(() => {
+    if (!monthlyData) return [];
+    
+    let filtered = [...monthlyData];
+
+    // Single month filter
+    if (selectedMonth !== "all") {
+      filtered = filtered.filter(m => m.month === selectedMonth);
+    }
+
+    // Period filter
+    if (selectedPeriod !== "all") {
+      const monthCount = parseInt(selectedPeriod);
+      filtered = filtered.slice(-monthCount);
+    }
+
+    return filtered;
+  }, [monthlyData, selectedMonth, selectedPeriod]);
+
+  // Calculate filtered summary
+  const filteredSummary = useMemo(() => {
+    if (!filteredMonths.length) return summary;
+
+    const totalRevenue = filteredMonths.reduce((sum, m) => sum + m.totalRevenue, 0);
+    const totalExpenses = filteredMonths.reduce((sum, m) => sum + m.totalExpenses, 0);
+    const totalProfit = filteredMonths.reduce((sum, m) => sum + m.totalProfit, 0);
+    const companyProfit = filteredMonths.reduce((sum, m) => sum + m.companyProfit, 0);
+    const ownersProfit = filteredMonths.reduce((sum, m) => sum + m.ownersProfit, 0);
+
+    return {
+      totalRevenue,
+      totalExpenses,
+      netProfit: totalProfit,
+      profitMargin: totalRevenue > 0 ? (totalProfit / totalRevenue) * 100 : 0,
+      companyShare: companyProfit,
+      companyPercent: totalProfit > 0 ? (companyProfit / totalProfit) * 100 : 0,
+      ownersShare: ownersProfit,
+      ownersPercent: totalProfit > 0 ? (ownersProfit / totalProfit) * 100 : 0,
+    };
+  }, [filteredMonths, summary]);
+
+  // Display months (filtered + coming soon if viewing all)
+  const displayMonths = useMemo(() => {
+    if (selectedMonth === "all" && selectedPeriod === "all") {
+      return allMonths;
+    }
+    return filteredMonths;
+  }, [selectedMonth, selectedPeriod, allMonths, filteredMonths]);
+
+  // Export to Excel
+  const handleExport = () => {
+    const data = filteredMonths.map(m => ({
+      Month: m.month,
+      Studios: m.studios,
+      Revenue: m.totalRevenue,
+      Expenses: m.totalExpenses,
+      Profit: m.totalProfit,
+      Occupancy: `${m.occupancyRate}%`,
+      AvgPrice: m.avgPrice,
+    }));
+
+    const csv = [
+      Object.keys(data[0]).join(","),
+      ...data.map(row => Object.values(row).join(","))
+    ].join("\n");
+
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `orbi-finance-${selectedMonth}-${Date.now()}.csv`;
+    a.click();
+  };
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="text-lg">Loading...</div>
+        <div className="text-lg text-white font-bold">Loading real financial data...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-[oklch(0.12_0.10_240)] to-[oklch(0.18_0.10_240)] p-6">
       {/* Header */}
-      <div className="bg-[#E74C3C] text-white p-8 rounded-lg mb-6">
-        <h1 className="text-4xl font-bold mb-2">Orbi City Dashboard</h1>
-        <p className="text-white/90">
-          {new Date().toLocaleDateString('en-US', { 
-            weekday: 'long', 
-            year: 'numeric', 
-            month: 'long', 
-            day: 'numeric' 
-          })}
+      <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-8 rounded-lg mb-6 shadow-xl">
+        <h1 className="text-4xl font-bold mb-2">💰 Finance Dashboard</h1>
+        <p className="text-white/90 font-bold">
+          Real Data from Excel • October 2024 - September 2025
         </p>
       </div>
 
-      {/* Top Section */}
-      <div className="bg-white rounded-lg p-6 mb-6 shadow-sm">
-        <div className="flex items-center justify-between mb-6">
-          <div className="bg-gradient-to-r from-yellow-400 to-orange-400 h-2 w-64 rounded-full" />
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm">
-              <Settings className="w-4 h-4 mr-2" />
-              Manage Fields
-            </Button>
-            <Button variant="outline" size="sm">
-              <Download className="w-4 h-4 mr-2" />
-              Export
-            </Button>
-            <Button className="bg-yellow-500 hover:bg-yellow-600" size="sm">
-              <Plus className="w-4 h-4 mr-2" />
-              Add Month
-            </Button>
+      {/* Filters Section */}
+      <div className="bg-white/10 backdrop-blur-md rounded-lg p-6 mb-6 shadow-xl border border-white/20">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <Filter className="w-5 h-5 text-white" />
+            <h3 className="font-bold text-white text-lg">Filters</h3>
           </div>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => {
+              setSelectedMonth("all");
+              setSelectedPeriod("all");
+            }}
+            className="bg-white/10 text-white border-white/20 hover:bg-white/20"
+          >
+            Reset Filters
+          </Button>
         </div>
-        
-        <p className="text-sm text-gray-600 mb-6">
-          Comprehensive Monthly Performance Analysis • FY 2024-2025
-        </p>
 
-        {/* KPI Cards */}
-        <div className="grid grid-cols-5 gap-4">
-          <Card className="p-4 bg-yellow-50 border-yellow-200">
-            <div className="text-sm text-gray-600 mb-1">TOTAL REVENUE</div>
-            <div className="text-2xl font-bold text-yellow-700">
-              ₾{summary?.totalRevenue.toLocaleString() || '0'}
-            </div>
-            <div className="text-xs text-yellow-600 mt-1">1 Period Performance</div>
-          </Card>
-
-          <Card className="p-4 bg-red-50 border-red-200">
-            <div className="text-sm text-gray-600 mb-1">TOTAL EXPENSES</div>
-            <div className="text-2xl font-bold text-red-700">
-              ₾{summary?.totalExpenses.toLocaleString() || '0'}
-            </div>
-            <div className="text-xs text-red-600 mt-1">Operating Costs</div>
-          </Card>
-
-          <Card className="p-4 bg-purple-50 border-purple-200">
-            <div className="text-sm text-gray-600 mb-1">NET PROFIT</div>
-            <div className="text-2xl font-bold text-purple-700">
-              ₾{summary?.netProfit.toLocaleString() || '0'}
-            </div>
-            <div className="text-xs text-purple-600 mt-1">
-              {summary?.profitMargin.toFixed(1)}% Margin
-            </div>
-          </Card>
-
-          <Card className="p-4 bg-green-50 border-green-200">
-            <div className="text-sm text-gray-600 mb-1">COMPANY SHARE</div>
-            <div className="text-2xl font-bold text-green-700">
-              ₾{summary?.companyShare.toLocaleString() || '0'}
-            </div>
-            <div className="text-xs text-green-600 mt-1">
-              {summary?.companyPercent.toFixed(1)}% of Profit
-            </div>
-          </Card>
-
-          <Card className="p-4 bg-orange-50 border-orange-200">
-            <div className="text-sm text-gray-600 mb-1">OWNERS SHARE</div>
-            <div className="text-2xl font-bold text-orange-700">
-              ₾{summary?.ownersShare.toLocaleString() || '0'}
-            </div>
-            <div className="text-xs text-orange-600 mt-1">
-              {summary?.ownersPercent.toFixed(1)}% of Profit
-            </div>
-          </Card>
-        </div>
-      </div>
-
-      {/* Period Selection */}
-      <Card className="p-4 mb-6">
-        <div className="flex items-center justify-between">
+        <div className="grid grid-cols-4 gap-4">
+          {/* Single Month Selector */}
           <div>
-            <h3 className="font-semibold mb-1">Period Selection</h3>
-            <p className="text-sm text-gray-600">
-              Filter reports by custom date range • October 2024 - September 2025
-            </p>
+            <label className="text-sm text-white/80 mb-2 block font-bold">Select Month</label>
+            <Select value={selectedMonth} onValueChange={setSelectedMonth}>
+              <SelectTrigger className="bg-white/10 text-white border-white/20">
+                <SelectValue placeholder="All Months" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Months</SelectItem>
+                {monthlyData?.map((m) => (
+                  <SelectItem key={m.month} value={m.month}>
+                    {m.month}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm">Start Date</Button>
-            <span className="text-gray-400">to</span>
-            <Button variant="outline" size="sm">End Date</Button>
+
+          {/* Period Quick Filters */}
+          <div>
+            <label className="text-sm text-white/80 mb-2 block font-bold">Quick Period</label>
+            <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
+              <SelectTrigger className="bg-white/10 text-white border-white/20">
+                <SelectValue placeholder="All Periods" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Periods (12 months)</SelectItem>
+                <SelectItem value="3">Last 3 Months</SelectItem>
+                <SelectItem value="6">Last 6 Months</SelectItem>
+                <SelectItem value="9">Last 9 Months</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Export Button */}
+          <div className="flex items-end">
+            <Button 
+              onClick={handleExport}
+              className="bg-green-600 hover:bg-green-700 text-white font-bold w-full"
+              disabled={filteredMonths.length === 0}
+            >
+              <Download className="w-4 h-4 mr-2" />
+              Export Excel
+            </Button>
+          </div>
+
+          {/* View Summary */}
+          <div className="flex items-end">
+            <Button 
+              className="bg-blue-600 hover:bg-blue-700 text-white font-bold w-full"
+            >
+              <TrendingUp className="w-4 h-4 mr-2" />
+              View Charts
+            </Button>
           </div>
         </div>
-      </Card>
+
+        <div className="mt-4 text-sm text-white/70 font-bold">
+          📊 Showing {displayMonths.length} months • 
+          {selectedMonth !== "all" ? ` Single Month: ${selectedMonth}` : ""} 
+          {selectedPeriod !== "all" ? ` Last ${selectedPeriod} Months` : " Full Period"}
+        </div>
+      </div>
+
+      {/* KPI Cards */}
+      <div className="bg-white/10 backdrop-blur-md rounded-lg p-6 mb-6 shadow-xl border border-white/20">
+        <h3 className="font-bold text-white text-lg mb-4">📈 Summary Statistics</h3>
+        <div className="grid grid-cols-5 gap-4">
+          <Card className="p-4 bg-gradient-to-br from-yellow-500/20 to-yellow-600/20 border-yellow-400/30 backdrop-blur-sm">
+            <div className="text-sm text-white/80 mb-1 font-bold">TOTAL REVENUE</div>
+            <div className="text-2xl font-bold text-yellow-300">
+              ₾{filteredSummary?.totalRevenue.toLocaleString() || '0'}
+            </div>
+            <div className="text-xs text-yellow-200 mt-1 font-bold">
+              {filteredMonths.length} Month{filteredMonths.length !== 1 ? 's' : ''}
+            </div>
+          </Card>
+
+          <Card className="p-4 bg-gradient-to-br from-red-500/20 to-red-600/20 border-red-400/30 backdrop-blur-sm">
+            <div className="text-sm text-white/80 mb-1 font-bold">TOTAL EXPENSES</div>
+            <div className="text-2xl font-bold text-red-300">
+              ₾{filteredSummary?.totalExpenses.toLocaleString() || '0'}
+            </div>
+            <div className="text-xs text-red-200 mt-1 font-bold">Operating Costs</div>
+          </Card>
+
+          <Card className="p-4 bg-gradient-to-br from-purple-500/20 to-purple-600/20 border-purple-400/30 backdrop-blur-sm">
+            <div className="text-sm text-white/80 mb-1 font-bold">NET PROFIT</div>
+            <div className="text-2xl font-bold text-purple-300">
+              ₾{filteredSummary?.netProfit.toLocaleString() || '0'}
+            </div>
+            <div className="text-xs text-purple-200 mt-1 font-bold">
+              {filteredSummary?.profitMargin.toFixed(1)}% Margin
+            </div>
+          </Card>
+
+          <Card className="p-4 bg-gradient-to-br from-green-500/20 to-green-600/20 border-green-400/30 backdrop-blur-sm">
+            <div className="text-sm text-white/80 mb-1 font-bold">COMPANY SHARE</div>
+            <div className="text-2xl font-bold text-green-300">
+              ₾{filteredSummary?.companyShare.toLocaleString() || '0'}
+            </div>
+            <div className="text-xs text-green-200 mt-1 font-bold">
+              {filteredSummary?.companyPercent.toFixed(1)}% of Profit
+            </div>
+          </Card>
+
+          <Card className="p-4 bg-gradient-to-br from-orange-500/20 to-orange-600/20 border-orange-400/30 backdrop-blur-sm">
+            <div className="text-sm text-white/80 mb-1 font-bold">OWNERS SHARE</div>
+            <div className="text-2xl font-bold text-orange-300">
+              ₾{filteredSummary?.ownersShare.toLocaleString() || '0'}
+            </div>
+            <div className="text-xs text-orange-200 mt-1 font-bold">
+              {filteredSummary?.ownersPercent.toFixed(1)}% of Profit
+            </div>
+          </Card>
+        </div>
+      </div>
 
       {/* Monthly Performance Breakdown */}
       <div className="mb-6">
-        <h2 className="text-xl font-bold mb-2">Monthly Performance Breakdown</h2>
-        <p className="text-sm text-gray-600 mb-4">
-          Detailed metrics and financial analysis for each reporting period
-        </p>
+        <h2 className="text-2xl font-bold mb-4 text-white">📊 Monthly Performance Breakdown</h2>
 
         <div className="grid grid-cols-3 gap-4">
-          {monthlyData?.map((month: any, idx: number) => (
-            <Card key={idx} className="p-4 hover:shadow-lg transition-shadow">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-bold text-lg">{month.month}</h3>
-                <div className="flex gap-2">
-                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">✏️</Button>
-                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">🗑️</Button>
+          {displayMonths?.map((month: any, idx: number) => (
+            <Card key={idx} className="p-4 hover:shadow-2xl transition-shadow bg-white/10 backdrop-blur-md border-white/20 relative">
+              {month.comingSoon ? (
+                // Coming Soon Card
+                <div className="text-center py-12">
+                  <div className="text-6xl mb-4">🔜</div>
+                  <h3 className="font-bold text-2xl text-white mb-2">{month.month}</h3>
+                  <div className="inline-block bg-yellow-500 text-black px-4 py-2 rounded-full font-bold text-sm">
+                    Coming Soon
+                  </div>
+                  <p className="text-white/60 text-sm mt-4 font-bold">
+                    Data will be available soon
+                  </p>
                 </div>
-              </div>
+              ) : (
+                // Real Data Card
+                <>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="font-bold text-lg text-white">{month.month}</h3>
+                  </div>
 
-              <div className="text-sm text-gray-600 mb-3">{month.studios} Studios</div>
+                  <div className="text-sm text-white/80 mb-3 font-bold">🏢 {month.studios} Studios</div>
 
-              {/* Operational */}
-              <div className="mb-3">
-                <div className="text-xs font-semibold text-green-700 mb-2">OPERATIONAL</div>
-                <div className="grid grid-cols-2 gap-2 text-xs">
-                  <div>
-                    <div className="text-gray-500">Days Available</div>
-                    <div className="font-semibold">{month.daysAvailable}</div>
+                  {/* Operational */}
+                  <div className="mb-3">
+                    <div className="text-xs font-bold text-green-300 mb-2">⚙️ OPERATIONAL</div>
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      <div>
+                        <div className="text-white/60 font-bold">Days Available</div>
+                        <div className="font-bold text-white">{month.daysAvailable}</div>
+                      </div>
+                      <div>
+                        <div className="text-white/60 font-bold">Days Occupied</div>
+                        <div className="font-bold text-white">{month.daysOccupied}</div>
+                      </div>
+                      <div>
+                        <div className="text-white/60 font-bold">Occupancy</div>
+                        <div className="font-bold text-white">{month.occupancyRate}%</div>
+                      </div>
+                      <div>
+                        <div className="text-white/60 font-bold">Average Price</div>
+                        <div className="font-bold text-white">₾{month.avgPrice}</div>
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <div className="text-gray-500">Days Occupied</div>
-                    <div className="font-semibold">{month.daysOccupied}</div>
-                  </div>
-                  <div>
-                    <div className="text-gray-500">Occupancy</div>
-                    <div className="font-semibold">{month.occupancyRate}%</div>
-                  </div>
-                  <div>
-                    <div className="text-gray-500">Average Price</div>
-                    <div className="font-semibold">₾{month.avgPrice}</div>
-                  </div>
-                </div>
-              </div>
 
-              {/* Revenue */}
-              <div className="mb-3">
-                <div className="text-xs font-semibold text-blue-700 mb-1">REVENUE</div>
-                <div className="text-sm">
-                  <div className="text-gray-500 text-xs">Total Revenue</div>
-                  <div className="font-bold text-lg">₾{month.totalRevenue.toLocaleString()}</div>
-                </div>
-              </div>
+                  {/* Revenue */}
+                  <div className="mb-3">
+                    <div className="text-xs font-bold text-blue-300 mb-1">💰 REVENUE</div>
+                    <div className="text-sm">
+                      <div className="text-white/60 text-xs font-bold">Total Revenue</div>
+                      <div className="font-bold text-lg text-white">₾{month.totalRevenue.toLocaleString()}</div>
+                    </div>
+                  </div>
 
-              {/* Expenses */}
-              <div className="mb-3">
-                <div className="text-xs font-semibold text-red-700 mb-2">EXPENSES</div>
-                <div className="grid grid-cols-2 gap-2 text-xs">
-                  <div>
-                    <div className="text-gray-500">Cleaning/Technical</div>
-                    <div className="font-semibold">₾{month.cleaningTech.toLocaleString()}</div>
+                  {/* Expenses */}
+                  <div className="mb-3">
+                    <div className="text-xs font-bold text-red-300 mb-2">💸 EXPENSES</div>
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      <div>
+                        <div className="text-white/60 font-bold">Cleaning/Technical</div>
+                        <div className="font-bold text-white">₾{month.cleaningTech.toLocaleString()}</div>
+                      </div>
+                      <div>
+                        <div className="text-white/60 font-bold">Marketing</div>
+                        <div className="font-bold text-white">₾{month.marketing.toLocaleString()}</div>
+                      </div>
+                      <div>
+                        <div className="text-white/60 font-bold">Salaries</div>
+                        <div className="font-bold text-white">₾{month.salaries.toLocaleString()}</div>
+                      </div>
+                      <div>
+                        <div className="text-white/60 font-bold">Utilities</div>
+                        <div className="font-bold text-white">₾{month.utilities.toLocaleString()}</div>
+                      </div>
+                    </div>
+                    <div className="mt-2 pt-2 border-t border-white/20">
+                      <div className="text-white/60 text-xs font-bold">Total Expenses</div>
+                      <div className="font-bold text-white">₾{month.totalExpenses.toLocaleString()}</div>
+                    </div>
                   </div>
-                  <div>
-                    <div className="text-gray-500">Marketing</div>
-                    <div className="font-semibold">₾{month.marketing.toLocaleString()}</div>
-                  </div>
-                  <div>
-                    <div className="text-gray-500">Salaries</div>
-                    <div className="font-semibold">₾{month.salaries.toLocaleString()}</div>
-                  </div>
-                  <div>
-                    <div className="text-gray-500">Utilities</div>
-                    <div className="font-semibold">₾{month.utilities.toLocaleString()}</div>
-                  </div>
-                </div>
-                <div className="mt-2 pt-2 border-t">
-                  <div className="text-gray-500 text-xs">Total Expenses</div>
-                  <div className="font-bold">₾{month.totalExpenses.toLocaleString()}</div>
-                </div>
-              </div>
 
-              {/* Profit */}
-              <div className="bg-gray-50 p-2 rounded">
-                <div className="text-xs font-semibold text-purple-700 mb-2">PROFIT</div>
-                <div className="mb-2">
-                  <div className="text-gray-500 text-xs">Total Profit</div>
-                  <div className="font-bold text-lg">₾{month.totalProfit.toLocaleString()}</div>
-                </div>
-                <div className="grid grid-cols-2 gap-2 text-xs">
-                  <div className="bg-green-50 p-2 rounded">
-                    <div className="text-gray-500">Company Profit</div>
-                    <div className="font-semibold text-green-700">₾{month.companyProfit.toLocaleString()}</div>
+                  {/* Profit */}
+                  <div className="bg-white/10 p-2 rounded border border-white/20">
+                    <div className="text-xs font-bold text-purple-300 mb-2">📊 PROFIT</div>
+                    <div className="mb-2">
+                      <div className="text-white/60 text-xs font-bold">Total Profit</div>
+                      <div className="font-bold text-lg text-white">₾{month.totalProfit.toLocaleString()}</div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      <div className="bg-green-500/20 p-2 rounded border border-green-400/30">
+                        <div className="text-white/60 font-bold">Company Profit</div>
+                        <div className="font-bold text-green-300">₾{month.companyProfit.toLocaleString()}</div>
+                      </div>
+                      <div className="bg-yellow-500/20 p-2 rounded border border-yellow-400/30">
+                        <div className="text-white/60 font-bold">Owners Profit</div>
+                        <div className="font-bold text-yellow-300">₾{month.ownersProfit.toLocaleString()}</div>
+                      </div>
+                    </div>
                   </div>
-                  <div className="bg-yellow-50 p-2 rounded">
-                    <div className="text-gray-500">Owners Profit</div>
-                    <div className="font-semibold text-yellow-700">₾{month.ownersProfit.toLocaleString()}</div>
-                  </div>
-                </div>
-              </div>
+                </>
+              )}
             </Card>
           ))}
         </div>
