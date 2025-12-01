@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Download, Calendar as CalendarIcon, Filter, TrendingUp } from "lucide-react";
+import { Download, Filter, TrendingUp, BarChart3 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import {
   Select,
@@ -10,6 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { FinanceCharts } from "@/components/FinanceCharts";
 
 export default function FinanceDashboard() {
   const { data: summary, isLoading } = trpc.realFinance.getSummary.useQuery();
@@ -18,6 +19,7 @@ export default function FinanceDashboard() {
   // State for filters
   const [selectedMonth, setSelectedMonth] = useState<string>("all");
   const [selectedPeriod, setSelectedPeriod] = useState<string>("all");
+  const [showCharts, setShowCharts] = useState(false);
 
   // All months including Coming Soon
   const allMonths = useMemo(() => {
@@ -189,13 +191,14 @@ export default function FinanceDashboard() {
             </Button>
           </div>
 
-          {/* View Summary */}
+          {/* Toggle Charts */}
           <div className="flex items-end">
             <Button 
-              className="bg-blue-600 hover:bg-blue-700 text-white font-bold w-full"
+              onClick={() => setShowCharts(!showCharts)}
+              className="bg-purple-600 hover:bg-purple-700 text-white font-bold w-full"
             >
-              <TrendingUp className="w-4 h-4 mr-2" />
-              View Charts
+              <BarChart3 className="w-4 h-4 mr-2" />
+              {showCharts ? "Hide Charts" : "Show Charts"}
             </Button>
           </div>
         </div>
@@ -260,6 +263,13 @@ export default function FinanceDashboard() {
           </Card>
         </div>
       </div>
+
+      {/* Charts Section */}
+      {showCharts && filteredMonths.length > 0 && (
+        <div className="mb-6">
+          <FinanceCharts monthlyData={filteredMonths} />
+        </div>
+      )}
 
       {/* Monthly Performance Breakdown */}
       <div className="mb-6">
