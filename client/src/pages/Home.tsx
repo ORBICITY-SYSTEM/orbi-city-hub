@@ -1,5 +1,6 @@
 import { Link } from "wouter";
 import { DollarSign, Megaphone, Calendar, Truck, TrendingUp, Users, Mail, Package } from "lucide-react";
+import { MainAIAgent } from "@/components/MainAIAgent";
 
 const modules = [
   {
@@ -51,6 +52,9 @@ export default function Home() {
         <h1 className="text-4xl font-bold text-white mb-2">ORBI City Hub</h1>
         <p className="text-gray-400 text-lg">Enterprise Management Platform</p>
       </div>
+
+      {/* Main AI Agent */}
+      <MainAIAgent />
 
       {/* Quick Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

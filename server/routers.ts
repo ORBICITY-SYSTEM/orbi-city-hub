@@ -34,8 +34,10 @@ import { googleBusinessRouter } from "./routers/googleBusiness";
 import { gmailOtelmsRouter } from "./routers/gmailOtelms";
 import { emailCategorizationRouter } from "./routers/emailCategorizationRouter";
 import { butlerRouter } from "./butlerRouter";
+import { aiAnalyzerRouter } from "./aiAnalyzerRouter";
 
 export const appRouter = router({
+  aiAnalyzer: aiAnalyzerRouter,
   butler: butlerRouter,
   google: googleRouter,
   fileUpload: fileUploadRouter,
