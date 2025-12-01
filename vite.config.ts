@@ -24,19 +24,33 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
+    // Optimize build performance
+    target: 'es2020',
     // Code splitting configuration
     rollupOptions: {
       output: {
-        manualChunks: {
-          // Vendor chunks
-          'react-vendor': ['react', 'react-dom', 'react/jsx-runtime'],
-          'router-vendor': ['wouter'],
-          'trpc-vendor': ['@trpc/client', '@trpc/react-query', '@tanstack/react-query'],
-          'ui-vendor': ['lucide-react', 'streamdown'],
-          // Feature chunks
-          'chart-libs': ['chart.js', 'react-chartjs-2'],
+        manualChunks: (id) => {
+          // More aggressive code splitting to reduce bundle size
+          if (id.includes('node_modules')) {
+            if (id.includes('react') || id.includes('react-dom')) {
+              return 'react-vendor';
+            }
+            if (id.includes('@trpc') || id.includes('@tanstack')) {
+              return 'trpc-vendor';
+            }
+            if (id.includes('chart.js') || id.includes('react-chartjs-2')) {
+              return 'chart-libs';
+            }
+            if (id.includes('lucide-react')) {
+              return 'ui-vendor';
+            }
+            // Split other node_modules into smaller chunks
+            return 'vendor';
+          }
         },
       },
+      // Increase max parallel file reads to prevent EMFILE errors
+      maxParallelFileOps: 20,
     },
     // Optimize chunk size
     chunkSizeWarningLimit: 1000,
@@ -46,6 +60,14 @@ export default defineConfig({
     sourcemap: false,
     // CSS code splitting
     cssCodeSplit: true,
+    // Disable size reporting to save memory
+    reportCompressedSize: false,
+    // Reduce memory usage
+    modulePreload: false,
+    // Reduce memory usage during build
+    commonjsOptions: {
+      transformMixedEsModules: true,
+    },
   },
   server: {
     host: true,

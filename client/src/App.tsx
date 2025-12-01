@@ -1,39 +1,60 @@
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import NotFound from "@/pages/NotFound";
+import { lazy, Suspense } from "react";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import ModularLayout from "./components/ModularLayout";
 import { UniversalChatPopup } from "./components/UniversalChatPopup";
 
-// Pages
+// Only Home is eagerly loaded for fast initial render
 import Home from "./pages/Home";
 
-// Finance Module
-import FinanceDashboard from "./pages/finance/FinanceDashboard";
-import FinanceAnalytics from "./pages/finance/FinanceAnalytics";
-import FinanceMonthlyReports from "./pages/finance/FinanceMonthlyReports";
-import FinanceOTELMS from "./pages/finance/FinanceOTELMS";
-import FinanceDevelopmentExpenses from "./pages/finance/FinanceDevelopmentExpenses";
+// All other pages are lazy-loaded to reduce initial bundle size
+const NotFound = lazy(() => import("./pages/NotFound"));
 
-// Marketing Module
-import MarketingDashboard from "./pages/marketing/MarketingDashboard";
-import OTAChannels from "./pages/marketing/OTAChannels";
-import WebsiteLeads from "./pages/marketing/WebsiteLeads";
+// Finance Module - Lazy
+const FinanceDashboard = lazy(() => import("./pages/finance/FinanceDashboard"));
+const FinanceAnalytics = lazy(() => import("./pages/finance/FinanceAnalytics"));
+const FinanceMonthlyReports = lazy(() => import("./pages/finance/FinanceMonthlyReports"));
+const FinanceOTELMS = lazy(() => import("./pages/finance/FinanceOTELMS"));
+const FinanceDevelopmentExpenses = lazy(() => import("./pages/finance/FinanceDevelopmentExpenses"));
 
-// Reservations Module
-import EmailInbox from "./pages/reservations/EmailInbox";
-import EmailDetail from "./pages/reservations/EmailDetail";
-import GuestCommunication from "./pages/reservations/GuestCommunication";
-import OTADashboard from "./pages/reservations/OTADashboard";
-import Automations from "./pages/reservations/Automations";
+// Marketing Module - Lazy
+const MarketingDashboard = lazy(() => import("./pages/marketing/MarketingDashboard"));
+const OTAChannels = lazy(() => import("./pages/marketing/OTAChannels"));
+const WebsiteLeads = lazy(() => import("./pages/marketing/WebsiteLeads"));
 
-// Logistics Module
-import LogisticsDashboard from "./pages/logistics/LogisticsDashboard";
-import Housekeeping from "./pages/logistics/Housekeeping";
+// Reservations Module - Lazy
+const EmailInbox = lazy(() => import("./pages/reservations/EmailInbox"));
+const EmailDetail = lazy(() => import("./pages/reservations/EmailDetail"));
+const GuestCommunication = lazy(() => import("./pages/reservations/GuestCommunication"));
+const OTADashboard = lazy(() => import("./pages/reservations/OTADashboard"));
+const Automations = lazy(() => import("./pages/reservations/Automations"));
+
+// Logistics Module - Lazy
+const LogisticsDashboard = lazy(() => import("./pages/logistics/LogisticsDashboard"));
+const Housekeeping = lazy(() => import("./pages/logistics/Housekeeping"));
+
+// Loading fallback component
+const LoadingFallback = () => (
+  <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-[#0a2f1f] to-[#0f4d35]">
+    <div className="text-center">
+      <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-green-400 mx-auto mb-4"></div>
+      <p className="text-green-200 text-lg font-medium">Loading...</p>
+    </div>
+  </div>
+);
 
 function Router() {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <RouterContent />
+    </Suspense>
+  );
+}
+
+function RouterContent() {
   return (
     <ModularLayout>
       <Switch>

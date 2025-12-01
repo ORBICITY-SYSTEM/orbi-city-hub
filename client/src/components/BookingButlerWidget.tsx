@@ -10,10 +10,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { trpc } from "@/lib/trpc";
-import { useNavigate } from "wouter";
+import { useLocation } from "wouter";
 
 export function BookingButlerWidget() {
-  const navigate = useNavigate();
+  const [, setLocation] = useLocation();
   
   const { data: pendingTasks, isLoading: tasksLoading } = trpc.butler.getPendingTasks.useQuery();
   const { data: metrics, isLoading: metricsLoading } = trpc.butler.getMetrics.useQuery({ days: 30 });
@@ -185,14 +185,14 @@ export function BookingButlerWidget() {
         {/* Actions */}
         <div className="flex gap-2">
           <Button 
-            onClick={() => navigate('/reservations/automations')}
+            onClick={() => setLocation('/reservations/automations')}
             className="flex-1"
             variant="default"
           >
             View All Tasks
           </Button>
           <Button 
-            onClick={() => navigate('/reservations/automations')}
+            onClick={() => setLocation('/reservations/automations')}
             variant="outline"
             className="flex-1"
           >
