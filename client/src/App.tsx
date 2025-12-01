@@ -5,6 +5,7 @@ import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import ModularLayout from "./components/ModularLayout";
+import { UniversalChatPopup } from "./components/UniversalChatPopup";
 
 // Pages
 import Home from "./pages/Home";
@@ -26,6 +27,7 @@ import EmailInbox from "./pages/reservations/EmailInbox";
 import EmailDetail from "./pages/reservations/EmailDetail";
 import GuestCommunication from "./pages/reservations/GuestCommunication";
 import OTADashboard from "./pages/reservations/OTADashboard";
+import Automations from "./pages/reservations/Automations";
 
 // Logistics Module
 import LogisticsDashboard from "./pages/logistics/LogisticsDashboard";
@@ -56,6 +58,7 @@ function Router() {
         <Route path="/reservations/email/:emailId" component={EmailDetail} />
         <Route path="/reservations/guests" component={GuestCommunication} />
         <Route path="/reservations/ota" component={OTADashboard} />
+        <Route path="/reservations/automations" component={Automations} />
 
         {/* Logistics Module */}
         <Route path="/logistics" component={LogisticsDashboard} />
@@ -76,6 +79,7 @@ function App() {
         <TooltipProvider>
           <Toaster />
           <Router />
+          <UniversalChatPopup />
         </TooltipProvider>
       </ThemeProvider>
     </ErrorBoundary>

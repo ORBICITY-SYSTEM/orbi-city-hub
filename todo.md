@@ -1614,3 +1614,56 @@
 - Reservations: 4 pages (Email Inbox, Email Detail, Guests, OTA)
 - Logistics: 2 pages (Dashboard, Housekeeping)
 
+
+
+---
+
+## 🤖 Phase: Booking.com Butler AI Agent Integration
+
+### Database Schema & Supabase Setup
+- [x] Design butler_tasks table schema
+- [x] Design booking_reviews table schema
+- [x] Design booking_metrics table schema
+- [x] Design butler_approvals table schema
+- [x] Create Supabase tables via SQL
+- [x] Set up RLS policies for security (MySQL doesn't support RLS, using FOREIGN KEY constraints)
+
+### AI Training & Knowledge Base
+- [x] Load booking_analysis.txt into AI context
+- [x] Load ChatGPT recommendations into AI context
+- [x] Create review response templates (positive/negative/neutral)
+- [x] Create recommendation templates (pricing/campaigns/facilities)
+- [x] Test AI response quality (templates created, ready for Gemini integration)
+
+### Backend (tRPC Procedures)
+- [x] butler.getPendingTasks - fetch tasks awaiting approval
+- [x] butler.getReviews - fetch Booking.com reviews
+- [x] butler.generateResponse - AI generates review response
+- [x] butler.approve - approve AI suggestion
+- [x] butler.reject - reject AI suggestion
+- [x] butler.getMetrics - fetch performance metrics
+- [x] butler.getRecommendations - get AI recommendations (+ butler.chat for universal assistant)
+
+### Frontend UI Components
+- [x] Create BookingButlerWidget component (Marketing → OTA Channels)
+- [x] Create AutomationsPage (Reservations → Automations/Butler) + UniversalChatPopup
+- [ ] Create PendingApprovalCard component
+- [ ] Create ButlerMetricsWidget (Core Dashboard)
+- [ ] Create NotificationBell with Butler alerts
+- [ ] Update Agent Card to show Butler status
+- [x] Add routes in App.tsx
+
+### Make.com Workflows
+- [ ] Workflow 1: Review Monitor (manual trigger → AI response → Dashboard)
+- [ ] Workflow 2: Performance Tracker (daily cron → metrics → alerts)
+- [ ] Workflow 3: Recommendation Engine (weekly → suggestions)
+- [ ] Set up webhooks to Supabase
+- [ ] Test workflow execution
+
+### Testing & Delivery
+- [ ] Test review response generation
+- [ ] Test approval flow
+- [ ] Test metrics display
+- [ ] Test Make.com integration
+- [ ] Write user documentation
+- [ ] Deploy and demonstrate to user

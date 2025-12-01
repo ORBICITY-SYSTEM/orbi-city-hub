@@ -1,0 +1,9 @@
+{
+  "query": "INSERT INTO booking_reviews (user_id, booking_reservation_id, guest_name, guest_country, rating, negative_comment, staff_rating, facilities_rating, cleanliness_rating, comfort_rating, value_rating, location_rating, review_date, has_response)\nVALUES \n  (1, '6112770363', 'Anna', 'Russia', 3.0, 'Very disgusting and dirty. Hair in bathroom. Bed linen turned over. Smells of dampness. Payment method questionable.', 2.5, 2.5, 2.5, 2.5, 5.0, 5.0, '2024-11-14', FALSE)",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user c2qSkVB4gKtEmor.bc3c8c9ce52a --database VzNbWtRJAsr2zJAegEjRtX --execute INSERT INTO booking_reviews (user_id, booking_reservation_id, guest_name, guest_country, rating, negative_comment, staff_rating, facilities_rating, cleanliness_rating, comfort_rating, value_rating, location_rating, review_date, has_response)\nVALUES \n  (1, '6112770363', 'Anna', 'Russia', 3.0, 'Very disgusting and dirty. Hair in bathroom. Bed linen turned over. Smells of dampness. Payment method questionable.', 2.5, 2.5, 2.5, 2.5, 5.0, 5.0, '2024-11-14', FALSE)",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 54
+}

@@ -17,6 +17,7 @@ import {
   Star,
   AlertCircle
 } from "lucide-react";
+import { BookingButlerWidget } from "@/components/BookingButlerWidget";
 
 // MINI Agent interface
 interface MiniAgent {
@@ -176,6 +177,9 @@ const OTAAgents = () => {
           </Button>
         </div>
       </div>
+
+      {/* Booking Butler Widget */}
+      <BookingButlerWidget />
 
       {/* Overview Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">

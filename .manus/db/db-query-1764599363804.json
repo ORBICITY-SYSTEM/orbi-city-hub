@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS butler_approvals (\n  id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),\n  user_id INT NOT NULL,\n  task_id VARCHAR(36),\n  action VARCHAR(50) NOT NULL,\n  action_by INT NOT NULL,\n  original_content JSON,\n  modified_content JSON,\n  notes TEXT,\n  estimated_impact JSON,\n  actual_impact JSON,\n  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n  INDEX idx_butler_approvals_user_id (user_id),\n  INDEX idx_butler_approvals_task_id (task_id),\n  INDEX idx_butler_approvals_action (action),\n  INDEX idx_butler_approvals_created_at (created_at DESC),\n  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,\n  FOREIGN KEY (task_id) REFERENCES butler_tasks(id) ON DELETE CASCADE\n)",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user c2qSkVB4gKtEmor.bc3c8c9ce52a --database VzNbWtRJAsr2zJAegEjRtX --execute CREATE TABLE IF NOT EXISTS butler_approvals (\n  id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),\n  user_id INT NOT NULL,\n  task_id VARCHAR(36),\n  action VARCHAR(50) NOT NULL,\n  action_by INT NOT NULL,\n  original_content JSON,\n  modified_content JSON,\n  notes TEXT,\n  estimated_impact JSON,\n  actual_impact JSON,\n  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n  INDEX idx_butler_approvals_user_id (user_id),\n  INDEX idx_butler_approvals_task_id (task_id),\n  INDEX idx_butler_approvals_action (action),\n  INDEX idx_butler_approvals_created_at (created_at DESC),\n  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,\n  FOREIGN KEY (task_id) REFERENCES butler_tasks(id) ON DELETE CASCADE\n)",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 274
+}
