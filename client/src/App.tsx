@@ -1,72 +1,71 @@
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
-import { Route, Switch, useLocation } from "wouter";
+import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
-import { FeedbackWidget } from "./components/FeedbackWidget";
 import { ThemeProvider } from "./contexts/ThemeContext";
-import OrbiDashboardLayout from "./components/OrbiDashboardLayout";
+import ModularLayout from "./components/ModularLayout";
 
 // Pages
-import CEODashboard from "./pages/CEODashboard";
-import Reservations from "./pages/Reservations";
-import Finance from "./pages/Finance";
-import Marketing from "./pages/Marketing";
-import Logistics from "./pages/Logistics";
-import Reports from "./pages/Reports";
-import Files from "./pages/Files";
-import Google from "./pages/Google";
-import SocialMedia from "./pages/SocialMedia";
-import AdminLogin from "./pages/AdminLogin";
-import FinanceDashboard from "./pages/FinanceDashboard";
-import Admin from "./pages/Admin";
-import AdminFeedback from "./pages/AdminFeedback";
-import ChannelDetail from "./pages/ChannelDetail";
-import OTELMSAnalytics from "./pages/OTELMSAnalytics";
-import AdminIntegrations from "./pages/AdminIntegrations";
-import EmailInbox from "./pages/EmailInbox";
-import EmailDetail from "./pages/EmailDetail";
+import Home from "./pages/Home";
+
+// Finance Module
+import FinanceDashboard from "./pages/finance/FinanceDashboard";
+import FinanceAnalytics from "./pages/finance/FinanceAnalytics";
+import FinanceMonthlyReports from "./pages/finance/FinanceMonthlyReports";
+import FinanceOTELMS from "./pages/finance/FinanceOTELMS";
+import FinanceDevelopmentExpenses from "./pages/finance/FinanceDevelopmentExpenses";
+
+// Marketing Module
+import MarketingDashboard from "./pages/marketing/MarketingDashboard";
+import OTAChannels from "./pages/marketing/OTAChannels";
+import WebsiteLeads from "./pages/marketing/WebsiteLeads";
+
+// Reservations Module
+import EmailInbox from "./pages/reservations/EmailInbox";
+import EmailDetail from "./pages/reservations/EmailDetail";
+import GuestCommunication from "./pages/reservations/GuestCommunication";
+import OTADashboard from "./pages/reservations/OTADashboard";
+
+// Logistics Module
+import LogisticsDashboard from "./pages/logistics/LogisticsDashboard";
+import Housekeeping from "./pages/logistics/Housekeeping";
 
 function Router() {
-  const [location] = useLocation();
-  const isAdminRoute = location.startsWith("/admin");
-
-  if (isAdminRoute) {
-    // Admin routes without layout
-    return (
-      <Switch>
-        <Route path="/admin/login" component={AdminLogin} />
-        <Route path="/admin/feedback" component={AdminFeedback} />
-        <Route path="/admin/integrations" component={AdminIntegrations} />
-        <Route path="/admin" component={Admin} />
-        <Route path="/404" component={NotFound} />
-        <Route component={NotFound} />
-      </Switch>
-    );
-  }
-
-  // Main app routes with layout
   return (
-    <OrbiDashboardLayout>
+    <ModularLayout>
       <Switch>
-        <Route path="/" component={CEODashboard} />
-        <Route path="/reservations" component={Reservations} />
-        <Route path="/finance" component={Finance} />
-        <Route path="/finance-dashboard" component={FinanceDashboard} />
-        <Route path="/marketing" component={Marketing} />
-        <Route path="/marketing/channels/:id" component={ChannelDetail} />
-        <Route path="/logistics" component={Logistics} />
-        <Route path="/reports" component={Reports} />
-        <Route path="/otelms-analytics" component={OTELMSAnalytics} />
-        <Route path="/files" component={Files} />
-      <Route path="/google" component={Google} />
-        <Route path="/social-media" component={SocialMedia} />
-        <Route path="/email-inbox" component={EmailInbox} />
-        <Route path="/email-inbox/:emailId" component={EmailDetail} />
+        {/* Home */}
+        <Route path="/" component={Home} />
+
+        {/* Finance Module */}
+        <Route path="/finance" component={FinanceDashboard} />
+        <Route path="/finance/analytics" component={FinanceAnalytics} />
+        <Route path="/finance/reports" component={FinanceMonthlyReports} />
+        <Route path="/finance/otelms" component={FinanceOTELMS} />
+        <Route path="/finance/expenses" component={FinanceDevelopmentExpenses} />
+
+        {/* Marketing Module */}
+        <Route path="/marketing" component={MarketingDashboard} />
+        <Route path="/marketing/ota" component={OTAChannels} />
+        <Route path="/marketing/leads" component={WebsiteLeads} />
+
+        {/* Reservations Module */}
+        <Route path="/reservations" component={OTADashboard} />
+        <Route path="/reservations/email" component={EmailInbox} />
+        <Route path="/reservations/email/:emailId" component={EmailDetail} />
+        <Route path="/reservations/guests" component={GuestCommunication} />
+        <Route path="/reservations/ota" component={OTADashboard} />
+
+        {/* Logistics Module */}
+        <Route path="/logistics" component={LogisticsDashboard} />
+        <Route path="/logistics/housekeeping" component={Housekeeping} />
+
+        {/* 404 */}
         <Route path="/404" component={NotFound} />
         <Route component={NotFound} />
       </Switch>
-    </OrbiDashboardLayout>
+    </ModularLayout>
   );
 }
 
@@ -77,7 +76,6 @@ function App() {
         <TooltipProvider>
           <Toaster />
           <Router />
-          <FeedbackWidget />
         </TooltipProvider>
       </ThemeProvider>
     </ErrorBoundary>
