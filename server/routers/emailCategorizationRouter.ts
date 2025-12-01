@@ -9,6 +9,7 @@ import { getDb } from "../db";
 import { emailCategories, unsubscribeSuggestions, emailSummaries } from "../../drizzle/schema";
 import { categorizeEmail, categorizeEmailsBatch, detectUnsubscribeLink, type EmailData } from "../emailCategorization";
 import { summarizeEmail, summarizeEmailsBatch, parseNaturalLanguageQuery } from "../emailSummarization";
+import { fetchAndCategorizeEmails, getGmailSyncStatus, searchGmailMessages } from "../gmailIntegration";
 import { eq, and, desc, sql } from "drizzle-orm";
 
 export const emailCategorizationRouter = router({
@@ -464,5 +465,48 @@ export const emailCategorizationRouter = router({
         parsedQuery,
         total: results.length,
       };
+    }),
+
+  /**
+   * Sync Gmail emails
+   */
+  syncGmailEmails: protectedProcedure
+    .input(z.object({
+      query: z.string().optional(),
+      maxResults: z.number().min(1).max(500).optional(),
+    }))
+    .mutation(async ({ input }) => {
+      const stats = await fetchAndCategorizeEmails(
+        input.query || "newer_than:7d",
+        input.maxResults || 50
+      );
+
+      return {
+        success: true,
+        stats,
+        message: `Synced ${stats.categorized} emails, ${stats.summarized} summarized, ${stats.skipped} skipped, ${stats.errors} errors`,
+      };
+    }),
+
+  /**
+   * Get Gmail sync status
+   */
+  getGmailSyncStatus: protectedProcedure
+    .query(async () => {
+      const status = await getGmailSyncStatus();
+      return status;
+    }),
+
+  /**
+   * Search Gmail directly
+   */
+  searchGmail: protectedProcedure
+    .input(z.object({
+      query: z.string(),
+      maxResults: z.number().min(1).max(500).optional(),
+    }))
+    .query(async ({ input }) => {
+      const result = await searchGmailMessages(input.query, input.maxResults || 50);
+      return result;
     }),
 });

@@ -1544,3 +1544,54 @@
 - [ ] Save final checkpoint
 - [ ] Publish via Manus Publish button
 - [ ] Verify production deployment
+
+---
+
+## Phase D: Gmail Integration + Email Detail View + Batch Actions (IN PROGRESS - 2025-11-29)
+
+### Gmail Integration:
+- [ ] Connect Gmail MCP
+- [ ] Create email fetching function
+- [ ] Auto-categorize fetched emails
+- [ ] Create background sync job
+- [ ] Add sync status UI
+
+### Email Detail View:
+- [ ] Create EmailDetail page component
+- [ ] Display full email content
+- [ ] Show AI summary
+- [ ] Display key points
+- [ ] Display action items
+- [ ] Add category override UI
+- [ ] Add route /email-inbox/:emailId
+
+### Batch Actions:
+- [ ] Add checkbox selection to email list
+- [ ] Create bulk categorization UI
+- [ ] Create mass unsubscribe function
+- [ ] Add batch delete/archive
+- [ ] Add "Select All" functionality
+
+---
+
+## 🔧 URGENT: Production Build Fix (IN PROGRESS - 2025-11-29)
+
+### Build Error:
+- [ ] Fix "Could not resolve entry module react-chartjs-2" error
+- [ ] Install missing react-chartjs-2 dependency
+- [ ] Test local production build
+- [ ] Create new checkpoint
+- [ ] Publish to team.orbicitybatumi.com
+
+---
+
+## 🎨 Dark Theme Conversion (IN PROGRESS - 2025-11-29)
+
+- [ ] Change default theme to dark in App.tsx
+- [ ] Update CSS variables for dark theme in index.css
+- [ ] Update all page backgrounds to dark
+- [ ] Update text colors to white/light
+- [ ] Update card backgrounds to dark
+- [ ] Test all pages for readability
+- [ ] Create checkpoint
+- [ ] Send preview link to user

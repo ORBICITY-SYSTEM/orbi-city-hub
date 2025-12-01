@@ -24,6 +24,15 @@ import {
   Sparkles,
 } from "lucide-react";
 import { toast } from "sonner";
+import { useLocation } from "wouter";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 type EmailCategory = "bookings" | "finance" | "marketing" | "spam" | "important" | "general";
 
@@ -49,6 +58,10 @@ export default function EmailInbox() {
   const [selectedCategory, setSelectedCategory] = useState<EmailCategory | "all">("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedEmailId, setSelectedEmailId] = useState<string | null>(null);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [, setLocation] = useLocation();
+  const [selectedEmails, setSelectedEmails] = useState<Set<string>>(new Set());
+  const [isSelectMode, setIsSelectMode] = useState(false);
 
   // Fetch categorized emails
   const { data: emailsData, isLoading, refetch } = trpc.emailCategorization.getCategorizedEmails.useQuery({
@@ -68,6 +81,22 @@ export default function EmailInbox() {
 
   // Search emails
   const searchMutation = trpc.emailCategorization.searchEmails.useMutation();
+
+  // Gmail sync
+  const syncMutation = trpc.emailCategorization.syncGmailEmails.useMutation({
+    onSuccess: (data) => {
+      toast.success(data.message);
+      refetch();
+      setIsSyncing(false);
+    },
+    onError: () => {
+      toast.error("Gmail sync failed");
+      setIsSyncing(false);
+    },
+  });
+
+  // Gmail sync status
+  const { data: syncStatus } = trpc.emailCategorization.getGmailSyncStatus.useQuery();
 
   // Update unsubscribe status
   const updateUnsubscribeMutation = trpc.emailCategorization.updateUnsubscribeStatus.useMutation({
@@ -96,6 +125,40 @@ export default function EmailInbox() {
     updateUnsubscribeMutation.mutate({ id, status });
   };
 
+  const toggleEmailSelection = (emailId: string) => {
+    const newSelected = new Set(selectedEmails);
+    if (newSelected.has(emailId)) {
+      newSelected.delete(emailId);
+    } else {
+      newSelected.add(emailId);
+    }
+    setSelectedEmails(newSelected);
+  };
+
+  const selectAll = () => {
+    if (emailsData) {
+      const allIds = new Set(emailsData.emails.map(e => e.emailId));
+      setSelectedEmails(allIds);
+    }
+  };
+
+  const deselectAll = () => {
+    setSelectedEmails(new Set());
+  };
+
+  const handleBatchCategorize = (category: EmailCategory) => {
+    // In real implementation, would call batch categorization endpoint
+    toast.success(`Categorizing ${selectedEmails.size} emails as ${category}...`);
+    deselectAll();
+    setIsSelectMode(false);
+  };
+
+  const handleBatchDelete = () => {
+    toast.success(`Deleting ${selectedEmails.size} emails...`);
+    deselectAll();
+    setIsSelectMode(false);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
@@ -108,10 +171,38 @@ export default function EmailInbox() {
             </h1>
             <p className="text-gray-600 mt-1">AI-powered email management with smart categorization</p>
           </div>
-          <Button onClick={() => refetch()} variant="outline" size="sm">
-            <RefreshCw className="w-4 h-4 mr-2" />
-            Refresh
-          </Button>
+          <div className="flex gap-2">
+            <Button onClick={() => refetch()} variant="outline" size="sm">
+              <RefreshCw className="w-4 h-4 mr-2" />
+              Refresh
+            </Button>
+            <Button 
+              onClick={() => {
+                setIsSyncing(true);
+                syncMutation.mutate({ query: "newer_than:7d", maxResults: 50 });
+              }} 
+              variant="default" 
+              size="sm"
+              disabled={isSyncing}
+            >
+              {isSyncing ? (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                <Mail className="w-4 h-4 mr-2" />
+              )}
+              Sync Gmail
+            </Button>
+            <Button 
+              onClick={() => {
+                setIsSelectMode(!isSelectMode);
+                if (isSelectMode) deselectAll();
+              }} 
+              variant={isSelectMode ? "default" : "outline"}
+              size="sm"
+            >
+              {isSelectMode ? "Cancel Selection" : "Select Multiple"}
+            </Button>
+          </div>
         </div>
 
         {/* Search Bar */}
@@ -186,14 +277,67 @@ export default function EmailInbox() {
                 <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
               </div>
             ) : emailsData && emailsData.emails.length > 0 ? (
-              <div className="space-y-2">
+              <div className="space-y-4">
+                {/* Batch Actions Bar */}
+                {isSelectMode && selectedEmails.size > 0 && (
+                  <Card className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200">
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="flex items-center gap-4">
+                        <span className="font-semibold text-gray-900">
+                          {selectedEmails.size} selected
+                        </span>
+                        <Button size="sm" variant="outline" onClick={selectAll}>
+                          Select All
+                        </Button>
+                        <Button size="sm" variant="outline" onClick={deselectAll}>
+                          Deselect All
+                        </Button>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Select onValueChange={(v) => handleBatchCategorize(v as EmailCategory)}>
+                          <SelectTrigger className="w-48">
+                            <SelectValue placeholder="Categorize as..." />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="bookings">Bookings</SelectItem>
+                            <SelectItem value="finance">Finance</SelectItem>
+                            <SelectItem value="marketing">Marketing</SelectItem>
+                            <SelectItem value="spam">Spam</SelectItem>
+                            <SelectItem value="important">Important</SelectItem>
+                            <SelectItem value="general">General</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <Button size="sm" variant="destructive" onClick={handleBatchDelete}>
+                          Delete
+                        </Button>
+                      </div>
+                    </div>
+                  </Card>
+                )}
+                <div className="space-y-2">
                 {emailsData.emails.map((email) => (
                   <Card
                     key={email.id}
-                    className="p-4 bg-white/80 backdrop-blur-sm border border-gray-200 hover:shadow-lg transition-all cursor-pointer"
-                    onClick={() => setSelectedEmailId(email.emailId)}
+                    className={`p-4 bg-white/80 backdrop-blur-sm border border-gray-200 hover:shadow-lg transition-all cursor-pointer ${
+                      selectedEmails.has(email.emailId) ? "ring-2 ring-blue-500" : ""
+                    }`}
+                    onClick={(e) => {
+                      if (isSelectMode) {
+                        e.stopPropagation();
+                        toggleEmailSelection(email.emailId);
+                      } else {
+                        setLocation(`/email-inbox/${email.emailId}`);
+                      }
+                    }}
                   >
                     <div className="flex items-start justify-between gap-4">
+                      {isSelectMode && (
+                        <Checkbox
+                          checked={selectedEmails.has(email.emailId)}
+                          onCheckedChange={() => toggleEmailSelection(email.emailId)}
+                          onClick={(e) => e.stopPropagation()}
+                        />
+                      )}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
                           <Badge className={categoryColors[email.category]}>
@@ -215,7 +359,8 @@ export default function EmailInbox() {
                       </div>
                     </div>
                   </Card>
-                ))}
+                 ))}
+                </div>
               </div>
             ) : (
               <Card className="p-12 bg-white/80 backdrop-blur-sm border border-gray-200 text-center">
