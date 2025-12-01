@@ -1667,3 +1667,14 @@
 - [ ] Test Make.com integration
 - [ ] Write user documentation
 - [ ] Deploy and demonstrate to user
+
+
+---
+
+## 🎨 Design Change: Dark Green Gradient Theme
+
+- [x] Update index.css - dark green gradient background
+- [x] Update text colors - light cream/yellow tones (oklch 0.92 0.03 80)
+- [x] Ensure emojis remain colorful (native emojis are always colorful)
+- [x] Test all pages with new theme
+- [ ] Save checkpoint
