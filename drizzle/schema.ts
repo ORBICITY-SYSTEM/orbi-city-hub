@@ -749,7 +749,7 @@ export type InsertEmailSummary = typeof emailSummaries.$inferInsert;
 // ============================================================================
 
 // Google OAuth tokens
-export const googleTokens = mysqlTable("google_tokens", {
+export const gmailGoogleTokens = mysqlTable("google_tokens", {
   id: int("id").autoincrement().primaryKey(),
   userId: int("user_id").notNull(),
   accessToken: text("access_token").notNull(),
@@ -760,7 +760,7 @@ export const googleTokens = mysqlTable("google_tokens", {
 });
 
 // Gmail messages
-export const gmailMessages = mysqlTable("gmail_messages", {
+export const gmailSyncMessages = mysqlTable("gmail_messages", {
   id: int("id").autoincrement().primaryKey(),
   userId: int("user_id").notNull(),
   messageId: varchar("message_id", { length: 255 }).notNull(),
@@ -780,7 +780,7 @@ export const gmailMessages = mysqlTable("gmail_messages", {
 });
 
 // Email categories (AI categorization)
-export const emailCategories = mysqlTable("email_categories", {
+export const gmailEmailCategories = mysqlTable("email_categories", {
   id: int("id").autoincrement().primaryKey(),
   messageId: int("message_id").notNull(),
   category: mysqlEnum("category", [
@@ -800,7 +800,7 @@ export const emailCategories = mysqlTable("email_categories", {
 });
 
 // Email responses (AI-generated)
-export const emailResponses = mysqlTable("email_responses", {
+export const gmailEmailResponses = mysqlTable("email_responses", {
   id: int("id").autoincrement().primaryKey(),
   messageId: int("message_id").notNull(),
   responseText: text("response_text").notNull(),
@@ -811,7 +811,7 @@ export const emailResponses = mysqlTable("email_responses", {
 });
 
 // Email booking revenue tracking
-export const emailBookingRevenue = mysqlTable("email_booking_revenue", {
+export const gmailBookingRevenue = mysqlTable("email_booking_revenue", {
   id: int("id").autoincrement().primaryKey(),
   messageId: int("message_id").notNull(),
   guestName: varchar("guest_name", { length: 255 }),
@@ -825,7 +825,7 @@ export const emailBookingRevenue = mysqlTable("email_booking_revenue", {
 });
 
 // Email sync log
-export const emailSyncLog = mysqlTable("email_sync_log", {
+export const gmailSyncLog = mysqlTable("email_sync_log", {
   id: int("id").autoincrement().primaryKey(),
   userId: int("user_id").notNull(),
   syncType: varchar("sync_type", { length: 50 }).notNull(),

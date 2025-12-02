@@ -65,8 +65,8 @@ async function getValidAccessToken(userId: number): Promise<string> {
 
   const [tokenData] = await db
     .select()
-    .from(db.schema.googleTokens)
-    .where(eq(db.schema.googleTokens.userId, userId))
+    .from(db.schema.gmailGoogleTokens)
+    .where(eq(db.schema.gmailGoogleTokens.userId, userId))
     .limit(1);
 
   if (!tokenData) {
@@ -87,13 +87,13 @@ async function getValidAccessToken(userId: number): Promise<string> {
 
     // Update tokens in database
     await db
-      .update(db.schema.googleTokens)
+      .update(db.schema.gmailGoogleTokens)
       .set({
         accessToken: newTokens.access_token,
         expiresAt: new Date(Date.now() + newTokens.expires_in * 1000),
         updatedAt: new Date(),
       })
-      .where(eq(db.schema.googleTokens.userId, userId));
+        .where(eq(db.schema.gmailGoogleTokens.userId, userId));
 
     return newTokens.access_token;
   }
@@ -220,11 +220,11 @@ export const gmailSyncRouter = router({
           // Check if message already exists
           const [existing] = await db
             .select()
-            .from(db.schema.gmailMessages)
+            .from(db.schema.gmailSyncMessages)
             .where(
-              and(
-                eq(db.schema.gmailMessages.userId, ctx.user.id),
-                eq(db.schema.gmailMessages.messageId, parsedMsg.messageId)
+            and(
+              eq(db.schema.gmailSyncMessages.userId, ctx.user.id),
+              eq(db.schema.gmailSyncMessages.messageId, parsedMsg.messageId)
               )
             )
             .limit(1);
@@ -232,22 +232,22 @@ export const gmailSyncRouter = router({
           if (existing) {
             // Update existing message
             await db
-              .update(db.schema.gmailMessages)
+              .update(db.schema.gmailSyncMessages)
               .set({
                 ...parsedMsg,
                 updatedAt: new Date(),
               })
-              .where(eq(db.schema.gmailMessages.id, existing.id));
+              .where(eq(db.schema.gmailSyncMessages.id, existing.id));
             messagesUpdated++;
           } else {
             // Insert new message
-            await db.insert(db.schema.gmailMessages).values(parsedMsg);
+            await db.insert(db.schema.gmailSyncMessages).values(parsedMsg);
             messagesNew++;
           }
         }
 
         // Log sync
-        await db.insert(db.schema.emailSyncLog).values({
+        await db.insert(db.schema.gmailSyncLog).values({
           userId: ctx.user.id,
           syncType: "gmail_manual",
           messagesFetched,
@@ -269,7 +269,7 @@ export const gmailSyncRouter = router({
         errorMessage = error instanceof Error ? error.message : "Unknown error";
 
         // Log failed sync
-        await db.insert(db.schema.emailSyncLog).values({
+        await db.insert(db.schema.gmailSyncLog).values({
           userId: ctx.user.id,
           syncType: "gmail_manual",
           messagesFetched,
@@ -325,9 +325,9 @@ export const gmailSyncRouter = router({
 
       const history = await db
         .select()
-        .from(db.schema.emailSyncLog)
-        .where(eq(db.schema.emailSyncLog.userId, ctx.user.id))
-        .orderBy(desc(db.schema.emailSyncLog.syncStartedAt))
+        .from(db.schema.gmailSyncLog)
+        .where(eq(db.schema.gmailSyncLog.userId, ctx.user.id))
+        .orderBy(desc(db.schema.gmailSyncLog.syncStartedAt))
         .limit(input.limit);
 
       return history;

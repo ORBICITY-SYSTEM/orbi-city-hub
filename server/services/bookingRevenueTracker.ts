@@ -157,7 +157,7 @@ export async function saveBookingRevenue(
 
   try {
     // Save to email_booking_revenue table
-    await db.insert(db.schema.emailBookingRevenue).values({
+    await db.insert(db.schema.gmailBookingRevenue).values({
       messageId,
       guestName: bookingData.guestName,
       checkInDate: bookingData.checkInDate,
