@@ -32,6 +32,7 @@ import { integrationsRouter } from "./routers/integrationsRouter";
 import { googleAnalyticsRouter } from "./routers/googleAnalytics";
 import { googleBusinessRouter } from "./routers/googleBusiness";
 import { gmailOtelmsRouter } from "./routers/gmailOtelms";
+import { gmailSyncRouter } from "./routers/gmailSync";
 import { emailCategorizationRouter } from "./routers/emailCategorizationRouter";
 import { butlerRouter } from "./butlerRouter";
 import { aiAnalyzerRouter } from "./aiAnalyzerRouter";
@@ -66,6 +67,7 @@ export const appRouter = router({
   googleAnalytics: googleAnalyticsRouter,
   googleBusiness: googleBusinessRouter,
   gmailOtelms: gmailOtelmsRouter,
+  gmailSync: gmailSyncRouter,
   emailCategorization: emailCategorizationRouter,
   system: systemRouter,
   auth: router({
