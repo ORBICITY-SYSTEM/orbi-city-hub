@@ -37,8 +37,10 @@ import { emailCategorizationRouter } from "./routers/emailCategorizationRouter";
 import { butlerRouter } from "./butlerRouter";
 import { aiAnalyzerRouter } from "./aiAnalyzerRouter";
 import { realFinanceRouter } from "./realFinanceRouter";
+import { ceoDashboardRouter } from "./routers/ceoDashboard";
 
 export const appRouter = router({
+  ceoDashboard: ceoDashboardRouter,
   realFinance: realFinanceRouter,
   aiAnalyzer: aiAnalyzerRouter,
   butler: butlerRouter,

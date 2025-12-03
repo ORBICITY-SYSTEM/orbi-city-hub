@@ -10,6 +10,9 @@ import { UniversalChatPopup } from "./components/UniversalChatPopup";
 // Only Home is eagerly loaded for fast initial render
 import Home from "./pages/Home";
 
+// CEO Dashboard - Lazy
+const CEODashboard = lazy(() => import("./pages/CEODashboard"));
+
 // All other pages are lazy-loaded to reduce initial bundle size
 const NotFound = lazy(() => import("./pages/NotFound"));
 
@@ -61,6 +64,7 @@ function RouterContent() {
       <Switch>
         {/* Home */}
         <Route path={"/"} component={Home} />
+        <Route path={"/ceo"} component={CEODashboard} />
         <Route path={"/real-finance"} component={RealFinanceDashboard} />
 
         {/* Finance Module */}
