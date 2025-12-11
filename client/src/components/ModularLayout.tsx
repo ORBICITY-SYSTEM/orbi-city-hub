@@ -21,7 +21,12 @@ import {
   Mail,
   Users,
   Package,
-  Wrench
+  Wrench,
+  MessageCircle,
+  Code,
+  TestTube,
+  BookOpen,
+  Rocket
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
@@ -83,6 +88,20 @@ const modules: ModuleItem[] = [
       { name: "Housekeeping", path: "/logistics/housekeeping", icon: Package },
       { name: "Maintenance", path: "/logistics/maintenance", icon: Wrench },
     ]
+  },
+  {
+    name: "WhatsApp Bot",
+    icon: MessageCircle,
+    color: "text-pink-500",
+    subItems: [
+      { name: "Quick Start", path: "/whatsapp/quick-start", icon: Rocket },
+      { name: "Implementation", path: "/whatsapp/implementation", icon: Code },
+      { name: "Code Examples", path: "/whatsapp/code-examples", icon: FileText },
+      { name: "System Prompt", path: "/whatsapp/system-prompt", icon: MessageCircle },
+      { name: "Testing", path: "/whatsapp/testing", icon: TestTube },
+      { name: "Resources", path: "/whatsapp/resources", icon: BookOpen },
+      { name: "Deployment", path: "/whatsapp/deployment", icon: Rocket },
+    ]
   }
 ];
 
@@ -90,7 +109,7 @@ export default function ModularLayout({ children }: { children: React.ReactNode 
   const { user, loading, isAuthenticated, logout } = useAuth();
   const [location] = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [expandedModules, setExpandedModules] = useState<string[]>(["Finance", "Marketing", "Reservations", "Logistics"]);
+  const [expandedModules, setExpandedModules] = useState<string[]>(["Finance", "Marketing", "Reservations", "Logistics", "WhatsApp Bot"]);
 
   // Auto-expand module based on current route
   useEffect(() => {

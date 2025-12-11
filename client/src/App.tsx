@@ -37,6 +37,15 @@ const Automations = lazy(() => import("./pages/reservations/Automations"));
 const LogisticsDashboard = lazy(() => import("./pages/logistics/LogisticsDashboard"));
 const Housekeeping = lazy(() => import("./pages/logistics/Housekeeping"));
 
+// WhatsApp Bot Module - Lazy
+const WhatsAppImplementation = lazy(() => import("./pages/Implementation"));
+const WhatsAppCodeExamples = lazy(() => import("./pages/CodeExamples"));
+const WhatsAppSystemPrompt = lazy(() => import("./pages/SystemPromptBuilder"));
+const WhatsAppTesting = lazy(() => import("./pages/Testing"));
+const WhatsAppResources = lazy(() => import("./pages/Resources"));
+const WhatsAppDeployment = lazy(() => import("./pages/DeploymentWizard"));
+const WhatsAppQuickStart = lazy(() => import("./pages/QuickStart"));
+
 // Loading fallback component
 const LoadingFallback = () => (
   <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-[#0a2f1f] to-[#0f4d35]">
@@ -86,6 +95,16 @@ function RouterContent() {
         {/* Logistics Module */}
         <Route path="/logistics" component={LogisticsDashboard} />
         <Route path="/logistics/housekeeping" component={Housekeeping} />
+
+        {/* WhatsApp Bot Module */}
+        <Route path="/whatsapp" component={WhatsAppQuickStart} />
+        <Route path="/whatsapp/quick-start" component={WhatsAppQuickStart} />
+        <Route path="/whatsapp/implementation" component={WhatsAppImplementation} />
+        <Route path="/whatsapp/code-examples" component={WhatsAppCodeExamples} />
+        <Route path="/whatsapp/system-prompt" component={WhatsAppSystemPrompt} />
+        <Route path="/whatsapp/testing" component={WhatsAppTesting} />
+        <Route path="/whatsapp/resources" component={WhatsAppResources} />
+        <Route path="/whatsapp/deployment" component={WhatsAppDeployment} />
 
         {/* 404 */}
         <Route path="/404" component={NotFound} />
