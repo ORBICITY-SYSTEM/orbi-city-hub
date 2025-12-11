@@ -60,6 +60,24 @@ export const guests = mysqlTable("guests", {
 export type Guest = typeof guests.$inferSelect;
 export type InsertGuest = typeof guests.$inferInsert;
 
+// Chat messages from n8n workflow
+export const chatMessages = mysqlTable("chatMessages", {
+  id: int("id").autoincrement().primaryKey(),
+  guestId: int("guestId"),
+  guestName: varchar("guestName", { length: 255 }).notNull(),
+  guestEmail: varchar("guestEmail", { length: 320 }),
+  guestPhone: varchar("guestPhone", { length: 50 }),
+  message: text("message").notNull(),
+  source: varchar("source", { length: 50 }).default("n8n").notNull(), // n8n, whatsapp, telegram, etc.
+  direction: mysqlEnum("direction", ["incoming", "outgoing"]).default("incoming").notNull(),
+  status: mysqlEnum("status", ["unread", "read", "replied"]).default("unread").notNull(),
+  metadata: text("metadata"), // JSON string for additional data
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type ChatMessage = typeof chatMessages.$inferSelect;
+export type InsertChatMessage = typeof chatMessages.$inferInsert;
+
 export const bookings = mysqlTable("bookings", {
   id: int("id").autoincrement().primaryKey(),
   guestId: int("guestId").notNull(),

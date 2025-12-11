@@ -37,6 +37,7 @@ import { emailCategorizationRouter } from "./routers/emailCategorizationRouter";
 import { butlerRouter } from "./butlerRouter";
 import { aiAnalyzerRouter } from "./aiAnalyzerRouter";
 import { realFinanceRouter } from "./realFinanceRouter";
+import { n8nWebhookRouter } from "./routers/n8nWebhook";
 
 export const appRouter = router({
   realFinance: realFinanceRouter,
@@ -69,6 +70,7 @@ export const appRouter = router({
   gmailOtelms: gmailOtelmsRouter,
   gmailSync: gmailSyncRouter,
   emailCategorization: emailCategorizationRouter,
+  n8nWebhook: n8nWebhookRouter,
   system: systemRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
