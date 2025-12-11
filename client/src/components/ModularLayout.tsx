@@ -134,59 +134,60 @@ export default function ModularLayout({ children }: { children: React.ReactNode 
     );
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-black">
-        <div className="text-center">
-          <Loader2 className="w-12 h-12 animate-spin text-green-500 mx-auto mb-4" />
-          <p className="text-gray-400">Loading ORBI City Hub...</p>
-        </div>
-      </div>
-    );
-  }
+  // Authentication disabled - public access
+  // if (loading) {
+  //   return (
+  //     <div className="min-h-screen flex items-center justify-center bg-black">
+  //       <div className="text-center">
+  //         <Loader2 className="w-12 h-12 animate-spin text-green-500 mx-auto mb-4" />
+  //         <p className="text-gray-400">Loading ORBI City Hub...</p>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-black px-4">
-        <div className="max-w-md w-full">
-          <div className="bg-gray-900 rounded-2xl shadow-xl p-8 border border-gray-800">
-            <div className="text-center mb-8">
-              <img 
-                src={APP_LOGO} 
-                alt={APP_TITLE} 
-                className="h-16 mx-auto mb-4"
-              />
-              <h1 className="text-3xl font-bold text-white mb-2">
-                {APP_TITLE}
-              </h1>
-              <p className="text-gray-400">
-                Enterprise Management Platform
-              </p>
-            </div>
-            
-            <div className="space-y-4">
-              <div className="bg-green-950 rounded-lg p-4 border border-green-800">
-                <h3 className="font-semibold text-green-400 mb-2">4 Core Modules:</h3>
-                <ul className="text-sm text-green-300 space-y-1">
-                  <li>• Finance & Analytics</li>
-                  <li>• Marketing & OTA</li>
-                  <li>• Reservations & Guests</li>
-                  <li>• Logistics & Operations</li>
-                </ul>
-              </div>
-              
-              <Button 
-                onClick={() => window.location.href = getLoginUrl()}
-                className="w-full bg-green-600 hover:bg-green-700 text-white py-6 text-lg font-semibold"
-              >
-                Sign In with Manus
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // if (!isAuthenticated) {
+  //   return (
+  //     <div className="min-h-screen flex items-center justify-center bg-black px-4">
+  //       <div className="max-w-md w-full">
+  //         <div className="bg-gray-900 rounded-2xl shadow-xl p-8 border border-gray-800">
+  //           <div className="text-center mb-8">
+  //             <img 
+  //               src={APP_LOGO} 
+  //               alt={APP_TITLE} 
+  //               className="h-16 mx-auto mb-4"
+  //             />
+  //             <h1 className="text-3xl font-bold text-white mb-2">
+  //               {APP_TITLE}
+  //             </h1>
+  //             <p className="text-gray-400">
+  //               Enterprise Management Platform
+  //             </p>
+  //           </div>
+  //           
+  //           <div className="space-y-4">
+  //             <div className="bg-green-950 rounded-lg p-4 border border-green-800">
+  //               <h3 className="font-semibold text-green-400 mb-2">4 Core Modules:</h3>
+  //               <ul className="text-sm text-green-300 space-y-1">
+  //                 <li>• Finance & Analytics</li>
+  //                 <li>• Marketing & OTA</li>
+  //                 <li>• Reservations & Guests</li>
+  //                 <li>• Logistics & Operations</li>
+  //               </ul>
+  //             </div>
+  //             
+  //             <Button 
+  //               onClick={() => window.location.href = getLoginUrl()}
+  //               className="w-full bg-green-600 hover:bg-green-700 text-white py-6 text-lg font-semibold"
+  //             >
+  //               Sign In with Manus
+  //             </Button>
+  //           </div>
+  //         </div>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="min-h-screen bg-black text-white">
