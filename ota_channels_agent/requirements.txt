@@ -1,0 +1,34 @@
+# OTA CHANNELS AGENT Dependencies
+
+# Browser automation
+selenium==4.15.2
+playwright==1.40.0
+beautifulsoup4==4.12.2
+lxml==4.9.3
+
+# HTTP requests
+requests==2.31.0
+httpx>=0.24.0,<0.25.0
+
+# Data processing
+pandas==2.1.3
+numpy==1.26.2
+
+# Database
+psycopg2-binary==2.9.9
+supabase==2.0.3
+
+# Scheduling
+schedule==1.2.0
+python-cron==1.0.0
+
+# Utilities
+python-dotenv==1.0.0
+pyyaml==6.0.1
+python-dateutil==2.8.2
+
+# Email
+google-api-python-client==2.108.0
+
+# AI/LLM (for analysis)
+openai==1.3.7
