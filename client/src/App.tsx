@@ -1,38 +1,145 @@
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import NotFound from "@/pages/NotFound";
+import { lazy, Suspense } from "react";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
+import ModularLayout from "./components/ModularLayout";
+import { UniversalChatPopup } from "./components/UniversalChatPopup";
+
+// Only Home is eagerly loaded for fast initial render
 import Home from "./pages/Home";
 
+// All other pages are lazy-loaded to reduce initial bundle size
+const NotFound = lazy(() => import("./pages/NotFound"));
+
+// Finance Module - Lazy
+const RealFinanceDashboard = lazy(() => import("./pages/RealFinanceDashboard"));
+const FinanceDashboard = lazy(() => import("./pages/finance/FinanceDashboard"));
+const FinanceAnalytics = lazy(() => import("./pages/finance/FinanceAnalytics"));
+const FinanceMonthlyReports = lazy(() => import("./pages/finance/FinanceMonthlyReports"));
+const FinanceOTELMS = lazy(() => import("./pages/finance/FinanceOTELMS"));
+const FinanceDevelopmentExpenses = lazy(() => import("./pages/finance/FinanceDevelopmentExpenses"));
+
+// Marketing Module - Lazy
+const MarketingDashboard = lazy(() => import("./pages/marketing/MarketingDashboard"));
+const OTAChannels = lazy(() => import("./pages/marketing/OTAChannels"));
+const WebsiteLeads = lazy(() => import("./pages/marketing/WebsiteLeads"));
+
+// Reservations Module - Lazy
+const EmailInbox = lazy(() => import("./pages/reservations/EmailInbox"));
+const EmailDetail = lazy(() => import("./pages/reservations/EmailDetail"));
+const GuestCommunication = lazy(() => import("./pages/reservations/GuestCommunication"));
+const OTADashboard = lazy(() => import("./pages/reservations/OTADashboard"));
+const Automations = lazy(() => import("./pages/reservations/Automations"));
+
+// Email Management Module - Lazy
+const EmailManagement = lazy(() => import("./pages/EmailManagement"));
+
+// Integrations Module - Lazy
+const Integrations = lazy(() => import("./pages/Integrations"));
+
+// Settings Module - Lazy
+const Settings = lazy(() => import("./pages/Settings"));
+
+// Logistics Module - Lazy
+const LogisticsDashboard = lazy(() => import("./pages/logistics/LogisticsDashboard"));
+const Housekeeping = lazy(() => import("./pages/logistics/Housekeeping"));
+
+// WhatsApp Bot Module - Lazy
+const WhatsAppImplementation = lazy(() => import("./pages/Implementation"));
+const WhatsAppCodeExamples = lazy(() => import("./pages/CodeExamples"));
+const WhatsAppSystemPrompt = lazy(() => import("./pages/SystemPromptBuilder"));
+const WhatsAppTesting = lazy(() => import("./pages/Testing"));
+const WhatsAppResources = lazy(() => import("./pages/Resources"));
+const WhatsAppDeployment = lazy(() => import("./pages/DeploymentWizard"));
+const WhatsAppQuickStart = lazy(() => import("./pages/QuickStart"));
+
+// Loading fallback component
+const LoadingFallback = () => (
+  <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-[#0a2f1f] to-[#0f4d35]">
+    <div className="text-center">
+      <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-green-400 mx-auto mb-4"></div>
+      <p className="text-green-200 text-lg font-medium">Loading...</p>
+    </div>
+  </div>
+);
 
 function Router() {
   return (
-    <Switch>
-      <Route path={"/"} component={Home} />
-      <Route path={"/404"} component={NotFound} />
-      {/* Final fallback route */}
-      <Route component={NotFound} />
-    </Switch>
+    <Suspense fallback={<LoadingFallback />}>
+      <RouterContent />
+    </Suspense>
   );
 }
 
-// NOTE: About Theme
-// - First choose a default theme according to your design style (dark or light bg), than change color palette in index.css
-//   to keep consistent foreground/background color across components
-// - If you want to make theme switchable, pass `switchable` ThemeProvider and use `useTheme` hook
+function RouterContent() {
+  return (
+    <ModularLayout>
+      <Switch>
+        {/* Home */}
+        <Route path={"/"} component={Home} />
+        <Route path={"/real-finance"} component={RealFinanceDashboard} />
+
+        {/* Finance Module */}
+        <Route path="/finance" component={FinanceDashboard} />
+        <Route path="/finance/analytics" component={FinanceAnalytics} />
+        <Route path="/finance/reports" component={FinanceMonthlyReports} />
+        <Route path="/finance/otelms" component={FinanceOTELMS} />
+        <Route path="/finance/expenses" component={FinanceDevelopmentExpenses} />
+
+        {/* Marketing Module */}
+        <Route path="/marketing" component={MarketingDashboard} />
+        <Route path="/marketing/ota" component={OTAChannels} />
+        <Route path="/marketing/leads" component={WebsiteLeads} />
+
+        {/* Reservations Module */}
+        <Route path="/reservations" component={OTADashboard} />
+        <Route path="/reservations/email" component={EmailInbox} />
+        <Route path="/reservations/email/:emailId" component={EmailDetail} />
+        <Route path="/reservations/guests" component={GuestCommunication} />
+        <Route path="/reservations/ota" component={OTADashboard} />
+        <Route path="/reservations/automations" component={Automations} />
+
+        {/* Email Management Module */}
+        <Route path="/email-management" component={EmailManagement} />
+
+        {/* Integrations Module */}
+        <Route path="/integrations" component={Integrations} />
+
+        {/* Settings Module */}
+        <Route path="/settings" component={Settings} />
+
+        {/* Logistics Module */}
+        <Route path="/logistics" component={LogisticsDashboard} />
+        <Route path="/logistics/housekeeping" component={Housekeeping} />
+
+        {/* WhatsApp Bot Module */}
+        <Route path="/whatsapp" component={WhatsAppQuickStart} />
+        <Route path="/whatsapp/quick-start" component={WhatsAppQuickStart} />
+        <Route path="/whatsapp/implementation" component={WhatsAppImplementation} />
+        <Route path="/whatsapp/code-examples" component={WhatsAppCodeExamples} />
+        <Route path="/whatsapp/system-prompt" component={WhatsAppSystemPrompt} />
+        <Route path="/whatsapp/testing" component={WhatsAppTesting} />
+        <Route path="/whatsapp/resources" component={WhatsAppResources} />
+        <Route path="/whatsapp/deployment" component={WhatsAppDeployment} />
+
+        {/* 404 */}
+        <Route path="/404" component={NotFound} />
+        <Route component={NotFound} />
+      </Switch>
+    </ModularLayout>
+  );
+}
 
 function App() {
   return (
     <ErrorBoundary>
-      <ThemeProvider
-        defaultTheme="light"
-        // switchable
-      >
+      <ThemeProvider defaultTheme="dark">
         <TooltipProvider>
           <Toaster />
           <Router />
+          <UniversalChatPopup />
         </TooltipProvider>
       </ThemeProvider>
     </ErrorBoundary>

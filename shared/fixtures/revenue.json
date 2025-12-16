@@ -1,0 +1,48 @@
+{
+  "summary": {
+    "totalRevenue": 920505,
+    "totalExpenses": 412340,
+    "netProfit": 508165,
+    "profitMargin": 55.2,
+    "currency": "GEL",
+    "period": "2024"
+  },
+  "monthly": [
+    { "month": "Jan", "revenue": 65200, "expenses": 32100, "occupancy": 45 },
+    { "month": "Feb", "revenue": 58900, "expenses": 29800, "occupancy": 42 },
+    { "month": "Mar", "revenue": 72400, "expenses": 34200, "occupancy": 55 },
+    { "month": "Apr", "revenue": 85600, "expenses": 38500, "occupancy": 68 },
+    { "month": "May", "revenue": 98200, "expenses": 42100, "occupancy": 78 },
+    { "month": "Jun", "revenue": 112500, "expenses": 48200, "occupancy": 92 },
+    { "month": "Jul", "revenue": 125800, "expenses": 52400, "occupancy": 98 },
+    { "month": "Aug", "revenue": 118900, "expenses": 49800, "occupancy": 95 },
+    { "month": "Sep", "revenue": 89400, "expenses": 39200, "occupancy": 72 },
+    { "month": "Oct", "revenue": 68200, "expenses": 31500, "occupancy": 58 },
+    { "month": "Nov", "revenue": 52800, "expenses": 28100, "occupancy": 48 },
+    { "month": "Dec", "revenue": 72605, "expenses": 36440, "occupancy": 62 }
+  ],
+  "byChannel": [
+    { "channel": "Booking.com", "revenue": 368202, "percentage": 40, "bookings": 245 },
+    { "channel": "Airbnb", "revenue": 184101, "percentage": 20, "bookings": 98 },
+    { "channel": "Direct", "revenue": 138076, "percentage": 15, "bookings": 156 },
+    { "channel": "Expedia", "revenue": 92051, "percentage": 10, "bookings": 67 },
+    { "channel": "Ostrovok", "revenue": 73640, "percentage": 8, "bookings": 89 },
+    { "channel": "Other", "revenue": 64435, "percentage": 7, "bookings": 45 }
+  ],
+  "expenseCategories": [
+    { "category": "Salaries", "amount": 165000, "percentage": 40 },
+    { "category": "Utilities", "amount": 61851, "percentage": 15 },
+    { "category": "Supplies", "amount": 49480, "percentage": 12 },
+    { "category": "Marketing", "amount": 41234, "percentage": 10 },
+    { "category": "Maintenance", "amount": 33187, "percentage": 8 },
+    { "category": "Commissions", "amount": 28864, "percentage": 7 },
+    { "category": "Other", "amount": 32724, "percentage": 8 }
+  ],
+  "kpis": {
+    "revPAR": 42.5,
+    "adr": 145.8,
+    "averageStay": 3.2,
+    "repeatGuestRate": 18.5,
+    "reviewScore": 8.9
+  }
+}

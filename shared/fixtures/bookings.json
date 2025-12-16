@@ -1,0 +1,92 @@
+{
+  "bookings": [
+    {
+      "id": "demo_1",
+      "guestName": "John Smith",
+      "guestEmail": "john.smith@example.com",
+      "roomNumber": "301",
+      "roomType": "Studio Deluxe",
+      "checkIn": "2024-12-15",
+      "checkOut": "2024-12-20",
+      "nights": 5,
+      "totalPrice": 750,
+      "currency": "GEL",
+      "channel": "Booking.com",
+      "status": "confirmed",
+      "paymentStatus": "paid",
+      "createdAt": "2024-12-10T10:30:00Z"
+    },
+    {
+      "id": "demo_2",
+      "guestName": "Maria Garcia",
+      "guestEmail": "maria.g@example.com",
+      "roomNumber": "405",
+      "roomType": "Studio Premium",
+      "checkIn": "2024-12-16",
+      "checkOut": "2024-12-22",
+      "nights": 6,
+      "totalPrice": 1080,
+      "currency": "GEL",
+      "channel": "Airbnb",
+      "status": "confirmed",
+      "paymentStatus": "paid",
+      "createdAt": "2024-12-11T14:20:00Z"
+    },
+    {
+      "id": "demo_3",
+      "guestName": "გიორგი ბერიძე",
+      "guestEmail": "giorgi.b@example.ge",
+      "roomNumber": "512",
+      "roomType": "Studio Sea View",
+      "checkIn": "2024-12-17",
+      "checkOut": "2024-12-19",
+      "nights": 2,
+      "totalPrice": 400,
+      "currency": "GEL",
+      "channel": "Direct",
+      "status": "pending",
+      "paymentStatus": "pending",
+      "createdAt": "2024-12-12T09:15:00Z"
+    },
+    {
+      "id": "demo_4",
+      "guestName": "Александр Петров",
+      "guestEmail": "alex.p@example.ru",
+      "roomNumber": "208",
+      "roomType": "Studio Standard",
+      "checkIn": "2024-12-18",
+      "checkOut": "2024-12-25",
+      "nights": 7,
+      "totalPrice": 980,
+      "currency": "GEL",
+      "channel": "Ostrovok",
+      "status": "confirmed",
+      "paymentStatus": "partial",
+      "createdAt": "2024-12-13T16:45:00Z"
+    },
+    {
+      "id": "demo_5",
+      "guestName": "Emma Wilson",
+      "guestEmail": "emma.w@example.com",
+      "roomNumber": "601",
+      "roomType": "Penthouse Suite",
+      "checkIn": "2024-12-20",
+      "checkOut": "2024-12-27",
+      "nights": 7,
+      "totalPrice": 2100,
+      "currency": "GEL",
+      "channel": "Expedia",
+      "status": "confirmed",
+      "paymentStatus": "paid",
+      "createdAt": "2024-12-14T11:00:00Z"
+    }
+  ],
+  "stats": {
+    "totalBookings": 5,
+    "confirmedBookings": 4,
+    "pendingBookings": 1,
+    "totalRevenue": 5310,
+    "averageNights": 5.4,
+    "occupancyRate": 78
+  }
+}
