@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE financialData (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  month VARCHAR(50) NOT NULL,\n  year INT NOT NULL,\n  monthNumber INT NOT NULL,\n  studios INT NOT NULL,\n  daysAvailable INT NOT NULL,\n  daysOccupied INT NOT NULL,\n  occupancyRate DECIMAL(5,2) NOT NULL,\n  avgPrice DECIMAL(10,2) NOT NULL,\n  totalRevenue DECIMAL(15,2) NOT NULL,\n  cleaningTech DECIMAL(15,2) NOT NULL,\n  marketing DECIMAL(15,2) NOT NULL,\n  salaries DECIMAL(15,2) NOT NULL,\n  utilities DECIMAL(15,2) NOT NULL,\n  totalExpenses DECIMAL(15,2) NOT NULL,\n  totalProfit DECIMAL(15,2) NOT NULL,\n  companyProfit DECIMAL(15,2) NOT NULL,\n  ownersProfit DECIMAL(15,2) NOT NULL,\n  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,\n  updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user c2qSkVB4gKtEmor.991468648419 --database 4ExKc24KNHdr4pKbTUzsoU --execute CREATE TABLE financialData (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  month VARCHAR(50) NOT NULL,\n  year INT NOT NULL,\n  monthNumber INT NOT NULL,\n  studios INT NOT NULL,\n  daysAvailable INT NOT NULL,\n  daysOccupied INT NOT NULL,\n  occupancyRate DECIMAL(5,2) NOT NULL,\n  avgPrice DECIMAL(10,2) NOT NULL,\n  totalRevenue DECIMAL(15,2) NOT NULL,\n  cleaningTech DECIMAL(15,2) NOT NULL,\n  marketing DECIMAL(15,2) NOT NULL,\n  salaries DECIMAL(15,2) NOT NULL,\n  utilities DECIMAL(15,2) NOT NULL,\n  totalExpenses DECIMAL(15,2) NOT NULL,\n  totalProfit DECIMAL(15,2) NOT NULL,\n  companyProfit DECIMAL(15,2) NOT NULL,\n  ownersProfit DECIMAL(15,2) NOT NULL,\n  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,\n  updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 197
+}

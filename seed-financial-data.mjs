@@ -1,0 +1,273 @@
+import { drizzle } from "drizzle-orm/mysql2";
+import mysql from "mysql2/promise";
+import { financialData } from "./drizzle/financialSchema.js";
+import { sql } from "drizzle-orm";
+
+const financialRecords = [
+  {
+    month: "Nov 2025",
+    year: 2025,
+    monthNumber: 11,
+    studios: 75,
+    daysAvailable: 2250,
+    daysOccupied: 1325,
+    occupancyRate: "77.00",
+    avgPrice: "40.00",
+    totalRevenue: "52665.00",
+    cleaningTech: "3332.00",
+    marketing: "1904.00",
+    salaries: "3000.00",
+    utilities: "1284.00",
+    totalExpenses: "9520.00",
+    totalProfit: "36105.00",
+    companyProfit: "4333.00",
+    ownersProfit: "31772.00"
+  },
+  {
+    month: "Oct 2025",
+    year: 2025,
+    monthNumber: 10,
+    studios: 56,
+    daysAvailable: 1736,
+    daysOccupied: 1182,
+    occupancyRate: "68.00",
+    avgPrice: "52.00",
+    totalRevenue: "61222.00",
+    cleaningTech: "5639.00",
+    marketing: "2537.00",
+    salaries: "3000.00",
+    utilities: "2921.00",
+    totalExpenses: "14097.00",
+    totalProfit: "47125.00",
+    companyProfit: "7069.00",
+    ownersProfit: "40056.00"
+  },
+  {
+    month: "Sep 2025",
+    year: 2025,
+    monthNumber: 9,
+    studios: 55,
+    daysAvailable: 1650,
+    daysOccupied: 1318,
+    occupancyRate: "80.50",
+    avgPrice: "87.00",
+    totalRevenue: "114074.00",
+    cleaningTech: "13860.00",
+    marketing: "10286.00",
+    salaries: "3000.00",
+    utilities: "7774.00",
+    totalExpenses: "34920.00",
+    totalProfit: "79154.00",
+    companyProfit: "12105.00",
+    ownersProfit: "67049.00"
+  },
+  {
+    month: "Aug 2025",
+    year: 2025,
+    monthNumber: 8,
+    studios: 54,
+    daysAvailable: 1674,
+    daysOccupied: 1513,
+    occupancyRate: "90.50",
+    avgPrice: "144.00",
+    totalRevenue: "218594.00",
+    cleaningTech: "12816.00",
+    marketing: "7282.00",
+    salaries: "4000.00",
+    utilities: "7062.00",
+    totalExpenses: "31160.00",
+    totalProfit: "187434.00",
+    companyProfit: "28889.00",
+    ownersProfit: "158545.00"
+  },
+  {
+    month: "Jul 2025",
+    year: 2025,
+    monthNumber: 7,
+    studios: 53,
+    daysAvailable: 1643,
+    daysOccupied: 1446,
+    occupancyRate: "88.00",
+    avgPrice: "121.00",
+    totalRevenue: "175512.00",
+    cleaningTech: "13592.00",
+    marketing: "5051.00",
+    salaries: "4000.00",
+    utilities: "3913.00",
+    totalExpenses: "26556.00",
+    totalProfit: "148956.00",
+    companyProfit: "17180.00",
+    ownersProfit: "131776.00"
+  },
+  {
+    month: "Jun 2025",
+    year: 2025,
+    monthNumber: 6,
+    studios: 53,
+    daysAvailable: 1590,
+    daysOccupied: 1182,
+    occupancyRate: "76.50",
+    avgPrice: "84.00",
+    totalRevenue: "99443.00",
+    cleaningTech: "12855.00",
+    marketing: "6879.00",
+    salaries: "2000.00",
+    utilities: "5239.00",
+    totalExpenses: "26973.00",
+    totalProfit: "72470.00",
+    companyProfit: "8269.00",
+    ownersProfit: "64201.00"
+  },
+  {
+    month: "May 2025",
+    year: 2025,
+    monthNumber: 5,
+    studios: 47,
+    daysAvailable: 1457,
+    daysOccupied: 1033,
+    occupancyRate: "71.00",
+    avgPrice: "67.00",
+    totalRevenue: "69350.00",
+    cleaningTech: "9743.00",
+    marketing: "2041.00",
+    salaries: "3000.00",
+    utilities: "2595.00",
+    totalExpenses: "17379.00",
+    totalProfit: "51971.00",
+    companyProfit: "8631.00",
+    ownersProfit: "43340.00"
+  },
+  {
+    month: "Apr 2025",
+    year: 2025,
+    monthNumber: 4,
+    studios: 45,
+    daysAvailable: 1350,
+    daysOccupied: 1080,
+    occupancyRate: "80.00",
+    avgPrice: "51.00",
+    totalRevenue: "55122.00",
+    cleaningTech: "6325.00",
+    marketing: "2139.00",
+    salaries: "2000.00",
+    utilities: "4090.00",
+    totalExpenses: "14554.00",
+    totalProfit: "40568.00",
+    companyProfit: "8190.00",
+    ownersProfit: "32378.00"
+  },
+  {
+    month: "Mar 2025",
+    year: 2025,
+    monthNumber: 3,
+    studios: 43,
+    daysAvailable: 1333,
+    daysOccupied: 957,
+    occupancyRate: "75.00",
+    avgPrice: "41.00",
+    totalRevenue: "39055.00",
+    cleaningTech: "4994.00",
+    marketing: "0.00",
+    salaries: "1500.00",
+    utilities: "2063.00",
+    totalExpenses: "8557.00",
+    totalProfit: "30498.00",
+    companyProfit: "5999.00",
+    ownersProfit: "24500.00"
+  },
+  {
+    month: "Feb 2025",
+    year: 2025,
+    monthNumber: 2,
+    studios: 37,
+    daysAvailable: 1036,
+    daysOccupied: 822,
+    occupancyRate: "77.30",
+    avgPrice: "40.00",
+    totalRevenue: "33200.00",
+    cleaningTech: "4045.00",
+    marketing: "1328.00",
+    salaries: "1500.00",
+    utilities: "1789.00",
+    totalExpenses: "8662.00",
+    totalProfit: "24538.00",
+    companyProfit: "5769.00",
+    ownersProfit: "18769.00"
+  },
+  {
+    month: "Jan 2025",
+    year: 2025,
+    monthNumber: 1,
+    studios: 34,
+    daysAvailable: 1054,
+    daysOccupied: 687,
+    occupancyRate: "63.30",
+    avgPrice: "43.00",
+    totalRevenue: "29429.00",
+    cleaningTech: "3252.00",
+    marketing: "1210.00",
+    salaries: "1500.00",
+    utilities: "1401.00",
+    totalExpenses: "7363.00",
+    totalProfit: "22066.00",
+    companyProfit: "4966.00",
+    ownersProfit: "17099.00"
+  },
+  {
+    month: "Dec 2024",
+    year: 2024,
+    monthNumber: 12,
+    studios: 34,
+    daysAvailable: 1054,
+    daysOccupied: 651,
+    occupancyRate: "60.00",
+    avgPrice: "41.00",
+    totalRevenue: "26775.00",
+    cleaningTech: "2509.00",
+    marketing: "500.00",
+    salaries: "1500.00",
+    utilities: "1449.00",
+    totalExpenses: "5958.00",
+    totalProfit: "20817.00",
+    companyProfit: "5368.00",
+    ownersProfit: "15449.00"
+  },
+  {
+    month: "Nov 2024",
+    year: 2024,
+    monthNumber: 11,
+    studios: 34,
+    daysAvailable: 1020,
+    daysOccupied: 632,
+    occupancyRate: "60.20",
+    avgPrice: "40.00",
+    totalRevenue: "25102.00",
+    cleaningTech: "2930.00",
+    marketing: "1806.00",
+    salaries: "1500.00",
+    utilities: "1836.00",
+    totalExpenses: "8072.00",
+    totalProfit: "17030.00",
+    companyProfit: "2596.00",
+    ownersProfit: "14434.00"
+  }
+];
+
+async function seed() {
+  const connection = await mysql.createConnection(process.env.DATABASE_URL);
+  const db = drizzle(connection);
+
+  console.log("Clearing existing financial data...");
+  await db.delete(financialData);
+
+  console.log("Inserting new financial data (Nov 2024 - Nov 2025)...");
+  for (const record of financialRecords) {
+    await db.insert(financialData).values(record);
+    console.log(`  Inserted: ${record.month}`);
+  }
+
+  console.log("Done! Inserted", financialRecords.length, "records");
+  await connection.end();
+}
+
+seed().catch(console.error);

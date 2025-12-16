@@ -1,4 +1,4 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, boolean, json } from "drizzle-orm/mysql-core";
+import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, boolean, json, decimal } from "drizzle-orm/mysql-core";
 
 /**
  * Core user table backing auth flow.
@@ -118,17 +118,41 @@ export type InsertErrorLog = typeof errorLogs.$inferInsert;
 
 /**
  * Financial data table for dashboard
+ * Stores monthly financial performance data from OTELMS Excel reports
  */
 export const financialData = mysqlTable("financialData", {
   id: int("id").autoincrement().primaryKey(),
-  date: timestamp("date").notNull(),
-  revenue: int("revenue").default(0),
-  expenses: int("expenses").default(0),
-  profit: int("profit").default(0),
-  channel: varchar("channel", { length: 64 }),
-  category: varchar("category", { length: 64 }),
-  description: text("description"),
+  
+  // Period
+  month: varchar("month", { length: 50 }).notNull(), // "November 2025"
+  year: int("year").notNull(),
+  monthNumber: int("monthNumber").notNull(), // 1-12
+  
+  // Operational Metrics
+  studios: int("studios").notNull(),
+  daysAvailable: int("daysAvailable").notNull(),
+  daysOccupied: int("daysOccupied").notNull(),
+  occupancyRate: decimal("occupancyRate", { precision: 5, scale: 2 }).notNull(), // 80.50
+  avgPrice: decimal("avgPrice", { precision: 10, scale: 2 }).notNull(),
+  
+  // Revenue
+  totalRevenue: decimal("totalRevenue", { precision: 15, scale: 2 }).notNull(),
+  
+  // Expenses
+  cleaningTech: decimal("cleaningTech", { precision: 15, scale: 2 }).notNull(),
+  marketing: decimal("marketing", { precision: 15, scale: 2 }).notNull(),
+  salaries: decimal("salaries", { precision: 15, scale: 2 }).notNull(),
+  utilities: decimal("utilities", { precision: 15, scale: 2 }).notNull(),
+  totalExpenses: decimal("totalExpenses", { precision: 15, scale: 2 }).notNull(),
+  
+  // Profit
+  totalProfit: decimal("totalProfit", { precision: 15, scale: 2 }).notNull(),
+  companyProfit: decimal("companyProfit", { precision: 15, scale: 2 }).notNull(),
+  ownersProfit: decimal("ownersProfit", { precision: 15, scale: 2 }).notNull(),
+  
+  // Metadata
   createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
 
 export type FinancialData = typeof financialData.$inferSelect;

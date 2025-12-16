@@ -9,7 +9,7 @@ const modules = [
     color: "bg-blue-500",
     path: "/finance",
     description: "Revenue, expenses, and financial analytics",
-    stats: { label: "Monthly Revenue", value: "₾45,230" }
+    stats: { label: "Annual Revenue", value: "₾999,543" }
   },
   {
     name: "Marketing",
@@ -17,7 +17,7 @@ const modules = [
     color: "bg-green-500",
     path: "/marketing",
     description: "OTA channels, campaigns, and website leads",
-    stats: { label: "Occupancy Rate", value: "85%" }
+    stats: { label: "Avg Occupancy", value: "74%" }
   },
   {
     name: "Reservations",
@@ -25,7 +25,7 @@ const modules = [
     color: "bg-purple-500",
     path: "/reservations",
     description: "Bookings, guests, and email management",
-    stats: { label: "Active Bookings", value: "247" }
+    stats: { label: "Active Studios", value: "75" }
   },
   {
     name: "Logistics",
@@ -38,10 +38,10 @@ const modules = [
 ];
 
 const quickStats = [
-  { label: "Total Revenue", value: "₾45,230", change: "+24.5%", icon: TrendingUp, positive: true },
-  { label: "Active Guests", value: "156", change: "+12", icon: Users, positive: true },
-  { label: "Unread Emails", value: "23", change: "-5", icon: Mail, positive: true },
-  { label: "Pending Tasks", value: "8", change: "-3", icon: Package, positive: true },
+  { label: "Total Revenue", value: "₾999,543", change: "+297%", icon: TrendingUp, positive: true },
+  { label: "Total Profit", value: "₾778,732", change: "+358%", icon: DollarSign, positive: true },
+  { label: "Studios", value: "75", change: "+41", icon: Users, positive: true },
+  { label: "Avg Occupancy", value: "74%", change: "+14%", icon: Package, positive: true },
 ];
 
 export default function Home() {
@@ -52,25 +52,6 @@ export default function Home() {
         <h1 className="text-4xl font-bold text-white mb-2">ORBI City Hub</h1>
         <p className="text-gray-400 text-lg">Enterprise Management Platform</p>
       </div>
-
-      {/* Real Finance Dashboard Link */}
-      <Link href="/real-finance">
-        <div className="bg-gradient-to-r from-green-900/50 to-blue-900/50 border-2 border-green-500 rounded-xl p-6 hover:border-green-400 transition-all cursor-pointer">
-          <div className="flex items-center gap-4">
-            <div className="text-6xl">💰</div>
-            <div className="flex-1">
-              <h2 className="text-2xl font-bold text-white mb-2">Real Finance Dashboard</h2>
-              <p className="text-gray-300">View actual financial data from ORBI City Financial Report (Oct 2024 - Sep 2025)</p>
-              <div className="flex gap-4 mt-3 text-sm">
-                <span className="text-green-400 font-semibold">₾920,505 Revenue</span>
-                <span className="text-blue-400 font-semibold">₾720,186 Profit</span>
-                <span className="text-purple-400 font-semibold">12 Months Data</span>
-              </div>
-            </div>
-            <div className="text-green-400 text-xl">→</div>
-          </div>
-        </div>
-      </Link>
 
       {/* Main AI Agent */}
       <MainAIAgent />

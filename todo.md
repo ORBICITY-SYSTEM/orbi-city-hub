@@ -28,3 +28,22 @@
 - [x] Create settings table (logo_url, primary_color, company_name)
 - [x] Implement CSS variables for theming
 - [x] Build settings UI for customization
+
+## Homepage Updates
+- [x] Remove Real Finance Dashboard card from homepage
+- [x] Update financial data with Nov 2024 - Nov 2025 report
+- [x] Update Finance module with new data
+
+## Power BI-Level Finance Module
+- [x] Create interactive month/year filter dropdowns
+- [ ] Add date range picker for custom periods
+- [x] Implement sortable data tables
+- [x] Build KPI cards with sparklines
+- [x] Create revenue/profit trend charts
+- [x] Add expense breakdown pie chart
+- [x] Build occupancy rate gauge
+- [ ] Implement studio growth visualization
+- [x] Add profit distribution chart (Company vs Owners)
+- [ ] Create cost optimization analysis view
+- [ ] Add export to Excel/PDF functionality
+- [ ] Implement comparison mode (month vs month)

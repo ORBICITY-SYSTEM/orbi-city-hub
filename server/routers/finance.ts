@@ -1,6 +1,6 @@
 import { router, publicProcedure } from "../_core/trpc";
 import { getDb } from "../db";
-import { financialData } from "../../drizzle/financialSchema";
+import { financialData } from "../../drizzle/schema";
 import { desc } from "drizzle-orm";
 
 export const financeRouter = router({
