@@ -81,3 +81,10 @@
 - [x] Implement role-based access control (RBAC)
 - [x] Add role management UI
 - [x] Protect routes based on user roles
+
+## OTA Command Center Data Import
+- [x] Analyze OTA Excel files (Booking.com, Airbnb, Expedia, Agoda, etc.)
+- [x] Create OTA bookings database schema
+- [x] Import real booking data from all channels
+- [x] Update OTA Dashboard with real statistics
+- [x] Display channel performance metrics
