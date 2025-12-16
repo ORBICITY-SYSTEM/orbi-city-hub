@@ -1,4 +1,7 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
+import * as XLSX from "xlsx";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { trpc } from "@/lib/trpc";
@@ -54,6 +57,13 @@ import {
 } from "lucide-react";
 import { Link } from "wouter";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { FileSpreadsheet, FileText } from "lucide-react";
 
 // Color palette for charts
 const COLORS = {
@@ -201,6 +211,123 @@ export default function PowerBIFinanceDashboard() {
     setSortDirection("desc");
   };
 
+  // Export to Excel
+  const exportToExcel = useCallback(() => {
+    if (!filteredData.length) return;
+
+    const exportData = filteredData.map(row => ({
+      'თვე': row.month,
+      'სტუდიოები': row.studios,
+      'ხელმისაწვდომი დღეები': row.daysAvailable,
+      'დაკავებული დღეები': row.daysOccupied,
+      'დატვირთვა (%)': row.occupancyRate,
+      'საშუალო ფასი (₾)': row.avgPrice,
+      'შემოსავალი (₾)': row.totalRevenue,
+      'დასუფთავება/ტექნიკა (₾)': row.cleaningTech,
+      'მარკეტინგი (₾)': row.marketing,
+      'ხელფასები (₾)': row.salaries,
+      'კომუნალური (₾)': row.utilities,
+      'სულ ხარჯები (₾)': row.totalExpenses,
+      'სულ მოგება (₾)': row.totalProfit,
+      'კომპანიის მოგება (₾)': row.companyProfit,
+      'მფლობელების მოგება (₾)': row.ownersProfit,
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(exportData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'ფინანსური მონაცემები');
+    
+    // Add summary sheet
+    if (filteredTotals) {
+      const summaryData = [
+        { 'მეტრიკა': 'სულ შემოსავალი', 'მნიშვნელობა': `₾${filteredTotals.totalRevenue.toLocaleString()}` },
+        { 'მეტრიკა': 'სულ ხარჯები', 'მნიშვნელობა': `₾${filteredTotals.totalExpenses.toLocaleString()}` },
+        { 'მეტრიკა': 'სულ მოგება', 'მნიშვნელობა': `₾${filteredTotals.totalProfit.toLocaleString()}` },
+        { 'მეტრიკა': 'მოგების მარჟა', 'მნიშვნელობა': `${filteredTotals.profitMargin.toFixed(1)}%` },
+        { 'მეტრიკა': 'საშუალო დატვირთვა', 'მნიშვნელობა': `${filteredTotals.avgOccupancy.toFixed(1)}%` },
+        { 'მეტრიკა': 'კომპანიის წილი', 'მნიშვნელობა': `₾${filteredTotals.companyProfit.toLocaleString()}` },
+        { 'მეტრიკა': 'მფლობელების წილი', 'მნიშვნელობა': `₾${filteredTotals.ownersProfit.toLocaleString()}` },
+      ];
+      const summaryWs = XLSX.utils.json_to_sheet(summaryData);
+      XLSX.utils.book_append_sheet(wb, summaryWs, 'შეჯამება');
+    }
+
+    const fileName = `ORBI_City_Finance_Report_${new Date().toISOString().split('T')[0]}.xlsx`;
+    XLSX.writeFile(wb, fileName);
+  }, [filteredData, filteredTotals]);
+
+  // Export to PDF
+  const exportToPDF = useCallback(() => {
+    if (!filteredData.length || !filteredTotals) return;
+
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    
+    // Title
+    doc.setFontSize(20);
+    doc.setTextColor(16, 185, 129); // Emerald color
+    doc.text('ORBI City Hub', pageWidth / 2, 20, { align: 'center' });
+    
+    doc.setFontSize(14);
+    doc.setTextColor(100, 100, 100);
+    doc.text('Financial Report', pageWidth / 2, 28, { align: 'center' });
+    
+    doc.setFontSize(10);
+    doc.text(`Generated: ${new Date().toLocaleDateString()}`, pageWidth / 2, 35, { align: 'center' });
+
+    // Summary Section
+    doc.setFontSize(12);
+    doc.setTextColor(0, 0, 0);
+    doc.text('Summary', 14, 50);
+    
+    const summaryData = [
+      ['Total Revenue', `${filteredTotals.totalRevenue.toLocaleString()} GEL`],
+      ['Total Expenses', `${filteredTotals.totalExpenses.toLocaleString()} GEL`],
+      ['Total Profit', `${filteredTotals.totalProfit.toLocaleString()} GEL`],
+      ['Profit Margin', `${filteredTotals.profitMargin.toFixed(1)}%`],
+      ['Avg Occupancy', `${filteredTotals.avgOccupancy.toFixed(1)}%`],
+      ['Active Studios', `${filteredTotals.latestStudios}`],
+      ['Company Share', `${filteredTotals.companyProfit.toLocaleString()} GEL`],
+      ['Owners Share', `${filteredTotals.ownersProfit.toLocaleString()} GEL`],
+    ];
+
+    autoTable(doc, {
+      startY: 55,
+      head: [['Metric', 'Value']],
+      body: summaryData,
+      theme: 'striped',
+      headStyles: { fillColor: [16, 185, 129] },
+      margin: { left: 14, right: 14 },
+    });
+
+    // Monthly Data Table
+    const finalY = (doc as any).lastAutoTable.finalY || 100;
+    doc.text('Monthly Data', 14, finalY + 15);
+
+    const tableData = filteredData.map(row => [
+      row.month,
+      row.studios.toString(),
+      `${row.occupancyRate.toFixed(1)}%`,
+      `${row.avgPrice} GEL`,
+      `${row.totalRevenue.toLocaleString()} GEL`,
+      `${row.totalExpenses.toLocaleString()} GEL`,
+      `${row.totalProfit.toLocaleString()} GEL`,
+    ]);
+
+    autoTable(doc, {
+      startY: finalY + 20,
+      head: [['Month', 'Studios', 'Occupancy', 'ADR', 'Revenue', 'Expenses', 'Profit']],
+      body: tableData,
+      theme: 'striped',
+      headStyles: { fillColor: [16, 185, 129] },
+      margin: { left: 14, right: 14 },
+      styles: { fontSize: 8 },
+    });
+
+    const fileName = `ORBI_City_Finance_Report_${new Date().toISOString().split('T')[0]}.pdf`;
+    doc.save(fileName);
+  }, [filteredData, filteredTotals]);
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-[#0a1628] via-[#0d2137] to-[#0a1628] flex items-center justify-center">
@@ -229,10 +356,30 @@ export default function PowerBIFinanceDashboard() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" className="border-gray-700 text-gray-300 hover:bg-gray-800">
-            <Download className="w-4 h-4 mr-2" />
-            ექსპორტი
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="border-emerald-600 text-emerald-400 hover:bg-emerald-900/30 hover:text-emerald-300">
+                <Download className="w-4 h-4 mr-2" />
+                ექსპორტი
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="bg-[#1a2942] border-[#2a3f5f]">
+              <DropdownMenuItem 
+                onClick={exportToExcel}
+                className="text-white hover:bg-emerald-900/30 cursor-pointer"
+              >
+                <FileSpreadsheet className="w-4 h-4 mr-2 text-emerald-400" />
+                Export to Excel
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={exportToPDF}
+                className="text-white hover:bg-blue-900/30 cursor-pointer"
+              >
+                <FileText className="w-4 h-4 mr-2 text-blue-400" />
+                Export to PDF
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 
