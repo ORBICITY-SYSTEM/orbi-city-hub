@@ -4,6 +4,7 @@ import { lazy, Suspense } from "react";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
+import { DemoModeProvider } from "./contexts/DemoModeContext";
 import ModularLayout from "./components/ModularLayout";
 import { UniversalChatPopup } from "./components/UniversalChatPopup";
 
@@ -55,6 +56,14 @@ const WhatsAppTesting = lazy(() => import("./pages/Testing"));
 const WhatsAppResources = lazy(() => import("./pages/Resources"));
 const WhatsAppDeployment = lazy(() => import("./pages/DeploymentWizard"));
 const WhatsAppQuickStart = lazy(() => import("./pages/QuickStart"));
+
+// AI Agent Module - Lazy
+const MirrorEffectAgent = lazy(() => import("./pages/ai/MirrorEffectAgent"));
+
+// System Pages - Lazy
+const ActivityLogPage = lazy(() => import("./pages/system/ActivityLogPage"));
+const AnalyticsDashboardPage = lazy(() => import("./pages/system/AnalyticsDashboardPage"));
+const WhiteLabelSettingsPage = lazy(() => import("./pages/system/WhiteLabelSettingsPage"));
 
 // Loading fallback component
 const LoadingFallback = () => (
@@ -116,6 +125,14 @@ function RouterContent() {
         <Route path="/logistics" component={LogisticsDashboard} />
         <Route path="/logistics/housekeeping" component={Housekeeping} />
 
+        {/* AI Agent Module */}
+        <Route path="/ai-agent" component={MirrorEffectAgent} />
+
+        {/* System Pages */}
+        <Route path="/system/activity-log" component={ActivityLogPage} />
+        <Route path="/system/analytics" component={AnalyticsDashboardPage} />
+        <Route path="/system/white-label" component={WhiteLabelSettingsPage} />
+
         {/* WhatsApp Bot Module */}
         <Route path="/whatsapp" component={WhatsAppQuickStart} />
         <Route path="/whatsapp/quick-start" component={WhatsAppQuickStart} />
@@ -138,11 +155,13 @@ function App() {
   return (
     <ErrorBoundary>
       <ThemeProvider defaultTheme="dark">
-        <TooltipProvider>
-          <Toaster />
-          <Router />
-          <UniversalChatPopup />
-        </TooltipProvider>
+        <DemoModeProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Router />
+            <UniversalChatPopup />
+          </TooltipProvider>
+        </DemoModeProvider>
       </ThemeProvider>
     </ErrorBoundary>
   );
