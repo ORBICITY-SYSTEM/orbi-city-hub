@@ -5,8 +5,10 @@ import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { DemoModeProvider } from "./contexts/DemoModeContext";
+import { RoleProvider } from "./contexts/RoleContext";
 import ModularLayout from "./components/ModularLayout";
 import { UniversalChatPopup } from "./components/UniversalChatPopup";
+import { PageLoadingSkeleton } from "./components/LoadingSkeleton";
 
 // Only Home is eagerly loaded for fast initial render
 import Home from "./pages/Home";
@@ -64,20 +66,11 @@ const MirrorEffectAgent = lazy(() => import("./pages/ai/MirrorEffectAgent"));
 const ActivityLogPage = lazy(() => import("./pages/system/ActivityLogPage"));
 const AnalyticsDashboardPage = lazy(() => import("./pages/system/AnalyticsDashboardPage"));
 const WhiteLabelSettingsPage = lazy(() => import("./pages/system/WhiteLabelSettingsPage"));
-
-// Loading fallback component
-const LoadingFallback = () => (
-  <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-[#0a2f1f] to-[#0f4d35]">
-    <div className="text-center">
-      <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-green-400 mx-auto mb-4"></div>
-      <p className="text-green-200 text-lg font-medium">Loading...</p>
-    </div>
-  </div>
-);
+const UserManagementPage = lazy(() => import("./pages/system/UserManagementPage"));
 
 function Router() {
   return (
-    <Suspense fallback={<LoadingFallback />}>
+    <Suspense fallback={<PageLoadingSkeleton />}>
       <RouterContent />
     </Suspense>
   );
@@ -132,6 +125,7 @@ function RouterContent() {
         <Route path="/system/activity-log" component={ActivityLogPage} />
         <Route path="/system/analytics" component={AnalyticsDashboardPage} />
         <Route path="/system/white-label" component={WhiteLabelSettingsPage} />
+        <Route path="/system/users" component={UserManagementPage} />
 
         {/* WhatsApp Bot Module */}
         <Route path="/whatsapp" component={WhatsAppQuickStart} />
@@ -155,13 +149,15 @@ function App() {
   return (
     <ErrorBoundary>
       <ThemeProvider defaultTheme="dark">
-        <DemoModeProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Router />
-            <UniversalChatPopup />
-          </TooltipProvider>
-        </DemoModeProvider>
+        <RoleProvider>
+          <DemoModeProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Router />
+              <UniversalChatPopup />
+            </TooltipProvider>
+          </DemoModeProvider>
+        </RoleProvider>
       </ThemeProvider>
     </ErrorBoundary>
   );
