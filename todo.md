@@ -88,3 +88,11 @@
 - [x] Import real booking data from all channels
 - [x] Update OTA Dashboard with real statistics
 - [x] Display channel performance metrics
+
+## Individual Bookings Table
+- [x] Create ota_bookings database table with guest details
+- [x] Import individual booking records from Excel files
+- [x] Build detailed bookings table UI with filters
+- [x] Add guest name, check-in/out dates, booking status columns
+- [x] Implement sorting and pagination
+- [x] Add search functionality

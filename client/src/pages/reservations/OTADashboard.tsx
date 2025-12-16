@@ -3,7 +3,10 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { RefreshCw, TrendingUp, Calendar, Euro, Building2, Activity, BarChart3 } from "lucide-react";
+import { RefreshCw, TrendingUp, Calendar, Euro, Building2, Activity, BarChart3, Search, Filter, ChevronLeft, ChevronRight, User, MapPin, Clock } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { trpc } from "@/lib/trpc";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
@@ -15,6 +18,17 @@ const OTADashboard = () => {
   // Fetch OTA channel data from database
   const { data: channels = [], isLoading: channelsLoading, refetch: refetchChannels } = trpc.ota.getChannels.useQuery();
   const { data: totals, isLoading: totalsLoading } = trpc.ota.getTotals.useQuery();
+  const [bookingsPage, setBookingsPage] = useState(1);
+  const [bookingsSearch, setBookingsSearch] = useState("");
+  const [bookingsChannel, setBookingsChannel] = useState("all");
+  const [bookingsStatus, setBookingsStatus] = useState("all");
+  const { data: bookingsData, isLoading: bookingsLoading } = trpc.ota.getBookings.useQuery({
+    page: bookingsPage,
+    limit: 15,
+    search: bookingsSearch,
+    channel: bookingsChannel === "all" ? undefined : bookingsChannel,
+    status: bookingsStatus === "all" ? undefined : bookingsStatus
+  });
 
   const handleSync = async () => {
     setSyncing(true);
@@ -299,6 +313,146 @@ const OTADashboard = () => {
                 </tfoot>
               </table>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Individual Bookings Table */}
+        <Card className="border-cyan-500/30 bg-slate-900/50">
+          <CardHeader>
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <User className="h-5 w-5 text-cyan-400" />
+                  Recent Bookings
+                </CardTitle>
+                <CardDescription>Individual booking details with guest information</CardDescription>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search guest, booking #..."
+                    value={bookingsSearch}
+                    onChange={(e) => { setBookingsSearch(e.target.value); setBookingsPage(1); }}
+                    className="pl-9 w-[200px] bg-slate-800 border-slate-700"
+                  />
+                </div>
+                <Select value={bookingsChannel} onValueChange={(v) => { setBookingsChannel(v); setBookingsPage(1); }}>
+                  <SelectTrigger className="w-[140px] bg-slate-800 border-slate-700">
+                    <SelectValue placeholder="Channel" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Channels</SelectItem>
+                    <SelectItem value="Booking.com">Booking.com</SelectItem>
+                    <SelectItem value="Expedia">Expedia</SelectItem>
+                    <SelectItem value="Agoda">Agoda</SelectItem>
+                    <SelectItem value="Airbnb">Airbnb</SelectItem>
+                    <SelectItem value="Ostrovok">Ostrovok</SelectItem>
+                    <SelectItem value="Sutochno">Sutochno</SelectItem>
+                    <SelectItem value="Hostelworld">Hostelworld</SelectItem>
+                    <SelectItem value="Tvil.ru">Tvil.ru</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Select value={bookingsStatus} onValueChange={(v) => { setBookingsStatus(v); setBookingsPage(1); }}>
+                  <SelectTrigger className="w-[130px] bg-slate-800 border-slate-700">
+                    <SelectValue placeholder="Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Status</SelectItem>
+                    <SelectItem value="confirmed">Confirmed</SelectItem>
+                    <SelectItem value="completed">Completed</SelectItem>
+                    <SelectItem value="cancelled">Cancelled</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {bookingsLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <RefreshCw className="h-6 w-6 animate-spin text-cyan-400" />
+              </div>
+            ) : (
+              <>
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="border-cyan-500/30">
+                        <TableHead className="text-muted-foreground">Booking #</TableHead>
+                        <TableHead className="text-muted-foreground">Guest</TableHead>
+                        <TableHead className="text-muted-foreground">Room</TableHead>
+                        <TableHead className="text-muted-foreground">Channel</TableHead>
+                        <TableHead className="text-muted-foreground">Check-in</TableHead>
+                        <TableHead className="text-muted-foreground">Check-out</TableHead>
+                        <TableHead className="text-muted-foreground">Nights</TableHead>
+                        <TableHead className="text-right text-muted-foreground">Amount</TableHead>
+                        <TableHead className="text-muted-foreground">Status</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {(bookingsData?.bookings || []).map((booking: any) => (
+                        <TableRow key={booking.id} className="border-slate-700/50 hover:bg-slate-800/50">
+                          <TableCell className="font-mono text-cyan-400">{booking.booking_number}</TableCell>
+                          <TableCell className="font-medium text-white">{booking.guest_name}</TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-1">
+                              <MapPin className="h-3 w-3 text-muted-foreground" />
+                              {booking.room_number}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="outline" className="border-cyan-500/50">{booking.channel}</Badge>
+                          </TableCell>
+                          <TableCell>{new Date(booking.check_in).toLocaleDateString()}</TableCell>
+                          <TableCell>{new Date(booking.check_out).toLocaleDateString()}</TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-1">
+                              <Clock className="h-3 w-3 text-muted-foreground" />
+                              {booking.nights}
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-right font-semibold text-cyan-400">€{Number(booking.amount).toLocaleString()}</TableCell>
+                          <TableCell>
+                            <Badge className={booking.status === 'completed' ? 'bg-green-600' : booking.status === 'confirmed' ? 'bg-blue-600' : 'bg-red-600'}>
+                              {booking.status}
+                            </Badge>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+                {/* Pagination */}
+                <div className="flex items-center justify-between mt-4 pt-4 border-t border-slate-700">
+                  <p className="text-sm text-muted-foreground">
+                    Showing {((bookingsPage - 1) * 15) + 1} - {Math.min(bookingsPage * 15, bookingsData?.total || 0)} of {bookingsData?.total || 0} bookings
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setBookingsPage(p => Math.max(1, p - 1))}
+                      disabled={bookingsPage === 1}
+                      className="border-slate-700"
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                    </Button>
+                    <span className="text-sm px-2">
+                      Page {bookingsPage} of {bookingsData?.totalPages || 1}
+                    </span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setBookingsPage(p => Math.min(bookingsData?.totalPages || 1, p + 1))}
+                      disabled={bookingsPage >= (bookingsData?.totalPages || 1)}
+                      className="border-slate-700"
+                    >
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              </>
+            )}
           </CardContent>
         </Card>
       </div>
