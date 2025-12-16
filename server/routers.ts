@@ -38,6 +38,10 @@ import { butlerRouter } from "./butlerRouter";
 import { aiAnalyzerRouter } from "./aiAnalyzerRouter";
 import { realFinanceRouter } from "./realFinanceRouter";
 import { n8nWebhookRouter } from "./routers/n8nWebhook";
+import { activityLogRouter } from "./routers/activityLog";
+import { notificationsRouter } from "./routers/notificationsRouter";
+import { analyticsRouter } from "./routers/analyticsRouter";
+import { whitelabelRouter } from "./routers/whitelabelRouter";
 
 export const appRouter = router({
   realFinance: realFinanceRouter,
@@ -71,6 +75,10 @@ export const appRouter = router({
   gmailSync: gmailSyncRouter,
   emailCategorization: emailCategorizationRouter,
   n8nWebhook: n8nWebhookRouter,
+  activityLog: activityLogRouter,
+  notifications: notificationsRouter,
+  analytics: analyticsRouter,
+  whitelabel: whitelabelRouter,
   system: systemRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),

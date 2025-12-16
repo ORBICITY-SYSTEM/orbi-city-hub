@@ -501,3 +501,89 @@ export const maintenanceSchedules = mysqlTable("maintenanceSchedules", {
 
 export type MaintenanceSchedule = typeof maintenanceSchedules.$inferSelect;
 export type InsertMaintenanceSchedule = typeof maintenanceSchedules.$inferInsert;
+
+
+/**
+ * Activity Logs table for audit trail
+ * Tracks all user and AI actions with rollback capability
+ */
+export const activityLogs = mysqlTable("activityLogs", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId"),
+  actionType: varchar("actionType", { length: 64 }).notNull(),
+  targetEntity: varchar("targetEntity", { length: 64 }),
+  targetId: varchar("targetId", { length: 128 }),
+  oldValue: json("oldValue"),
+  newValue: json("newValue"),
+  ipAddress: varchar("ipAddress", { length: 45 }),
+  userAgent: text("userAgent"),
+  module: varchar("module", { length: 64 }),
+  isRollbackable: boolean("isRollbackable").default(true),
+  rolledBackAt: timestamp("rolledBackAt"),
+  rolledBackBy: int("rolledBackBy"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type ActivityLog = typeof activityLogs.$inferSelect;
+export type InsertActivityLog = typeof activityLogs.$inferInsert;
+
+/**
+ * Notifications table for in-app notifications
+ */
+export const notifications = mysqlTable("notifications", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId"),
+  type: mysqlEnum("type", ["info", "success", "warning", "error", "approval"]).default("info").notNull(),
+  title: varchar("title", { length: 255 }).notNull(),
+  message: text("message"),
+  actionUrl: varchar("actionUrl", { length: 512 }),
+  actionLabel: varchar("actionLabel", { length: 64 }),
+  isRead: boolean("isRead").default(false),
+  readAt: timestamp("readAt"),
+  emailSent: boolean("emailSent").default(false),
+  whatsappSent: boolean("whatsappSent").default(false),
+  priority: mysqlEnum("priority", ["low", "normal", "high", "urgent"]).default("normal").notNull(),
+  expiresAt: timestamp("expiresAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type Notification = typeof notifications.$inferSelect;
+export type InsertNotification = typeof notifications.$inferInsert;
+
+/**
+ * White-label settings table
+ */
+export const whitelabelSettings = mysqlTable("whitelabelSettings", {
+  id: int("id").autoincrement().primaryKey(),
+  companyName: varchar("companyName", { length: 255 }).default("ORBI City Hub"),
+  logoUrl: text("logoUrl"),
+  faviconUrl: text("faviconUrl"),
+  primaryColor: varchar("primaryColor", { length: 32 }).default("#10b981"),
+  secondaryColor: varchar("secondaryColor", { length: 32 }).default("#1e293b"),
+  accentColor: varchar("accentColor", { length: 32 }).default("#3b82f6"),
+  customCss: text("customCss"),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type WhitelabelSetting = typeof whitelabelSettings.$inferSelect;
+export type InsertWhitelabelSetting = typeof whitelabelSettings.$inferInsert;
+
+/**
+ * AI Task Analytics table
+ */
+export const aiTaskAnalytics = mysqlTable("aiTaskAnalytics", {
+  id: int("id").autoincrement().primaryKey(),
+  taskType: varchar("taskType", { length: 64 }).notNull(),
+  status: mysqlEnum("status", ["pending", "approved", "rejected", "completed", "failed"]).default("pending").notNull(),
+  userId: int("userId"),
+  approvedBy: int("approvedBy"),
+  approvedAt: timestamp("approvedAt"),
+  completedAt: timestamp("completedAt"),
+  executionTimeMs: int("executionTimeMs"),
+  errorMessage: text("errorMessage"),
+  metadata: json("metadata"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type AiTaskAnalytic = typeof aiTaskAnalytics.$inferSelect;
+export type InsertAiTaskAnalytic = typeof aiTaskAnalytics.$inferInsert;
