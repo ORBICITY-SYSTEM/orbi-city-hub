@@ -96,3 +96,8 @@
 - [x] Add guest name, check-in/out dates, booking status columns
 - [x] Implement sorting and pagination
 - [x] Add search functionality
+
+## Export Bookings to Excel
+- [x] Add Export to Excel button to bookings table
+- [x] Implement filter-aware export (respects channel and status filters)
+- [x] Include all booking details in export

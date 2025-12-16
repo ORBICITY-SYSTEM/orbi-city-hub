@@ -3,7 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { RefreshCw, TrendingUp, Calendar, Euro, Building2, Activity, BarChart3, Search, Filter, ChevronLeft, ChevronRight, User, MapPin, Clock } from "lucide-react";
+import { RefreshCw, TrendingUp, Calendar, Euro, Building2, Activity, BarChart3, Search, Filter, ChevronLeft, ChevronRight, User, MapPin, Clock, Download } from "lucide-react";
+import * as XLSX from "xlsx";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -328,6 +329,33 @@ const OTADashboard = () => {
                 <CardDescription>Individual booking details with guest information</CardDescription>
               </div>
               <div className="flex flex-wrap gap-2">
+                <Button
+                  onClick={() => {
+                    const dataToExport = (bookingsData?.bookings || []).map((b: any) => ({
+                      'Booking #': b.booking_number,
+                      'Guest Name': b.guest_name,
+                      'Room': b.room_number,
+                      'Channel': b.channel,
+                      'Check-in': b.check_in,
+                      'Check-out': b.check_out,
+                      'Nights': b.nights,
+                      'Amount (€)': b.amount,
+                      'Status': b.status
+                    }));
+                    const ws = XLSX.utils.json_to_sheet(dataToExport);
+                    const wb = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(wb, ws, 'Bookings');
+                    const filterInfo = `${bookingsChannel !== 'all' ? bookingsChannel : 'All'}_${bookingsStatus !== 'all' ? bookingsStatus : 'All'}`;
+                    XLSX.writeFile(wb, `OTA_Bookings_${filterInfo}_${new Date().toISOString().split('T')[0]}.xlsx`);
+                    toast.success('ექსპორტი დასრულდა', { description: `${dataToExport.length} ჯავშანი ექსპორტირებულია` });
+                  }}
+                  variant="outline"
+                  size="sm"
+                  className="gap-2 border-cyan-500/50 hover:bg-cyan-500/10"
+                >
+                  <Download className="h-4 w-4" />
+                  Export Excel
+                </Button>
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
