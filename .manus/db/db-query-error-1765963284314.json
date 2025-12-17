@@ -1,0 +1,8 @@
+{
+  "query": "SELECT channel, COUNT(*) as bookings, SUM(total_amount) as total_revenue, AVG(total_amount) as avg_booking FROM ota_bookings GROUP BY channel ORDER BY total_revenue DESC LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user c2qSkVB4gKtEmor.991468648419 --database 4ExKc24KNHdr4pKbTUzsoU --execute SELECT channel, COUNT(*) as bookings, SUM(total_amount) as total_revenue, AVG(total_amount) as avg_booking FROM ota_bookings GROUP BY channel ORDER BY total_revenue DESC LIMIT 10;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'total_amount' in 'group statement'"
+  ]
+}

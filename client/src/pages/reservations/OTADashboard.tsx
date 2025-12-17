@@ -3,13 +3,16 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { RefreshCw, TrendingUp, TrendingDown, Calendar, DollarSign, Building2, Activity, BarChart3, Search, Filter, ChevronLeft, ChevronRight, User, MapPin, Clock, Download, Brain, Sparkles, ArrowUpRight, ArrowDownRight, Minus } from "lucide-react";
+import { RefreshCw, TrendingUp, TrendingDown, Calendar, Building2, Activity, BarChart3, Search, Filter, ChevronLeft, ChevronRight, User, MapPin, Clock, Download, Brain, Sparkles, ArrowUpRight, ArrowDownRight, Minus, Banknote, X, Check, ChevronsUpDown } from "lucide-react";
 import * as XLSX from "xlsx";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { trpc } from "@/lib/trpc";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, Legend, AreaChart, Area, ComposedChart } from "recharts";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { cn } from "@/lib/utils";
 
 // Channel first booking dates and colors
 const channelInfo: Record<string, { firstDate: string; color: string }> = {
@@ -39,17 +42,18 @@ const MONTHS = [
   { value: '2025-12', label: 'დეკემბერი 2025' },
 ];
 
-// EUR to GEL conversion rate (approximate)
-const EUR_TO_GEL = 2.95;
+// Data is already in GEL - NO CONVERSION NEEDED
+// Excel files contain GEL amounts directly
 
 export default function OTADashboard() {
-  const [selectedMonths, setSelectedMonths] = useState<string[]>([]);
+  const [selectedMonth, setSelectedMonth] = useState<string>('all');
   const [syncing, setSyncing] = useState(false);
   const [bookingsSearch, setBookingsSearch] = useState('');
   const [bookingsChannel, setBookingsChannel] = useState('all');
   const [bookingsStatus, setBookingsStatus] = useState('all');
   const [bookingsPage, setBookingsPage] = useState(1);
   const [activeTab, setActiveTab] = useState<'overview' | 'monthly' | 'channels' | 'ai'>('overview');
+  const [monthFilterOpen, setMonthFilterOpen] = useState(false);
 
   // Fetch OTA data
   const { data: channelsData, isLoading: channelsLoading, refetch } = trpc.ota.getChannels.useQuery();
@@ -62,46 +66,42 @@ export default function OTADashboard() {
     limit: 15
   });
 
-  // Convert EUR to GEL
-  const toGEL = (eur: number) => eur * EUR_TO_GEL;
-
-  // Filter data by selected months
+  // Filter data by selected month (single selection)
   const filteredMonthlyData = useMemo(() => {
     if (!monthlyData?.stats) return [];
-    if (selectedMonths.length === 0) return monthlyData.stats;
-    return monthlyData.stats.filter((s: any) => selectedMonths.includes(s.month));
-  }, [monthlyData, selectedMonths]);
+    if (selectedMonth === 'all') return monthlyData.stats;
+    return monthlyData.stats.filter((s: any) => s.month === selectedMonth);
+  }, [monthlyData, selectedMonth]);
 
-  // Calculate totals based on filtered data
+  // Calculate totals based on filtered data - NO CONVERSION, data is in GEL
   const totals = useMemo(() => {
     if (filteredMonthlyData.length === 0 && channelsData?.channels) {
-      // Use all data if no filter
       const channels = channelsData.channels;
       return {
-        bookings: channels.reduce((sum: number, c: any) => sum + c.bookings, 0),
-        revenue: toGEL(channels.reduce((sum: number, c: any) => sum + c.revenue, 0)),
-        nights: channels.reduce((sum: number, c: any) => sum + c.nights, 0),
+        bookings: channels.reduce((sum: number, c: any) => sum + Number(c.bookings), 0),
+        revenue: channels.reduce((sum: number, c: any) => sum + Number(c.revenue), 0),
+        nights: channels.reduce((sum: number, c: any) => sum + Number(c.nights), 0),
         activeChannels: channels.length
       };
     }
     return {
-      bookings: filteredMonthlyData.reduce((sum: number, s: any) => sum + s.bookings, 0),
-      revenue: toGEL(filteredMonthlyData.reduce((sum: number, s: any) => sum + Number(s.revenue), 0)),
-      nights: filteredMonthlyData.reduce((sum: number, s: any) => sum + s.nights, 0),
+      bookings: filteredMonthlyData.reduce((sum: number, s: any) => sum + Number(s.bookings), 0),
+      revenue: filteredMonthlyData.reduce((sum: number, s: any) => sum + Number(s.revenue), 0),
+      nights: filteredMonthlyData.reduce((sum: number, s: any) => sum + Number(s.nights), 0),
       activeChannels: new Set(filteredMonthlyData.map((s: any) => s.channel)).size
     };
   }, [filteredMonthlyData, channelsData]);
 
-  // Chart data by channel (filtered)
+  // Chart data by channel (filtered) - NO CONVERSION
   const chartData = useMemo(() => {
     if (filteredMonthlyData.length === 0 && channelsData?.channels) {
       return channelsData.channels.map((c: any) => ({
         name: c.channel,
-        bookings: c.bookings,
-        revenue: toGEL(c.revenue),
-        nights: c.nights,
-        avgRevenue: toGEL(c.bookings > 0 ? c.revenue / c.bookings : 0),
-        avgPerNight: toGEL(c.nights > 0 ? c.revenue / c.nights : 0),
+        bookings: Number(c.bookings),
+        revenue: Number(c.revenue),
+        nights: Number(c.nights),
+        avgRevenue: c.bookings > 0 ? Number(c.revenue) / Number(c.bookings) : 0,
+        avgPerNight: c.nights > 0 ? Number(c.revenue) / Number(c.nights) : 0,
         color: channelInfo[c.channel]?.color || '#666'
       }));
     }
@@ -111,23 +111,23 @@ export default function OTADashboard() {
       if (!grouped[s.channel]) {
         grouped[s.channel] = { bookings: 0, revenue: 0, nights: 0 };
       }
-      grouped[s.channel].bookings += s.bookings;
+      grouped[s.channel].bookings += Number(s.bookings);
       grouped[s.channel].revenue += Number(s.revenue);
-      grouped[s.channel].nights += s.nights;
+      grouped[s.channel].nights += Number(s.nights);
     });
     
     return Object.entries(grouped).map(([channel, data]: [string, any]) => ({
       name: channel,
       bookings: data.bookings,
-      revenue: toGEL(data.revenue),
+      revenue: data.revenue,
       nights: data.nights,
-      avgRevenue: toGEL(data.bookings > 0 ? data.revenue / data.bookings : 0),
-      avgPerNight: toGEL(data.nights > 0 ? data.revenue / data.nights : 0),
+      avgRevenue: data.bookings > 0 ? data.revenue / data.bookings : 0,
+      avgPerNight: data.nights > 0 ? data.revenue / data.nights : 0,
       color: channelInfo[channel]?.color || '#666'
     })).sort((a, b) => b.revenue - a.revenue);
   }, [filteredMonthlyData, channelsData]);
 
-  // Monthly trend data
+  // Monthly trend data - NO CONVERSION
   const monthlyTrendData = useMemo(() => {
     if (!monthlyData?.stats) return [];
     
@@ -136,28 +136,27 @@ export default function OTADashboard() {
       if (!grouped[s.month]) {
         grouped[s.month] = { month: s.month, bookings: 0, revenue: 0, nights: 0 };
       }
-      grouped[s.month].bookings += s.bookings;
+      grouped[s.month].bookings += Number(s.bookings);
       grouped[s.month].revenue += Number(s.revenue);
-      grouped[s.month].nights += s.nights;
+      grouped[s.month].nights += Number(s.nights);
     });
     
     return Object.values(grouped)
       .map((d: any) => ({
         ...d,
-        revenue: toGEL(d.revenue),
-        avgPerNight: toGEL(d.nights > 0 ? d.revenue / d.nights : 0),
+        avgPerNight: d.nights > 0 ? d.revenue / d.nights : 0,
         label: MONTHS.find(m => m.value === d.month)?.label.split(' ')[0] || d.month
       }))
       .sort((a, b) => a.month.localeCompare(b.month));
   }, [monthlyData]);
 
-  // Channel monthly breakdown for comparison
+  // Channel monthly breakdown - NO CONVERSION
   const channelMonthlyData = useMemo(() => {
     if (!monthlyData?.stats) return [];
     return monthlyData.stats.map((s: any) => ({
       ...s,
-      revenue: toGEL(Number(s.revenue)),
-      avgPerNight: toGEL(s.nights > 0 ? Number(s.revenue) / s.nights : 0)
+      revenue: Number(s.revenue),
+      avgPerNight: s.nights > 0 ? Number(s.revenue) / Number(s.nights) : 0
     }));
   }, [monthlyData]);
 
@@ -176,7 +175,6 @@ export default function OTADashboard() {
     const daysActive = Math.floor((today.getTime() - firstDate.getTime()) / (1000 * 60 * 60 * 24));
     const monthsActive = Math.ceil(daysActive / 30);
     
-    // Calculate growth
     const sortedMonths = [...monthlyChannelData].sort((a, b) => a.month.localeCompare(b.month));
     const firstMonth = sortedMonths[0];
     const lastMonth = sortedMonths[sortedMonths.length - 1];
@@ -184,11 +182,9 @@ export default function OTADashboard() {
       ? ((lastMonth.revenue - firstMonth.revenue) / firstMonth.revenue * 100).toFixed(0)
       : 'N/A';
     
-    // Best performing month
     const bestMonth = [...monthlyChannelData].sort((a, b) => b.revenue - a.revenue)[0];
     const bestMonthLabel = MONTHS.find(m => m.value === bestMonth?.month)?.label || bestMonth?.month;
     
-    // Average metrics
     const avgBookingsPerMonth = (channelData.bookings / monthsActive).toFixed(1);
     const avgRevenuePerMonth = (channelData.revenue / monthsActive).toFixed(0);
     
@@ -226,16 +222,6 @@ export default function OTADashboard() {
     toast.success('სინქრონიზაცია დასრულდა', { description: 'ყველა OTA არხი განახლდა' });
   };
 
-  const toggleMonth = (month: string) => {
-    setSelectedMonths(prev => 
-      prev.includes(month) 
-        ? prev.filter(m => m !== month)
-        : [...prev, month]
-    );
-  };
-
-  const clearFilters = () => setSelectedMonths([]);
-
   const totalRevenue = totals.revenue;
   const avgRevenue = totals.bookings > 0 ? totals.revenue / totals.bookings : 0;
 
@@ -251,59 +237,61 @@ export default function OTADashboard() {
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-emerald-400 bg-clip-text text-transparent">
               Orbi OTA Command Center
             </h1>
             <p className="text-muted-foreground mt-1">რეალური ჯავშნების ანალიტიკა ყველა არხზე</p>
           </div>
-          <Button
-            onClick={handleSync}
+          <Button 
+            onClick={handleSync} 
             disabled={syncing}
-            className="gap-2 bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-600 hover:to-emerald-600"
+            className="bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-600 hover:to-emerald-600"
           >
-            <RefreshCw className={`h-4 w-4 ${syncing ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`h-4 w-4 mr-2 ${syncing ? 'animate-spin' : ''}`} />
             {syncing ? 'სინქრონიზაცია...' : 'სინქრონიზაცია'}
           </Button>
         </div>
 
-        {/* Month Filters */}
+        {/* Month Filter - Professional Dropdown */}
         <Card className="border-cyan-500/30 bg-slate-900/50">
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-lg flex items-center gap-2">
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
                 <Filter className="h-5 w-5 text-cyan-400" />
-                თვეების ფილტრი
-              </CardTitle>
-              {selectedMonths.length > 0 && (
-                <Button variant="ghost" size="sm" onClick={clearFilters} className="text-cyan-400">
-                  გასუფთავება ({selectedMonths.length})
+                <span className="text-sm font-medium text-slate-300">თვის ფილტრი:</span>
+              </div>
+              <Select value={selectedMonth} onValueChange={setSelectedMonth}>
+                <SelectTrigger className="w-[280px] bg-slate-800 border-slate-700 focus:border-cyan-500">
+                  <SelectValue placeholder="აირჩიეთ თვე" />
+                </SelectTrigger>
+                <SelectContent className="bg-slate-800 border-slate-700">
+                  <SelectItem value="all" className="focus:bg-cyan-500/20">
+                    <span className="flex items-center gap-2">
+                      <Calendar className="h-4 w-4" />
+                      ყველა თვე
+                    </span>
+                  </SelectItem>
+                  {MONTHS.map(month => (
+                    <SelectItem key={month.value} value={month.value} className="focus:bg-cyan-500/20">
+                      {month.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {selectedMonth !== 'all' && (
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => setSelectedMonth('all')}
+                  className="text-cyan-400 hover:text-cyan-300"
+                >
+                  <X className="h-4 w-4 mr-1" />
+                  გასუფთავება
                 </Button>
               )}
             </div>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-wrap gap-2">
-              {MONTHS.map(month => (
-                <Button
-                  key={month.value}
-                  variant={selectedMonths.includes(month.value) ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => toggleMonth(month.value)}
-                  className={selectedMonths.includes(month.value) 
-                    ? "bg-cyan-500 hover:bg-cyan-600" 
-                    : "border-slate-700 hover:border-cyan-500"}
-                >
-                  {month.label}
-                </Button>
-              ))}
-            </div>
-            {selectedMonths.length > 0 && (
-              <p className="text-sm text-muted-foreground mt-3">
-                არჩეულია: {selectedMonths.map(m => MONTHS.find(x => x.value === m)?.label).join(', ')}
-              </p>
-            )}
           </CardContent>
         </Card>
 
@@ -331,7 +319,7 @@ export default function OTADashboard() {
                   </p>
                   <p className="text-xs text-muted-foreground">საშ: ₾{avgRevenue.toFixed(0)}</p>
                 </div>
-                <DollarSign className="h-10 w-10 text-emerald-400 opacity-80" />
+                <Banknote className="h-10 w-10 text-emerald-400 opacity-80" />
               </div>
             </CardContent>
           </Card>
@@ -342,7 +330,7 @@ export default function OTADashboard() {
                 <div>
                   <p className="text-sm text-muted-foreground">სულ ღამეები</p>
                   <p className="text-3xl font-bold text-purple-400">{totals.nights.toLocaleString()}</p>
-                  <p className="text-xs text-muted-foreground">საშ: ₾{(totals.revenue / totals.nights).toFixed(0)}/ღამე</p>
+                  <p className="text-xs text-muted-foreground">საშ: ₾{totals.nights > 0 ? (totals.revenue / totals.nights).toFixed(0) : 0}/ღამე</p>
                 </div>
                 <Building2 className="h-10 w-10 text-purple-400 opacity-80" />
               </div>
@@ -364,7 +352,7 @@ export default function OTADashboard() {
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-2 border-b border-slate-700 pb-2">
+        <div className="flex gap-2 flex-wrap">
           {[
             { id: 'overview', label: 'მიმოხილვა', icon: BarChart3 },
             { id: 'monthly', label: 'თვიური ანალიზი', icon: Calendar },
@@ -373,9 +361,11 @@ export default function OTADashboard() {
           ].map(tab => (
             <Button
               key={tab.id}
-              variant={activeTab === tab.id ? "default" : "ghost"}
+              variant={activeTab === tab.id ? "default" : "outline"}
               onClick={() => setActiveTab(tab.id as any)}
-              className={activeTab === tab.id ? "bg-cyan-500" : ""}
+              className={activeTab === tab.id 
+                ? "bg-cyan-500 hover:bg-cyan-600" 
+                : "border-slate-700 hover:border-cyan-500"}
             >
               <tab.icon className="h-4 w-4 mr-2" />
               {tab.label}
@@ -383,18 +373,14 @@ export default function OTADashboard() {
           ))}
         </div>
 
-        {/* Overview Tab */}
+        {/* Tab Content */}
         {activeTab === 'overview' && (
           <div className="space-y-6">
-            {/* Charts Row */}
+            {/* Revenue by Channel */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Revenue by Channel */}
-              <Card className="border-cyan-500/30 bg-slate-900/50">
+              <Card className="border-slate-700 bg-slate-900/50">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <BarChart3 className="h-5 w-5 text-cyan-400" />
-                    შემოსავალი არხების მიხედვით
-                  </CardTitle>
+                  <CardTitle className="text-lg">შემოსავალი არხების მიხედვით</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <ResponsiveContainer width="100%" height={300}>
@@ -406,19 +392,19 @@ export default function OTADashboard() {
                         formatter={(value: number) => [`₾${value.toLocaleString('ka-GE', { maximumFractionDigits: 0 })}`, 'შემოსავალი']}
                         contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155' }}
                       />
-                      <Bar dataKey="revenue" fill="#22d3ee" radius={[0, 4, 4, 0]} />
+                      <Bar dataKey="revenue" fill="#22d3ee">
+                        {chartData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Bar>
                     </BarChart>
                   </ResponsiveContainer>
                 </CardContent>
               </Card>
 
-              {/* Revenue Distribution Pie */}
-              <Card className="border-cyan-500/30 bg-slate-900/50">
+              <Card className="border-slate-700 bg-slate-900/50">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <TrendingUp className="h-5 w-5 text-cyan-400" />
-                    შემოსავლის განაწილება
-                  </CardTitle>
+                  <CardTitle className="text-lg">შემოსავლის განაწილება</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <ResponsiveContainer width="100%" height={300}>
@@ -447,79 +433,65 @@ export default function OTADashboard() {
               </Card>
             </div>
 
-            {/* Detailed Channel Statistics */}
-            <Card className="border-cyan-500/30 bg-slate-900/50">
+            {/* Channel Statistics Table */}
+            <Card className="border-slate-700 bg-slate-900/50">
               <CardHeader>
-                <CardTitle>დეტალური არხების სტატისტიკა</CardTitle>
+                <CardTitle className="text-lg">დეტალური არხების სტატისტიკა</CardTitle>
                 <CardDescription>სრული ანალიზი ყველა OTA არხზე</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-cyan-500/30">
-                        <th className="text-left py-3 px-4 text-muted-foreground font-medium">არხი</th>
-                        <th className="text-right py-3 px-4 text-muted-foreground font-medium">ჯავშნები</th>
-                        <th className="text-right py-3 px-4 text-muted-foreground font-medium">შემოსავალი</th>
-                        <th className="text-right py-3 px-4 text-muted-foreground font-medium">ღამეები</th>
-                        <th className="text-right py-3 px-4 text-muted-foreground font-medium">საშ/ჯავშანი</th>
-                        <th className="text-right py-3 px-4 text-muted-foreground font-medium">საშ/ღამე</th>
-                        <th className="text-right py-3 px-4 text-muted-foreground font-medium">წილი</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {chartData.map((channel) => (
-                        <tr key={channel.name} className="border-b border-slate-700/50 hover:bg-slate-800/50">
-                          <td className="py-3 px-4">
-                            <div className="flex items-center gap-2">
-                              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: channel.color }} />
-                              <span className="font-medium text-white">{channel.name}</span>
-                            </div>
-                          </td>
-                          <td className="text-right py-3 px-4">{channel.bookings.toLocaleString()}</td>
-                          <td className="text-right py-3 px-4 text-emerald-400 font-semibold">
-                            ₾{channel.revenue.toLocaleString('ka-GE', { maximumFractionDigits: 0 })}
-                          </td>
-                          <td className="text-right py-3 px-4">{channel.nights.toLocaleString()}</td>
-                          <td className="text-right py-3 px-4">₾{channel.avgRevenue.toFixed(0)}</td>
-                          <td className="text-right py-3 px-4">₾{channel.avgPerNight.toFixed(0)}</td>
-                          <td className="text-right py-3 px-4">
-                            {totalRevenue > 0 ? ((channel.revenue / totalRevenue) * 100).toFixed(1) : 0}%
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                    <tfoot>
-                      <tr className="border-t-2 border-cyan-500/50 bg-slate-800/30">
-                        <td className="py-3 px-4 font-bold text-white">სულ</td>
-                        <td className="text-right py-3 px-4 font-bold">{totals.bookings.toLocaleString()}</td>
-                        <td className="text-right py-3 px-4 font-bold text-emerald-400">
-                          ₾{totalRevenue.toLocaleString('ka-GE', { maximumFractionDigits: 0 })}
-                        </td>
-                        <td className="text-right py-3 px-4 font-bold">{totals.nights.toLocaleString()}</td>
-                        <td className="text-right py-3 px-4 font-bold">₾{avgRevenue.toFixed(0)}</td>
-                        <td className="text-right py-3 px-4 font-bold">₾{(totalRevenue / totals.nights).toFixed(0)}</td>
-                        <td className="text-right py-3 px-4 font-bold">100%</td>
-                      </tr>
-                    </tfoot>
-                  </table>
-                </div>
+                <Table>
+                  <TableHeader>
+                    <TableRow className="border-slate-700">
+                      <TableHead>არხი</TableHead>
+                      <TableHead className="text-right">ჯავშნები</TableHead>
+                      <TableHead className="text-right">შემოსავალი</TableHead>
+                      <TableHead className="text-right">ღამეები</TableHead>
+                      <TableHead className="text-right">საშ/ჯავშანი</TableHead>
+                      <TableHead className="text-right">საშ/ღამე</TableHead>
+                      <TableHead className="text-right">წილი</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {chartData.map((channel) => (
+                      <TableRow key={channel.name} className="border-slate-700">
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: channel.color }} />
+                            {channel.name}
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-right">{channel.bookings}</TableCell>
+                        <TableCell className="text-right text-emerald-400">₾{channel.revenue.toLocaleString('ka-GE', { maximumFractionDigits: 0 })}</TableCell>
+                        <TableCell className="text-right">{channel.nights}</TableCell>
+                        <TableCell className="text-right">₾{channel.avgRevenue.toFixed(0)}</TableCell>
+                        <TableCell className="text-right">₾{channel.avgPerNight.toFixed(0)}</TableCell>
+                        <TableCell className="text-right">{((channel.revenue / totalRevenue) * 100).toFixed(1)}%</TableCell>
+                      </TableRow>
+                    ))}
+                    <TableRow className="border-slate-700 font-bold bg-slate-800/50">
+                      <TableCell>სულ</TableCell>
+                      <TableCell className="text-right">{totals.bookings.toLocaleString()}</TableCell>
+                      <TableCell className="text-right text-emerald-400">₾{totals.revenue.toLocaleString('ka-GE', { maximumFractionDigits: 0 })}</TableCell>
+                      <TableCell className="text-right">{totals.nights.toLocaleString()}</TableCell>
+                      <TableCell className="text-right">₾{avgRevenue.toFixed(0)}</TableCell>
+                      <TableCell className="text-right">₾{totals.nights > 0 ? (totals.revenue / totals.nights).toFixed(0) : 0}</TableCell>
+                      <TableCell className="text-right">100%</TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
               </CardContent>
             </Card>
 
-            {/* Additional Analytics Charts */}
+            {/* Additional Charts */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Average Price per Night by Channel */}
-              <Card className="border-cyan-500/30 bg-slate-900/50">
+              <Card className="border-slate-700 bg-slate-900/50">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <DollarSign className="h-5 w-5 text-emerald-400" />
-                    საშუალო ფასი ღამეში (არხების მიხედვით)
-                  </CardTitle>
+                  <CardTitle className="text-lg">საშუალო ფასი ღამეში (არხების მიხედვით)</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <ResponsiveContainer width="100%" height={250}>
-                    <BarChart data={chartData.sort((a, b) => b.avgPerNight - a.avgPerNight)}>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={chartData}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
                       <XAxis dataKey="name" stroke="#94a3b8" angle={-45} textAnchor="end" height={80} />
                       <YAxis stroke="#94a3b8" tickFormatter={(v) => `₾${v}`} />
@@ -527,30 +499,31 @@ export default function OTADashboard() {
                         formatter={(value: number) => [`₾${value.toFixed(0)}`, 'საშ/ღამე']}
                         contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155' }}
                       />
-                      <Bar dataKey="avgPerNight" fill="#10b981" radius={[4, 4, 0, 0]} />
+                      <Bar dataKey="avgPerNight" fill="#a855f7">
+                        {chartData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Bar>
                     </BarChart>
                   </ResponsiveContainer>
                 </CardContent>
               </Card>
 
-              {/* Bookings vs Revenue Comparison */}
-              <Card className="border-cyan-500/30 bg-slate-900/50">
+              <Card className="border-slate-700 bg-slate-900/50">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Activity className="h-5 w-5 text-purple-400" />
-                    ჯავშნები vs შემოსავალი
-                  </CardTitle>
+                  <CardTitle className="text-lg">ჯავშნები vs შემოსავალი</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <ResponsiveContainer width="100%" height={250}>
+                  <ResponsiveContainer width="100%" height={300}>
                     <ComposedChart data={chartData}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
                       <XAxis dataKey="name" stroke="#94a3b8" angle={-45} textAnchor="end" height={80} />
                       <YAxis yAxisId="left" stroke="#94a3b8" />
                       <YAxis yAxisId="right" orientation="right" stroke="#94a3b8" tickFormatter={(v) => `₾${(v/1000).toFixed(0)}k`} />
                       <Tooltip contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155' }} />
-                      <Bar yAxisId="left" dataKey="bookings" fill="#8b5cf6" name="ჯავშნები" radius={[4, 4, 0, 0]} />
-                      <Line yAxisId="right" type="monotone" dataKey="revenue" stroke="#22d3ee" strokeWidth={3} name="შემოსავალი" />
+                      <Legend />
+                      <Bar yAxisId="left" dataKey="bookings" name="ჯავშნები" fill="#22d3ee" />
+                      <Line yAxisId="right" type="monotone" dataKey="revenue" name="შემოსავალი" stroke="#10b981" strokeWidth={2} />
                     </ComposedChart>
                   </ResponsiveContainer>
                 </CardContent>
@@ -559,26 +532,19 @@ export default function OTADashboard() {
           </div>
         )}
 
-        {/* Monthly Tab */}
         {activeTab === 'monthly' && (
           <div className="space-y-6">
             {/* Monthly Revenue Trend */}
-            <Card className="border-cyan-500/30 bg-slate-900/50">
+            <Card className="border-slate-700 bg-slate-900/50">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <TrendingUp className="h-5 w-5 text-cyan-400" />
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5 text-emerald-400" />
                   თვიური შემოსავლის ტრენდი
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={350}>
+                <ResponsiveContainer width="100%" height={300}>
                   <AreaChart data={monthlyTrendData}>
-                    <defs>
-                      <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#22d3ee" stopOpacity={0.8}/>
-                        <stop offset="95%" stopColor="#22d3ee" stopOpacity={0}/>
-                      </linearGradient>
-                    </defs>
                     <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
                     <XAxis dataKey="label" stroke="#94a3b8" />
                     <YAxis stroke="#94a3b8" tickFormatter={(v) => `₾${(v/1000).toFixed(0)}k`} />
@@ -589,17 +555,17 @@ export default function OTADashboard() {
                       ]}
                       contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155' }}
                     />
-                    <Area type="monotone" dataKey="revenue" stroke="#22d3ee" fillOpacity={1} fill="url(#colorRevenue)" />
+                    <Area type="monotone" dataKey="revenue" stroke="#10b981" fill="#10b98133" strokeWidth={2} />
                   </AreaChart>
                 </ResponsiveContainer>
               </CardContent>
             </Card>
 
-            {/* Monthly Bookings & Nights */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card className="border-cyan-500/30 bg-slate-900/50">
+              {/* Monthly Bookings */}
+              <Card className="border-slate-700 bg-slate-900/50">
                 <CardHeader>
-                  <CardTitle>თვიური ჯავშნები</CardTitle>
+                  <CardTitle className="text-lg">თვიური ჯავშნები</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <ResponsiveContainer width="100%" height={250}>
@@ -608,15 +574,16 @@ export default function OTADashboard() {
                       <XAxis dataKey="label" stroke="#94a3b8" />
                       <YAxis stroke="#94a3b8" />
                       <Tooltip contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155' }} />
-                      <Bar dataKey="bookings" fill="#8b5cf6" name="ჯავშნები" radius={[4, 4, 0, 0]} />
+                      <Bar dataKey="bookings" fill="#a855f7" name="ჯავშნები" />
                     </BarChart>
                   </ResponsiveContainer>
                 </CardContent>
               </Card>
 
-              <Card className="border-cyan-500/30 bg-slate-900/50">
+              {/* Average Price per Night */}
+              <Card className="border-slate-700 bg-slate-900/50">
                 <CardHeader>
-                  <CardTitle>საშუალო ფასი ღამეში (თვეების მიხედვით)</CardTitle>
+                  <CardTitle className="text-lg">საშუალო ფასი ღამეში (თვეების მიხედვით)</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <ResponsiveContainer width="100%" height={250}>
@@ -628,85 +595,73 @@ export default function OTADashboard() {
                         formatter={(value: number) => [`₾${value.toFixed(0)}`, 'საშ/ღამე']}
                         contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155' }}
                       />
-                      <Line type="monotone" dataKey="avgPerNight" stroke="#10b981" strokeWidth={3} dot={{ fill: '#10b981' }} />
+                      <Line type="monotone" dataKey="avgPerNight" stroke="#22d3ee" strokeWidth={2} dot={{ fill: '#22d3ee' }} />
                     </LineChart>
                   </ResponsiveContainer>
                 </CardContent>
               </Card>
             </div>
 
-            {/* Monthly Breakdown Table */}
-            <Card className="border-cyan-500/30 bg-slate-900/50">
+            {/* Monthly Details Table */}
+            <Card className="border-slate-700 bg-slate-900/50">
               <CardHeader>
-                <CardTitle>თვიური დეტალური ცხრილი</CardTitle>
+                <CardTitle className="text-lg">თვიური დეტალური ცხრილი</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-cyan-500/30">
-                        <th className="text-left py-3 px-4 text-muted-foreground font-medium">თვე</th>
-                        <th className="text-right py-3 px-4 text-muted-foreground font-medium">ჯავშნები</th>
-                        <th className="text-right py-3 px-4 text-muted-foreground font-medium">შემოსავალი</th>
-                        <th className="text-right py-3 px-4 text-muted-foreground font-medium">ღამეები</th>
-                        <th className="text-right py-3 px-4 text-muted-foreground font-medium">საშ/ღამე</th>
-                        <th className="text-right py-3 px-4 text-muted-foreground font-medium">ცვლილება</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {monthlyTrendData.map((month, idx) => {
-                        const prevMonth = monthlyTrendData[idx - 1];
-                        const change = prevMonth ? ((month.revenue - prevMonth.revenue) / prevMonth.revenue * 100) : 0;
-                        return (
-                          <tr key={month.month} className="border-b border-slate-700/50 hover:bg-slate-800/50">
-                            <td className="py-3 px-4 font-medium text-white">
-                              {MONTHS.find(m => m.value === month.month)?.label || month.month}
-                            </td>
-                            <td className="text-right py-3 px-4">{month.bookings.toLocaleString()}</td>
-                            <td className="text-right py-3 px-4 text-emerald-400 font-semibold">
-                              ₾{month.revenue.toLocaleString('ka-GE', { maximumFractionDigits: 0 })}
-                            </td>
-                            <td className="text-right py-3 px-4">{month.nights.toLocaleString()}</td>
-                            <td className="text-right py-3 px-4">₾{month.avgPerNight.toFixed(0)}</td>
-                            <td className="text-right py-3 px-4">
-                              {idx > 0 && (
-                                <span className={`flex items-center justify-end gap-1 ${change >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-                                  {change >= 0 ? <ArrowUpRight className="h-4 w-4" /> : <ArrowDownRight className="h-4 w-4" />}
-                                  {Math.abs(change).toFixed(0)}%
-                                </span>
-                              )}
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
+                <Table>
+                  <TableHeader>
+                    <TableRow className="border-slate-700">
+                      <TableHead>თვე</TableHead>
+                      <TableHead className="text-right">ჯავშნები</TableHead>
+                      <TableHead className="text-right">შემოსავალი</TableHead>
+                      <TableHead className="text-right">ღამეები</TableHead>
+                      <TableHead className="text-right">საშ/ღამე</TableHead>
+                      <TableHead className="text-right">ცვლილება</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {monthlyTrendData.map((month, idx) => {
+                      const prevMonth = monthlyTrendData[idx - 1];
+                      const change = prevMonth ? ((month.revenue - prevMonth.revenue) / prevMonth.revenue * 100) : 0;
+                      return (
+                        <TableRow key={month.month} className="border-slate-700">
+                          <TableCell>{MONTHS.find(m => m.value === month.month)?.label || month.month}</TableCell>
+                          <TableCell className="text-right">{month.bookings}</TableCell>
+                          <TableCell className="text-right text-emerald-400">₾{month.revenue.toLocaleString('ka-GE', { maximumFractionDigits: 0 })}</TableCell>
+                          <TableCell className="text-right">{month.nights}</TableCell>
+                          <TableCell className="text-right">₾{month.avgPerNight.toFixed(0)}</TableCell>
+                          <TableCell className="text-right">
+                            {idx > 0 && (
+                              <span className={`flex items-center justify-end gap-1 ${change >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                                {change >= 0 ? <ArrowUpRight className="h-4 w-4" /> : <ArrowDownRight className="h-4 w-4" />}
+                                {Math.abs(change).toFixed(0)}%
+                              </span>
+                            )}
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
               </CardContent>
             </Card>
           </div>
         )}
 
-        {/* Channels Comparison Tab */}
         {activeTab === 'channels' && (
           <div className="space-y-6">
             {/* Channel Performance Over Time */}
-            <Card className="border-cyan-500/30 bg-slate-900/50">
+            <Card className="border-slate-700 bg-slate-900/50">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <TrendingUp className="h-5 w-5 text-cyan-400" />
-                  არხების შედარება დროში
-                </CardTitle>
+                <CardTitle className="text-lg">არხების შემოსავალი დროში</CardTitle>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={400}>
-                  <LineChart>
+                  <LineChart data={monthlyTrendData}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
                     <XAxis 
-                      dataKey="month" 
+                      dataKey="label" 
                       stroke="#94a3b8"
-                      tickFormatter={(v) => MONTHS.find(m => m.value === v)?.label.split(' ')[0] || v}
-                      allowDuplicatedCategory={false}
                     />
                     <YAxis stroke="#94a3b8" tickFormatter={(v) => `₾${(v/1000).toFixed(0)}k`} />
                     <Tooltip 
@@ -714,55 +669,27 @@ export default function OTADashboard() {
                       contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155' }}
                     />
                     <Legend />
-                    {Object.keys(channelInfo).map(channel => {
-                      const data = channelMonthlyData
-                        .filter(m => m.channel === channel)
-                        .sort((a, b) => a.month.localeCompare(b.month));
-                      if (data.length === 0) return null;
-                      return (
-                        <Line
-                          key={channel}
-                          data={data}
-                          type="monotone"
-                          dataKey="revenue"
-                          name={channel}
-                          stroke={channelInfo[channel].color}
-                          strokeWidth={2}
-                          dot={{ fill: channelInfo[channel].color }}
-                        />
-                      );
-                    })}
+                    <Line type="monotone" dataKey="revenue" name="შემოსავალი" stroke="#10b981" strokeWidth={2} />
                   </LineChart>
                 </ResponsiveContainer>
               </CardContent>
             </Card>
 
-            {/* Channel Cards Grid */}
+            {/* Channel Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {chartData.map(channel => (
-                <Card key={channel.name} className="border-slate-700 bg-slate-900/50 hover:border-cyan-500/50 transition-colors">
-                  <CardContent className="pt-4">
-                    <div className="flex items-center gap-2 mb-3">
-                      <div className="w-4 h-4 rounded-full" style={{ backgroundColor: channel.color }} />
-                      <span className="font-semibold text-white">{channel.name}</span>
+                <Card key={channel.name} className="border-slate-700 bg-slate-900/50">
+                  <CardHeader className="pb-2">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full" style={{ backgroundColor: channel.color }} />
+                      <CardTitle className="text-sm">{channel.name}</CardTitle>
                     </div>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">შემოსავალი:</span>
-                        <span className="text-emerald-400 font-semibold">₾{channel.revenue.toLocaleString('ka-GE', { maximumFractionDigits: 0 })}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">ჯავშნები:</span>
-                        <span>{channel.bookings}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">საშ/ჯავშანი:</span>
-                        <span>₾{channel.avgRevenue.toFixed(0)}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">საშ/ღამე:</span>
-                        <span>₾{channel.avgPerNight.toFixed(0)}</span>
-                      </div>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-2xl font-bold text-emerald-400">₾{channel.revenue.toLocaleString('ka-GE', { maximumFractionDigits: 0 })}</p>
+                    <div className="flex justify-between text-xs text-muted-foreground mt-2">
+                      <span>{channel.bookings} ჯავშანი</span>
+                      <span>₾{channel.avgPerNight.toFixed(0)}/ღამე</span>
                     </div>
                   </CardContent>
                 </Card>
@@ -771,18 +698,15 @@ export default function OTADashboard() {
           </div>
         )}
 
-        {/* AI Analysis Tab */}
         {activeTab === 'ai' && (
           <div className="space-y-6">
-            <Card className="border-purple-500/30 bg-gradient-to-br from-slate-900 to-purple-950/20">
+            <Card className="border-cyan-500/30 bg-slate-900/50">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Brain className="h-6 w-6 text-purple-400" />
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Sparkles className="h-5 w-5 text-cyan-400" />
                   AI ანალიზი - OTA არხების ისტორია
                 </CardTitle>
-                <CardDescription>
-                  თითოეული არხის პირველი ჯავშნიდან დღემდე დეტალური ანალიზი
-                </CardDescription>
+                <CardDescription>თითოეული არხის პირველი ჯავშნიდან დღემდე დეტალური ანალიზი</CardDescription>
               </CardHeader>
             </Card>
 
@@ -791,53 +715,47 @@ export default function OTADashboard() {
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="w-5 h-5 rounded-full" style={{ backgroundColor: analysis.color }} />
+                      <div className="w-4 h-4 rounded-full" style={{ backgroundColor: analysis.color }} />
                       <CardTitle className="text-xl">{analysis.channel}</CardTitle>
-                      <Badge variant="outline" className="ml-2">
+                      <Badge variant="outline" className="border-cyan-500/50 text-cyan-400">
                         აქტიური {analysis.daysActive} დღე
                       </Badge>
                     </div>
                     <div className="text-right">
-                      <p className="text-2xl font-bold text-emerald-400">
-                        ₾{analysis.totalRevenue.toLocaleString('ka-GE', { maximumFractionDigits: 0 })}
-                      </p>
+                      <p className="text-2xl font-bold text-emerald-400">₾{analysis.totalRevenue.toLocaleString('ka-GE', { maximumFractionDigits: 0 })}</p>
                       <p className="text-sm text-muted-foreground">სულ შემოსავალი</p>
                     </div>
                   </div>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                    <div className="bg-slate-800/50 rounded-lg p-3">
+                    <div className="bg-slate-800/50 p-3 rounded-lg">
                       <p className="text-xs text-muted-foreground">პირველი ჯავშანი</p>
-                      <p className="text-lg font-semibold text-white">{analysis.firstDate}</p>
+                      <p className="text-lg font-semibold">{analysis.firstDate}</p>
                     </div>
-                    <div className="bg-slate-800/50 rounded-lg p-3">
+                    <div className="bg-slate-800/50 p-3 rounded-lg">
                       <p className="text-xs text-muted-foreground">სულ ჯავშნები</p>
-                      <p className="text-lg font-semibold text-white">{analysis.totalBookings}</p>
+                      <p className="text-lg font-semibold">{analysis.totalBookings}</p>
                     </div>
-                    <div className="bg-slate-800/50 rounded-lg p-3">
+                    <div className="bg-slate-800/50 p-3 rounded-lg">
                       <p className="text-xs text-muted-foreground">საშ. თვეში</p>
-                      <p className="text-lg font-semibold text-cyan-400">₾{analysis.avgRevenuePerMonth}</p>
+                      <p className="text-lg font-semibold text-emerald-400">₾{analysis.avgRevenuePerMonth}</p>
                     </div>
-                    <div className="bg-slate-800/50 rounded-lg p-3">
+                    <div className="bg-slate-800/50 p-3 rounded-lg">
                       <p className="text-xs text-muted-foreground">საუკეთესო თვე</p>
-                      <p className="text-lg font-semibold text-emerald-400">{analysis.bestMonth}</p>
+                      <p className="text-lg font-semibold text-cyan-400">{analysis.bestMonth}</p>
                     </div>
                   </div>
-                  
-                  <div className="bg-gradient-to-r from-purple-900/20 to-cyan-900/20 rounded-lg p-4 border border-purple-500/20">
+                  <div className="bg-gradient-to-r from-cyan-500/10 to-emerald-500/10 p-4 rounded-lg border border-cyan-500/20">
                     <div className="flex items-start gap-2">
-                      <Sparkles className="h-5 w-5 text-purple-400 mt-0.5" />
+                      <Brain className="h-5 w-5 text-cyan-400 mt-0.5" />
                       <div>
-                        <p className="font-semibold text-purple-300 mb-1">AI ინსაითი</p>
-                        <p className="text-sm text-muted-foreground">
-                          {analysis.channel} არხი აქტიურია <strong>{analysis.daysActive}</strong> დღის განმავლობაში 
-                          ({analysis.monthsActive} თვე). საშუალოდ თვეში მოაქვს <strong>₾{analysis.avgRevenuePerMonth}</strong> და 
-                          <strong> {analysis.avgBookingsPerMonth}</strong> ჯავშანი. 
-                          საშუალო შემოსავალი ჯავშანზე: <strong>₾{analysis.avgPerBooking.toFixed(0)}</strong>, 
-                          ღამეზე: <strong>₾{analysis.avgPerNight.toFixed(0)}</strong>. 
-                          საუკეთესო თვე იყო <strong>{analysis.bestMonth}</strong> 
-                          (₾{analysis.bestMonthRevenue.toLocaleString('ka-GE', { maximumFractionDigits: 0 })}).
+                        <p className="text-sm font-medium text-cyan-400">AI ინსაითი</p>
+                        <p className="text-sm text-slate-300 mt-1">
+                          {analysis.channel} არხი აქტიურია {analysis.daysActive} დღის განმავლობაში ({analysis.monthsActive} თვე). 
+                          საშუალოდ თვეში მოაქვს ₾{analysis.avgRevenuePerMonth} და {analysis.avgBookingsPerMonth} ჯავშანი. 
+                          საშუალო შემოსავალი ჯავშანზე: ₾{analysis.avgPerBooking.toFixed(0)}, ღამეზე: ₾{analysis.avgPerNight.toFixed(0)}. 
+                          საუკეთესო თვე იყო {analysis.bestMonth}(₾{analysis.bestMonthRevenue.toLocaleString('ka-GE', { maximumFractionDigits: 0 })}).
                           {analysis.revenueGrowth !== 'N/A' && Number(analysis.revenueGrowth) > 0 && (
                             <span className="text-emerald-400"> ზრდა პირველი თვიდან: +{analysis.revenueGrowth}%</span>
                           )}
@@ -851,169 +769,170 @@ export default function OTADashboard() {
           </div>
         )}
 
-        {/* Individual Bookings Table */}
-        <Card className="border-cyan-500/30 bg-slate-900/50">
+        {/* Recent Bookings */}
+        <Card className="border-slate-700 bg-slate-900/50">
           <CardHeader>
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div className="flex items-center justify-between">
               <div>
-                <CardTitle className="flex items-center gap-2">
-                  <User className="h-5 w-5 text-cyan-400" />
-                  ბოლო ჯავშნები
-                </CardTitle>
+                <CardTitle className="text-lg">ბოლო ჯავშნები</CardTitle>
                 <CardDescription>ინდივიდუალური ჯავშნების დეტალები</CardDescription>
               </div>
-              <div className="flex flex-wrap gap-2">
-                <Button
-                  onClick={() => {
-                    const dataToExport = (bookingsData?.bookings || []).map((b: any) => ({
-                      'ჯავშნის #': b.booking_number,
-                      'სტუმარი': b.guest_name,
-                      'ოთახი': b.room_number,
-                      'არხი': b.channel,
-                      'Check-in': b.check_in,
-                      'Check-out': b.check_out,
-                      'ღამეები': b.nights,
-                      'თანხა (₾)': (b.amount * EUR_TO_GEL).toFixed(0),
-                      'სტატუსი': b.status
-                    }));
-                    const ws = XLSX.utils.json_to_sheet(dataToExport);
-                    const wb = XLSX.utils.book_new();
-                    XLSX.utils.book_append_sheet(wb, ws, 'ჯავშნები');
-                    const filterInfo = `${bookingsChannel !== 'all' ? bookingsChannel : 'ყველა'}_${bookingsStatus !== 'all' ? bookingsStatus : 'ყველა'}`;
-                    XLSX.writeFile(wb, `OTA_ჯავშნები_${filterInfo}_${new Date().toISOString().split('T')[0]}.xlsx`);
-                    toast.success('ექსპორტი დასრულდა', { description: `${dataToExport.length} ჯავშანი ექსპორტირებულია` });
-                  }}
-                  variant="outline"
-                  size="sm"
-                  className="gap-2 border-cyan-500/50 hover:bg-cyan-500/10"
-                >
-                  <Download className="h-4 w-4" />
-                  Excel ექსპორტი
-                </Button>
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="ძიება..."
-                    value={bookingsSearch}
-                    onChange={(e) => { setBookingsSearch(e.target.value); setBookingsPage(1); }}
-                    className="pl-9 w-[200px] bg-slate-800 border-slate-700"
-                  />
-                </div>
-                <Select value={bookingsChannel} onValueChange={(v) => { setBookingsChannel(v); setBookingsPage(1); }}>
-                  <SelectTrigger className="w-[140px] bg-slate-800 border-slate-700">
-                    <SelectValue placeholder="არხი" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">ყველა არხი</SelectItem>
-                    {Object.keys(channelInfo).map(ch => (
-                      <SelectItem key={ch} value={ch}>{ch}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <Select value={bookingsStatus} onValueChange={(v) => { setBookingsStatus(v); setBookingsPage(1); }}>
-                  <SelectTrigger className="w-[130px] bg-slate-800 border-slate-700">
-                    <SelectValue placeholder="სტატუსი" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">ყველა</SelectItem>
-                    <SelectItem value="confirmed">დადასტურებული</SelectItem>
-                    <SelectItem value="completed">დასრულებული</SelectItem>
-                    <SelectItem value="cancelled">გაუქმებული</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              <Button 
+                variant="outline" 
+                size="sm"
+                className="border-emerald-500/50 text-emerald-400 hover:bg-emerald-500/10"
+                onClick={() => {
+                  const dataToExport = bookingsData?.bookings || [];
+                  if (dataToExport.length === 0) {
+                    toast.error('ექსპორტისთვის მონაცემები არ არის');
+                    return;
+                  }
+                  const ws = XLSX.utils.json_to_sheet(dataToExport.map((b: any) => ({
+                    'ჯავშნის #': b.booking_number,
+                    'სტუმარი': b.guest_name,
+                    'ოთახი': b.room_number,
+                    'არხი': b.channel,
+                    'Check-in': b.check_in,
+                    'Check-out': b.check_out,
+                    'ღამეები': b.nights,
+                    'თანხა (₾)': b.amount,
+                    'სტატუსი': b.status
+                  })));
+                  const wb = XLSX.utils.book_new();
+                  XLSX.utils.book_append_sheet(wb, ws, 'ჯავშნები');
+                  const filterInfo = `${bookingsChannel !== 'all' ? bookingsChannel : 'ყველა'}_${bookingsStatus !== 'all' ? bookingsStatus : 'ყველა'}`;
+                  XLSX.writeFile(wb, `OTA_ჯავშნები_${filterInfo}_${new Date().toISOString().split('T')[0]}.xlsx`);
+                  toast.success('ექსპორტი დასრულდა', { description: `${dataToExport.length} ჯავშანი ექსპორტირებულია` });
+                }}
+              >
+                <Download className="h-4 w-4 mr-2" />
+                Excel ექსპორტი
+              </Button>
             </div>
           </CardHeader>
           <CardContent>
-            {bookingsLoading ? (
-              <div className="flex items-center justify-center py-8">
-                <RefreshCw className="h-6 w-6 animate-spin text-cyan-400" />
+            {/* Filters */}
+            <div className="flex flex-wrap gap-4 mb-4">
+              <div className="flex-1 min-w-[200px]">
+                <Input
+                  placeholder="ძებნა..."
+                  value={bookingsSearch}
+                  onChange={(e) => setBookingsSearch(e.target.value)}
+                  className="bg-slate-800 border-slate-700"
+                />
               </div>
-            ) : (
-              <>
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow className="border-cyan-500/30">
-                        <TableHead className="text-muted-foreground">ჯავშნის #</TableHead>
-                        <TableHead className="text-muted-foreground">სტუმარი</TableHead>
-                        <TableHead className="text-muted-foreground">ოთახი</TableHead>
-                        <TableHead className="text-muted-foreground">არხი</TableHead>
-                        <TableHead className="text-muted-foreground">Check-in</TableHead>
-                        <TableHead className="text-muted-foreground">Check-out</TableHead>
-                        <TableHead className="text-muted-foreground">ღამეები</TableHead>
-                        <TableHead className="text-right text-muted-foreground">თანხა</TableHead>
-                        <TableHead className="text-muted-foreground">სტატუსი</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {(bookingsData?.bookings || []).map((booking: any) => (
-                        <TableRow key={booking.id} className="border-slate-700/50 hover:bg-slate-800/50">
-                          <TableCell className="font-mono text-cyan-400">{booking.booking_number}</TableCell>
-                          <TableCell className="font-medium text-white">{booking.guest_name}</TableCell>
-                          <TableCell>
-                            <div className="flex items-center gap-1">
-                              <MapPin className="h-3 w-3 text-muted-foreground" />
-                              {booking.room_number}
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex items-center gap-2">
-                              <div 
-                                className="w-2 h-2 rounded-full" 
-                                style={{ backgroundColor: channelInfo[booking.channel]?.color || '#666' }}
-                              />
-                              {booking.channel}
-                            </div>
-                          </TableCell>
-                          <TableCell>{booking.check_in}</TableCell>
-                          <TableCell>{booking.check_out}</TableCell>
-                          <TableCell>{booking.nights}</TableCell>
-                          <TableCell className="text-right text-emerald-400 font-semibold">
-                            ₾{(booking.amount * EUR_TO_GEL).toLocaleString('ka-GE', { maximumFractionDigits: 0 })}
-                          </TableCell>
-                          <TableCell>
-                            <Badge variant={
-                              booking.status === 'confirmed' ? 'default' :
-                              booking.status === 'completed' ? 'secondary' : 'destructive'
-                            }>
-                              {booking.status === 'confirmed' ? 'დადასტურებული' :
-                               booking.status === 'completed' ? 'დასრულებული' : 'გაუქმებული'}
-                            </Badge>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
+              <Select value={bookingsChannel} onValueChange={setBookingsChannel}>
+                <SelectTrigger className="w-[180px] bg-slate-800 border-slate-700">
+                  <SelectValue placeholder="არხი" />
+                </SelectTrigger>
+                <SelectContent className="bg-slate-800 border-slate-700">
+                  <SelectItem value="all">ყველა არხი</SelectItem>
+                  {chartData.map(c => (
+                    <SelectItem key={c.name} value={c.name}>{c.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select value={bookingsStatus} onValueChange={setBookingsStatus}>
+                <SelectTrigger className="w-[180px] bg-slate-800 border-slate-700">
+                  <SelectValue placeholder="სტატუსი" />
+                </SelectTrigger>
+                <SelectContent className="bg-slate-800 border-slate-700">
+                  <SelectItem value="all">ყველა</SelectItem>
+                  <SelectItem value="confirmed">დადასტურებული</SelectItem>
+                  <SelectItem value="completed">დასრულებული</SelectItem>
+                  <SelectItem value="cancelled">გაუქმებული</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Table */}
+            <Table>
+              <TableHeader>
+                <TableRow className="border-slate-700">
+                  <TableHead>ჯავშნის #</TableHead>
+                  <TableHead>სტუმარი</TableHead>
+                  <TableHead>ოთახი</TableHead>
+                  <TableHead>არხი</TableHead>
+                  <TableHead>Check-in</TableHead>
+                  <TableHead>Check-out</TableHead>
+                  <TableHead className="text-right">ღამეები</TableHead>
+                  <TableHead className="text-right">თანხა</TableHead>
+                  <TableHead>სტატუსი</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {bookingsData?.bookings?.map((booking: any) => (
+                  <TableRow key={booking.id} className="border-slate-700">
+                    <TableCell className="font-mono text-cyan-400">{booking.booking_number}</TableCell>
+                    <TableCell>{booking.guest_name}</TableCell>
+                    <TableCell>
+                      <Badge variant="outline" className="border-slate-600">
+                        {booking.room_number}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Badge 
+                        style={{ 
+                          backgroundColor: `${channelInfo[booking.channel]?.color}20`,
+                          borderColor: channelInfo[booking.channel]?.color,
+                          color: channelInfo[booking.channel]?.color
+                        }}
+                        variant="outline"
+                      >
+                        {booking.channel}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>{booking.check_in}</TableCell>
+                    <TableCell>{booking.check_out}</TableCell>
+                    <TableCell className="text-right">{booking.nights}</TableCell>
+                    <TableCell className="text-right text-emerald-400 font-semibold">
+                      ₾{Number(booking.amount).toLocaleString('ka-GE', { maximumFractionDigits: 0 })}
+                    </TableCell>
+                    <TableCell>
+                      <Badge 
+                        variant={booking.status === 'confirmed' ? 'default' : booking.status === 'completed' ? 'secondary' : 'destructive'}
+                        className={
+                          booking.status === 'confirmed' ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/50' :
+                          booking.status === 'completed' ? 'bg-slate-500/20 text-slate-400 border-slate-500/50' :
+                          'bg-red-500/20 text-red-400 border-red-500/50'
+                        }
+                      >
+                        {booking.status === 'confirmed' ? 'დადასტურებული' : 
+                         booking.status === 'completed' ? 'დასრულებული' : 'გაუქმებული'}
+                      </Badge>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+
+            {/* Pagination */}
+            {bookingsData && bookingsData.totalPages > 1 && (
+              <div className="flex items-center justify-between mt-4">
+                <p className="text-sm text-muted-foreground">
+                  ნაჩვენებია {((bookingsPage - 1) * 15) + 1}-{Math.min(bookingsPage * 15, bookingsData.total)} / {bookingsData.total}
+                </p>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setBookingsPage(p => Math.max(1, p - 1))}
+                    disabled={bookingsPage === 1}
+                    className="border-slate-700"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setBookingsPage(p => Math.min(bookingsData.totalPages, p + 1))}
+                    disabled={bookingsPage === bookingsData.totalPages}
+                    className="border-slate-700"
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
                 </div>
-                
-                {/* Pagination */}
-                {bookingsData && bookingsData.total > 15 && (
-                  <div className="flex items-center justify-between mt-4">
-                    <p className="text-sm text-muted-foreground">
-                      ნაჩვენებია {((bookingsPage - 1) * 15) + 1}-{Math.min(bookingsPage * 15, bookingsData.total)} / {bookingsData.total}
-                    </p>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setBookingsPage(p => Math.max(1, p - 1))}
-                        disabled={bookingsPage === 1}
-                      >
-                        <ChevronLeft className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setBookingsPage(p => p + 1)}
-                        disabled={bookingsPage * 15 >= bookingsData.total}
-                      >
-                        <ChevronRight className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                )}
-              </>
+              </div>
             )}
           </CardContent>
         </Card>

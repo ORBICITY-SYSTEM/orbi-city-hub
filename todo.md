@@ -111,3 +111,11 @@
 - [x] Implement AI analysis for each OTA channel (from first booking to today)
 - [x] Add channel-specific performance insights
 - [x] Add month-over-month growth metrics
+
+## OTA Command Center Bug Fixes (Critical)
+- [x] Remove EUR to GEL conversion - Excel data is already in GEL
+- [x] Replace month filter buttons with professional dropdown select
+- [x] Fix all currency symbols to ₾ (remove any $ signs)
+- [x] Use exact amounts from Excel files without any conversion
+- [x] Fix duplicate total rows in Excel (ჯამი გვერდზე, ჯამი excluded)
+- [x] Verified totals: ₾465,177 total revenue, 1,413 bookings

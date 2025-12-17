@@ -1,0 +1,14 @@
+{
+  "query": "SELECT SUM(revenue) as grand_total, SUM(bookings) as total_bookings FROM ota_monthly_stats;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user c2qSkVB4gKtEmor.991468648419 --database 4ExKc24KNHdr4pKbTUzsoU --execute SELECT SUM(revenue) as grand_total, SUM(bookings) as total_bookings FROM ota_monthly_stats;",
+  "rows": [
+    {
+      "grand_total": "1046553.85",
+      "total_bookings": "1420"
+    }
+  ],
+  "messages": [],
+  "stdout": "grand_total\ttotal_bookings\n1046553.85\t1420\n",
+  "stderr": "",
+  "execution_time_ms": 57
+}

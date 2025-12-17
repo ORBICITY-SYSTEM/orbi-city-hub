@@ -1,0 +1,9 @@
+{
+  "query": "INSERT INTO ota_monthly_stats (channel, month, bookings, revenue, nights) VALUES \n('Ostrovok', '2025-06', 7, 1449.75, 12),\n('Ostrovok', '2025-07', 34, 16071.77, 118),\n('Ostrovok', '2025-08', 21, 14950.09, 100),\n('Ostrovok', '2025-09', 16, 7575.53, 64),\n('Ostrovok', '2025-10', 11, 1147.52, 16),\n('Ostrovok', '2025-11', 3, 913.8, 14),\n('Ostrovok', '2025-12', 3, 1487.6, 24),\n('Ostrovok', '2026-02', 1, 140.25, 1),\n('Ostrovok', '2026-03', 1, 385.56, 6),\n('Ostrovok', '2026-05', 1, 635.46, 6),\n('Ostrovok', '2026-07', 3, 3979.53, 27),\n('Ostrovok', '2026-08', 1, 4250.0, 10);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user c2qSkVB4gKtEmor.991468648419 --database 4ExKc24KNHdr4pKbTUzsoU --execute INSERT INTO ota_monthly_stats (channel, month, bookings, revenue, nights) VALUES \n('Ostrovok', '2025-06', 7, 1449.75, 12),\n('Ostrovok', '2025-07', 34, 16071.77, 118),\n('Ostrovok', '2025-08', 21, 14950.09, 100),\n('Ostrovok', '2025-09', 16, 7575.53, 64),\n('Ostrovok', '2025-10', 11, 1147.52, 16),\n('Ostrovok', '2025-11', 3, 913.8, 14),\n('Ostrovok', '2025-12', 3, 1487.6, 24),\n('Ostrovok', '2026-02', 1, 140.25, 1),\n('Ostrovok', '2026-03', 1, 385.56, 6),\n('Ostrovok', '2026-05', 1, 635.46, 6),\n('Ostrovok', '2026-07', 3, 3979.53, 27),\n('Ostrovok', '2026-08', 1, 4250.0, 10);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 58
+}
