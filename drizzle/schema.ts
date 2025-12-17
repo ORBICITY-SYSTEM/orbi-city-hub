@@ -1,4 +1,4 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, boolean, json, decimal } from "drizzle-orm/mysql-core";
+import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, boolean, json, decimal, bigint } from "drizzle-orm/mysql-core";
 
 /**
  * Core user table backing auth flow.
@@ -662,3 +662,42 @@ export const guestReviews = mysqlTable("guestReviews", {
 
 export type GuestReview = typeof guestReviews.$inferSelect;
 export type InsertGuestReview = typeof guestReviews.$inferInsert;
+
+
+/**
+ * Google Business Profile tokens storage
+ */
+export const googleBusinessTokens = mysqlTable("googleBusinessTokens", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  accessToken: text("accessToken"),
+  refreshToken: text("refreshToken"),
+  expiryDate: bigint("expiryDate", { mode: "number" }),
+  accountId: varchar("accountId", { length: 255 }),
+  locationId: varchar("locationId", { length: 255 }),
+  locationName: varchar("locationName", { length: 255 }),
+  isActive: boolean("isActive").default(true),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type GoogleBusinessToken = typeof googleBusinessTokens.$inferSelect;
+export type InsertGoogleBusinessToken = typeof googleBusinessTokens.$inferInsert;
+
+/**
+ * Review notifications table
+ */
+export const reviewNotifications = mysqlTable("reviewNotifications", {
+  id: int("id").autoincrement().primaryKey(),
+  reviewId: int("reviewId"),
+  type: mysqlEnum("type", ["new_review", "negative_review", "response_needed", "response_posted"]).notNull(),
+  title: varchar("title", { length: 255 }).notNull(),
+  message: text("message"),
+  isRead: boolean("isRead").default(false),
+  priority: mysqlEnum("priority", ["low", "normal", "high", "urgent"]).default("normal").notNull(),
+  metadata: json("metadata"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type ReviewNotification = typeof reviewNotifications.$inferSelect;
+export type InsertReviewNotification = typeof reviewNotifications.$inferInsert;

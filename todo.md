@@ -148,3 +148,14 @@
 - [x] Replace demo data with actual API responses (fallback to demo if not connected)
 - [x] Add error handling and rate limiting
 - [x] Test live review fetching
+
+## Outscraper Integration (Replacing Google OAuth)
+- [x] Remove non-working Google OAuth code
+- [x] Create Outscraper webhook endpoint `/api/trpc/reviews.receiveOutscraperWebhook`
+- [x] Parse Outscraper review data format
+- [x] Save new reviews to database
+- [x] Create notification on new review
+- [x] Create urgent notification on negative review (1-2 stars)
+- [x] Update frontend to show Outscraper connection status and webhook URL
+- [x] Test webhook endpoint - working!
+- [x] Push all changes to GitHub

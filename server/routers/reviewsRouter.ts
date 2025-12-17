@@ -1,134 +1,19 @@
 import { router, protectedProcedure, publicProcedure } from "../_core/trpc";
 import { z } from "zod";
 import { getDb } from "../db";
-import { guestReviews } from "../../drizzle/schema";
-import { eq, desc, sql, and, gte, lte, like } from "drizzle-orm";
-import { google } from 'googleapis';
-
-// Google Business Profile OAuth2 configuration
-const CLIENT_ID = process.env.GOOGLE_BUSINESS_CLIENT_ID;
-const CLIENT_SECRET = process.env.GOOGLE_BUSINESS_CLIENT_SECRET;
-
-// Store tokens in memory (in production, these should be in database)
-let googleTokens: {
-  access_token?: string;
-  refresh_token?: string;
-  expiry_date?: number;
-} | null = null;
-
-let googleAccountId: string | null = null;
-let googleLocationId: string | null = null;
-
-function getGoogleOAuth2Client() {
-  if (!CLIENT_ID || !CLIENT_SECRET) {
-    return null;
-  }
-  
-  const redirectUri = process.env.NODE_ENV === 'production' 
-    ? 'https://hub.orbicitybatumi.com/api/google-business/callback'
-    : 'http://localhost:3000/api/google-business/callback';
-  
-  return new google.auth.OAuth2(CLIENT_ID, CLIENT_SECRET, redirectUri);
-}
+import { guestReviews, notifications } from "../../drizzle/schema";
+import { eq, desc, sql, and, gte, lte } from "drizzle-orm";
 
 /**
- * Fetch reviews from Google Business Profile API
+ * Helper functions for review processing
  */
-async function fetchGoogleBusinessReviews(): Promise<Array<{
-  source: 'google';
-  externalId: string;
-  reviewerName: string;
-  rating: number;
-  content: string;
-  language: string;
-  sentiment: 'positive' | 'neutral' | 'negative';
-  topics: string[];
-  reviewDate: Date;
-  hasReply: boolean;
-  replyContent?: string;
-  replyDate?: Date;
-}> | null> {
-  const client = getGoogleOAuth2Client();
-  
-  if (!client || !googleTokens?.refresh_token) {
-    console.log('[GoogleBusiness] Not authenticated, using demo data');
-    return null;
-  }
-  
-  if (!googleAccountId || !googleLocationId) {
-    console.log('[GoogleBusiness] No location selected, using demo data');
-    return null;
-  }
-  
-  client.setCredentials(googleTokens);
-  
-  try {
-    const accessToken = await client.getAccessToken();
-    
-    const url = `https://mybusiness.googleapis.com/v4/${googleAccountId}/${googleLocationId}/reviews?pageSize=100`;
-    
-    const response = await fetch(url, {
-      headers: {
-        'Authorization': `Bearer ${accessToken.token}`,
-      },
-    });
-    
-    if (!response.ok) {
-      const error = await response.text();
-      console.error('[GoogleBusiness] API error:', error);
-      return null;
-    }
-    
-    const data = await response.json();
-    
-    if (!data.reviews || data.reviews.length === 0) {
-      console.log('[GoogleBusiness] No reviews found');
-      return null;
-    }
-    
-    // Transform Google API response to our format
-    return data.reviews.map((review: any) => {
-      const rating = convertStarRating(review.starRating);
-      const sentiment = rating >= 4 ? 'positive' : rating >= 3 ? 'neutral' : 'negative';
-      const topics = extractTopics(review.comment || '');
-      
-      return {
-        source: 'google' as const,
-        externalId: `google_${review.reviewId || review.name?.split('/').pop()}`,
-        reviewerName: review.reviewer?.displayName || 'Anonymous',
-        rating,
-        content: review.comment || '',
-        language: detectLanguage(review.comment || ''),
-        sentiment,
-        topics,
-        reviewDate: new Date(review.createTime),
-        hasReply: !!review.reviewReply,
-        replyContent: review.reviewReply?.comment,
-        replyDate: review.reviewReply?.updateTime ? new Date(review.reviewReply.updateTime) : undefined,
-      };
-    });
-  } catch (error) {
-    console.error('[GoogleBusiness] Failed to fetch reviews:', error);
-    return null;
-  }
-}
-
-function convertStarRating(rating: string): number {
-  const map: Record<string, number> = {
-    'ONE': 1,
-    'TWO': 2,
-    'THREE': 3,
-    'FOUR': 4,
-    'FIVE': 5,
-  };
-  return map[rating] || parseInt(rating) || 0;
-}
-
 function detectLanguage(text: string): string {
-  // Simple language detection based on character sets
   if (/[\u10A0-\u10FF]/.test(text)) return 'ka'; // Georgian
   if (/[\u0400-\u04FF]/.test(text)) return 'ru'; // Cyrillic (Russian)
   if (/[\u00C0-\u017F]/.test(text) && /ş|ğ|ı|ö|ü|ç/i.test(text)) return 'tr'; // Turkish
+  if (/[\u3040-\u30FF\u4E00-\u9FAF]/.test(text)) return 'ja'; // Japanese
+  if (/[\uAC00-\uD7AF]/.test(text)) return 'ko'; // Korean
+  if (/[\u0600-\u06FF]/.test(text)) return 'ar'; // Arabic
   return 'en';
 }
 
@@ -137,15 +22,15 @@ function extractTopics(text: string): string[] {
   const lowerText = text.toLowerCase();
   
   const topicKeywords: Record<string, string[]> = {
-    'cleanliness': ['clean', 'чист', 'temiz', 'სუფთა'],
-    'service': ['service', 'staff', 'персонал', 'сервис', 'hizmet', 'მომსახურება'],
-    'location': ['location', 'расположен', 'konum', 'მდებარეობა'],
-    'view': ['view', 'вид', 'manzara', 'ხედი', 'море', 'sea', 'deniz'],
-    'value': ['price', 'value', 'цена', 'fiyat', 'ucuz', 'ფასი'],
-    'wifi': ['wifi', 'internet', 'интернет'],
-    'noise': ['noise', 'noisy', 'шум', 'gürültü'],
-    'comfort': ['comfort', 'комфорт', 'rahat', 'კომფორტი'],
-    'breakfast': ['breakfast', 'завтрак', 'kahvaltı'],
+    'cleanliness': ['clean', 'чист', 'temiz', 'სუფთა', 'sauber', 'propre'],
+    'service': ['service', 'staff', 'персонал', 'сервис', 'hizmet', 'მომსახურება', 'personal'],
+    'location': ['location', 'расположен', 'konum', 'მდებარეობა', 'lage', 'ubicación'],
+    'view': ['view', 'вид', 'manzara', 'ხედი', 'море', 'sea', 'deniz', 'aussicht', 'vista'],
+    'value': ['price', 'value', 'цена', 'fiyat', 'ucuz', 'ფასი', 'preis', 'precio'],
+    'wifi': ['wifi', 'internet', 'интернет', 'wi-fi'],
+    'noise': ['noise', 'noisy', 'шум', 'gürültü', 'laut', 'ruido'],
+    'comfort': ['comfort', 'комфорт', 'rahat', 'კომფორტი', 'bequem', 'cómodo'],
+    'breakfast': ['breakfast', 'завтрак', 'kahvaltı', 'frühstück', 'desayuno'],
   };
   
   for (const [topic, keywords] of Object.entries(topicKeywords)) {
@@ -157,11 +42,151 @@ function extractTopics(text: string): string[] {
   return topics.length > 0 ? topics : ['general'];
 }
 
+function determineSentiment(rating: number): 'positive' | 'neutral' | 'negative' {
+  if (rating >= 4) return 'positive';
+  if (rating >= 3) return 'neutral';
+  return 'negative';
+}
+
 /**
  * Reviews Router - Comprehensive review management API
- * Handles reviews from all platforms: Google, Booking, Airbnb, etc.
+ * Handles reviews from Outscraper webhook and all platforms
  */
 export const reviewsRouter = router({
+  /**
+   * Outscraper Webhook - Receives reviews from Outscraper
+   * This is a PUBLIC endpoint for webhook access
+   */
+  receiveOutscraperWebhook: publicProcedure
+    .input(z.object({
+      // Outscraper sends reviews in this format
+      reviews: z.array(z.object({
+        author_title: z.string().optional(),
+        review_rating: z.number().optional(),
+        review_text: z.string().optional(),
+        review_datetime_utc: z.string().optional(),
+        review_id: z.string().optional(),
+        owner_answer: z.string().optional(),
+        owner_answer_timestamp_datetime_utc: z.string().optional(),
+        review_link: z.string().optional(),
+        author_image: z.string().optional(),
+      })).optional(),
+      // Alternative format - single review
+      author_title: z.string().optional(),
+      review_rating: z.number().optional(),
+      review_text: z.string().optional(),
+      review_datetime_utc: z.string().optional(),
+      review_id: z.string().optional(),
+      owner_answer: z.string().optional(),
+      owner_answer_timestamp_datetime_utc: z.string().optional(),
+    }))
+    .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+
+      let imported = 0;
+      let skipped = 0;
+      const newReviews: any[] = [];
+
+      // Handle both array and single review formats
+      const reviewsToProcess = input.reviews || (input.author_title ? [input] : []);
+
+      for (const review of reviewsToProcess) {
+        const externalId = `outscraper_${review.review_id || Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        
+        // Check if review already exists
+        const existing = await db
+          .select()
+          .from(guestReviews)
+          .where(eq(guestReviews.externalId, externalId))
+          .limit(1);
+
+        if (existing.length > 0) {
+          skipped++;
+          continue;
+        }
+
+        const rating = review.review_rating || 5;
+        const content = review.review_text || '';
+        const sentiment = determineSentiment(rating);
+        const topics = extractTopics(content);
+        const language = detectLanguage(content);
+
+        // Insert new review
+        const [insertedReview] = await db.insert(guestReviews).values({
+          source: 'google',
+          externalId,
+          reviewerName: review.author_title || 'Anonymous',
+          rating,
+          content,
+          language,
+          sentiment,
+          topics,
+          reviewDate: review.review_datetime_utc ? new Date(review.review_datetime_utc) : new Date(),
+          hasReply: !!review.owner_answer,
+          replyContent: review.owner_answer || null,
+          replyDate: review.owner_answer_timestamp_datetime_utc 
+            ? new Date(review.owner_answer_timestamp_datetime_utc) 
+            : null,
+        }).$returningId();
+
+        imported++;
+        newReviews.push({
+          id: insertedReview.id,
+          reviewerName: review.author_title,
+          rating,
+          sentiment,
+        });
+
+        // Create notification for new review
+        const notificationType = rating <= 2 ? 'error' : rating <= 3 ? 'warning' : 'info';
+        const notificationPriority = rating <= 2 ? 'urgent' : rating <= 3 ? 'high' : 'normal';
+        
+        await db.insert(notifications).values({
+          type: notificationType,
+          title: rating <= 2 
+            ? `⚠️ უარყოფითი მიმოხილვა: ${rating}★` 
+            : `ახალი მიმოხილვა: ${rating}★`,
+          message: `${review.author_title || 'Anonymous'}: "${content.substring(0, 100)}${content.length > 100 ? '...' : ''}"`,
+          priority: notificationPriority,
+          actionUrl: '/reservations/guests',
+          actionLabel: 'მიმოხილვის ნახვა',
+        });
+      }
+
+      return {
+        success: true,
+        imported,
+        skipped,
+        total: reviewsToProcess.length,
+        newReviews,
+      };
+    }),
+
+  /**
+   * Get Outscraper connection status
+   */
+  getOutscraperStatus: protectedProcedure.query(async () => {
+    // Check if we have any reviews from outscraper
+    const db = await getDb();
+    if (!db) return { connected: false, lastSync: null, totalReviews: 0 };
+
+    const result = await db
+      .select({ 
+        count: sql<number>`COUNT(*)`,
+        lastDate: sql<string>`MAX(createdAt)`,
+      })
+      .from(guestReviews)
+      .where(eq(guestReviews.source, 'google'));
+
+    return {
+      connected: true,
+      webhookUrl: '/api/trpc/reviews.receiveOutscraperWebhook',
+      lastSync: result[0]?.lastDate || null,
+      totalGoogleReviews: result[0]?.count || 0,
+    };
+  }),
+
   /**
    * Get all reviews with filtering and pagination
    */
@@ -264,85 +289,59 @@ export const reviewsRouter = router({
       const statsResult = await db
         .select({
           total: sql<number>`COUNT(*)`,
-          avgRating: sql<number>`AVG(rating)`,
-          positive: sql<number>`SUM(CASE WHEN sentiment = 'positive' THEN 1 ELSE 0 END)`,
-          neutral: sql<number>`SUM(CASE WHEN sentiment = 'neutral' THEN 1 ELSE 0 END)`,
-          negative: sql<number>`SUM(CASE WHEN sentiment = 'negative' THEN 1 ELSE 0 END)`,
-          withReply: sql<number>`SUM(CASE WHEN hasReply = 1 THEN 1 ELSE 0 END)`,
-          withoutReply: sql<number>`SUM(CASE WHEN hasReply = 0 THEN 1 ELSE 0 END)`,
+          avgRating: sql<number>`AVG(${guestReviews.rating})`,
+          positiveCount: sql<number>`SUM(CASE WHEN ${guestReviews.sentiment} = 'positive' THEN 1 ELSE 0 END)`,
+          neutralCount: sql<number>`SUM(CASE WHEN ${guestReviews.sentiment} = 'neutral' THEN 1 ELSE 0 END)`,
+          negativeCount: sql<number>`SUM(CASE WHEN ${guestReviews.sentiment} = 'negative' THEN 1 ELSE 0 END)`,
+          repliedCount: sql<number>`SUM(CASE WHEN ${guestReviews.hasReply} = true THEN 1 ELSE 0 END)`,
+          pendingCount: sql<number>`SUM(CASE WHEN ${guestReviews.hasReply} = false THEN 1 ELSE 0 END)`,
         })
         .from(guestReviews)
         .where(whereClause);
 
-      // Get rating distribution
-      const ratingDist = await db
-        .select({
-          rating: guestReviews.rating,
-          count: sql<number>`COUNT(*)`,
-        })
-        .from(guestReviews)
-        .where(whereClause)
-        .groupBy(guestReviews.rating);
+      const stats = statsResult[0];
+      const total = stats?.total || 0;
 
-      // Get source distribution
-      const sourceDist = await db
-        .select({
-          source: guestReviews.source,
-          count: sql<number>`COUNT(*)`,
-          avgRating: sql<number>`AVG(rating)`,
-        })
-        .from(guestReviews)
-        .where(whereClause)
-        .groupBy(guestReviews.source);
-
-      // Get recent trend (last 30 days vs previous 30 days)
+      // Get trend (last 30 days vs previous 30 days)
       const thirtyDaysAgo = new Date();
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
       const sixtyDaysAgo = new Date();
       sixtyDaysAgo.setDate(sixtyDaysAgo.getDate() - 60);
 
-      const recentCount = await db
+      const recentConditions = [...conditions, gte(guestReviews.reviewDate, thirtyDaysAgo)];
+      const previousConditions = [
+        ...conditions,
+        gte(guestReviews.reviewDate, sixtyDaysAgo),
+        lte(guestReviews.reviewDate, thirtyDaysAgo),
+      ];
+
+      const [recentResult] = await db
         .select({ count: sql<number>`COUNT(*)` })
         .from(guestReviews)
-        .where(gte(guestReviews.reviewDate, thirtyDaysAgo));
+        .where(and(...recentConditions));
 
-      const previousCount = await db
+      const [previousResult] = await db
         .select({ count: sql<number>`COUNT(*)` })
         .from(guestReviews)
-        .where(and(
-          gte(guestReviews.reviewDate, sixtyDaysAgo),
-          lte(guestReviews.reviewDate, thirtyDaysAgo)
-        ));
+        .where(and(...previousConditions));
 
-      const stats = statsResult[0];
-      const ratingDistribution: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
-      ratingDist.forEach(r => {
-        ratingDistribution[r.rating] = r.count;
-      });
+      const recentCount = recentResult?.count || 0;
+      const previousCount = previousResult?.count || 0;
+      const change = recentCount - previousCount;
 
       return {
-        total: stats?.total || 0,
-        averageRating: stats?.avgRating ? parseFloat(stats.avgRating.toFixed(2)) : 0,
-        sentiment: {
-          positive: stats?.positive || 0,
-          neutral: stats?.neutral || 0,
-          negative: stats?.negative || 0,
-        },
-        replies: {
-          answered: stats?.withReply || 0,
-          pending: stats?.withoutReply || 0,
-          responseRate: stats?.total ? Math.round((stats.withReply / stats.total) * 100) : 0,
-        },
-        ratingDistribution,
-        sourceDistribution: sourceDist.map(s => ({
-          source: s.source,
-          count: s.count,
-          avgRating: s.avgRating ? parseFloat(s.avgRating.toFixed(2)) : 0,
-        })),
+        total,
+        avgRating: stats?.avgRating ? parseFloat(stats.avgRating.toFixed(1)) : 0,
+        positiveCount: stats?.positiveCount || 0,
+        neutralCount: stats?.neutralCount || 0,
+        negativeCount: stats?.negativeCount || 0,
+        repliedCount: stats?.repliedCount || 0,
+        pendingCount: stats?.pendingCount || 0,
+        responseRate: total > 0 ? Math.round(((stats?.repliedCount || 0) / total) * 100) : 0,
+        positiveRate: total > 0 ? Math.round(((stats?.positiveCount || 0) / total) * 100) : 0,
         trend: {
-          recent: recentCount[0]?.count || 0,
-          previous: previousCount[0]?.count || 0,
-          change: (recentCount[0]?.count || 0) - (previousCount[0]?.count || 0),
+          change,
+          percentage: previousCount > 0 ? Math.round((change / previousCount) * 100) : 0,
         },
       };
     }),
@@ -438,14 +437,8 @@ export const reviewsRouter = router({
       } else if (r.sentiment === "negative") {
         aiReply = `Dear ${r.reviewerName || "Guest"},\n\nThank you for taking the time to share your feedback. We sincerely apologize for the issues you experienced during your stay. Your concerns about ${(r.topics as string[])?.slice(0, 2).join(" and ") || "your experience"} have been noted and we are taking immediate steps to address them.\n\nWe would love the opportunity to make things right. Please contact us directly so we can discuss how to improve your next visit.\n\nSincerely,\nORBI City Management`;
       } else {
-        aiReply = `Dear ${r.reviewerName || "Guest"},\n\nThank you for your review and for choosing ORBI City for your stay in Batumi. We appreciate your feedback and are always working to improve our services.\n\nWe hope to welcome you back soon!\n\nBest regards,\nORBI City Team`;
+        aiReply = `Dear ${r.reviewerName || "Guest"},\n\nThank you for sharing your experience with us. We appreciate your feedback about ${(r.topics as string[])?.slice(0, 2).join(" and ") || "your stay"} and will use it to continue improving our services.\n\nWe hope to have the pleasure of hosting you again in the future!\n\nBest regards,\nORBI City Team`;
       }
-
-      // Save AI suggestion
-      await db
-        .update(guestReviews)
-        .set({ aiSuggestedReply: aiReply })
-        .where(eq(guestReviews.id, input.id));
 
       return { aiReply };
     }),
@@ -478,20 +471,18 @@ export const reviewsRouter = router({
       // Aggregate topics
       const topicStats: Record<string, { total: number; positive: number; negative: number; neutral: number }> = {};
 
-      reviews.forEach(r => {
-        const topics = r.topics as string[] | null;
-        if (topics) {
-          topics.forEach(topic => {
-            if (!topicStats[topic]) {
-              topicStats[topic] = { total: 0, positive: 0, negative: 0, neutral: 0 };
-            }
-            topicStats[topic].total++;
-            if (r.sentiment === "positive") topicStats[topic].positive++;
-            else if (r.sentiment === "negative") topicStats[topic].negative++;
-            else topicStats[topic].neutral++;
-          });
+      for (const review of reviews) {
+        const topics = (review.topics as string[]) || [];
+        for (const topic of topics) {
+          if (!topicStats[topic]) {
+            topicStats[topic] = { total: 0, positive: 0, negative: 0, neutral: 0 };
+          }
+          topicStats[topic].total++;
+          if (review.sentiment === 'positive') topicStats[topic].positive++;
+          else if (review.sentiment === 'negative') topicStats[topic].negative++;
+          else topicStats[topic].neutral++;
         }
-      });
+      }
 
       return Object.entries(topicStats)
         .map(([topic, stats]) => ({
@@ -503,77 +494,29 @@ export const reviewsRouter = router({
     }),
 
   /**
-   * Sync reviews from Google Business Profile (Live API)
+   * Manual sync - imports demo data for testing
    */
-  syncGoogleReviews: protectedProcedure.mutation(async () => {
+  syncDemoReviews: protectedProcedure.mutation(async () => {
     const db = await getDb();
     if (!db) throw new Error("Database not available");
 
-    // Try to fetch live reviews from Google Business Profile API
-    const liveReviews = await fetchGoogleBusinessReviews();
-    
-    if (liveReviews && liveReviews.length > 0) {
-      // Use live data from Google Business Profile
-      let imported = 0;
-      let skipped = 0;
-
-      for (const review of liveReviews) {
-        // Check if review already exists
-        const existing = await db
-          .select()
-          .from(guestReviews)
-          .where(eq(guestReviews.externalId, review.externalId))
-          .limit(1);
-
-        if (existing.length > 0) {
-          skipped++;
-          continue;
-        }
-
-        // Insert new review
-        await db.insert(guestReviews).values({
-          source: review.source,
-          externalId: review.externalId,
-          reviewerName: review.reviewerName,
-          rating: review.rating,
-          content: review.content,
-          language: review.language || 'en',
-          sentiment: review.sentiment,
-          topics: review.topics,
-          reviewDate: review.reviewDate,
-          hasReply: review.hasReply,
-          replyContent: review.replyContent,
-          replyDate: review.replyDate,
-        });
-        imported++;
-      }
-
-      return {
-        success: true,
-        imported,
-        skipped,
-        total: liveReviews.length,
-        source: 'live_api',
-      };
-    }
-
-    // Fallback to demo reviews if API not connected
-    const googleReviews = [
+    // Demo reviews for testing
+    const demoReviews = [
       {
         source: "google" as const,
-        externalId: "google_koba_1",
+        externalId: "demo_google_1",
         reviewerName: "კობა ჩივლაური",
         rating: 5,
-        content: "",
+        content: "შესანიშნავი ადგილი! ძალიან კმაყოფილი ვარ.",
         language: "ka",
         sentiment: "positive" as const,
-        topics: ["service"],
+        topics: ["service", "cleanliness"],
         reviewDate: new Date("2024-12-13"),
         hasReply: false,
       },
       {
         source: "google" as const,
-        externalId: "google_berkay_2",
+        externalId: "demo_google_2",
         reviewerName: "Berkay Cihan",
         rating: 5,
         content: "Gayet ucuz ve temiz ama direkt oraya gidince oda yok diyorlar anlayamadım dışarıda kiralıyorlar tavsiye ederim",
@@ -583,109 +526,12 @@ export const reviewsRouter = router({
         reviewDate: new Date("2024-12-12"),
         hasReply: false,
       },
-      {
-        source: "google" as const,
-        externalId: "google_maria_3",
-        reviewerName: "Maria Ivanova",
-        rating: 4,
-        content: "Хорошее место, чисто и уютно. Вид на море потрясающий!",
-        language: "ru",
-        sentiment: "positive" as const,
-        topics: ["cleanliness", "view"],
-        reviewDate: new Date("2024-12-10"),
-        hasReply: false,
-      },
-      {
-        source: "google" as const,
-        externalId: "google_john_4",
-        reviewerName: "John Smith",
-        rating: 3,
-        content: "Average experience. Location is great but room could be cleaner.",
-        language: "en",
-        sentiment: "neutral" as const,
-        topics: ["location", "cleanliness"],
-        reviewDate: new Date("2024-12-08"),
-        hasReply: false,
-      },
-      {
-        source: "google" as const,
-        externalId: "google_anna_5",
-        reviewerName: "Anna Petrova",
-        rating: 5,
-        content: "Отличный отель! Персонал очень дружелюбный, номер чистый и комфортный. Рекомендую!",
-        language: "ru",
-        sentiment: "positive" as const,
-        topics: ["staff", "cleanliness", "comfort"],
-        reviewDate: new Date("2024-12-05"),
-        hasReply: false,
-      },
-      {
-        source: "google" as const,
-        externalId: "google_mehmet_6",
-        reviewerName: "Mehmet Yılmaz",
-        rating: 4,
-        content: "Güzel bir otel, deniz manzarası harika. Fiyat performans açısından iyi.",
-        language: "tr",
-        sentiment: "positive" as const,
-        topics: ["view", "value"],
-        reviewDate: new Date("2024-12-03"),
-        hasReply: false,
-      },
-      {
-        source: "google" as const,
-        externalId: "google_david_7",
-        reviewerName: "David Brown",
-        rating: 2,
-        content: "Not what I expected. Noisy at night and breakfast was disappointing.",
-        language: "en",
-        sentiment: "negative" as const,
-        topics: ["noise", "breakfast"],
-        reviewDate: new Date("2024-12-01"),
-        hasReply: false,
-      },
-      {
-        source: "google" as const,
-        externalId: "google_giorgi_8",
-        reviewerName: "გიორგი მამუკაშვილი",
-        rating: 5,
-        content: "საუკეთესო სასტუმრო ბათუმში! ზღვის ხედი უბრალოდ განსაცვიფრებელია.",
-        language: "ka",
-        sentiment: "positive" as const,
-        topics: ["view", "overall"],
-        reviewDate: new Date("2024-11-28"),
-        hasReply: false,
-      },
-      {
-        source: "google" as const,
-        externalId: "google_elena_9",
-        reviewerName: "Elena Kuznetsova",
-        rating: 4,
-        content: "Очень понравилось! Близко к пляжу, хороший сервис.",
-        language: "ru",
-        sentiment: "positive" as const,
-        topics: ["location", "service"],
-        reviewDate: new Date("2024-11-25"),
-        hasReply: false,
-      },
-      {
-        source: "google" as const,
-        externalId: "google_ali_10",
-        reviewerName: "Ali Demir",
-        rating: 3,
-        content: "Fena değil ama daha iyi olabilirdi. Wifi zayıftı.",
-        language: "tr",
-        sentiment: "neutral" as const,
-        topics: ["wifi"],
-        reviewDate: new Date("2024-11-22"),
-        hasReply: false,
-      },
     ];
 
     let imported = 0;
     let skipped = 0;
 
-    for (const review of googleReviews) {
-      // Check if review already exists
+    for (const review of demoReviews) {
       const existing = await db
         .select()
         .from(guestReviews)
@@ -697,178 +543,10 @@ export const reviewsRouter = router({
         continue;
       }
 
-      // Insert new review
-      await db.insert(guestReviews).values({
-        source: review.source,
-        externalId: review.externalId,
-        reviewerName: review.reviewerName,
-        rating: review.rating,
-        content: review.content,
-        language: review.language,
-        sentiment: review.sentiment,
-        topics: review.topics,
-        reviewDate: review.reviewDate,
-        hasReply: review.hasReply,
-      });
+      await db.insert(guestReviews).values(review);
       imported++;
     }
 
-    return {
-      success: true,
-      imported,
-      skipped,
-      total: googleReviews.length,
-      source: 'demo',
-    };
+    return { success: true, imported, skipped, total: demoReviews.length };
   }),
-
-  /**
-   * Get Google Business Profile connection status
-   */
-  getGoogleConnectionStatus: protectedProcedure.query(async () => {
-    const client = getGoogleOAuth2Client();
-    
-    if (!client) {
-      return {
-        connected: false,
-        configured: false,
-        error: 'OAuth2 credentials not configured. Please set GOOGLE_BUSINESS_CLIENT_ID and GOOGLE_BUSINESS_CLIENT_SECRET.',
-      };
-    }
-    
-    if (!googleTokens?.refresh_token) {
-      const authUrl = client.generateAuthUrl({
-        access_type: 'offline',
-        scope: ['https://www.googleapis.com/auth/business.manage'],
-        prompt: 'consent',
-      });
-      
-      return {
-        connected: false,
-        configured: true,
-        authUrl,
-        error: 'Not authenticated. Please connect your Google Business Profile.',
-      };
-    }
-    
-    return {
-      connected: true,
-      configured: true,
-      accountId: googleAccountId,
-      locationId: googleLocationId,
-    };
-  }),
-
-  /**
-   * Exchange Google OAuth code for tokens
-   */
-  exchangeGoogleCode: protectedProcedure
-    .input(z.object({ code: z.string() }))
-    .mutation(async ({ input }) => {
-      const client = getGoogleOAuth2Client();
-      if (!client) {
-        throw new Error('OAuth2 credentials not configured');
-      }
-      
-      try {
-        const { tokens } = await client.getToken(input.code);
-        googleTokens = tokens;
-        client.setCredentials(tokens);
-        
-        return { success: true };
-      } catch (error) {
-        console.error('[GoogleBusiness] Token exchange failed:', error);
-        throw new Error('Failed to exchange authorization code');
-      }
-    }),
-
-  /**
-   * Set active Google Business location
-   */
-  setGoogleLocation: protectedProcedure
-    .input(z.object({
-      accountId: z.string(),
-      locationId: z.string(),
-    }))
-    .mutation(async ({ input }) => {
-      googleAccountId = input.accountId;
-      googleLocationId = input.locationId;
-      return { success: true };
-    }),
-
-  /**
-   * List Google Business accounts
-   */
-  listGoogleAccounts: protectedProcedure.query(async () => {
-    const client = getGoogleOAuth2Client();
-    if (!client || !googleTokens?.refresh_token) {
-      return { accounts: [], error: 'Not authenticated' };
-    }
-    
-    client.setCredentials(googleTokens);
-    
-    try {
-      const accessToken = await client.getAccessToken();
-      
-      const response = await fetch(
-        'https://mybusinessaccountmanagement.googleapis.com/v1/accounts',
-        {
-          headers: {
-            'Authorization': `Bearer ${accessToken.token}`,
-          },
-        }
-      );
-      
-      if (!response.ok) {
-        const error = await response.text();
-        console.error('[GoogleBusiness] List accounts error:', error);
-        return { accounts: [], error: `API error: ${response.status}` };
-      }
-      
-      const data = await response.json();
-      return { accounts: data.accounts || [] };
-    } catch (error) {
-      console.error('[GoogleBusiness] Failed to list accounts:', error);
-      return { accounts: [], error: 'Failed to list accounts' };
-    }
-  }),
-
-  /**
-   * List locations for a Google Business account
-   */
-  listGoogleLocations: protectedProcedure
-    .input(z.object({ accountId: z.string() }))
-    .query(async ({ input }) => {
-      const client = getGoogleOAuth2Client();
-      if (!client || !googleTokens?.refresh_token) {
-        return { locations: [], error: 'Not authenticated' };
-      }
-      
-      client.setCredentials(googleTokens);
-      
-      try {
-        const accessToken = await client.getAccessToken();
-        
-        const response = await fetch(
-          `https://mybusinessbusinessinformation.googleapis.com/v1/${input.accountId}/locations`,
-          {
-            headers: {
-              'Authorization': `Bearer ${accessToken.token}`,
-            },
-          }
-        );
-        
-        if (!response.ok) {
-          const error = await response.text();
-          console.error('[GoogleBusiness] List locations error:', error);
-          return { locations: [], error: `API error: ${response.status}` };
-        }
-        
-        const data = await response.json();
-        return { locations: data.locations || [] };
-      } catch (error) {
-        console.error('[GoogleBusiness] Failed to list locations:', error);
-        return { locations: [], error: 'Failed to list locations' };
-      }
-    }),
 });

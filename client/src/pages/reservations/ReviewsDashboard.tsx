@@ -109,19 +109,17 @@ const ReviewsDashboard = () => {
     },
   });
 
-  // Google connection status
-  const { data: googleStatus, refetch: refetchGoogleStatus } = trpc.reviews.getGoogleConnectionStatus.useQuery();
+  // Outscraper webhook status
+  const { data: outscraperStatus } = trpc.reviews.getOutscraperStatus.useQuery();
+  const [showWebhookInfo, setShowWebhookInfo] = useState(false);
 
-  const syncGoogleMutation = trpc.reviews.syncGoogleReviews.useMutation({
+  const syncDemoMutation = trpc.reviews.syncDemoReviews.useMutation({
     onSuccess: (data) => {
-      const sourceText = data.source === 'live_api' 
-        ? t('(ცოცხალი API)', '(Live API)') 
-        : t('(დემო მონაცემები)', '(Demo Data)');
       toast({ 
         title: t("წარმატება", "Success"), 
         description: t(
-          `${data.imported} მიმოხილვა იმპორტირებულია, ${data.skipped} გამოტოვებულია ${sourceText}`,
-          `${data.imported} reviews imported, ${data.skipped} skipped ${sourceText}`
+          `${data.imported} დემო მიმოხილვა იმპორტირებულია`,
+          `${data.imported} demo reviews imported`
         )
       });
       refetch();
@@ -135,10 +133,13 @@ const ReviewsDashboard = () => {
     },
   });
 
-  const handleConnectGoogle = () => {
-    if (googleStatus?.authUrl) {
-      window.open(googleStatus.authUrl, '_blank', 'width=600,height=700');
-    }
+  const copyWebhookUrl = () => {
+    const webhookUrl = `${window.location.origin}/api/trpc/reviews.receiveOutscraperWebhook`;
+    navigator.clipboard.writeText(webhookUrl);
+    toast({ 
+      title: t("დაკოპირდა", "Copied"), 
+      description: t("Webhook URL დაკოპირდა", "Webhook URL copied to clipboard")
+    });
   };
 
   const handleGenerateAiReply = () => {
@@ -197,20 +198,16 @@ const ReviewsDashboard = () => {
           </p>
         </div>
         <div className="flex gap-2 items-center">
-          {googleStatus?.connected ? (
-            <div className="flex items-center gap-2 px-3 py-1 bg-emerald-500/10 rounded-full text-emerald-600 text-sm">
-              <CheckCircle2 className="h-4 w-4" />
-              {t("Google დაკავშირებულია", "Google Connected")}
-            </div>
-          ) : googleStatus?.configured ? (
-            <Button onClick={handleConnectGoogle} variant="outline" size="sm">
-              <Globe className="h-4 w-4 mr-2" />
-              {t("Google-ის დაკავშირება", "Connect Google")}
-            </Button>
-          ) : null}
-          <Button onClick={() => syncGoogleMutation.mutate()} variant="default" disabled={syncGoogleMutation.isPending}>
-            <Globe className={`h-4 w-4 mr-2 ${syncGoogleMutation.isPending ? "animate-spin" : ""}`} />
-            {t("Google სინქრონიზაცია", "Sync Google")}
+          {/* Outscraper Webhook Info Button */}
+          <Button onClick={() => setShowWebhookInfo(!showWebhookInfo)} variant="outline" size="sm">
+            <Globe className="h-4 w-4 mr-2" />
+            {t("Outscraper Webhook", "Outscraper Webhook")}
+          </Button>
+          
+          {/* Demo Sync Button */}
+          <Button onClick={() => syncDemoMutation.mutate()} variant="default" disabled={syncDemoMutation.isPending}>
+            <Globe className={`h-4 w-4 mr-2 ${syncDemoMutation.isPending ? "animate-spin" : ""}`} />
+            {t("დემო სინქრონიზაცია", "Demo Sync")}
           </Button>
           <Button onClick={() => refetch()} variant="outline" disabled={isLoading}>
             <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? "animate-spin" : ""}`} />
@@ -218,6 +215,45 @@ const ReviewsDashboard = () => {
           </Button>
         </div>
       </div>
+
+      {/* Outscraper Webhook Info Panel */}
+      {showWebhookInfo && (
+        <Card className="bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border-blue-500/20">
+          <CardContent className="p-4">
+            <div className="flex items-start justify-between">
+              <div className="space-y-2">
+                <h3 className="font-semibold text-lg">{t("Outscraper Webhook კონფიგურაცია", "Outscraper Webhook Configuration")}</h3>
+                <p className="text-sm text-muted-foreground">
+                  {t("დააკოპირეთ ეს URL და ჩასვით Outscraper-ის Webhook პარამეტრებში", "Copy this URL and paste it in Outscraper's Webhook settings")}
+                </p>
+                <div className="flex items-center gap-2 mt-2">
+                  <code className="bg-background/50 px-3 py-2 rounded text-sm font-mono flex-1">
+                    {`${window.location.origin}/api/trpc/reviews.receiveOutscraperWebhook`}
+                  </code>
+                  <Button onClick={copyWebhookUrl} size="sm" variant="outline">
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                </div>
+                <div className="flex items-center gap-4 mt-3 text-sm">
+                  <div className="flex items-center gap-1">
+                    <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                    <span>{t("Google მიმოხილვები", "Google Reviews")}: {outscraperStatus?.totalGoogleReviews || 0}</span>
+                  </div>
+                  {outscraperStatus?.lastSync && (
+                    <div className="flex items-center gap-1 text-muted-foreground">
+                      <Clock className="h-4 w-4" />
+                      <span>{t("ბოლო სინქრონიზაცია", "Last sync")}: {format(new Date(outscraperStatus.lastSync), 'dd/MM/yyyy HH:mm')}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+              <Button onClick={() => setShowWebhookInfo(false)} variant="ghost" size="sm">
+                ✕
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -247,7 +283,7 @@ const ReviewsDashboard = () => {
               <div>
                 <p className="text-sm text-muted-foreground">{t("საშუალო რეიტინგი", "Average Rating")}</p>
                 <div className="flex items-center gap-2 mt-1">
-                  <p className="text-3xl font-bold">{stats?.averageRating?.toFixed(1) || "0.0"}</p>
+                  <p className="text-3xl font-bold">{stats?.avgRating?.toFixed(1) || "0.0"}</p>
                   <Star className="h-6 w-6 fill-yellow-400 text-yellow-400" />
                 </div>
               </div>
@@ -263,9 +299,9 @@ const ReviewsDashboard = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">{t("პასუხის მოლოდინში", "Pending Replies")}</p>
-                <p className="text-3xl font-bold mt-1">{stats?.replies?.pending || 0}</p>
+                <p className="text-3xl font-bold mt-1">{stats?.pendingCount || 0}</p>
                 <p className="text-sm text-muted-foreground mt-1">
-                  {stats?.replies?.responseRate || 0}% {t("პასუხგაცემული", "response rate")}
+                  {stats?.responseRate || 0}% {t("პასუხგაცემული", "response rate")}
                 </p>
               </div>
               <div className="h-12 w-12 rounded-full bg-orange-500/10 flex items-center justify-center">
@@ -281,7 +317,7 @@ const ReviewsDashboard = () => {
               <div>
                 <p className="text-sm text-muted-foreground">{t("დადებითი %", "Positive %")}</p>
                 <p className="text-3xl font-bold mt-1 text-emerald-500">
-                  {stats?.total ? Math.round((stats.sentiment.positive / stats.total) * 100) : 0}%
+                  {stats?.positiveRate || 0}%
                 </p>
               </div>
               <div className="h-12 w-12 rounded-full bg-emerald-500/10 flex items-center justify-center">
