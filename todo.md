@@ -162,3 +162,11 @@
 - [x] Stats showing correctly: 121 total, 3.2 avg rating, 52% positive
 - [x] Outscraper scheduled task configured (daily at 18:07)
 - [x] Push all changes to GitHub
+
+## Multi-Platform Review Scraping via Outscraper
+- [x] Configure Booking.com reviews scraper (100 reviews imported)
+- [x] Configure Airbnb reviews scraper (17 reviews imported)
+- [x] Configure TripAdvisor reviews scraper (7 reviews imported)
+- [x] Configure Expedia reviews scraper (attempted - no results)
+- [ ] Configure Facebook reviews scraper (not available in Outscraper)
+- [x] Total: 222 reviews from 4 platforms (Google 98 + Booking 100 + Airbnb 17 + TripAdvisor 7)
