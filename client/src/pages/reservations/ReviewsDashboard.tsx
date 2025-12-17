@@ -109,13 +109,19 @@ const ReviewsDashboard = () => {
     },
   });
 
+  // Google connection status
+  const { data: googleStatus, refetch: refetchGoogleStatus } = trpc.reviews.getGoogleConnectionStatus.useQuery();
+
   const syncGoogleMutation = trpc.reviews.syncGoogleReviews.useMutation({
     onSuccess: (data) => {
+      const sourceText = data.source === 'live_api' 
+        ? t('(ცოცხალი API)', '(Live API)') 
+        : t('(დემო მონაცემები)', '(Demo Data)');
       toast({ 
         title: t("წარმატება", "Success"), 
         description: t(
-          `${data.imported} მიმოხილვა იმპორტირებულია, ${data.skipped} გამოტოვებულია`,
-          `${data.imported} reviews imported, ${data.skipped} skipped`
+          `${data.imported} მიმოხილვა იმპორტირებულია, ${data.skipped} გამოტოვებულია ${sourceText}`,
+          `${data.imported} reviews imported, ${data.skipped} skipped ${sourceText}`
         )
       });
       refetch();
@@ -128,6 +134,12 @@ const ReviewsDashboard = () => {
       });
     },
   });
+
+  const handleConnectGoogle = () => {
+    if (googleStatus?.authUrl) {
+      window.open(googleStatus.authUrl, '_blank', 'width=600,height=700');
+    }
+  };
 
   const handleGenerateAiReply = () => {
     if (!selectedReview) return;
@@ -184,7 +196,18 @@ const ReviewsDashboard = () => {
             {t("ყველა პლატფორმის მიმოხილვები ერთ ადგილას", "All platform reviews in one place")}
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 items-center">
+          {googleStatus?.connected ? (
+            <div className="flex items-center gap-2 px-3 py-1 bg-emerald-500/10 rounded-full text-emerald-600 text-sm">
+              <CheckCircle2 className="h-4 w-4" />
+              {t("Google დაკავშირებულია", "Google Connected")}
+            </div>
+          ) : googleStatus?.configured ? (
+            <Button onClick={handleConnectGoogle} variant="outline" size="sm">
+              <Globe className="h-4 w-4 mr-2" />
+              {t("Google-ის დაკავშირება", "Connect Google")}
+            </Button>
+          ) : null}
           <Button onClick={() => syncGoogleMutation.mutate()} variant="default" disabled={syncGoogleMutation.isPending}>
             <Globe className={`h-4 w-4 mr-2 ${syncGoogleMutation.isPending ? "animate-spin" : ""}`} />
             {t("Google სინქრონიზაცია", "Sync Google")}

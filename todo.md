@@ -138,3 +138,13 @@
 - [ ] Export reviews to Excel functionality
 - [x] Add Google Business Profile sync button
 - [x] Import Google reviews from Orbi City Sea view Aparthotel
+
+## Live Google Business API Integration
+- [x] Research Google Business Profile API requirements
+- [x] Create server-side Google Business API service
+- [x] Implement OAuth2 authentication flow for Google Business
+- [x] Add "Connect Google" button with OAuth flow
+- [x] Fetch live reviews from Orbi City Sea view Aparthotel (when connected)
+- [x] Replace demo data with actual API responses (fallback to demo if not connected)
+- [x] Add error handling and rate limiting
+- [x] Test live review fetching

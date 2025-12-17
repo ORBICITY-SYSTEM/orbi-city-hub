@@ -1,8 +1,161 @@
-import { router, protectedProcedure } from "../_core/trpc";
+import { router, protectedProcedure, publicProcedure } from "../_core/trpc";
 import { z } from "zod";
 import { getDb } from "../db";
 import { guestReviews } from "../../drizzle/schema";
 import { eq, desc, sql, and, gte, lte, like } from "drizzle-orm";
+import { google } from 'googleapis';
+
+// Google Business Profile OAuth2 configuration
+const CLIENT_ID = process.env.GOOGLE_BUSINESS_CLIENT_ID;
+const CLIENT_SECRET = process.env.GOOGLE_BUSINESS_CLIENT_SECRET;
+
+// Store tokens in memory (in production, these should be in database)
+let googleTokens: {
+  access_token?: string;
+  refresh_token?: string;
+  expiry_date?: number;
+} | null = null;
+
+let googleAccountId: string | null = null;
+let googleLocationId: string | null = null;
+
+function getGoogleOAuth2Client() {
+  if (!CLIENT_ID || !CLIENT_SECRET) {
+    return null;
+  }
+  
+  const redirectUri = process.env.NODE_ENV === 'production' 
+    ? 'https://hub.orbicitybatumi.com/api/google-business/callback'
+    : 'http://localhost:3000/api/google-business/callback';
+  
+  return new google.auth.OAuth2(CLIENT_ID, CLIENT_SECRET, redirectUri);
+}
+
+/**
+ * Fetch reviews from Google Business Profile API
+ */
+async function fetchGoogleBusinessReviews(): Promise<Array<{
+  source: 'google';
+  externalId: string;
+  reviewerName: string;
+  rating: number;
+  content: string;
+  language: string;
+  sentiment: 'positive' | 'neutral' | 'negative';
+  topics: string[];
+  reviewDate: Date;
+  hasReply: boolean;
+  replyContent?: string;
+  replyDate?: Date;
+}> | null> {
+  const client = getGoogleOAuth2Client();
+  
+  if (!client || !googleTokens?.refresh_token) {
+    console.log('[GoogleBusiness] Not authenticated, using demo data');
+    return null;
+  }
+  
+  if (!googleAccountId || !googleLocationId) {
+    console.log('[GoogleBusiness] No location selected, using demo data');
+    return null;
+  }
+  
+  client.setCredentials(googleTokens);
+  
+  try {
+    const accessToken = await client.getAccessToken();
+    
+    const url = `https://mybusiness.googleapis.com/v4/${googleAccountId}/${googleLocationId}/reviews?pageSize=100`;
+    
+    const response = await fetch(url, {
+      headers: {
+        'Authorization': `Bearer ${accessToken.token}`,
+      },
+    });
+    
+    if (!response.ok) {
+      const error = await response.text();
+      console.error('[GoogleBusiness] API error:', error);
+      return null;
+    }
+    
+    const data = await response.json();
+    
+    if (!data.reviews || data.reviews.length === 0) {
+      console.log('[GoogleBusiness] No reviews found');
+      return null;
+    }
+    
+    // Transform Google API response to our format
+    return data.reviews.map((review: any) => {
+      const rating = convertStarRating(review.starRating);
+      const sentiment = rating >= 4 ? 'positive' : rating >= 3 ? 'neutral' : 'negative';
+      const topics = extractTopics(review.comment || '');
+      
+      return {
+        source: 'google' as const,
+        externalId: `google_${review.reviewId || review.name?.split('/').pop()}`,
+        reviewerName: review.reviewer?.displayName || 'Anonymous',
+        rating,
+        content: review.comment || '',
+        language: detectLanguage(review.comment || ''),
+        sentiment,
+        topics,
+        reviewDate: new Date(review.createTime),
+        hasReply: !!review.reviewReply,
+        replyContent: review.reviewReply?.comment,
+        replyDate: review.reviewReply?.updateTime ? new Date(review.reviewReply.updateTime) : undefined,
+      };
+    });
+  } catch (error) {
+    console.error('[GoogleBusiness] Failed to fetch reviews:', error);
+    return null;
+  }
+}
+
+function convertStarRating(rating: string): number {
+  const map: Record<string, number> = {
+    'ONE': 1,
+    'TWO': 2,
+    'THREE': 3,
+    'FOUR': 4,
+    'FIVE': 5,
+  };
+  return map[rating] || parseInt(rating) || 0;
+}
+
+function detectLanguage(text: string): string {
+  // Simple language detection based on character sets
+  if (/[\u10A0-\u10FF]/.test(text)) return 'ka'; // Georgian
+  if (/[\u0400-\u04FF]/.test(text)) return 'ru'; // Cyrillic (Russian)
+  if (/[\u00C0-\u017F]/.test(text) && /ş|ğ|ı|ö|ü|ç/i.test(text)) return 'tr'; // Turkish
+  return 'en';
+}
+
+function extractTopics(text: string): string[] {
+  const topics: string[] = [];
+  const lowerText = text.toLowerCase();
+  
+  const topicKeywords: Record<string, string[]> = {
+    'cleanliness': ['clean', 'чист', 'temiz', 'სუფთა'],
+    'service': ['service', 'staff', 'персонал', 'сервис', 'hizmet', 'მომსახურება'],
+    'location': ['location', 'расположен', 'konum', 'მდებარეობა'],
+    'view': ['view', 'вид', 'manzara', 'ხედი', 'море', 'sea', 'deniz'],
+    'value': ['price', 'value', 'цена', 'fiyat', 'ucuz', 'ფასი'],
+    'wifi': ['wifi', 'internet', 'интернет'],
+    'noise': ['noise', 'noisy', 'шум', 'gürültü'],
+    'comfort': ['comfort', 'комфорт', 'rahat', 'კომფორტი'],
+    'breakfast': ['breakfast', 'завтрак', 'kahvaltı'],
+  };
+  
+  for (const [topic, keywords] of Object.entries(topicKeywords)) {
+    if (keywords.some(kw => lowerText.includes(kw))) {
+      topics.push(topic);
+    }
+  }
+  
+  return topics.length > 0 ? topics : ['general'];
+}
 
 /**
  * Reviews Router - Comprehensive review management API
@@ -350,14 +503,61 @@ export const reviewsRouter = router({
     }),
 
   /**
-   * Sync reviews from Google Business Profile
+   * Sync reviews from Google Business Profile (Live API)
    */
   syncGoogleReviews: protectedProcedure.mutation(async () => {
     const db = await getDb();
     if (!db) throw new Error("Database not available");
 
-    // Demo reviews from Google Business Profile (Orbi City Sea view Aparthotel)
-    // These represent actual reviews from the business
+    // Try to fetch live reviews from Google Business Profile API
+    const liveReviews = await fetchGoogleBusinessReviews();
+    
+    if (liveReviews && liveReviews.length > 0) {
+      // Use live data from Google Business Profile
+      let imported = 0;
+      let skipped = 0;
+
+      for (const review of liveReviews) {
+        // Check if review already exists
+        const existing = await db
+          .select()
+          .from(guestReviews)
+          .where(eq(guestReviews.externalId, review.externalId))
+          .limit(1);
+
+        if (existing.length > 0) {
+          skipped++;
+          continue;
+        }
+
+        // Insert new review
+        await db.insert(guestReviews).values({
+          source: review.source,
+          externalId: review.externalId,
+          reviewerName: review.reviewerName,
+          rating: review.rating,
+          content: review.content,
+          language: review.language || 'en',
+          sentiment: review.sentiment,
+          topics: review.topics,
+          reviewDate: review.reviewDate,
+          hasReply: review.hasReply,
+          replyContent: review.replyContent,
+          replyDate: review.replyDate,
+        });
+        imported++;
+      }
+
+      return {
+        success: true,
+        imported,
+        skipped,
+        total: liveReviews.length,
+        source: 'live_api',
+      };
+    }
+
+    // Fallback to demo reviews if API not connected
     const googleReviews = [
       {
         source: "google" as const,
@@ -518,6 +718,157 @@ export const reviewsRouter = router({
       imported,
       skipped,
       total: googleReviews.length,
+      source: 'demo',
     };
   }),
+
+  /**
+   * Get Google Business Profile connection status
+   */
+  getGoogleConnectionStatus: protectedProcedure.query(async () => {
+    const client = getGoogleOAuth2Client();
+    
+    if (!client) {
+      return {
+        connected: false,
+        configured: false,
+        error: 'OAuth2 credentials not configured. Please set GOOGLE_BUSINESS_CLIENT_ID and GOOGLE_BUSINESS_CLIENT_SECRET.',
+      };
+    }
+    
+    if (!googleTokens?.refresh_token) {
+      const authUrl = client.generateAuthUrl({
+        access_type: 'offline',
+        scope: ['https://www.googleapis.com/auth/business.manage'],
+        prompt: 'consent',
+      });
+      
+      return {
+        connected: false,
+        configured: true,
+        authUrl,
+        error: 'Not authenticated. Please connect your Google Business Profile.',
+      };
+    }
+    
+    return {
+      connected: true,
+      configured: true,
+      accountId: googleAccountId,
+      locationId: googleLocationId,
+    };
+  }),
+
+  /**
+   * Exchange Google OAuth code for tokens
+   */
+  exchangeGoogleCode: protectedProcedure
+    .input(z.object({ code: z.string() }))
+    .mutation(async ({ input }) => {
+      const client = getGoogleOAuth2Client();
+      if (!client) {
+        throw new Error('OAuth2 credentials not configured');
+      }
+      
+      try {
+        const { tokens } = await client.getToken(input.code);
+        googleTokens = tokens;
+        client.setCredentials(tokens);
+        
+        return { success: true };
+      } catch (error) {
+        console.error('[GoogleBusiness] Token exchange failed:', error);
+        throw new Error('Failed to exchange authorization code');
+      }
+    }),
+
+  /**
+   * Set active Google Business location
+   */
+  setGoogleLocation: protectedProcedure
+    .input(z.object({
+      accountId: z.string(),
+      locationId: z.string(),
+    }))
+    .mutation(async ({ input }) => {
+      googleAccountId = input.accountId;
+      googleLocationId = input.locationId;
+      return { success: true };
+    }),
+
+  /**
+   * List Google Business accounts
+   */
+  listGoogleAccounts: protectedProcedure.query(async () => {
+    const client = getGoogleOAuth2Client();
+    if (!client || !googleTokens?.refresh_token) {
+      return { accounts: [], error: 'Not authenticated' };
+    }
+    
+    client.setCredentials(googleTokens);
+    
+    try {
+      const accessToken = await client.getAccessToken();
+      
+      const response = await fetch(
+        'https://mybusinessaccountmanagement.googleapis.com/v1/accounts',
+        {
+          headers: {
+            'Authorization': `Bearer ${accessToken.token}`,
+          },
+        }
+      );
+      
+      if (!response.ok) {
+        const error = await response.text();
+        console.error('[GoogleBusiness] List accounts error:', error);
+        return { accounts: [], error: `API error: ${response.status}` };
+      }
+      
+      const data = await response.json();
+      return { accounts: data.accounts || [] };
+    } catch (error) {
+      console.error('[GoogleBusiness] Failed to list accounts:', error);
+      return { accounts: [], error: 'Failed to list accounts' };
+    }
+  }),
+
+  /**
+   * List locations for a Google Business account
+   */
+  listGoogleLocations: protectedProcedure
+    .input(z.object({ accountId: z.string() }))
+    .query(async ({ input }) => {
+      const client = getGoogleOAuth2Client();
+      if (!client || !googleTokens?.refresh_token) {
+        return { locations: [], error: 'Not authenticated' };
+      }
+      
+      client.setCredentials(googleTokens);
+      
+      try {
+        const accessToken = await client.getAccessToken();
+        
+        const response = await fetch(
+          `https://mybusinessbusinessinformation.googleapis.com/v1/${input.accountId}/locations`,
+          {
+            headers: {
+              'Authorization': `Bearer ${accessToken.token}`,
+            },
+          }
+        );
+        
+        if (!response.ok) {
+          const error = await response.text();
+          console.error('[GoogleBusiness] List locations error:', error);
+          return { locations: [], error: `API error: ${response.status}` };
+        }
+        
+        const data = await response.json();
+        return { locations: data.locations || [] };
+      } catch (error) {
+        console.error('[GoogleBusiness] Failed to list locations:', error);
+        return { locations: [], error: 'Failed to list locations' };
+      }
+    }),
 });
