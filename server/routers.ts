@@ -43,6 +43,7 @@ import { notificationsRouter } from "./routers/notificationsRouter";
 import { analyticsRouter } from "./routers/analyticsRouter";
 import { whitelabelRouter } from "./routers/whitelabelRouter";
 import { otaRouter } from "./routers/otaRouter";
+import { reviewsRouter } from "./routers/reviewsRouter";
 
 export const appRouter = router({
   realFinance: realFinanceRouter,
@@ -81,6 +82,7 @@ export const appRouter = router({
   analytics: analyticsRouter,
   whitelabel: whitelabelRouter,
   ota: otaRouter,
+  reviews: reviewsRouter,
   system: systemRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),

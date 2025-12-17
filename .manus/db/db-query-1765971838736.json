@@ -1,0 +1,145 @@
+{
+  "query": "SELECT id, source, reviewerName, rating, sentiment, content, reviewDate FROM guestReviews WHERE source = 'google' ORDER BY reviewDate DESC LIMIT 15",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user c2qSkVB4gKtEmor.991468648419 --database 4ExKc24KNHdr4pKbTUzsoU --execute SELECT id, source, reviewerName, rating, sentiment, content, reviewDate FROM guestReviews WHERE source = 'google' ORDER BY reviewDate DESC LIMIT 15",
+  "rows": [
+    {
+      "id": "3",
+      "source": "google",
+      "reviewerName": "Yuki Tanaka",
+      "rating": "5",
+      "sentiment": "positive",
+      "content": "とても清潔で美しいアパートメント。スタッフも親切でした。また来たいです！",
+      "reviewDate": "2025-12-16 00:00:00"
+    },
+    {
+      "id": "2",
+      "source": "google",
+      "reviewerName": "Elena Ivanova",
+      "rating": "5",
+      "sentiment": "positive",
+      "content": "Прекрасні апартаменти з видом на море. Все було ідеально - чистота, сервіс, розташування. Дякуємо!",
+      "reviewDate": "2025-12-15 00:00:00"
+    },
+    {
+      "id": "1",
+      "source": "google",
+      "reviewerName": "Dmitry Volkov",
+      "rating": "5",
+      "sentiment": "positive",
+      "content": "Шикарные апартаменты с потрясающим видом на море. Чисто, уютно, современно. Персонал очень отзывчивый. Рекомендую!",
+      "reviewDate": "2025-12-14 00:00:00"
+    },
+    {
+      "id": "6",
+      "source": "google",
+      "reviewerName": "Giorgi Beridze",
+      "rating": "4",
+      "sentiment": "positive",
+      "content": "ძალიან კარგი ბინა და მდებარეობა. ოდნავ ძვირია, მაგრამ ხარისხი შეესაბამება ფასს.",
+      "reviewDate": "2025-12-13 00:00:00"
+    },
+    {
+      "id": "4",
+      "source": "google",
+      "reviewerName": "Ahmed Hassan",
+      "rating": "5",
+      "sentiment": "positive",
+      "content": "Five star service in a beautiful location. The apartment was modern and well-equipped. Highly recommend for families!",
+      "reviewDate": "2025-12-10 00:00:00"
+    },
+    {
+      "id": "5",
+      "source": "google",
+      "reviewerName": "Anna Müller",
+      "rating": "5",
+      "sentiment": "positive",
+      "content": "Wunderschöne Wohnung mit Meerblick. Alles war sauber und modern. Das Personal war sehr freundlich.",
+      "reviewDate": "2025-12-09 00:00:00"
+    },
+    {
+      "id": "11",
+      "source": "google",
+      "reviewerName": "Michael Brown",
+      "rating": "3",
+      "sentiment": "neutral",
+      "content": "Nice apartment with great views. However, the WiFi was slow and the AC was noisy at night.",
+      "reviewDate": "2025-12-08 00:00:00"
+    },
+    {
+      "id": "30001",
+      "source": "google",
+      "reviewerName": "კობა ჩივლაური",
+      "rating": "5",
+      "sentiment": "positive",
+      "content": "",
+      "reviewDate": "2024-12-13 00:00:00"
+    },
+    {
+      "id": "30002",
+      "source": "google",
+      "reviewerName": "Berkay Cihan",
+      "rating": "5",
+      "sentiment": "positive",
+      "content": "Gayet ucuz ve temiz ama direkt oraya gidince oda yok diyorlar anlayamadım dışarıda kiralıyorlar tavsiye ederim",
+      "reviewDate": "2024-12-12 00:00:00"
+    },
+    {
+      "id": "30003",
+      "source": "google",
+      "reviewerName": "Maria Ivanova",
+      "rating": "4",
+      "sentiment": "positive",
+      "content": "Хорошее место, чисто и уютно. Вид на море потрясающий!",
+      "reviewDate": "2024-12-10 00:00:00"
+    },
+    {
+      "id": "30004",
+      "source": "google",
+      "reviewerName": "John Smith",
+      "rating": "3",
+      "sentiment": "neutral",
+      "content": "Average experience. Location is great but room could be cleaner.",
+      "reviewDate": "2024-12-08 00:00:00"
+    },
+    {
+      "id": "30005",
+      "source": "google",
+      "reviewerName": "Anna Petrova",
+      "rating": "5",
+      "sentiment": "positive",
+      "content": "Отличный отель! Персонал очень дружелюбный, номер чистый и комфортный. Рекомендую!",
+      "reviewDate": "2024-12-05 00:00:00"
+    },
+    {
+      "id": "30006",
+      "source": "google",
+      "reviewerName": "Mehmet Yılmaz",
+      "rating": "4",
+      "sentiment": "positive",
+      "content": "Güzel bir otel, deniz manzarası harika. Fiyat performans açısından iyi.",
+      "reviewDate": "2024-12-03 00:00:00"
+    },
+    {
+      "id": "30007",
+      "source": "google",
+      "reviewerName": "David Brown",
+      "rating": "2",
+      "sentiment": "negative",
+      "content": "Not what I expected. Noisy at night and breakfast was disappointing.",
+      "reviewDate": "2024-12-01 00:00:00"
+    },
+    {
+      "id": "30008",
+      "source": "google",
+      "reviewerName": "გიორგი მამუკაშვილი",
+      "rating": "5",
+      "sentiment": "positive",
+      "content": "საუკეთესო სასტუმრო ბათუმში! ზღვის ხედი უბრალოდ განსაცვიფრებელია.",
+      "reviewDate": "2024-11-28 00:00:00"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tsource\treviewerName\trating\tsentiment\tcontent\treviewDate\n3\tgoogle\tYuki Tanaka\t5\tpositive\tとても清潔で美しいアパートメント。スタッフも親切でした。また来たいです！\t2025-12-16 00:00:00\n2\tgoogle\tElena Ivanova\t5\tpositive\tПрекрасні апартаменти з видом на море. Все було ідеально - чистота, сервіс, розташування. Дякуємо!\t2025-12-15 00:00:00\n1\tgoogle\tDmitry Volkov\t5\tpositive\tШикарные апартаменты с потрясающим видом на море. Чисто, уютно, современно. Персонал очень отзывчивый. Рекомендую!\t2025-12-14 00:00:00\n6\tgoogle\tGiorgi Beridze\t4\tpositive\tძალიან კარგი ბინა და მდებარეობა. ოდნავ ძვირია, მაგრამ ხარისხი შეესაბამება ფასს.\t2025-12-13 00:00:00\n4\tgoogle\tAhmed Hassan\t5\tpositive\tFive star service in a beautiful location. The apartment was modern and well-equipped. Highly recommend for families!\t2025-12-10 00:00:00\n5\tgoogle\tAnna Müller\t5\tpositive\tWunderschöne Wohnung mit Meerblick. Alles war sauber und modern. Das Personal war sehr freundlich.\t2025-12-09 00:00:00\n11\tgoogle\tMichael Brown\t3\tneutral\tNice apartment with great views. However, the WiFi was slow and the AC was noisy at night.\t2025-12-08 00:00:00\n30001\tgoogle\tკობა ჩივლაური\t5\tpositive\t\t2024-12-13 00:00:00\n30002\tgoogle\tBerkay Cihan\t5\tpositive\tGayet ucuz ve temiz ama direkt oraya gidince oda yok diyorlar anlayamadım dışarıda kiralıyorlar tavsiye ederim\t2024-12-12 00:00:00\n30003\tgoogle\tMaria Ivanova\t4\tpositive\tХорошее место, чисто и уютно. Вид на море потрясающий!\t2024-12-10 00:00:00\n30004\tgoogle\tJohn Smith\t3\tneutral\tAverage experience. Location is great but room could be cleaner.\t2024-12-08 00:00:00\n30005\tgoogle\tAnna Petrova\t5\tpositive\tОтличный отель! Персонал очень дружелюбный, номер чистый и комфортный. Рекомендую!\t2024-12-05 00:00:00\n30006\tgoogle\tMehmet Yılmaz\t4\tpositive\tGüzel bir otel, deniz manzarası harika. Fiyat performans açısından iyi.\t2024-12-03 00:00:00\n30007\tgoogle\tDavid Brown\t2\tnegative\tNot what I expected. Noisy at night and breakfast was disappointing.\t2024-12-01 00:00:00\n30008\tgoogle\tგიორგი მამუკაშვილი\t5\tpositive\tსაუკეთესო სასტუმრო ბათუმში! ზღვის ხედი უბრალოდ განსაცვიფრებელია.\t2024-11-28 00:00:00\n",
+  "stderr": "",
+  "execution_time_ms": 59
+}

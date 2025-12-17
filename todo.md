@@ -119,3 +119,22 @@
 - [x] Use exact amounts from Excel files without any conversion
 - [x] Fix duplicate total rows in Excel (ჯამი გვერდზე, ჯამი excluded)
 - [x] Verified totals: ₾465,177 total revenue, 1,413 bookings
+
+## Google Reviews Dashboard (Premium)
+- [x] Create reviews database schema (source, rating, text, author, date, response, response_date)
+- [x] Seed realistic demo data for Google, Booking.com, Airbnb, TripAdvisor reviews
+- [x] Build reviews API endpoints (list, stats, filters)
+- [x] Design premium dashboard UI with KPI cards
+- [x] Add source filter (Google, Booking, Airbnb, TripAdvisor, Facebook)
+- [x] Add rating filter (1-5 stars)
+- [x] Add sentiment filter (positive, neutral, negative)
+- [ ] Add date range picker
+- [x] Add response status filter (responded/pending)
+- [ ] Show rating distribution chart
+- [ ] Show rating trend over time chart
+- [x] Show response rate statistics
+- [x] Display individual review cards with response capability
+- [x] Add AI-powered response suggestions
+- [ ] Export reviews to Excel functionality
+- [x] Add Google Business Profile sync button
+- [x] Import Google reviews from Orbi City Sea view Aparthotel

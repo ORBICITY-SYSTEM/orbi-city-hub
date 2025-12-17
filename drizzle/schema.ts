@@ -611,3 +611,54 @@ export const aiTaskAnalytics = mysqlTable("aiTaskAnalytics", {
 
 export type AiTaskAnalytic = typeof aiTaskAnalytics.$inferSelect;
 export type InsertAiTaskAnalytic = typeof aiTaskAnalytics.$inferInsert;
+
+
+/**
+ * Guest Reviews table for multi-platform review management
+ * Stores reviews from Google, Booking.com, Airbnb, TripAdvisor, Facebook, etc.
+ */
+export const guestReviews = mysqlTable("guestReviews", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // Source information
+  source: mysqlEnum("source", ["google", "booking", "airbnb", "expedia", "tripadvisor", "facebook", "agoda", "hostelworld", "direct"]).notNull(),
+  externalId: varchar("externalId", { length: 255 }), // Original review ID from platform
+  reviewUrl: text("reviewUrl"),
+  
+  // Reviewer info
+  reviewerName: varchar("reviewerName", { length: 255 }),
+  reviewerAvatar: text("reviewerAvatar"),
+  reviewerCountry: varchar("reviewerCountry", { length: 64 }),
+  
+  // Review content
+  rating: int("rating").notNull(), // 1-5 or 1-10 normalized to 1-5
+  title: varchar("title", { length: 500 }),
+  content: text("content"),
+  language: varchar("language", { length: 16 }).default("en"),
+  
+  // Categorization
+  sentiment: mysqlEnum("sentiment", ["positive", "neutral", "negative"]).default("neutral"),
+  topics: json("topics").$type<string[]>(), // ["cleanliness", "location", "service", "value"]
+  
+  // Property info
+  apartmentCode: varchar("apartmentCode", { length: 32 }),
+  stayDate: timestamp("stayDate"),
+  
+  // Response tracking
+  hasReply: boolean("hasReply").default(false),
+  replyContent: text("replyContent"),
+  replyDate: timestamp("replyDate"),
+  repliedBy: int("repliedBy"),
+  
+  // AI analysis
+  aiSummary: text("aiSummary"),
+  aiSuggestedReply: text("aiSuggestedReply"),
+  
+  // Metadata
+  reviewDate: timestamp("reviewDate").notNull(),
+  importedAt: timestamp("importedAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type GuestReview = typeof guestReviews.$inferSelect;
+export type InsertGuestReview = typeof guestReviews.$inferInsert;

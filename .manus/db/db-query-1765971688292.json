@@ -1,0 +1,30 @@
+{
+  "query": "SELECT source, COUNT(*) as total, AVG(rating) as avg_rating FROM guestReviews GROUP BY source",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user c2qSkVB4gKtEmor.991468648419 --database 4ExKc24KNHdr4pKbTUzsoU --execute SELECT source, COUNT(*) as total, AVG(rating) as avg_rating FROM guestReviews GROUP BY source",
+  "rows": [
+    {
+      "source": "booking",
+      "total": "3",
+      "avg_rating": "4.0000"
+    },
+    {
+      "source": "google",
+      "total": "17",
+      "avg_rating": "4.2353"
+    },
+    {
+      "source": "facebook",
+      "total": "1",
+      "avg_rating": "5.0000"
+    },
+    {
+      "source": "airbnb",
+      "total": "1",
+      "avg_rating": "5.0000"
+    }
+  ],
+  "messages": [],
+  "stdout": "source\ttotal\tavg_rating\nbooking\t3\t4.0000\ngoogle\t17\t4.2353\nfacebook\t1\t5.0000\nairbnb\t1\t5.0000\n",
+  "stderr": "",
+  "execution_time_ms": 95
+}

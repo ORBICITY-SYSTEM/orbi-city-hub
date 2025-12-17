@@ -1,0 +1,86 @@
+{
+  "query": "SELECT reviewerName, COUNT(*) as cnt FROM guestReviews GROUP BY reviewerName HAVING cnt > 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user c2qSkVB4gKtEmor.991468648419 --database 4ExKc24KNHdr4pKbTUzsoU --execute SELECT reviewerName, COUNT(*) as cnt FROM guestReviews GROUP BY reviewerName HAVING cnt > 1;",
+  "rows": [
+    {
+      "reviewerName": "Carlos Rodriguez",
+      "cnt": "2"
+    },
+    {
+      "reviewerName": "Sarah Johnson",
+      "cnt": "2"
+    },
+    {
+      "reviewerName": "Lisa Anderson",
+      "cnt": "2"
+    },
+    {
+      "reviewerName": "James Wilson",
+      "cnt": "2"
+    },
+    {
+      "reviewerName": "Maria Kowalska",
+      "cnt": "2"
+    },
+    {
+      "reviewerName": "Giorgi Beridze",
+      "cnt": "2"
+    },
+    {
+      "reviewerName": "Yuki Tanaka",
+      "cnt": "2"
+    },
+    {
+      "reviewerName": "Olga Petrova",
+      "cnt": "2"
+    },
+    {
+      "reviewerName": "Elena Ivanova",
+      "cnt": "2"
+    },
+    {
+      "reviewerName": "David Chen",
+      "cnt": "2"
+    },
+    {
+      "reviewerName": "Michael Brown",
+      "cnt": "2"
+    },
+    {
+      "reviewerName": "Anna Müller",
+      "cnt": "2"
+    },
+    {
+      "reviewerName": "Sophie Martin",
+      "cnt": "2"
+    },
+    {
+      "reviewerName": "Emma Thompson",
+      "cnt": "2"
+    },
+    {
+      "reviewerName": "Dmitry Volkov",
+      "cnt": "2"
+    },
+    {
+      "reviewerName": "John Smith",
+      "cnt": "2"
+    },
+    {
+      "reviewerName": "Alexander Petrov",
+      "cnt": "2"
+    },
+    {
+      "reviewerName": "Ahmed Hassan",
+      "cnt": "2"
+    },
+    {
+      "reviewerName": "Natalia Kozlova",
+      "cnt": "2"
+    }
+  ],
+  "messages": [],
+  "stdout": "reviewerName\tcnt\nCarlos Rodriguez\t2\nSarah Johnson\t2\nLisa Anderson\t2\nJames Wilson\t2\nMaria Kowalska\t2\nGiorgi Beridze\t2\nYuki Tanaka\t2\nOlga Petrova\t2\nElena Ivanova\t2\nDavid Chen\t2\nMichael Brown\t2\nAnna Müller\t2\nSophie Martin\t2\nEmma Thompson\t2\nDmitry Volkov\t2\nJohn Smith\t2\nAlexander Petrov\t2\nAhmed Hassan\t2\nNatalia Kozlova\t2\n",
+  "stderr": "",
+  "execution_time_ms": 58
+}

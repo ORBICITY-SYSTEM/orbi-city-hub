@@ -1,0 +1,9 @@
+{
+  "query": "DELETE t1 FROM guestReviews t1 INNER JOIN guestReviews t2 WHERE t1.id > t2.id AND t1.reviewerName = t2.reviewerName AND t1.content = t2.content;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user c2qSkVB4gKtEmor.991468648419 --database 4ExKc24KNHdr4pKbTUzsoU --execute DELETE t1 FROM guestReviews t1 INNER JOIN guestReviews t2 WHERE t1.id > t2.id AND t1.reviewerName = t2.reviewerName AND t1.content = t2.content;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 61
+}

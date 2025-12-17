@@ -1,0 +1,50 @@
+{
+  "query": "SELECT id, source, reviewerName, rating, sentiment, reviewDate FROM guestReviews ORDER BY reviewDate DESC LIMIT 5",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user c2qSkVB4gKtEmor.991468648419 --database 4ExKc24KNHdr4pKbTUzsoU --execute SELECT id, source, reviewerName, rating, sentiment, reviewDate FROM guestReviews ORDER BY reviewDate DESC LIMIT 5",
+  "rows": [
+    {
+      "id": "3",
+      "source": "google",
+      "reviewerName": "Yuki Tanaka",
+      "rating": "5",
+      "sentiment": "positive",
+      "reviewDate": "2025-12-16 00:00:00"
+    },
+    {
+      "id": "2",
+      "source": "google",
+      "reviewerName": "Elena Ivanova",
+      "rating": "5",
+      "sentiment": "positive",
+      "reviewDate": "2025-12-15 00:00:00"
+    },
+    {
+      "id": "1",
+      "source": "google",
+      "reviewerName": "Dmitry Volkov",
+      "rating": "5",
+      "sentiment": "positive",
+      "reviewDate": "2025-12-14 00:00:00"
+    },
+    {
+      "id": "10",
+      "source": "facebook",
+      "reviewerName": "Natalia Kozlova",
+      "rating": "5",
+      "sentiment": "positive",
+      "reviewDate": "2025-12-14 00:00:00"
+    },
+    {
+      "id": "6",
+      "source": "google",
+      "reviewerName": "Giorgi Beridze",
+      "rating": "4",
+      "sentiment": "positive",
+      "reviewDate": "2025-12-13 00:00:00"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tsource\treviewerName\trating\tsentiment\treviewDate\n3\tgoogle\tYuki Tanaka\t5\tpositive\t2025-12-16 00:00:00\n2\tgoogle\tElena Ivanova\t5\tpositive\t2025-12-15 00:00:00\n1\tgoogle\tDmitry Volkov\t5\tpositive\t2025-12-14 00:00:00\n10\tfacebook\tNatalia Kozlova\t5\tpositive\t2025-12-14 00:00:00\n6\tgoogle\tGiorgi Beridze\t4\tpositive\t2025-12-13 00:00:00\n",
+  "stderr": "",
+  "execution_time_ms": 53
+}
