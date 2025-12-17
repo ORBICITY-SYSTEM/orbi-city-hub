@@ -101,3 +101,13 @@
 - [x] Add Export to Excel button to bookings table
 - [x] Implement filter-aware export (respects channel and status filters)
 - [x] Include all booking details in export
+
+## OTA Command Center Redesign
+- [x] Change currency from EUR to GEL (Georgian Lari)
+- [x] Add multi-month filter selection
+- [x] Add monthly comparison analytics
+- [x] Add average price per night trends
+- [x] Add detailed analytics charts after Channel Statistics
+- [x] Implement AI analysis for each OTA channel (from first booking to today)
+- [x] Add channel-specific performance insights
+- [x] Add month-over-month growth metrics
