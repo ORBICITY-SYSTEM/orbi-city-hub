@@ -260,7 +260,7 @@ export const reviewsRouter = router({
   /**
    * Get review statistics
    */
-  getStats: protectedProcedure
+  getStats: publicProcedure
     .input(z.object({
       source: z.enum(["all", "google", "booking", "airbnb", "expedia", "tripadvisor", "facebook", "agoda", "hostelworld", "direct"]).default("all"),
       dateFrom: z.string().optional(),
@@ -300,7 +300,8 @@ export const reviewsRouter = router({
         .where(whereClause);
 
       const stats = statsResult[0];
-      const total = stats?.total || 0;
+      console.log('[Reviews Stats] Raw stats result:', JSON.stringify(statsResult));
+      const total = Number(stats?.total) || 0;
 
       // Get trend (last 30 days vs previous 30 days)
       const thirtyDaysAgo = new Date();
@@ -318,12 +319,12 @@ export const reviewsRouter = router({
       const [recentResult] = await db
         .select({ count: sql<number>`COUNT(*)` })
         .from(guestReviews)
-        .where(and(...recentConditions));
+        .where(recentConditions.length > 0 ? and(...recentConditions) : undefined);
 
       const [previousResult] = await db
         .select({ count: sql<number>`COUNT(*)` })
         .from(guestReviews)
-        .where(and(...previousConditions));
+        .where(previousConditions.length > 0 ? and(...previousConditions) : undefined);
 
       const recentCount = recentResult?.count || 0;
       const previousCount = previousResult?.count || 0;
@@ -331,14 +332,14 @@ export const reviewsRouter = router({
 
       return {
         total,
-        avgRating: stats?.avgRating ? parseFloat(stats.avgRating.toFixed(1)) : 0,
-        positiveCount: stats?.positiveCount || 0,
-        neutralCount: stats?.neutralCount || 0,
-        negativeCount: stats?.negativeCount || 0,
-        repliedCount: stats?.repliedCount || 0,
-        pendingCount: stats?.pendingCount || 0,
-        responseRate: total > 0 ? Math.round(((stats?.repliedCount || 0) / total) * 100) : 0,
-        positiveRate: total > 0 ? Math.round(((stats?.positiveCount || 0) / total) * 100) : 0,
+        avgRating: stats?.avgRating ? parseFloat(Number(stats.avgRating).toFixed(1)) : 0,
+        positiveCount: Number(stats?.positiveCount) || 0,
+        neutralCount: Number(stats?.neutralCount) || 0,
+        negativeCount: Number(stats?.negativeCount) || 0,
+        repliedCount: Number(stats?.repliedCount) || 0,
+        pendingCount: Number(stats?.pendingCount) || 0,
+        responseRate: total > 0 ? Math.round((Number(stats?.repliedCount || 0) / total) * 100) : 0,
+        positiveRate: total > 0 ? Math.round((Number(stats?.positiveCount || 0) / total) * 100) : 0,
         trend: {
           change,
           percentage: previousCount > 0 ? Math.round((change / previousCount) * 100) : 0,

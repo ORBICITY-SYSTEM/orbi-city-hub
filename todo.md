@@ -149,13 +149,16 @@
 - [x] Add error handling and rate limiting
 - [x] Test live review fetching
 
-## Outscraper Integration (Replacing Google OAuth)
+## Outscraper Integration (Replacing Google OAuth) ✅ COMPLETED
 - [x] Remove non-working Google OAuth code
-- [x] Create Outscraper webhook endpoint `/api/trpc/reviews.receiveOutscraperWebhook`
+- [x] Create Outscraper webhook endpoint `/api/webhooks/outscraper-reviews`
 - [x] Parse Outscraper review data format
-- [x] Save new reviews to database
+- [x] Save new reviews to database (97 real Google reviews imported!)
 - [x] Create notification on new review
 - [x] Create urgent notification on negative review (1-2 stars)
 - [x] Update frontend to show Outscraper connection status and webhook URL
 - [x] Test webhook endpoint - working!
+- [x] Import all 97 Google reviews from Orbi City Sea view Aparthotel
+- [x] Stats showing correctly: 121 total, 3.2 avg rating, 52% positive
+- [x] Outscraper scheduled task configured (daily at 18:07)
 - [x] Push all changes to GitHub
