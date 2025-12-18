@@ -16,7 +16,7 @@ import { useLogisticsRealtimeNotifications } from "@/hooks/useLogisticsRealtimeN
 
 const Logistics = () => {
   const navigate = useLocation();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   // Enable real-time notifications

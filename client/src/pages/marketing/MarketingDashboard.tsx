@@ -42,7 +42,7 @@ interface SalesChannel {
 
 const Marketing = () => {
   const navigate = useLocation();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   
   const [salesChannels, setSalesChannels] = useState<SalesChannel[]>(() => {
@@ -434,7 +434,7 @@ const Marketing = () => {
                   <span className="text-xs text-success">+18%</span>
                 </div>
                 <div className="text-2xl font-bold text-foreground">€68.1K</div>
-                <div className="text-sm text-muted-foreground">Revenue MTD</div>
+                <div className="text-sm text-muted-foreground">{language === 'ka' ? 'შემოსავალი თვის დასაწყისიდან' : 'Revenue MTD'}</div>
               </Card>
 
               <Card className="p-6 border-border bg-gradient-card hover:border-ocean/30 transition-colors">
@@ -445,7 +445,7 @@ const Marketing = () => {
                   <span className="text-xs text-success">+24%</span>
                 </div>
                 <div className="text-2xl font-bold text-foreground">546</div>
-                <div className="text-sm text-muted-foreground">Total Bookings</div>
+                <div className="text-sm text-muted-foreground">{language === 'ka' ? 'სულ ჯავშნები' : 'Total Bookings'}</div>
               </Card>
 
               <Card className="p-6 border-border bg-gradient-card hover:border-ocean/30 transition-colors">
@@ -456,7 +456,7 @@ const Marketing = () => {
                   <span className="text-xs text-success">+8%</span>
                 </div>
                 <div className="text-2xl font-bold text-foreground">87%</div>
-                <div className="text-sm text-muted-foreground">Occupancy Rate</div>
+                <div className="text-sm text-muted-foreground">{language === 'ka' ? 'დაკავების მაჩვენებელი' : 'Occupancy Rate'}</div>
               </Card>
 
               <Card className="p-6 border-border bg-gradient-card hover:border-ocean/30 transition-colors">
@@ -467,17 +467,17 @@ const Marketing = () => {
                   <span className="text-xs text-info">12.4K</span>
                 </div>
                 <div className="text-2xl font-bold text-foreground">4.2K</div>
-                <div className="text-sm text-muted-foreground">Website Visits</div>
+                <div className="text-sm text-muted-foreground">{language === 'ka' ? 'საიტის ვიზიტები' : 'Website Visits'}</div>
               </Card>
             </div>
 
             {/* Active Campaigns */}
             <div>
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-bold text-foreground">Active Campaigns</h2>
+                <h2 className="text-xl font-bold text-foreground">{language === 'ka' ? 'აქტიური კამპანიები' : 'Active Campaigns'}</h2>
                 <Button variant="outline" className="border-ocean/30 hover:bg-ocean/10 hover:text-ocean">
                   <Calendar className="h-4 w-4 mr-2" />
-                  New Campaign
+                  {language === 'ka' ? 'ახალი კამპანია' : 'New Campaign'}
                 </Button>
               </div>
               
@@ -497,11 +497,11 @@ const Marketing = () => {
                       
                       <div className="flex items-center gap-8">
                         <div className="text-right">
-                          <div className="text-sm text-muted-foreground">Performance</div>
+                          <div className="text-sm text-muted-foreground">{language === 'ka' ? 'შესრულება' : 'Performance'}</div>
                           <div className="text-lg font-bold text-success">{campaign.performance}</div>
                         </div>
                         <div className="text-right">
-                          <div className="text-sm text-muted-foreground">Budget</div>
+                          <div className="text-sm text-muted-foreground">{language === 'ka' ? 'ბიუჯეტი' : 'Budget'}</div>
                           <div className="text-lg font-bold text-foreground">{campaign.budget}</div>
                         </div>
                         <Badge 
@@ -521,7 +521,7 @@ const Marketing = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* OTA Performance */}
               <div>
-                <h2 className="text-xl font-bold text-foreground mb-4">OTA Performance</h2>
+                <h2 className="text-xl font-bold text-foreground mb-4">{language === 'ka' ? 'OTA შესრულება' : 'OTA Performance'}</h2>
                 <Card className="p-6 border-border bg-gradient-card">
                   <div className="space-y-4">
                     {otaPerformance.map((ota, index) => (
@@ -542,7 +542,7 @@ const Marketing = () => {
 
               {/* Social Media */}
               <div>
-                <h2 className="text-xl font-bold text-foreground mb-4">Social Media</h2>
+                <h2 className="text-xl font-bold text-foreground mb-4">{language === 'ka' ? 'სოციალური მედია' : 'Social Media'}</h2>
                 <div className="space-y-4">
                   {socialStats.map((social, index) => (
                     <Card key={index} className="p-6 border-border bg-card hover:border-ocean/20 transition-colors">

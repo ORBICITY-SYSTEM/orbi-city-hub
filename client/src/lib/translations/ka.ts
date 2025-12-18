@@ -34,7 +34,7 @@ export const ka: Translations = {
     butlerAI: "Butler AI",
     email: "ელფოსტა",
     reviews: "მიმოხილვები",
-    otaCommand: "OTA სარდლობა",
+    otaCommand: "OTA მართვა",
     
     // Logistics
     logisticsDashboard: "მთავარი",
@@ -108,7 +108,7 @@ export const ka: Translations = {
   
   // OTA Dashboard
   ota: {
-    title: "Orbi OTA სარდლობის ცენტრი",
+    title: "Orbi OTA მართვის ცენტრი",
     subtitle: "რეალური ჯავშნების ანალიტიკა ყველა არხზე",
     sync: "სინქრონიზაცია",
     syncing: "სინქრონიზაცია...",

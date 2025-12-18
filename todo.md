@@ -271,3 +271,14 @@
 - [x] Update toast notifications with translations
 - [x] Update modal dialogs with translations
 - [x] Update error messages with translations
+
+## Complete Full Bilingual Translation (Modern Georgian)
+- [x] Update translations with modern terms (Command Center → მართვის ცენტრი, not სარდლობა)
+- [x] OTA Dashboard - all KPI cards, tabs, chart labels, filters
+- [x] Finance Dashboard - all content
+- [x] Marketing Dashboard - all content
+- [x] Reviews Dashboard - all content
+- [x] Logistics Dashboard - all content
+- [x] Home page - all module cards and stats
+- [x] Fix all mixed language issues
+- [ ] Push to GitHub

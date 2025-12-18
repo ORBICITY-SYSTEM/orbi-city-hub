@@ -52,7 +52,7 @@ const platformConfig: Record<string, { color: string; bgColor: string; icon: str
 };
 
 const ReviewsDashboard = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { toast } = useToast();
   
   // Filters state
