@@ -63,6 +63,7 @@ const INTEGRATIONS = {
       { name: "Outscraper Webhook", description: { en: "Real-time review data collection", ka: "რეალ-ტაიმ მიმოხილვების მონაცემების შეგროვება" } },
       { name: "Gmail Push Notifications", description: { en: "Real-time email notifications via Pub/Sub", ka: "რეალ-ტაიმ ელფოსტის შეტყობინებები" } },
       { name: "WhatsApp Business Bot", description: { en: "Automated guest messaging and support", ka: "ავტომატური სტუმრების შეტყობინებები" } },
+      { name: "Telegram Bot", description: { en: "Staff notifications and guest communication", ka: "პერსონალის შეტყობინებები და სტუმრებთან კომუნიკაცია" } },
       { name: "Scheduled Tasks (Cron)", description: { en: "Automated daily reports and sync jobs", ka: "ავტომატური დღიური ანგარიშები" } }
     ]
   },
@@ -135,7 +136,6 @@ const COMING_SOON = {
     color: "from-violet-500 to-purple-500",
     items: [
       { name: "Twilio SMS", description: { en: "SMS notifications and 2FA", ka: "SMS შეტყობინებები და 2FA" } },
-      { name: "Telegram Bot", description: { en: "Guest communication via Telegram", ka: "სტუმრებთან კომუნიკაცია Telegram-ით" } },
       { name: "Slack Integration", description: { en: "Team notifications and alerts", ka: "გუნდის შეტყობინებები და გაფრთხილებები" } },
       { name: "Discord Webhooks", description: { en: "Real-time team updates", ka: "რეალ-ტაიმ გუნდის განახლებები" } },
       { name: "Intercom", description: { en: "Live chat and customer support", ka: "ლაივ ჩატი და მომხმარებლის მხარდაჭერა" } }
