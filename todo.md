@@ -259,3 +259,15 @@
 - [x] Update Main AI Agent to use translations
 - [x] English version: no Georgian text
 - [x] Georgian version: can use English terms
+
+## Remaining UI Translations (Buttons, Notifications, Popups)
+- [x] Expand en.ts with all dashboard text
+- [x] Expand ka.ts with Georgian translations
+- [x] Update OTA Dashboard with translations
+- [x] Update Finance Dashboard with translations
+- [x] Update Marketing Dashboard with translations
+- [x] Update Reviews Dashboard with translations
+- [x] Update Logistics Dashboard with translations
+- [x] Update toast notifications with translations
+- [x] Update modal dialogs with translations
+- [x] Update error messages with translations

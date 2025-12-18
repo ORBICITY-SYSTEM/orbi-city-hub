@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
@@ -54,6 +55,7 @@ export default function OTADashboard() {
   const [bookingsPage, setBookingsPage] = useState(1);
   const [activeTab, setActiveTab] = useState<'overview' | 'monthly' | 'channels' | 'ai'>('overview');
   const [monthFilterOpen, setMonthFilterOpen] = useState(false);
+  const { t, language } = useLanguage();
 
   // Fetch OTA data
   const { data: channelsData, isLoading: channelsLoading, refetch } = trpc.ota.getChannels.useQuery();
@@ -219,7 +221,7 @@ export default function OTADashboard() {
     await new Promise(resolve => setTimeout(resolve, 2000));
     await refetch();
     setSyncing(false);
-    toast.success('სინქრონიზაცია დასრულდა', { description: 'ყველა OTA არხი განახლდა' });
+    toast.success(t('toast.syncComplete'), { description: t('ota.syncSuccess') });
   };
 
   const totalRevenue = totals.revenue;
@@ -242,9 +244,9 @@ export default function OTADashboard() {
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-3xl md:text-4xl font-bold text-cyan-400 tracking-tight">
-                  Orbi OTA Command Center
+                  {t('ota.title')}
                 </h1>
-                <p className="text-lg text-white/90 mt-2 font-medium">OTA სარდლობის ცენტრი / რეალური ჯავშნების ანალიტიკა ყველა არხზე</p>
+                <p className="text-lg text-white/90 mt-2 font-medium">{t('ota.subtitle')}</p>
               </div>
               <Button 
                 onClick={handleSync} 
@@ -252,7 +254,7 @@ export default function OTADashboard() {
                 className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white shadow-lg"
               >
                 <RefreshCw className={`h-4 w-4 mr-2 ${syncing ? 'animate-spin' : ''}`} />
-                {syncing ? 'სინქრონიზაცია...' : 'სინქრონიზაცია'}
+                {syncing ? t('ota.syncing') : t('ota.sync')}
               </Button>
             </div>
           </div>
@@ -274,11 +276,11 @@ export default function OTADashboard() {
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
                 <Filter className="h-5 w-5 text-cyan-400" />
-                <span className="text-sm font-medium text-slate-300">თვის ფილტრი:</span>
+                <span className="text-sm font-medium text-slate-300">{t('ota.monthFilter')}:</span>
               </div>
               <Select value={selectedMonth} onValueChange={setSelectedMonth}>
                 <SelectTrigger className="w-[280px] bg-slate-800 border-slate-700 focus:border-cyan-500">
-                  <SelectValue placeholder="აირჩიეთ თვე" />
+                  <SelectValue placeholder={t('ota.selectMonth')} />
                 </SelectTrigger>
                 <SelectContent className="bg-slate-800 border-slate-700">
                   <SelectItem value="all" className="focus:bg-cyan-500/20">
@@ -302,7 +304,7 @@ export default function OTADashboard() {
                   className="text-cyan-400 hover:text-cyan-300"
                 >
                   <X className="h-4 w-4 mr-1" />
-                  გასუფთავება
+                  {t('ota.clear')}
                 </Button>
               )}
             </div>
@@ -315,7 +317,7 @@ export default function OTADashboard() {
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">სულ ჯავშნები</p>
+                  <p className="text-sm text-muted-foreground">{t('ota.totalBookings')}</p>
                   <p className="text-3xl font-bold text-white">{totals.bookings.toLocaleString()}</p>
                 </div>
                 <Calendar className="h-10 w-10 text-cyan-400 opacity-80" />
@@ -327,7 +329,7 @@ export default function OTADashboard() {
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">სულ შემოსავალი</p>
+                  <p className="text-sm text-muted-foreground">{t('ota.totalRevenue')}</p>
                   <p className="text-3xl font-bold text-emerald-400">
                     ₾{totals.revenue.toLocaleString('ka-GE', { maximumFractionDigits: 0 })}
                   </p>
@@ -342,7 +344,7 @@ export default function OTADashboard() {
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">სულ ღამეები</p>
+                  <p className="text-sm text-muted-foreground">{t('ota.totalNights')}</p>
                   <p className="text-3xl font-bold text-purple-400">{totals.nights.toLocaleString()}</p>
                   <p className="text-xs text-muted-foreground">საშ: ₾{totals.nights > 0 ? (totals.revenue / totals.nights).toFixed(0) : 0}/ღამე</p>
                 </div>
@@ -737,7 +739,7 @@ export default function OTADashboard() {
                     </div>
                     <div className="text-right">
                       <p className="text-2xl font-bold text-emerald-400">₾{analysis.totalRevenue.toLocaleString('ka-GE', { maximumFractionDigits: 0 })}</p>
-                      <p className="text-sm text-muted-foreground">სულ შემოსავალი</p>
+                      <p className="text-sm text-muted-foreground">{t('ota.totalRevenue')}</p>
                     </div>
                   </div>
                 </CardHeader>

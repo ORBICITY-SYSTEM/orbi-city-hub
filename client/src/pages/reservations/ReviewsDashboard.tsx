@@ -138,8 +138,8 @@ const ReviewsDashboard = () => {
     const webhookUrl = `${window.location.origin}/api/trpc/reviews.receiveOutscraperWebhook`;
     navigator.clipboard.writeText(webhookUrl);
     toast({ 
-      title: t("დაკოპირდა", "Copied"), 
-      description: t("Webhook URL დაკოპირდა", "Webhook URL copied to clipboard")
+      title: t('toast.copied'), 
+      description: t('toast.copied')
     });
   };
 
@@ -178,11 +178,11 @@ const ReviewsDashboard = () => {
   const getSentimentBadge = (sentiment: string) => {
     switch (sentiment) {
       case "positive":
-        return <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20"><ThumbsUp className="h-3 w-3 mr-1" />{t("დადებითი", "Positive")}</Badge>;
+        return <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20"><ThumbsUp className="h-3 w-3 mr-1" />{t('reviews.positiveReviews')}</Badge>;
       case "negative":
-        return <Badge className="bg-red-500/10 text-red-600 border-red-500/20"><ThumbsDown className="h-3 w-3 mr-1" />{t("უარყოფითი", "Negative")}</Badge>;
+        return <Badge className="bg-red-500/10 text-red-600 border-red-500/20"><ThumbsDown className="h-3 w-3 mr-1" />{t('reviews.negativeReviews')}</Badge>;
       default:
-        return <Badge className="bg-gray-500/10 text-gray-600 border-gray-500/20"><Minus className="h-3 w-3 mr-1" />{t("ნეიტრალური", "Neutral")}</Badge>;
+        return <Badge className="bg-gray-500/10 text-gray-600 border-gray-500/20"><Minus className="h-3 w-3 mr-1" />{t('reviews.neutralReviews')}</Badge>;
     }
   };
 
@@ -194,10 +194,10 @@ const ReviewsDashboard = () => {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl md:text-4xl font-bold text-cyan-400 tracking-tight">
-                Reviews Command Center
+                {t('reviews.title')}
               </h1>
               <p className="text-lg text-white/90 mt-2 font-medium">
-                მიმოხილვების ცენტრი / ყველა პლატფორმის მიმოხილვები ერთ ადგილას
+                {t('reviews.subtitle')}
               </p>
             </div>
             <div className="flex gap-2 items-center">
@@ -210,11 +210,11 @@ const ReviewsDashboard = () => {
           {/* Demo Sync Button */}
           <Button onClick={() => syncDemoMutation.mutate()} variant="default" disabled={syncDemoMutation.isPending}>
             <Globe className={`h-4 w-4 mr-2 ${syncDemoMutation.isPending ? "animate-spin" : ""}`} />
-            {t("დემო სინქრონიზაცია", "Demo Sync")}
+            {t('ota.sync')}
           </Button>
           <Button onClick={() => refetch()} variant="outline" disabled={isLoading}>
             <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? "animate-spin" : ""}`} />
-            {t("განახლება", "Refresh")}
+            {t('common.refresh')}
           </Button>
             </div>
           </div>

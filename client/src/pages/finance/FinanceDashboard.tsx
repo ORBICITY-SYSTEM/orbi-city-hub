@@ -6,10 +6,12 @@ import { FinanceActivityLog } from "@/components/finance/FinanceActivityLog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const Finance = () => {
   const navigate = useLocation();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const { t } = useLanguage();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -26,7 +28,7 @@ const Finance = () => {
             {isAuthenticated && (
               <Button variant="ghost" size="sm" onClick={() => setLocation("/")} className="text-cyan-300 hover:text-white hover:bg-white/10">
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                მთავარი
+                {t('nav.home')}
               </Button>
             )}
             <div className="flex items-center gap-3">
@@ -35,10 +37,10 @@ const Finance = () => {
               </div>
               <div>
           <h1 className="text-3xl md:text-4xl font-bold text-cyan-400 tracking-tight">
-            Financial Intelligence
+            {t('finance.title')}
           </h1>
           <p className="text-lg text-white/90 mt-2 font-medium">
-            ფინანსური ინტელექტი / შემოსავლები, ხარჯები და ფინანსური ანალიტიკა
+            {t('finance.subtitle')}
           </p>
               </div>
             </div>
@@ -61,21 +63,21 @@ const Finance = () => {
           <TabsList className="mb-8 bg-slate-800/50 border border-cyan-500/20">
             <TabsTrigger value="modules" className="data-[state=active]:bg-cyan-600 data-[state=active]:text-white">
               <TrendingUp className="h-4 w-4 mr-2" />
-              მოდულები
+              {t('home.mainModules')}
             </TabsTrigger>
             <TabsTrigger value="activity" className="data-[state=active]:bg-cyan-600 data-[state=active]:text-white">
               <Activity className="h-4 w-4 mr-2" />
-              აქტივობის ლოგი
+              {t('common.overview')}
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="modules">
             <div className="mb-8">
               <h2 className="text-2xl font-bold text-white mb-2">
-                აირჩიეთ მოდული
+                {t('home.mainModules')}
               </h2>
               <p className="text-cyan-300/70">
-                ფინანსური მართვის 4 ძირითადი მოდული
+                {t('modules.finance.description')}
               </p>
             </div>
             <FinanceModulesLanding />

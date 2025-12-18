@@ -367,8 +367,8 @@ const Marketing = () => {
                 </Button>
               )}
               <div>
-                <h1 className="text-3xl md:text-4xl font-bold text-cyan-400 tracking-tight">Marketing Control Center</h1>
-                <p className="text-lg text-white/90 mt-1 font-medium">მარკეტინგის ცენტრი / კამპანიების მართვა და ანალიტიკა</p>
+                <h1 className="text-3xl md:text-4xl font-bold text-cyan-400 tracking-tight">{t('marketing.title')}</h1>
+                <p className="text-lg text-white/90 mt-1 font-medium">{t('marketing.subtitle')}</p>
               </div>
             </div>
             <Badge className="bg-cyan-500/20 text-cyan-300 border-cyan-500/30">
@@ -394,7 +394,7 @@ const Marketing = () => {
           <TabsList className="grid w-full grid-cols-7 lg:w-auto lg:inline-grid">
             <TabsTrigger value="dashboard" className="gap-2">
               <LayoutDashboard className="h-4 w-4" />
-              {t("დეშბორდი", "Dashboard")}
+              {t('common.overview')}
             </TabsTrigger>
             <TabsTrigger value="command-center" className="gap-2">
               <Zap className="h-4 w-4" />
@@ -402,19 +402,19 @@ const Marketing = () => {
             </TabsTrigger>
             <TabsTrigger value="sales-channels" className="gap-2">
               <ShoppingCart className="h-4 w-4" />
-              {t("გაყიდვების არხები", "Sales Channels")}
+              {t('submenu.otaChannels')}
             </TabsTrigger>
             <TabsTrigger value="photos" className="gap-2">
               <Image className="h-4 w-4" />
-              {t("ფოტოები", "Photos")}
+              {t('common.details')}
             </TabsTrigger>
             <TabsTrigger value="videos" className="gap-2">
               <Video className="h-4 w-4" />
-              {t("ვიდეოები", "Videos")}
+              {t('common.more')}
             </TabsTrigger>
             <TabsTrigger value="expenses" className="gap-2">
               <DollarSign className="h-4 w-4" />
-              {t("ხარჯები", "Expenses")}
+              {t('finance.totalExpenses')}
             </TabsTrigger>
             <TabsTrigger value="emails" className="gap-2">
               <Mail className="h-4 w-4" />

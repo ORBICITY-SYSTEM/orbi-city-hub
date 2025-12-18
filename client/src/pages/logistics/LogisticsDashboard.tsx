@@ -37,7 +37,7 @@ const Logistics = () => {
             {isAuthenticated && (
               <Button variant="ghost" size="sm" onClick={() => setLocation("/")} className="text-cyan-300 hover:text-white hover:bg-white/10">
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                {t("უკან", "უკან")}
+                {t('nav.home')}
               </Button>
             )}
             <div className="flex items-center gap-3">
@@ -46,10 +46,10 @@ const Logistics = () => {
               </div>
               <div>
                 <h1 className="text-3xl md:text-4xl font-bold text-cyan-400 tracking-tight">
-                  Logistics Command Center
+                  {t('logistics.title')}
                 </h1>
                 <p className="text-lg text-white/90 mt-1 font-medium">
-                  ლოჯისტიკის ცენტრი / სტუდიოების ინვენტარის მართვა და ანალიტიკა
+                  {t('logistics.subtitle')}
                 </p>
               </div>
             </div>
@@ -72,11 +72,11 @@ const Logistics = () => {
           <TabsList className="grid w-full grid-cols-5 mb-8">
             <TabsTrigger value="dashboard" className="flex items-center gap-2">
               <BarChart3 className="h-4 w-4" />
-              {t("დეშბორდი", "Dashboard")}
+              {t('common.overview')}
             </TabsTrigger>
             <TabsTrigger value="inventory" className="flex items-center gap-2">
               <Package className="h-4 w-4" />
-              {t("ინვენტარი", "Inventory")}
+              {t('submenu.inventory')}
             </TabsTrigger>
             <TabsTrigger value="housekeeping" className="flex items-center gap-2">
               <ClipboardList className="h-4 w-4" />
