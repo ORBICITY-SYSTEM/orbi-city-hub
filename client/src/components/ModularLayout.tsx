@@ -1,5 +1,7 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { APP_LOGO, APP_TITLE, getLoginUrl } from "@/const";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { 
   LayoutDashboard, 
@@ -35,13 +37,13 @@ import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
 
 interface SubMenuItem {
-  name: string;
+  nameKey: string;
   path: string;
   icon: React.ComponentType<{ className?: string }>;
 }
 
 interface ModuleItem {
-  name: string;
+  nameKey: string;
   icon: React.ComponentType<{ className?: string }>;
   color: string;
   subItems: SubMenuItem[];
@@ -49,79 +51,80 @@ interface ModuleItem {
 
 const modules: ModuleItem[] = [
   {
-    name: "ფინანსები",
+    nameKey: "nav.finance",
     icon: DollarSign,
     color: "text-cyan-400",
     subItems: [
-      { name: "მთავარი", path: "/finance", icon: LayoutDashboard },
-      { name: "ანალიტიკა", path: "/finance/analytics", icon: TrendingUp },
-      { name: "თვიური ანგარიშები", path: "/finance/reports", icon: FileText },
-      { name: "OTELMS", path: "/finance/otelms", icon: Database },
-      { name: "დევ ხარჯები", path: "/finance/expenses", icon: BarChart3 },
+      { nameKey: "submenu.financeDashboard", path: "/finance", icon: LayoutDashboard },
+      { nameKey: "submenu.analytics", path: "/finance/analytics", icon: TrendingUp },
+      { nameKey: "submenu.reports", path: "/finance/reports", icon: FileText },
+      { nameKey: "submenu.otelms", path: "/finance/otelms", icon: Database },
+      { nameKey: "submenu.devExpenses", path: "/finance/expenses", icon: BarChart3 },
     ]
   },
   {
-    name: "მარკეტინგი",
+    nameKey: "nav.marketing",
     icon: Megaphone,
     color: "text-cyan-400",
     subItems: [
-      { name: "მთავარი", path: "/marketing", icon: LayoutDashboard },
-      { name: "OTA არხები", path: "/marketing/ota", icon: Globe },
-      { name: "ვებ ლიდები", path: "/marketing/leads", icon: Users },
+      { nameKey: "submenu.marketingDashboard", path: "/marketing", icon: LayoutDashboard },
+      { nameKey: "submenu.otaChannels", path: "/marketing/ota", icon: Globe },
+      { nameKey: "submenu.webLeads", path: "/marketing/leads", icon: Users },
     ]
   },
   {
-    name: "რეზერვაციები",
+    nameKey: "nav.reservations",
     icon: Calendar,
     color: "text-cyan-400",
     subItems: [
-      { name: "მთავარი", path: "/reservations", icon: LayoutDashboard },
-      { name: "AI პასხები", path: "/reservations/ai-responses", icon: Sparkles },
-      { name: "Butler AI", path: "/reservations/automations", icon: Bot },
-      { name: "ელფოსტა", path: "/reservations/email", icon: Mail },
-      { name: "მიმოხილვები", path: "/reservations/guests", icon: Users },
-      { name: "OTA სარდლობა", path: "/reservations/ota", icon: Globe },
+      { nameKey: "submenu.otaDashboard", path: "/reservations", icon: LayoutDashboard },
+      { nameKey: "submenu.aiResponses", path: "/reservations/ai-responses", icon: Sparkles },
+      { nameKey: "submenu.butlerAI", path: "/reservations/automations", icon: Bot },
+      { nameKey: "submenu.email", path: "/reservations/email", icon: Mail },
+      { nameKey: "submenu.reviews", path: "/reservations/guests", icon: Users },
+      { nameKey: "submenu.otaCommand", path: "/reservations/ota", icon: Globe },
     ]
   },
   {
-    name: "ლოჯისტიკა",
+    nameKey: "nav.logistics",
     icon: Truck,
     color: "text-cyan-400",
     subItems: [
-      { name: "მთავარი", path: "/logistics", icon: LayoutDashboard },
-      { name: "დალაგება", path: "/logistics/housekeeping", icon: Package },
-      { name: "მოვლა", path: "/logistics/maintenance", icon: Wrench },
+      { nameKey: "submenu.logisticsDashboard", path: "/logistics", icon: LayoutDashboard },
+      { nameKey: "submenu.housekeeping", path: "/logistics/housekeeping", icon: Package },
+      { nameKey: "submenu.maintenance", path: "/logistics/maintenance", icon: Wrench },
     ]
   },
   {
-    name: "WhatsApp ბოტი",
+    nameKey: "nav.whatsappBot",
     icon: MessageCircle,
     color: "text-cyan-400",
     subItems: [
-      { name: "სწრაფი დაწყება", path: "/whatsapp/quick-start", icon: Rocket },
-      { name: "იმპლემენტაცია", path: "/whatsapp/implementation", icon: Code },
-      { name: "კოდის მაგალითები", path: "/whatsapp/code-examples", icon: FileText },
-      { name: "სისტემის პრომპტი", path: "/whatsapp/system-prompt", icon: MessageCircle },
-      { name: "ტესტირება", path: "/whatsapp/testing", icon: TestTube },
-      { name: "რესურსები", path: "/whatsapp/resources", icon: BookOpen },
-      { name: "განთავსება", path: "/whatsapp/deployment", icon: Rocket },
+      { nameKey: "submenu.quickStart", path: "/whatsapp/quick-start", icon: Rocket },
+      { nameKey: "submenu.implementation", path: "/whatsapp/implementation", icon: Code },
+      { nameKey: "submenu.codeExamples", path: "/whatsapp/code-examples", icon: FileText },
+      { nameKey: "submenu.systemPrompt", path: "/whatsapp/system-prompt", icon: MessageCircle },
+      { nameKey: "submenu.testing", path: "/whatsapp/testing", icon: TestTube },
+      { nameKey: "submenu.resources", path: "/whatsapp/resources", icon: BookOpen },
+      { nameKey: "submenu.deployment", path: "/whatsapp/deployment", icon: Rocket },
     ]
   }
 ];
 
 export default function ModularLayout({ children }: { children: React.ReactNode }) {
   const { user, loading, isAuthenticated, logout } = useAuth();
+  const { t } = useLanguage();
   const [location] = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [expandedModules, setExpandedModules] = useState<string[]>(["Finance", "Marketing", "Reservations", "Logistics", "WhatsApp Bot"]);
+  const [expandedModules, setExpandedModules] = useState<string[]>(["nav.finance", "nav.marketing", "nav.reservations", "nav.logistics", "nav.whatsappBot"]);
 
   // Auto-expand module based on current route
   useEffect(() => {
     const currentModule = modules.find(m => 
       m.subItems.some(item => location.startsWith(item.path))
     );
-    if (currentModule && !expandedModules.includes(currentModule.name)) {
-      setExpandedModules(prev => [...prev, currentModule.name]);
+    if (currentModule && !expandedModules.includes(currentModule.nameKey)) {
+      setExpandedModules(prev => [...prev, currentModule.nameKey]);
     }
   }, [location]);
 
@@ -130,184 +133,110 @@ export default function ModularLayout({ children }: { children: React.ReactNode 
     setSidebarOpen(false);
   }, [location]);
 
-  const toggleModule = (moduleName: string) => {
+  const toggleModule = (moduleNameKey: string) => {
     setExpandedModules(prev => 
-      prev.includes(moduleName) 
-        ? prev.filter(name => name !== moduleName)
-        : [...prev, moduleName]
+      prev.includes(moduleNameKey) 
+        ? prev.filter(name => name !== moduleNameKey)
+        : [...prev, moduleNameKey]
     );
   };
 
-  // Authentication disabled - public access
-  // if (loading) {
-  //   return (
-  //     <div className="min-h-screen flex items-center justify-center bg-black">
-  //       <div className="text-center">
-  //         <Loader2 className="w-12 h-12 animate-spin text-green-500 mx-auto mb-4" />
-  //         <p className="text-gray-400">Loading ORBI City Hub...</p>
-  //       </div>
-  //     </div>
-  //   );
-  // }
-
-  // if (!isAuthenticated) {
-  //   return (
-  //     <div className="min-h-screen flex items-center justify-center bg-black px-4">
-  //       <div className="max-w-md w-full">
-  //         <div className="bg-gray-900 rounded-2xl shadow-xl p-8 border border-gray-800">
-  //           <div className="text-center mb-8">
-  //             <img 
-  //               src={APP_LOGO} 
-  //               alt={APP_TITLE} 
-  //               className="h-16 mx-auto mb-4"
-  //             />
-  //             <h1 className="text-3xl font-bold text-white mb-2">
-  //               {APP_TITLE}
-  //             </h1>
-  //             <p className="text-gray-400">
-  //               Enterprise Management Platform
-  //             </p>
-  //           </div>
-  //           
-  //           <div className="space-y-4">
-  //             <div className="bg-green-950 rounded-lg p-4 border border-green-800">
-  //               <h3 className="font-semibold text-green-400 mb-2">4 Core Modules:</h3>
-  //               <ul className="text-sm text-green-300 space-y-1">
-  //                 <li>• Finance & Analytics</li>
-  //                 <li>• Marketing & OTA</li>
-  //                 <li>• Reservations & Guests</li>
-  //                 <li>• Logistics & Operations</li>
-  //               </ul>
-  //             </div>
-  //             
-  //             <Button 
-  //               onClick={() => window.location.href = getLoginUrl()}
-  //               className="w-full bg-green-600 hover:bg-green-700 text-white py-6 text-lg font-semibold"
-  //             >
-  //               Sign In with Manus
-  //             </Button>
-  //           </div>
-  //         </div>
-  //       </div>
-  //     </div>
-  //   );
-  // }
-
   return (
-    <div className="min-h-screen text-white" style={{ background: 'linear-gradient(135deg, #0a1628 0%, #0d2847 50%, #0f3460 100%)' }}>
-      {/* Header */}
-      <header className="fixed top-0 left-0 right-0 h-16 bg-slate-900/95 border-b border-cyan-500/20 z-50 backdrop-blur-sm">
-        <div className="h-full px-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="lg:hidden p-2 hover:bg-gray-800 rounded-lg"
-            >
-              {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </button>
-            
-            <Link href="/">
-              <a className="flex items-center gap-3">
-                <img src={APP_LOGO} alt={APP_TITLE} className="h-8" />
-                <span className="font-bold text-lg hidden sm:inline">{APP_TITLE}</span>
-              </a>
-            </Link>
-          </div>
-
-          <div className="flex items-center gap-4">
-            <div className="text-sm text-gray-400 hidden sm:block">
-              {user?.name || user?.email}
-            </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+      {/* Mobile Header */}
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-slate-900/95 backdrop-blur-sm border-b border-cyan-500/20">
+        <div className="flex items-center justify-between px-4 py-3">
+          <Link href="/" className="flex items-center gap-2">
+            <img src={APP_LOGO} alt={APP_TITLE} className="w-8 h-8" />
+            <span className="font-bold text-white">{APP_TITLE}</span>
+          </Link>
+          <div className="flex items-center gap-2">
+            <LanguageSwitcher />
             <Button
-              onClick={logout}
               variant="ghost"
-              size="sm"
-              className="text-gray-400 hover:text-white"
+              size="icon"
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="text-white"
             >
-              <LogOut className="w-4 h-4 mr-2" />
-              Logout
+              {sidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </Button>
           </div>
         </div>
-      </header>
+      </div>
 
       {/* Sidebar */}
       <aside className={cn(
-        "fixed top-16 left-0 bottom-0 w-64 bg-slate-900/95 border-r border-cyan-500/20 overflow-y-auto z-40 transition-transform duration-300 backdrop-blur-sm",
-        sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+        "fixed top-0 left-0 z-40 h-screen bg-gradient-to-b from-slate-900 to-slate-950 border-r border-cyan-500/20 transition-transform duration-300",
+        "w-64 lg:translate-x-0",
+        sidebarOpen ? "translate-x-0" : "-translate-x-full"
       )}>
-        <nav className="p-4 space-y-2">
+        {/* Logo */}
+        <div className="hidden lg:flex items-center gap-3 px-6 py-4 border-b border-cyan-500/20">
+          <Link href="/" className="flex items-center gap-3">
+            <img src={APP_LOGO} alt={APP_TITLE} className="w-10 h-10" />
+            <span className="font-bold text-xl text-white">{APP_TITLE}</span>
+          </Link>
+        </div>
+
+        {/* Navigation */}
+        <nav className="px-4 py-6 space-y-2 overflow-y-auto h-[calc(100vh-80px)] lg:h-[calc(100vh-72px)] mt-16 lg:mt-0">
           {/* Home */}
           <Link href="/">
-            <a className={cn(
-              "flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
+            <div className={cn(
+              "flex items-center gap-3 px-4 py-3 rounded-lg transition-all cursor-pointer",
               location === "/" 
-                ? "bg-cyan-600 text-white" 
-                : "text-cyan-300/70 hover:bg-cyan-900/30 hover:text-white"
+                ? "bg-cyan-500/20 text-cyan-400" 
+                : "text-white/70 hover:bg-slate-800/50 hover:text-white"
             )}>
               <LayoutDashboard className="w-5 h-5" />
-              <span className="font-medium">მთავარი</span>
-            </a>
+              <span className="font-medium">{t("nav.home")}</span>
+            </div>
           </Link>
 
-          <div className="h-px bg-cyan-500/20 my-4" />
-
           {/* Modules */}
-          {modules.map((module) => {
-            const isExpanded = expandedModules.includes(module.name);
-            const isActive = module.subItems.some(item => location.startsWith(item.path));
-            
-            return (
-              <div key={module.name} className="space-y-1">
-                <button
-                  onClick={() => toggleModule(module.name)}
-                  className={cn(
-                    "w-full flex items-center justify-between px-4 py-3 rounded-lg transition-colors",
-                    isActive 
-                      ? "bg-cyan-900/40 text-white" 
-                      : "text-cyan-300/70 hover:bg-cyan-900/30 hover:text-white"
-                  )}
-                >
-                  <div className="flex items-center gap-3">
-                    <module.icon className={cn("w-5 h-5", module.color)} />
-                    <span className="font-medium">{module.name}</span>
-                  </div>
-                  {isExpanded ? (
-                    <ChevronDown className="w-4 h-4" />
-                  ) : (
-                    <ChevronRight className="w-4 h-4" />
-                  )}
-                </button>
-
-                {isExpanded && (
-                  <div className="ml-4 pl-4 border-l border-cyan-500/20 space-y-1">
-                    {module.subItems.map((item) => (
-                      <Link key={item.path} href={item.path}>
-                        <a className={cn(
-                          "flex items-center gap-3 px-4 py-2 rounded-lg transition-colors text-sm",
-                          location === item.path
-                            ? "bg-cyan-600 text-white"
-                            : "text-cyan-300/60 hover:bg-cyan-900/30 hover:text-white"
-                        )}>
-                          <item.icon className="w-4 h-4" />
-                          <span>{item.name}</span>
-                        </a>
-                      </Link>
-                    ))}
-                  </div>
+          {modules.map((module) => (
+            <div key={module.nameKey}>
+              <button
+                onClick={() => toggleModule(module.nameKey)}
+                className={cn(
+                  "w-full flex items-center justify-between px-4 py-3 rounded-lg transition-all",
+                  module.subItems.some(item => location.startsWith(item.path))
+                    ? "bg-cyan-500/10 text-cyan-400"
+                    : "text-white/70 hover:bg-slate-800/50 hover:text-white"
                 )}
-              </div>
-            );
-          })}
+              >
+                <div className="flex items-center gap-3">
+                  <module.icon className={cn("w-5 h-5", module.color)} />
+                  <span className="font-medium">{t(module.nameKey)}</span>
+                </div>
+                {expandedModules.includes(module.nameKey) ? (
+                  <ChevronDown className="w-4 h-4" />
+                ) : (
+                  <ChevronRight className="w-4 h-4" />
+                )}
+              </button>
+              
+              {expandedModules.includes(module.nameKey) && (
+                <div className="ml-4 mt-1 space-y-1 border-l border-cyan-500/20 pl-4">
+                  {module.subItems.map((item) => (
+                    <Link key={item.path} href={item.path}>
+                      <div className={cn(
+                        "flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all cursor-pointer",
+                        location === item.path
+                          ? "bg-cyan-500/20 text-cyan-400"
+                          : "text-white/60 hover:bg-slate-800/50 hover:text-white"
+                      )}>
+                        <item.icon className="w-4 h-4" />
+                        <span>{t(item.nameKey)}</span>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
         </nav>
       </aside>
-
-      {/* Main Content */}
-      <main className="lg:ml-64 pt-16 min-h-screen">
-        <div className="p-6">
-          {children}
-        </div>
-      </main>
 
       {/* Mobile Overlay */}
       {sidebarOpen && (
@@ -316,6 +245,31 @@ export default function ModularLayout({ children }: { children: React.ReactNode 
           onClick={() => setSidebarOpen(false)}
         />
       )}
+
+      {/* Main Content */}
+      <main className="lg:ml-64 min-h-screen">
+        {/* Desktop Header */}
+        <header className="hidden lg:flex items-center justify-end gap-4 px-6 py-4 border-b border-cyan-500/20 bg-slate-900/50">
+          {user && (
+            <span className="text-sm text-white/70">{user.name || user.email}</span>
+          )}
+          <LanguageSwitcher />
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={logout}
+            className="text-white/70 hover:text-white hover:bg-slate-800"
+          >
+            <LogOut className="w-4 h-4 mr-2" />
+            {t("logout")}
+          </Button>
+        </header>
+
+        {/* Page Content */}
+        <div className="pt-16 lg:pt-0">
+          {children}
+        </div>
+      </main>
     </div>
   );
 }

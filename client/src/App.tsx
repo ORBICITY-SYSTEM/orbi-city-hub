@@ -6,6 +6,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { DemoModeProvider } from "./contexts/DemoModeContext";
 import { RoleProvider } from "./contexts/RoleContext";
+import { LanguageProvider } from "./contexts/LanguageContext";
 import ModularLayout from "./components/ModularLayout";
 import { UniversalChatPopup } from "./components/UniversalChatPopup";
 import { PageLoadingSkeleton } from "./components/LoadingSkeleton";
@@ -152,15 +153,17 @@ function App() {
   return (
     <ErrorBoundary>
       <ThemeProvider defaultTheme="dark">
-        <RoleProvider>
-          <DemoModeProvider>
-            <TooltipProvider>
-              <Toaster />
-              <Router />
-              <UniversalChatPopup />
-            </TooltipProvider>
-          </DemoModeProvider>
-        </RoleProvider>
+        <LanguageProvider>
+          <RoleProvider>
+            <DemoModeProvider>
+              <TooltipProvider>
+                <Toaster />
+                <Router />
+                <UniversalChatPopup />
+              </TooltipProvider>
+            </DemoModeProvider>
+          </RoleProvider>
+        </LanguageProvider>
       </ThemeProvider>
     </ErrorBoundary>
   );

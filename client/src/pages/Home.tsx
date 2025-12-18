@@ -1,64 +1,55 @@
 import { Link } from "wouter";
-import { DollarSign, Megaphone, Calendar, Truck, TrendingUp, Users, Mail, Package } from "lucide-react";
+import { DollarSign, Megaphone, Calendar, Truck, TrendingUp, Users, Package } from "lucide-react";
 import { MainAIAgent } from "@/components/MainAIAgent";
-
-const modules = [
-  {
-    name: "ფინანსები",
-    nameEn: "Finance",
-    icon: DollarSign,
-    color: "bg-cyan-500",
-    path: "/finance",
-    description: "შემოსავლები, ხარჯები და ფინანსური ანალიტიკა",
-    stats: { label: "წლიური შემოსავალი", value: "₾999,543" }
-  },
-  {
-    name: "მარკეტინგი",
-    nameEn: "Marketing",
-    icon: Megaphone,
-    color: "bg-cyan-600",
-    path: "/marketing",
-    description: "OTA არხები, კამპანიები და ვებსაიტის ლიდები",
-    stats: { label: "საშ. დატვირთვა", value: "74%" }
-  },
-  {
-    name: "რეზერვაციები",
-    nameEn: "Reservations",
-    icon: Calendar,
-    color: "bg-cyan-700",
-    path: "/reservations",
-    description: "ჯავშნები, სტუმრები და ელფოსტის მართვა",
-    stats: { label: "აქტიური სტუდიოები", value: "75" }
-  },
-  {
-    name: "ლოჯისტიკა",
-    nameEn: "Logistics",
-    icon: Truck,
-    color: "bg-cyan-800",
-    path: "/logistics",
-    description: "დალაგება, მოვლა და ოპერაციები",
-    stats: { label: "დღევანდელი ამოცანები", value: "12" }
-  }
-];
-
-const quickStats = [
-  { label: "სულ შემოსავალი", value: "₾999,543", change: "+297%", icon: TrendingUp, positive: true },
-  { label: "სულ მოგება", value: "₾778,732", change: "+358%", icon: DollarSign, positive: true },
-  { label: "სტუდიოები", value: "75", change: "+41", icon: Users, positive: true },
-  { label: "საშ. დატვირთვა", value: "74%", change: "+14%", icon: Package, positive: true },
-];
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function Home() {
+  const { t } = useLanguage();
+
+  const modules = [
+    {
+      key: "finance",
+      icon: DollarSign,
+      color: "bg-cyan-500",
+      path: "/finance",
+    },
+    {
+      key: "marketing",
+      icon: Megaphone,
+      color: "bg-cyan-600",
+      path: "/marketing",
+    },
+    {
+      key: "reservations",
+      icon: Calendar,
+      color: "bg-cyan-700",
+      path: "/reservations",
+    },
+    {
+      key: "logistics",
+      icon: Truck,
+      color: "bg-cyan-800",
+      path: "/logistics",
+    }
+  ];
+
+  const quickStats = [
+    { key: "totalRevenue", value: "₾999,543", change: "+297%", icon: TrendingUp, positive: true },
+    { key: "totalProfit", value: "₾778,732", change: "+358%", icon: DollarSign, positive: true },
+    { key: "studios", value: "75", change: "+41", icon: Users, positive: true },
+    { key: "avgOccupancy", value: "74%", change: "+14%", icon: Package, positive: true },
+  ];
+
   return (
     <div className="space-y-8">
       {/* Header with Ocean Wave */}
       <div className="relative rounded-2xl overflow-hidden">
         <div className="relative z-10 px-8 pt-8 pb-20">
           <h1 className="text-4xl md:text-5xl font-bold text-cyan-400 tracking-tight mb-2">
-            ORBI City Hub
+            {t("home.title")}
           </h1>
           <p className="text-lg text-white/90 font-medium">
-            ორბი სითი ჰაბი / საზღვაო აპარტჰოტელის მართვის პლატფორმა
+            {t("home.subtitle")}
           </p>
         </div>
         {/* Ocean Wave SVG */}
@@ -69,57 +60,63 @@ export default function Home() {
             <path d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V0Z" className="fill-[#0f3460]" />
           </svg>
         </div>
-        {/* Background */}
-        <div className="absolute inset-0 -z-10" style={{ background: 'linear-gradient(135deg, #0a1628 0%, #0d2847 50%, #0f3460 100%)' }} />
+        <div className="absolute inset-0 bg-gradient-to-br from-[#0a1628] via-[#0d2847] to-[#0f3460]" style={{ zIndex: -1 }} />
       </div>
 
       {/* Main AI Agent */}
-      <MainAIAgent />
-
-      {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {quickStats.map((stat) => (
-          <div key={stat.label} className="bg-slate-900/80 rounded-xl p-6 border border-cyan-500/20 backdrop-blur-sm">
-            <div className="flex items-center justify-between mb-4">
-              <stat.icon className="w-8 h-8 text-cyan-400" />
-              <span className={`text-sm font-semibold ${stat.positive ? 'text-cyan-400' : 'text-red-400'}`}>
-                {stat.change}
-              </span>
-            </div>
-            <div className="text-3xl font-bold text-white mb-1">{stat.value}</div>
-            <div className="text-sm text-cyan-300/70">{stat.label}</div>
-          </div>
-        ))}
+      <div className="px-6">
+        <MainAIAgent />
       </div>
 
-      {/* Modules */}
-      <div>
-        <h2 className="text-2xl font-bold text-cyan-400 mb-6">ძირითადი მოდულები</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* Quick Stats */}
+      <div className="px-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {quickStats.map((stat) => (
+            <div key={stat.key} className="bg-slate-800/50 border border-cyan-500/20 rounded-xl p-4">
+              <div className="flex items-center justify-between mb-2">
+                <span className={`text-xs font-medium ${stat.positive ? 'text-cyan-400' : 'text-red-400'}`}>
+                  {stat.change}
+                </span>
+                <stat.icon className="w-4 h-4 text-cyan-400" />
+              </div>
+              <div className="text-2xl font-bold text-white">{stat.value}</div>
+              <div className="text-sm text-white/60">{t(`home.${stat.key}`)}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Module Cards */}
+      <div className="px-6 pb-8">
+        <h2 className="text-xl font-semibold text-white mb-4">{t("home.mainModules")}</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {modules.map((module) => (
-            <Link key={module.name} href={module.path}>
-              <a className="block bg-slate-900/80 rounded-xl p-6 border border-cyan-500/20 hover:border-cyan-400 transition-all group backdrop-blur-sm">
-                <div className="flex items-start gap-4">
-                  <div className={`${module.color} p-3 rounded-lg shadow-lg`}>
-                    <module.icon className="w-8 h-8 text-white" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-xl font-bold text-white mb-2 group-hover:text-cyan-400 transition-colors">
-                      {module.name}
-                    </h3>
-                    <p className="text-cyan-300/60 text-sm mb-4">{module.description}</p>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <div className="text-sm text-cyan-300/50">{module.stats.label}</div>
-                        <div className="text-2xl font-bold text-white">{module.stats.value}</div>
-                      </div>
-                      <div className="text-cyan-400 opacity-0 group-hover:opacity-100 transition-opacity">
-                        ნახვა →
-                      </div>
+            <Link key={module.key} href={module.path}>
+              <div className="bg-slate-800/50 border border-cyan-500/20 rounded-xl p-6 hover:border-cyan-400/50 transition-all cursor-pointer group">
+                <div className={`w-12 h-12 ${module.color} rounded-lg flex items-center justify-center mb-4`}>
+                  <module.icon className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="text-lg font-semibold text-white mb-1">
+                  {t(`modules.${module.key}.title`)}
+                </h3>
+                <p className="text-sm text-white/60 mb-3">
+                  {t(`modules.${module.key}.description`)}
+                </p>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="text-xs text-white/40">{t(`modules.${module.key}.metric`)}</div>
+                    <div className="text-lg font-bold text-cyan-400">
+                      {module.key === "finance" && "₾999,543"}
+                      {module.key === "marketing" && "74%"}
+                      {module.key === "reservations" && "75"}
+                      {module.key === "logistics" && "12"}
                     </div>
                   </div>
+                  <span className="text-cyan-400 text-sm group-hover:translate-x-1 transition-transform">
+                    {t("home.view")} →
+                  </span>
                 </div>
-              </a>
+              </div>
             </Link>
           ))}
         </div>

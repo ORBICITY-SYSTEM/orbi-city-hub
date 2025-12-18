@@ -248,3 +248,14 @@
 - [x] Description text bilingual
 - [x] Upload button text bilingual
 - [x] All helper text bilingual
+
+## Full Bilingual Website (EN/KA Language Switcher)
+- [x] Create LanguageContext for language state management
+- [x] Create translations files (en.ts, ka.ts)
+- [x] Add language switcher dropdown in header
+- [x] Update Home page to use translations
+- [ ] Update all dashboard pages to use translations
+- [x] Update sidebar navigation to use translations
+- [x] Update Main AI Agent to use translations
+- [x] English version: no Georgian text
+- [x] Georgian version: can use English terms

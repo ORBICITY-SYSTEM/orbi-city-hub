@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Upload, Loader2, CheckCircle2, AlertCircle, TrendingUp, Users, DollarSign, Package } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface AnalysisResult {
   fileType: string;
@@ -46,14 +47,8 @@ const MODULE_COLORS: Record<string, string> = {
   logistics: "text-cyan-400",
 };
 
-const MODULE_NAMES: Record<string, string> = {
-  finance: "ფინანსები",
-  marketing: "მარკეტინგი",
-  reservations: "რეზერვაციები",
-  logistics: "ლოჯისტიკა",
-};
-
 export function MainAIAgent() {
+  const { t } = useLanguage();
   const [file, setFile] = useState<File | null>(null);
   const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -87,12 +82,12 @@ export function MainAIAgent() {
         });
 
         setAnalysis(result);
-        toast.success("ფაილი წარმატებით გაანალიზდა! / File analyzed successfully!");
+        toast.success(t("aiAgent.analysisSuccess"));
       };
       reader.readAsDataURL(file);
     } catch (error) {
       console.error("Error analyzing file:", error);
-      toast.error("ფაილის ანალიზი ვერ მოხერხდა / Failed to analyze file");
+      toast.error(t("aiAgent.analysisFailed"));
     } finally {
       setIsAnalyzing(false);
     }
@@ -102,17 +97,11 @@ export function MainAIAgent() {
     <Card className="w-full border-cyan-500/30 bg-slate-900/50">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <span className="text-cyan-400">🤖 Main AI Agent</span>
-          <span className="text-sm font-normal text-white/80">Intelligent Data Distribution</span>
+          <span className="text-cyan-400">🤖 {t("aiAgent.title")}</span>
+          <span className="text-sm font-normal text-white/80">{t("aiAgent.subtitle")}</span>
         </CardTitle>
-        <CardDescription className="text-white/70">
-          მთავარი AI აგენტი / ინტელექტუალური მონაცემების განაწილება
-        </CardDescription>
         <CardDescription className="text-cyan-300/60">
-          Upload Excel/PDF files and AI will automatically analyze and distribute data to the right modules
-        </CardDescription>
-        <CardDescription className="text-white/60">
-          ატვირთეთ Excel/PDF ფაილები და AI ავტომატურად გააანალიზებს და გაანაწილებს მონაცემებს შესაბამის მოდულებში
+          {t("aiAgent.description")}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -124,7 +113,7 @@ export function MainAIAgent() {
           >
             <Upload className="w-6 h-6 text-cyan-400" />
             <span className="text-sm text-white/70">
-              {file ? file.name : "Click to upload Excel or PDF / დააჭირეთ Excel ან PDF ასატვირთად"}
+              {file ? file.name : t("aiAgent.uploadPrompt")}
             </span>
             <input
               id="file-upload"
@@ -143,12 +132,12 @@ export function MainAIAgent() {
             {isAnalyzing ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                ანალიზი... / Analyzing...
+                {t("aiAgent.analyzing")}
               </>
             ) : (
               <>
                 <CheckCircle2 className="w-4 h-4 mr-2" />
-                Analyze / ანალიზი
+                {t("aiAgent.analyze")}
               </>
             )}
           </Button>
@@ -162,11 +151,11 @@ export function MainAIAgent() {
               <div className="flex items-start gap-3">
                 <CheckCircle2 className="w-5 h-5 text-cyan-400 mt-0.5" />
                 <div className="flex-1">
-                  <h4 className="font-semibold mb-1 text-cyan-400">Analysis Complete / ანალიზი დასრულდა</h4>
+                  <h4 className="font-semibold mb-1 text-cyan-400">{t("aiAgent.analysisComplete")}</h4>
                   <p className="text-sm text-white/70">{analysis.summary}</p>
                   <div className="flex items-center gap-4 mt-2 text-xs text-white/50">
-                    <span>Type / ტიპი: {analysis.fileType.replace("_", " ")}</span>
-                    <span>Confidence / სიზუსტე: {(analysis.confidence * 100).toFixed(0)}%</span>
+                    <span>{t("aiAgent.type")}: {analysis.fileType.replace("_", " ")}</span>
+                    <span>{t("aiAgent.confidence")}: {(analysis.confidence * 100).toFixed(0)}%</span>
                   </div>
                 </div>
               </div>
@@ -174,12 +163,11 @@ export function MainAIAgent() {
 
             {/* Data Distributions */}
             <div>
-              <h4 className="font-semibold mb-3 text-cyan-400">📊 Data Distribution / მონაცემების განაწილება</h4>
+              <h4 className="font-semibold mb-3 text-cyan-400">📊 {t("aiAgent.dataDistribution")}</h4>
               <div className="grid gap-3">
                 {analysis.distributions.map((dist, idx) => {
                   const Icon = MODULE_ICONS[dist.module] || Package;
                   const colorClass = MODULE_COLORS[dist.module] || "text-cyan-400";
-                  const moduleName = MODULE_NAMES[dist.module] || dist.module;
 
                   return (
                     <div
@@ -189,8 +177,7 @@ export function MainAIAgent() {
                       <Icon className={`w-5 h-5 ${colorClass}`} />
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
-                          <span className="font-medium capitalize text-white">{dist.module}</span>
-                          <span className="text-xs text-white/50">/ {moduleName}</span>
+                          <span className="font-medium capitalize text-white">{t(`modules.${dist.module}`)}</span>
                           <span className="text-xs text-white/30">→</span>
                           <span className="text-sm text-white/60">{dist.category}</span>
                         </div>
@@ -221,7 +208,7 @@ export function MainAIAgent() {
             {/* Suggestions */}
             {analysis.suggestions.length > 0 && (
               <div>
-                <h4 className="font-semibold mb-3 text-cyan-400">💡 AI Suggestions / AI რეკომენდაციები</h4>
+                <h4 className="font-semibold mb-3 text-cyan-400">💡 {t("aiAgent.suggestions")}</h4>
                 <div className="space-y-2">
                   {analysis.suggestions.map((suggestion, idx) => (
                     <div
@@ -248,10 +235,8 @@ export function MainAIAgent() {
         {/* Info */}
         {!analysis && !isAnalyzing && (
           <div className="text-center text-sm py-8">
-            <p className="text-white/70">Upload a financial report, booking list, or inventory sheet</p>
-            <p className="text-white/50 mt-1">ატვირთეთ ფინანსური ანგარიში, ჯავშნების სია ან ინვენტარის ცხრილი</p>
-            <p className="text-cyan-300/60 mt-3">AI will analyze and distribute data automatically</p>
-            <p className="text-white/40 mt-1">AI ავტომატურად გააანალიზებს და გაანაწილებს მონაცემებს</p>
+            <p className="text-white/70">{t("aiAgent.uploadHint")}</p>
+            <p className="text-cyan-300/60 mt-3">{t("aiAgent.autoDistribute")}</p>
           </div>
         )}
       </CardContent>
