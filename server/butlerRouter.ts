@@ -490,5 +490,100 @@ Answer questions about any aspect of the business. Be specific, data-driven, and
           unrepliedReviewsCount: unrepliedReviews.length
         }
       };
+    }),
+
+  // ============================================
+  // GET AI RESPONSE METRICS
+  // ============================================
+  getAIResponseMetrics: protectedProcedure
+    .input(z.object({
+      days: z.number().optional().default(30)
+    }))
+    .query(async ({ ctx, input }) => {
+      const db = await butlerDb.getDb();
+      if (!db) {
+        return {
+          avgGenerationTime: 0,
+          approvalRate: 0,
+          totalResponses: 0,
+          approvedCount: 0,
+          rejectedCount: 0,
+          pendingCount: 0,
+          avgApprovalTime: 0,
+          dailyStats: []
+        };
+      }
+
+      const daysAgo = new Date();
+      daysAgo.setDate(daysAgo.getDate() - input.days);
+
+      // Get all review response tasks
+      const [tasks] = await db.execute(
+        `SELECT 
+          id, status, created_at, updated_at,
+          TIMESTAMPDIFF(SECOND, created_at, updated_at) as processing_time
+        FROM butler_tasks 
+        WHERE task_type = 'review_response' 
+          AND created_at >= ?
+        ORDER BY created_at DESC`,
+        [daysAgo.toISOString()]
+      ) as any;
+
+      const taskList = tasks as any[];
+      const totalResponses = taskList.length;
+      const approvedCount = taskList.filter(t => t.status === 'approved' || t.status === 'completed').length;
+      const rejectedCount = taskList.filter(t => t.status === 'rejected').length;
+      const pendingCount = taskList.filter(t => t.status === 'pending').length;
+
+      // Calculate approval rate
+      const decidedCount = approvedCount + rejectedCount;
+      const approvalRate = decidedCount > 0 ? Math.round((approvedCount / decidedCount) * 100) : 0;
+
+      // Calculate average processing time (generation + approval)
+      const completedTasks = taskList.filter(t => t.processing_time && t.processing_time > 0);
+      const avgProcessingTime = completedTasks.length > 0
+        ? Math.round(completedTasks.reduce((sum, t) => sum + t.processing_time, 0) / completedTasks.length)
+        : 0;
+
+      // Estimate AI generation time (typically 2-5 seconds)
+      const avgGenerationTime = Math.min(avgProcessingTime, 5);
+      const avgApprovalTime = Math.max(0, avgProcessingTime - avgGenerationTime);
+
+      // Get daily stats for chart
+      const [dailyData] = await db.execute(
+        `SELECT 
+          DATE(created_at) as date,
+          COUNT(*) as total,
+          SUM(CASE WHEN status IN ('approved', 'completed') THEN 1 ELSE 0 END) as approved,
+          SUM(CASE WHEN status = 'rejected' THEN 1 ELSE 0 END) as rejected,
+          AVG(TIMESTAMPDIFF(SECOND, created_at, updated_at)) as avg_time
+        FROM butler_tasks 
+        WHERE task_type = 'review_response' 
+          AND created_at >= ?
+        GROUP BY DATE(created_at)
+        ORDER BY date DESC
+        LIMIT 30`,
+        [daysAgo.toISOString()]
+      ) as any;
+
+      const dailyStats = (dailyData as any[]).map(d => ({
+        date: d.date,
+        total: Number(d.total),
+        approved: Number(d.approved),
+        rejected: Number(d.rejected),
+        approvalRate: d.total > 0 ? Math.round((d.approved / d.total) * 100) : 0,
+        avgTime: Math.round(d.avg_time || 0)
+      }));
+
+      return {
+        avgGenerationTime,
+        approvalRate,
+        totalResponses,
+        approvedCount,
+        rejectedCount,
+        pendingCount,
+        avgApprovalTime,
+        dailyStats
+      };
     })
 });

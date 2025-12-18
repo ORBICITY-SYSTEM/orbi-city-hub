@@ -36,7 +36,7 @@ import {
   Trash2
 } from "lucide-react";
 import { format } from "date-fns";
-import { AIReviewResponseQueue } from "@/components/ai-review-response";
+import { AIReviewResponseQueue, AIResponseMetricsWidget } from "@/components/ai-review-response";
 
 // Platform icons/colors
 const platformConfig: Record<string, { color: string; bgColor: string; icon: string }> = {
@@ -425,7 +425,11 @@ const ReviewsDashboard = () => {
         </TabsList>
 
         {/* AI Response Queue - NEW */}
-        <TabsContent value="ai-responses">
+        <TabsContent value="ai-responses" className="space-y-6">
+          {/* AI Response Metrics Widget */}
+          <AIResponseMetricsWidget />
+          
+          {/* AI Response Queue */}
           <AIReviewResponseQueue />
         </TabsContent>
 
