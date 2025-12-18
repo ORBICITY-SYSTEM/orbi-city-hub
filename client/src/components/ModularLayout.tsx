@@ -49,62 +49,62 @@ interface ModuleItem {
 
 const modules: ModuleItem[] = [
   {
-    name: "Finance",
+    name: "ფინანსები",
     icon: DollarSign,
-    color: "text-blue-500",
+    color: "text-cyan-400",
     subItems: [
-      { name: "Dashboard", path: "/finance", icon: LayoutDashboard },
-      { name: "Analytics", path: "/finance/analytics", icon: TrendingUp },
-      { name: "Monthly Reports", path: "/finance/reports", icon: FileText },
+      { name: "მთავარი", path: "/finance", icon: LayoutDashboard },
+      { name: "ანალიტიკა", path: "/finance/analytics", icon: TrendingUp },
+      { name: "თვიური ანგარიშები", path: "/finance/reports", icon: FileText },
       { name: "OTELMS", path: "/finance/otelms", icon: Database },
-      { name: "Dev Expenses", path: "/finance/expenses", icon: BarChart3 },
+      { name: "დევ ხარჯები", path: "/finance/expenses", icon: BarChart3 },
     ]
   },
   {
-    name: "Marketing",
+    name: "მარკეტინგი",
     icon: Megaphone,
-    color: "text-green-500",
+    color: "text-cyan-400",
     subItems: [
-      { name: "Dashboard", path: "/marketing", icon: LayoutDashboard },
-      { name: "OTA Channels", path: "/marketing/ota", icon: Globe },
-      { name: "Website Leads", path: "/marketing/leads", icon: Users },
+      { name: "მთავარი", path: "/marketing", icon: LayoutDashboard },
+      { name: "OTA არხები", path: "/marketing/ota", icon: Globe },
+      { name: "ვებ ლიდები", path: "/marketing/leads", icon: Users },
     ]
   },
   {
-    name: "Reservations",
+    name: "რეზერვაციები",
     icon: Calendar,
-    color: "text-purple-500",
+    color: "text-cyan-400",
     subItems: [
-      { name: "Dashboard", path: "/reservations", icon: LayoutDashboard },
-      { name: "AI Responses", path: "/reservations/ai-responses", icon: Sparkles },
+      { name: "მთავარი", path: "/reservations", icon: LayoutDashboard },
+      { name: "AI პასხები", path: "/reservations/ai-responses", icon: Sparkles },
       { name: "Butler AI", path: "/reservations/automations", icon: Bot },
-      { name: "Email Inbox", path: "/reservations/email", icon: Mail },
-      { name: "Guest Communication", path: "/reservations/guests", icon: Users },
-      { name: "OTA Dashboard", path: "/reservations/ota", icon: Globe },
+      { name: "ელფოსტა", path: "/reservations/email", icon: Mail },
+      { name: "მიმოხილვები", path: "/reservations/guests", icon: Users },
+      { name: "OTA სარდლობა", path: "/reservations/ota", icon: Globe },
     ]
   },
   {
-    name: "Logistics",
+    name: "ლოჯისტიკა",
     icon: Truck,
-    color: "text-orange-500",
+    color: "text-cyan-400",
     subItems: [
-      { name: "Dashboard", path: "/logistics", icon: LayoutDashboard },
-      { name: "Housekeeping", path: "/logistics/housekeeping", icon: Package },
-      { name: "Maintenance", path: "/logistics/maintenance", icon: Wrench },
+      { name: "მთავარი", path: "/logistics", icon: LayoutDashboard },
+      { name: "დალაგება", path: "/logistics/housekeeping", icon: Package },
+      { name: "მოვლა", path: "/logistics/maintenance", icon: Wrench },
     ]
   },
   {
-    name: "WhatsApp Bot",
+    name: "WhatsApp ბოტი",
     icon: MessageCircle,
-    color: "text-pink-500",
+    color: "text-cyan-400",
     subItems: [
-      { name: "Quick Start", path: "/whatsapp/quick-start", icon: Rocket },
-      { name: "Implementation", path: "/whatsapp/implementation", icon: Code },
-      { name: "Code Examples", path: "/whatsapp/code-examples", icon: FileText },
-      { name: "System Prompt", path: "/whatsapp/system-prompt", icon: MessageCircle },
-      { name: "Testing", path: "/whatsapp/testing", icon: TestTube },
-      { name: "Resources", path: "/whatsapp/resources", icon: BookOpen },
-      { name: "Deployment", path: "/whatsapp/deployment", icon: Rocket },
+      { name: "სწრაფი დაწყება", path: "/whatsapp/quick-start", icon: Rocket },
+      { name: "იმპლემენტაცია", path: "/whatsapp/implementation", icon: Code },
+      { name: "კოდის მაგალითები", path: "/whatsapp/code-examples", icon: FileText },
+      { name: "სისტემის პრომპტი", path: "/whatsapp/system-prompt", icon: MessageCircle },
+      { name: "ტესტირება", path: "/whatsapp/testing", icon: TestTube },
+      { name: "რესურსები", path: "/whatsapp/resources", icon: BookOpen },
+      { name: "განთავსება", path: "/whatsapp/deployment", icon: Rocket },
     ]
   }
 ];
@@ -194,9 +194,9 @@ export default function ModularLayout({ children }: { children: React.ReactNode 
   // }
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen text-white" style={{ background: 'linear-gradient(135deg, #0a1628 0%, #0d2847 50%, #0f3460 100%)' }}>
       {/* Header */}
-      <header className="fixed top-0 left-0 right-0 h-16 bg-gray-900 border-b border-gray-800 z-50">
+      <header className="fixed top-0 left-0 right-0 h-16 bg-slate-900/95 border-b border-cyan-500/20 z-50 backdrop-blur-sm">
         <div className="h-full px-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button
@@ -233,7 +233,7 @@ export default function ModularLayout({ children }: { children: React.ReactNode 
 
       {/* Sidebar */}
       <aside className={cn(
-        "fixed top-16 left-0 bottom-0 w-64 bg-gray-900 border-r border-gray-800 overflow-y-auto z-40 transition-transform duration-300",
+        "fixed top-16 left-0 bottom-0 w-64 bg-slate-900/95 border-r border-cyan-500/20 overflow-y-auto z-40 transition-transform duration-300 backdrop-blur-sm",
         sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
       )}>
         <nav className="p-4 space-y-2">
@@ -242,15 +242,15 @@ export default function ModularLayout({ children }: { children: React.ReactNode 
             <a className={cn(
               "flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
               location === "/" 
-                ? "bg-green-600 text-white" 
-                : "text-gray-400 hover:bg-gray-800 hover:text-white"
+                ? "bg-cyan-600 text-white" 
+                : "text-cyan-300/70 hover:bg-cyan-900/30 hover:text-white"
             )}>
               <LayoutDashboard className="w-5 h-5" />
-              <span className="font-medium">Home</span>
+              <span className="font-medium">მთავარი</span>
             </a>
           </Link>
 
-          <div className="h-px bg-gray-800 my-4" />
+          <div className="h-px bg-cyan-500/20 my-4" />
 
           {/* Modules */}
           {modules.map((module) => {
@@ -264,8 +264,8 @@ export default function ModularLayout({ children }: { children: React.ReactNode 
                   className={cn(
                     "w-full flex items-center justify-between px-4 py-3 rounded-lg transition-colors",
                     isActive 
-                      ? "bg-gray-800 text-white" 
-                      : "text-gray-400 hover:bg-gray-800 hover:text-white"
+                      ? "bg-cyan-900/40 text-white" 
+                      : "text-cyan-300/70 hover:bg-cyan-900/30 hover:text-white"
                   )}
                 >
                   <div className="flex items-center gap-3">
@@ -280,14 +280,14 @@ export default function ModularLayout({ children }: { children: React.ReactNode 
                 </button>
 
                 {isExpanded && (
-                  <div className="ml-4 pl-4 border-l border-gray-800 space-y-1">
+                  <div className="ml-4 pl-4 border-l border-cyan-500/20 space-y-1">
                     {module.subItems.map((item) => (
                       <Link key={item.path} href={item.path}>
                         <a className={cn(
                           "flex items-center gap-3 px-4 py-2 rounded-lg transition-colors text-sm",
                           location === item.path
-                            ? "bg-gray-800 text-white"
-                            : "text-gray-500 hover:bg-gray-800 hover:text-white"
+                            ? "bg-cyan-600 text-white"
+                            : "text-cyan-300/60 hover:bg-cyan-900/30 hover:text-white"
                         )}>
                           <item.icon className="w-4 h-4" />
                           <span>{item.name}</span>
