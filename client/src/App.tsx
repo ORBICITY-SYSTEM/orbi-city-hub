@@ -39,6 +39,7 @@ const ReviewsDashboard = lazy(() => import("./pages/reservations/ReviewsDashboar
 const OTADashboard = lazy(() => import("./pages/reservations/OTADashboard"));
 const Automations = lazy(() => import("./pages/reservations/Automations"));
 const AIResponseQueue = lazy(() => import("./pages/reservations/AIResponseQueue"));
+const TelegramBot = lazy(() => import("./pages/reservations/TelegramBot"));
 
 // Email Management Module - Lazy
 const EmailManagement = lazy(() => import("./pages/EmailManagement"));
@@ -109,6 +110,7 @@ function RouterContent() {
         <Route path="/reservations/automations" component={Automations} />
         <Route path="/reservations/ai-responses" component={AIResponseQueue} />
         <Route path="/reservations/whatsapp-bot" component={WhatsAppQuickStart} />
+        <Route path="/reservations/telegram-bot" component={TelegramBot} />
 
         {/* Email Management Module */}
         <Route path="/email-management" component={EmailManagement} />

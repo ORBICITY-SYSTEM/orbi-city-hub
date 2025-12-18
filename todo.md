@@ -326,3 +326,13 @@
 - [x] Test EN version - must be 100% English
 - [x] Test KA version - must be 100% Georgian
 - [ ] Push all fixes to GitHub
+
+## Telegram Bot Integration
+- [x] Add TELEGRAM_BOT_TOKEN as environment secret (validated: @orbicity_notifications_bot)
+- [x] Create Telegram Bot router (server/routers/telegramRouter.ts)
+- [x] Create Telegram Bot service for sending messages
+- [x] Create Telegram Bot management page
+- [x] Add navigation link in sidebar
+- [ ] Add Telegram to Integrations Showcase as active
+- [x] Test sending messages via Telegram (20 tests passed)
+- [ ] Save checkpoint and push to GitHub

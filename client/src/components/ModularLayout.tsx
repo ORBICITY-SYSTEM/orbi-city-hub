@@ -30,7 +30,8 @@ import {
   BookOpen,
   Rocket,
   Sparkles,
-  Bot
+  Bot,
+  Send
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
@@ -84,6 +85,7 @@ const modules: ModuleItem[] = [
       { nameKey: "submenu.reviews", path: "/reservations/guests", icon: Users },
       { nameKey: "submenu.otaCommand", path: "/reservations/ota", icon: Globe },
       { nameKey: "submenu.whatsappBot", path: "/whatsapp", icon: MessageCircle },
+      { nameKey: "submenu.telegramBot", path: "/reservations/telegram-bot", icon: Send },
     ]
   },
   {

@@ -34,6 +34,7 @@ export const en = {
     reviews: "Reviews",
     otaCommand: "OTA Command",
     whatsappBot: "WhatsApp Bot",
+    telegramBot: "Telegram Bot",
     
     // Logistics
     logisticsDashboard: "Dashboard",
