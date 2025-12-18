@@ -180,10 +180,10 @@ export default function Home() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-4xl md:text-5xl font-bold text-cyan-400 tracking-tight mb-2">
-                {language === 'ka' ? "CEO Dashboard" : "CEO Dashboard"}
+                Hotel Management System
               </h1>
-              <p className="text-lg text-white/90 font-medium">
-                {language === 'ka' ? "ORBI City Sea View / რეალ-ტაიმ მენეჯმენტი" : "ORBI City Sea View / Real-time Management"}
+              <p className="text-sm text-white/60 font-medium">
+                {language === 'ka' ? "ყველაფერი ერთ სივრცეში CEO-სთვის" : "All in one for CEO"}
               </p>
             </div>
             {/* Action Buttons */}

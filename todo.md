@@ -336,3 +336,13 @@
 - [ ] Add Telegram to Integrations Showcase as active
 - [x] Test sending messages via Telegram (20 tests passed)
 - [ ] Save checkpoint and push to GitHub
+
+
+## Menu & Dashboard Restructure
+- [x] Update Home dashboard: "Hotel Management System" + "All in one for CEO" (remove ORBI City Sea View subtitle)
+- [x] Restructure sidebar with 4 main modules in order: Reservations, Marketing, Finance, Logistics
+- [x] Each main module: 4-7 logical submodules
+- [ ] Each module dashboard: summary stats + AI Agent button
+- [x] Remove duplicate/unnecessary menu items
+- [x] Test all navigation links
+- [ ] Save checkpoint

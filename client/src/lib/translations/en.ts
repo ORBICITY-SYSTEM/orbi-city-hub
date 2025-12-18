@@ -14,35 +14,44 @@ export const en = {
   
   // Submenu items
   submenu: {
-    // Finance
-    financeDashboard: "Dashboard",
-    analytics: "Analytics",
-    reports: "Monthly Reports",
-    otelms: "OTELMS",
-    devExpenses: "Dev Expenses",
-    
-    // Marketing
-    marketingDashboard: "Dashboard",
+    // Reservations (7 submodules)
+    reservationsDashboard: "Dashboard",
     otaChannels: "OTA Channels",
-    webLeads: "Web Leads",
-    
-    // Reservations
-    otaDashboard: "Dashboard",
+    reviews: "Reviews",
     aiResponses: "AI Responses",
     butlerAI: "Butler AI",
-    email: "Email",
-    reviews: "Reviews",
-    otaCommand: "OTA Command",
-    whatsappBot: "WhatsApp Bot",
     telegramBot: "Telegram Bot",
+    email: "Email Inbox",
     
-    // Logistics
+    // Marketing (5 submodules)
+    marketingDashboard: "Dashboard",
+    otaPerformance: "OTA Performance",
+    webLeads: "Web Leads",
+    campaigns: "Campaigns",
+    socialMedia: "Social Media",
+    
+    // Finance (6 submodules)
+    financeDashboard: "Dashboard",
+    revenueAnalytics: "Revenue Analytics",
+    monthlyReports: "Monthly Reports",
+    expenses: "Expenses",
+    ownerPayouts: "Owner Payouts",
+    otelms: "OTELMS",
+    
+    // Logistics (5 submodules)
     logisticsDashboard: "Dashboard",
-    inventory: "Inventory",
     housekeeping: "Housekeeping",
     maintenance: "Maintenance",
+    inventory: "Inventory",
+    taskManagement: "Task Management",
     
-    // WhatsApp
+    // Legacy keys for compatibility
+    otaDashboard: "Dashboard",
+    otaCommand: "OTA Command",
+    whatsappBot: "WhatsApp Bot",
+    analytics: "Analytics",
+    reports: "Reports",
+    devExpenses: "Dev Expenses",
     quickStart: "Quick Start",
     implementation: "Implementation",
     codeExamples: "Code Examples",

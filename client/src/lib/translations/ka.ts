@@ -16,35 +16,44 @@ export const ka: Translations = {
   
   // Submenu items
   submenu: {
-    // Finance
-    financeDashboard: "მთავარი",
-    analytics: "ანალიტიკა",
-    reports: "თვიური ანგარიშები",
-    otelms: "OTELMS",
-    devExpenses: "დევ ხარჯები",
-    
-    // Marketing
-    marketingDashboard: "მთავარი",
+    // Reservations (7 submodules)
+    reservationsDashboard: "მთავარი",
     otaChannels: "OTA არხები",
-    webLeads: "ვებ ლიდები",
-    
-    // Reservations
-    otaDashboard: "მთავარი",
+    reviews: "მიმოხილვები",
     aiResponses: "AI პასუხები",
     butlerAI: "Butler AI",
+    telegramBot: "Telegram ბოტი",
     email: "ელფოსტა",
-    reviews: "მიმოხილვები",
+    
+    // Marketing (5 submodules)
+    marketingDashboard: "მთავარი",
+    otaPerformance: "OTA შედეგები",
+    webLeads: "ვებ ლიდები",
+    campaigns: "კამპანიები",
+    socialMedia: "სოციალური მედია",
+    
+    // Finance (6 submodules)
+    financeDashboard: "მთავარი",
+    revenueAnalytics: "შემოსავლის ანალიტიკა",
+    monthlyReports: "თვიური ანგარიშები",
+    expenses: "ხარჯები",
+    ownerPayouts: "მფლობელის გადახდები",
+    otelms: "OTELMS",
+    
+    // Logistics (5 submodules)
+    logisticsDashboard: "მთავარი",
+    housekeeping: "დალაგება",
+    maintenance: "მოვლა-პატრონობა",
+    inventory: "ინვენტარი",
+    taskManagement: "დავალებები",
+    
+    // Legacy keys for compatibility
+    otaDashboard: "მთავარი",
     otaCommand: "OTA მართვა",
     whatsappBot: "WhatsApp ბოტი",
-    telegramBot: "Telegram ბოტი",
-    
-    // Logistics
-    logisticsDashboard: "მთავარი",
-    inventory: "ინვენტარი",
-    housekeeping: "დალაგება",
-    maintenance: "მოვლა",
-    
-    // WhatsApp
+    analytics: "ანალიტიკა",
+    reports: "ანგარიშები",
+    devExpenses: "დევ ხარჯები",
     quickStart: "სწრაფი დაწყება",
     implementation: "იმპლემენტაცია",
     codeExamples: "კოდის მაგალითები",
