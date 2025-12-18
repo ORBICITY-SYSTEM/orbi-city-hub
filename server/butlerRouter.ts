@@ -493,6 +493,79 @@ Answer questions about any aspect of the business. Be specific, data-driven, and
     }),
 
   // ============================================
+  // MARK RESPONSE AS DONE (Simple 3-Step Workflow)
+  // ============================================
+  markResponseDone: protectedProcedure
+    .input(z.object({
+      taskId: z.string(),
+      responseText: z.string()
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const db = await butlerDb.getDb();
+      if (!db) throw new Error("Database not available");
+
+      // Get task details
+      const task = await butlerDb.getButlerTaskById(input.taskId);
+      if (!task) throw new Error("Task not found");
+      if (task.task_type !== 'review_response') throw new Error("Not a review response task");
+
+      const { reviewId, source, reviewerName, rating, originalReview } = task.ai_suggestion;
+
+      // 1. Update review with final response in database
+      await butlerDb.updateReviewResponse(reviewId, input.responseText, true);
+
+      // 2. Mark task as completed with published status
+      await db.execute(
+        `UPDATE butler_tasks 
+         SET status = 'completed', 
+             updated_at = NOW(),
+             ai_suggestion = JSON_SET(ai_suggestion, '$.publishedAt', ?, '$.publishedBy', ?, '$.finalResponse', ?)
+         WHERE id = ?`,
+        [new Date().toISOString(), ctx.user.name || ctx.user.email, input.responseText, input.taskId]
+      );
+
+      // 3. Create activity log entry
+      try {
+        await db.execute(
+          `INSERT INTO activity_logs (user_id, action_type, target_entity, target_id, description, created_at)
+           VALUES (?, 'review_response_published', 'review', ?, ?, NOW())`,
+          [
+            ctx.user.id,
+            String(reviewId),
+            `Published response to ${reviewerName}'s ${rating}★ ${source} review`
+          ]
+        );
+      } catch (logError) {
+        console.log('[Butler] Activity log error (non-critical):', logError);
+      }
+
+      // 4. Update AI memory/stats
+      try {
+        // Increment completed responses counter
+        const today = new Date().toISOString().split('T')[0];
+        await db.execute(
+          `INSERT INTO ai_response_stats (date, completed_count, platform)
+           VALUES (?, 1, ?)
+           ON DUPLICATE KEY UPDATE completed_count = completed_count + 1`,
+          [today, source || 'google']
+        );
+      } catch (statsError) {
+        console.log('[Butler] Stats update error (non-critical):', statsError);
+      }
+
+      console.log(`[Butler] Response marked as done: ${reviewerName}'s ${source} review by ${ctx.user.name}`);
+
+      return { 
+        success: true, 
+        message: 'Response published successfully',
+        reviewId,
+        platform: source,
+        publishedAt: new Date().toISOString(),
+        publishedBy: ctx.user.name || ctx.user.email
+      };
+    }),
+
+  // ============================================
   // GET AI RESPONSE METRICS
   // ============================================
   getAIResponseMetrics: protectedProcedure

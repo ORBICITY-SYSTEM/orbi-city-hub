@@ -26,7 +26,9 @@ import {
   Code,
   TestTube,
   BookOpen,
-  Rocket
+  Rocket,
+  Sparkles,
+  Bot
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
@@ -74,6 +76,8 @@ const modules: ModuleItem[] = [
     color: "text-purple-500",
     subItems: [
       { name: "Dashboard", path: "/reservations", icon: LayoutDashboard },
+      { name: "AI Responses", path: "/reservations/ai-responses", icon: Sparkles },
+      { name: "Butler AI", path: "/reservations/automations", icon: Bot },
       { name: "Email Inbox", path: "/reservations/email", icon: Mail },
       { name: "Guest Communication", path: "/reservations/guests", icon: Users },
       { name: "OTA Dashboard", path: "/reservations/ota", icon: Globe },

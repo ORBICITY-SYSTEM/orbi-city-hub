@@ -209,3 +209,19 @@
 - [x] Add average response time display with trend
 - [x] Add approval rate percentage with chart
 - [x] Integrate widget into Reviews Dashboard
+
+## N8N Google Business API Integration
+- [ ] Open N8N Review Response Webhook workflow
+- [ ] Add Google Business Profile node
+- [ ] Configure OAuth credentials for Google Business API
+- [ ] Map webhook data to Google API fields (reviewId, responseText)
+- [ ] Test posting response to Google Reviews
+- [ ] Activate and save workflow
+
+## Simplified Review Response Workflow for Manager (Mariam)
+- [x] Add "Open in OTA" link button next to Copy
+- [x] Add "Mark as Done" button after manager posts response
+- [x] Auto-update AI Agent memory when response is marked done
+- [x] Update statistics when response is completed
+- [x] Clean up duplicate functions and modules
+- [x] Push all changes to GitHub

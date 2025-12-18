@@ -13,22 +13,58 @@ import {
   X,
   Copy,
   Edit3,
-  Send,
   Sparkles,
   Clock,
   AlertTriangle,
   MessageSquare,
   ExternalLink,
+  CheckCircle2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-// Platform config
-const platformConfig: Record<string, { name: string; color: string; bgColor: string; icon: string }> = {
-  google: { name: "Google", color: "text-blue-600", bgColor: "bg-blue-500/10 border-blue-500/20", icon: "G" },
-  booking: { name: "Booking.com", color: "text-blue-800", bgColor: "bg-blue-800/10 border-blue-800/20", icon: "B" },
-  airbnb: { name: "Airbnb", color: "text-rose-500", bgColor: "bg-rose-500/10 border-rose-500/20", icon: "A" },
-  tripadvisor: { name: "TripAdvisor", color: "text-green-600", bgColor: "bg-green-500/10 border-green-500/20", icon: "T" },
-  expedia: { name: "Expedia", color: "text-yellow-600", bgColor: "bg-yellow-500/10 border-yellow-500/20", icon: "E" },
+// Platform config with OTA URLs
+const platformConfig: Record<string, { 
+  name: string; 
+  color: string; 
+  bgColor: string; 
+  icon: string;
+  reviewUrl?: string;
+}> = {
+  google: { 
+    name: "Google", 
+    color: "text-blue-600", 
+    bgColor: "bg-blue-500/10 border-blue-500/20", 
+    icon: "G",
+    reviewUrl: "https://business.google.com/reviews"
+  },
+  booking: { 
+    name: "Booking.com", 
+    color: "text-blue-800", 
+    bgColor: "bg-blue-800/10 border-blue-800/20", 
+    icon: "B",
+    reviewUrl: "https://admin.booking.com/hotel/hoteladmin/extranet_ng/manage/reviews.html"
+  },
+  airbnb: { 
+    name: "Airbnb", 
+    color: "text-rose-500", 
+    bgColor: "bg-rose-500/10 border-rose-500/20", 
+    icon: "A",
+    reviewUrl: "https://www.airbnb.com/hosting/reviews"
+  },
+  tripadvisor: { 
+    name: "TripAdvisor", 
+    color: "text-green-600", 
+    bgColor: "bg-green-500/10 border-green-500/20", 
+    icon: "T",
+    reviewUrl: "https://www.tripadvisor.com/Owners"
+  },
+  expedia: { 
+    name: "Expedia", 
+    color: "text-yellow-600", 
+    bgColor: "bg-yellow-500/10 border-yellow-500/20", 
+    icon: "E",
+    reviewUrl: "https://apps.expediapartnercentral.com/lodging/reviews"
+  },
 };
 
 // Priority config
@@ -73,14 +109,18 @@ export function AIReviewResponseCard({ task, onApprove, onReject }: AIReviewResp
   const [isEditing, setIsEditing] = useState(false);
   const [editedResponse, setEditedResponse] = useState(task.ai_suggestion.responseText);
   const [isRegenerating, setIsRegenerating] = useState(false);
+  const [isCopied, setIsCopied] = useState(false);
+  const [isMarkingDone, setIsMarkingDone] = useState(false);
 
-  const approveMutation = trpc.butler.approve.useMutation({
+  // Mark as done mutation - this updates AI memory and statistics
+  const markDoneMutation = trpc.butler.markResponseDone.useMutation({
     onSuccess: (data) => {
       toast({
-        title: t("დადასტურდა!", "Approved!"),
-        description: data.n8nResult?.sent 
-          ? t("პასუხი გაიგზავნა N8N-ში", "Response sent to N8N")
-          : t("პასუხი შენახულია", "Response saved"),
+        title: t("დასრულდა! ✅", "Done! ✅"),
+        description: t(
+          "პასუხი დაფიქსირდა, სტატისტიკა განახლდა", 
+          "Response recorded, statistics updated"
+        ),
       });
       onApprove?.();
     },
@@ -90,6 +130,7 @@ export function AIReviewResponseCard({ task, onApprove, onReject }: AIReviewResp
         description: error.message,
         variant: "destructive",
       });
+      setIsMarkingDone(false);
     },
   });
 
@@ -107,6 +148,7 @@ export function AIReviewResponseCard({ task, onApprove, onReject }: AIReviewResp
     onSuccess: (data) => {
       setEditedResponse(data.newResponse);
       setIsRegenerating(false);
+      setIsCopied(false); // Reset copy state when regenerated
       toast({
         title: t("განახლდა!", "Regenerated!"),
         description: t("ახალი პასუხი დაგენერირდა", "New response generated"),
@@ -117,11 +159,41 @@ export function AIReviewResponseCard({ task, onApprove, onReject }: AIReviewResp
     },
   });
 
-  const handleApprove = () => {
-    approveMutation.mutate({
+  // Step 1: Copy response
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(editedResponse);
+      setIsCopied(true);
+      toast({
+        title: t("დაკოპირდა! 📋", "Copied! 📋"),
+        description: t(
+          "ახლა გახსენით OTA და ჩასვით პასუხი", 
+          "Now open OTA and paste the response"
+        ),
+      });
+    } catch (err) {
+      toast({
+        title: t("შეცდომა", "Error"),
+        description: t("კოპირება ვერ მოხერხდა", "Failed to copy"),
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Step 2: Open OTA link
+  const handleOpenOTA = () => {
+    const platform = platformConfig[task.ai_suggestion.source?.toLowerCase()];
+    if (platform?.reviewUrl) {
+      window.open(platform.reviewUrl, '_blank');
+    }
+  };
+
+  // Step 3: Mark as Done
+  const handleMarkDone = () => {
+    setIsMarkingDone(true);
+    markDoneMutation.mutate({
       taskId: task.id,
-      modifiedContent: isEditing ? { responseText: editedResponse } : undefined,
-      sendToN8N: true,
+      responseText: editedResponse,
     });
   };
 
@@ -134,15 +206,8 @@ export function AIReviewResponseCard({ task, onApprove, onReject }: AIReviewResp
 
   const handleRegenerate = () => {
     setIsRegenerating(true);
+    setIsCopied(false);
     regenerateMutation.mutate({ taskId: task.id });
-  };
-
-  const handleCopy = () => {
-    navigator.clipboard.writeText(editedResponse);
-    toast({
-      title: t("დაკოპირდა!", "Copied!"),
-      description: t("პასუხი დაკოპირდა", "Response copied to clipboard"),
-    });
   };
 
   const { ai_suggestion } = task;
@@ -196,25 +261,15 @@ export function AIReviewResponseCard({ task, onApprove, onReject }: AIReviewResp
             </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleCopy}
-              className="h-8"
-            >
-              <Copy className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsEditing(!isEditing)}
-              className={cn("h-8", isEditing && "bg-accent/20")}
-            >
-              <Edit3 className="h-4 w-4" />
-            </Button>
-          </div>
+          {/* Edit Button */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setIsEditing(!isEditing)}
+            className={cn("h-8", isEditing && "bg-accent/20")}
+          >
+            <Edit3 className="h-4 w-4" />
+          </Button>
         </div>
       </CardHeader>
 
@@ -252,7 +307,10 @@ export function AIReviewResponseCard({ task, onApprove, onReject }: AIReviewResp
           {isEditing ? (
             <Textarea
               value={editedResponse}
-              onChange={(e) => setEditedResponse(e.target.value)}
+              onChange={(e) => {
+                setEditedResponse(e.target.value);
+                setIsCopied(false);
+              }}
               className="min-h-[150px] bg-background/50"
               placeholder={t("შეცვალეთ პასუხი...", "Edit response...")}
             />
@@ -263,44 +321,82 @@ export function AIReviewResponseCard({ task, onApprove, onReject }: AIReviewResp
           )}
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex items-center justify-between pt-2 border-t border-border/50">
+        {/* Simple 3-Step Workflow for Manager */}
+        <div className="p-4 rounded-lg bg-gradient-to-r from-emerald-500/10 to-green-500/10 border border-emerald-500/20">
+          <div className="text-sm font-medium text-emerald-700 dark:text-emerald-400 mb-3">
+            {t("მარტივი 3 ნაბიჯი:", "Simple 3 Steps:")}
+          </div>
+          
+          <div className="flex flex-wrap items-center gap-3">
+            {/* Step 1: Copy */}
+            <Button
+              size="lg"
+              variant={isCopied ? "outline" : "default"}
+              onClick={handleCopy}
+              className={cn(
+                "flex-1 min-w-[140px] h-12 text-base font-semibold transition-all",
+                isCopied 
+                  ? "border-emerald-500 text-emerald-600 bg-emerald-50 dark:bg-emerald-950" 
+                  : "bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg"
+              )}
+            >
+              {isCopied ? (
+                <>
+                  <CheckCircle2 className="h-5 w-5 mr-2" />
+                  {t("დაკოპირდა!", "Copied!")}
+                </>
+              ) : (
+                <>
+                  <Copy className="h-5 w-5 mr-2" />
+                  {t("1. კოპირება", "1. Copy")}
+                </>
+              )}
+            </Button>
+
+            {/* Step 2: Open OTA */}
+            <Button
+              size="lg"
+              variant="outline"
+              onClick={handleOpenOTA}
+              disabled={!platform.reviewUrl}
+              className="flex-1 min-w-[140px] h-12 text-base font-semibold border-2 border-accent hover:bg-accent/10"
+            >
+              <ExternalLink className="h-5 w-5 mr-2" />
+              {t("2. გახსნა", "2. Open")} {platform.name}
+            </Button>
+
+            {/* Step 3: Mark Done */}
+            <Button
+              size="lg"
+              onClick={handleMarkDone}
+              disabled={isMarkingDone || markDoneMutation.isPending}
+              className={cn(
+                "flex-1 min-w-[140px] h-12 text-base font-semibold shadow-lg",
+                "bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white"
+              )}
+            >
+              {isMarkingDone || markDoneMutation.isPending ? (
+                <RefreshCw className="h-5 w-5 mr-2 animate-spin" />
+              ) : (
+                <Check className="h-5 w-5 mr-2" />
+              )}
+              {t("3. დასრულდა!", "3. Done!")}
+            </Button>
+          </div>
+        </div>
+
+        {/* Reject Button (smaller, less prominent) */}
+        <div className="flex justify-end pt-2 border-t border-border/50">
           <Button
-            variant="outline"
+            variant="ghost"
             size="sm"
             onClick={handleReject}
             disabled={rejectMutation.isPending}
-            className="text-red-600 border-red-200 hover:bg-red-50"
+            className="text-muted-foreground hover:text-red-600 hover:bg-red-50"
           >
             <X className="h-4 w-4 mr-1" />
-            {t("უარყოფა", "Reject")}
+            {t("გამოტოვება", "Skip")}
           </Button>
-
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleCopy}
-              className="border-accent/30 hover:bg-accent/10"
-            >
-              <Copy className="h-4 w-4 mr-1" />
-              {t("კოპირება", "Copy")}
-            </Button>
-            
-            <Button
-              size="sm"
-              onClick={handleApprove}
-              disabled={approveMutation.isPending}
-              className="bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white shadow-lg"
-            >
-              {approveMutation.isPending ? (
-                <RefreshCw className="h-4 w-4 mr-1 animate-spin" />
-              ) : (
-                <Check className="h-4 w-4 mr-1" />
-              )}
-              {t("დადასტურება & გაგზავნა", "Approve & Send")}
-            </Button>
-          </div>
         </div>
       </CardContent>
     </Card>
