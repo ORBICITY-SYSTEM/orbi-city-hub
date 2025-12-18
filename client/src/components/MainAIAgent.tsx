@@ -40,10 +40,17 @@ const MODULE_ICONS: Record<string, any> = {
 };
 
 const MODULE_COLORS: Record<string, string> = {
-  finance: "text-blue-500",
-  marketing: "text-green-500",
-  reservations: "text-purple-500",
-  logistics: "text-orange-500",
+  finance: "text-cyan-400",
+  marketing: "text-cyan-400",
+  reservations: "text-cyan-400",
+  logistics: "text-cyan-400",
+};
+
+const MODULE_NAMES: Record<string, string> = {
+  finance: "ფინანსები",
+  marketing: "მარკეტინგი",
+  reservations: "რეზერვაციები",
+  logistics: "ლოჯისტიკა",
 };
 
 export function MainAIAgent() {
@@ -80,26 +87,32 @@ export function MainAIAgent() {
         });
 
         setAnalysis(result);
-        toast.success("File analyzed successfully!");
+        toast.success("ფაილი წარმატებით გაანალიზდა! / File analyzed successfully!");
       };
       reader.readAsDataURL(file);
     } catch (error) {
       console.error("Error analyzing file:", error);
-      toast.error("Failed to analyze file");
+      toast.error("ფაილის ანალიზი ვერ მოხერხდა / Failed to analyze file");
     } finally {
       setIsAnalyzing(false);
     }
   };
 
   return (
-    <Card className="w-full">
+    <Card className="w-full border-cyan-500/30 bg-slate-900/50">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          🤖 Main AI Agent
-          <span className="text-sm font-normal text-muted-foreground">Intelligent Data Distribution</span>
+          <span className="text-cyan-400">🤖 Main AI Agent</span>
+          <span className="text-sm font-normal text-white/80">Intelligent Data Distribution</span>
         </CardTitle>
-        <CardDescription>
+        <CardDescription className="text-white/70">
+          მთავარი AI აგენტი / ინტელექტუალური მონაცემების განაწილება
+        </CardDescription>
+        <CardDescription className="text-cyan-300/60">
           Upload Excel/PDF files and AI will automatically analyze and distribute data to the right modules
+        </CardDescription>
+        <CardDescription className="text-white/60">
+          ატვირთეთ Excel/PDF ფაილები და AI ავტომატურად გააანალიზებს და გაანაწილებს მონაცემებს შესაბამის მოდულებში
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -107,11 +120,11 @@ export function MainAIAgent() {
         <div className="flex items-center gap-4">
           <label
             htmlFor="file-upload"
-            className="flex-1 flex items-center justify-center gap-2 border-2 border-dashed border-border rounded-lg p-8 cursor-pointer hover:border-primary transition-colors"
+            className="flex-1 flex items-center justify-center gap-2 border-2 border-dashed border-cyan-500/30 rounded-lg p-8 cursor-pointer hover:border-cyan-400 transition-colors bg-slate-800/30"
           >
-            <Upload className="w-6 h-6 text-muted-foreground" />
-            <span className="text-sm text-muted-foreground">
-              {file ? file.name : "Click to upload Excel or PDF"}
+            <Upload className="w-6 h-6 text-cyan-400" />
+            <span className="text-sm text-white/70">
+              {file ? file.name : "Click to upload Excel or PDF / დააჭირეთ Excel ან PDF ასატვირთად"}
             </span>
             <input
               id="file-upload"
@@ -125,16 +138,17 @@ export function MainAIAgent() {
             onClick={handleAnalyze}
             disabled={!file || isAnalyzing}
             size="lg"
+            className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white"
           >
             {isAnalyzing ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Analyzing...
+                ანალიზი... / Analyzing...
               </>
             ) : (
               <>
                 <CheckCircle2 className="w-4 h-4 mr-2" />
-                Analyze
+                Analyze / ანალიზი
               </>
             )}
           </Button>
@@ -144,15 +158,15 @@ export function MainAIAgent() {
         {analysis && (
           <div className="space-y-4">
             {/* Summary */}
-            <div className="bg-muted/50 rounded-lg p-4">
+            <div className="bg-slate-800/50 rounded-lg p-4 border border-cyan-500/20">
               <div className="flex items-start gap-3">
-                <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5" />
+                <CheckCircle2 className="w-5 h-5 text-cyan-400 mt-0.5" />
                 <div className="flex-1">
-                  <h4 className="font-semibold mb-1">Analysis Complete</h4>
-                  <p className="text-sm text-muted-foreground">{analysis.summary}</p>
-                  <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
-                    <span>Type: {analysis.fileType.replace("_", " ")}</span>
-                    <span>Confidence: {(analysis.confidence * 100).toFixed(0)}%</span>
+                  <h4 className="font-semibold mb-1 text-cyan-400">Analysis Complete / ანალიზი დასრულდა</h4>
+                  <p className="text-sm text-white/70">{analysis.summary}</p>
+                  <div className="flex items-center gap-4 mt-2 text-xs text-white/50">
+                    <span>Type / ტიპი: {analysis.fileType.replace("_", " ")}</span>
+                    <span>Confidence / სიზუსტე: {(analysis.confidence * 100).toFixed(0)}%</span>
                   </div>
                 </div>
               </div>
@@ -160,40 +174,42 @@ export function MainAIAgent() {
 
             {/* Data Distributions */}
             <div>
-              <h4 className="font-semibold mb-3">📊 Data Distribution</h4>
+              <h4 className="font-semibold mb-3 text-cyan-400">📊 Data Distribution / მონაცემების განაწილება</h4>
               <div className="grid gap-3">
                 {analysis.distributions.map((dist, idx) => {
                   const Icon = MODULE_ICONS[dist.module] || Package;
-                  const colorClass = MODULE_COLORS[dist.module] || "text-gray-500";
+                  const colorClass = MODULE_COLORS[dist.module] || "text-cyan-400";
+                  const moduleName = MODULE_NAMES[dist.module] || dist.module;
 
                   return (
                     <div
                       key={idx}
-                      className="flex items-center gap-3 bg-card border border-border rounded-lg p-3"
+                      className="flex items-center gap-3 bg-slate-800/50 border border-cyan-500/20 rounded-lg p-3"
                     >
                       <Icon className={`w-5 h-5 ${colorClass}`} />
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
-                          <span className="font-medium capitalize">{dist.module}</span>
-                          <span className="text-xs text-muted-foreground">→</span>
-                          <span className="text-sm text-muted-foreground">{dist.category}</span>
+                          <span className="font-medium capitalize text-white">{dist.module}</span>
+                          <span className="text-xs text-white/50">/ {moduleName}</span>
+                          <span className="text-xs text-white/30">→</span>
+                          <span className="text-sm text-white/60">{dist.category}</span>
                         </div>
                         <div className="text-sm mt-1">
-                          <span className="font-semibold">{dist.data.fieldName}:</span>{" "}
-                          <span className="text-primary">
+                          <span className="font-semibold text-white/80">{dist.data.fieldName}:</span>{" "}
+                          <span className="text-cyan-400">
                             {typeof dist.data.value === "number"
                               ? dist.data.value.toLocaleString()
                               : dist.data.value}
                             {dist.data.unit && ` ${dist.data.unit}`}
                           </span>
                           {dist.data.period && (
-                            <span className="text-xs text-muted-foreground ml-2">
+                            <span className="text-xs text-white/50 ml-2">
                               ({dist.data.period})
                             </span>
                           )}
                         </div>
                       </div>
-                      <span className="text-xs text-muted-foreground">
+                      <span className="text-xs text-white/50">
                         {(dist.confidence * 100).toFixed(0)}%
                       </span>
                     </div>
@@ -205,19 +221,19 @@ export function MainAIAgent() {
             {/* Suggestions */}
             {analysis.suggestions.length > 0 && (
               <div>
-                <h4 className="font-semibold mb-3">💡 AI Suggestions</h4>
+                <h4 className="font-semibold mb-3 text-cyan-400">💡 AI Suggestions / AI რეკომენდაციები</h4>
                 <div className="space-y-2">
                   {analysis.suggestions.map((suggestion, idx) => (
                     <div
                       key={idx}
-                      className="flex items-start gap-3 bg-muted/30 rounded-lg p-3"
+                      className="flex items-start gap-3 bg-slate-800/30 border border-cyan-500/10 rounded-lg p-3"
                     >
-                      <AlertCircle className="w-4 h-4 text-blue-500 mt-0.5" />
+                      <AlertCircle className="w-4 h-4 text-cyan-400 mt-0.5" />
                       <div className="flex-1">
-                        <div className="text-sm font-medium capitalize">
+                        <div className="text-sm font-medium capitalize text-white/80">
                           {suggestion.action.replace(/_/g, " ")}
                         </div>
-                        <div className="text-sm text-muted-foreground mt-1">
+                        <div className="text-sm text-white/60 mt-1">
                           {suggestion.description}
                         </div>
                       </div>
@@ -231,9 +247,11 @@ export function MainAIAgent() {
 
         {/* Info */}
         {!analysis && !isAnalyzing && (
-          <div className="text-center text-sm text-muted-foreground py-8">
-            <p>Upload a financial report, booking list, or inventory sheet</p>
-            <p className="mt-1">AI will analyze and distribute data automatically</p>
+          <div className="text-center text-sm py-8">
+            <p className="text-white/70">Upload a financial report, booking list, or inventory sheet</p>
+            <p className="text-white/50 mt-1">ატვირთეთ ფინანსური ანგარიში, ჯავშნების სია ან ინვენტარის ცხრილი</p>
+            <p className="text-cyan-300/60 mt-3">AI will analyze and distribute data automatically</p>
+            <p className="text-white/40 mt-1">AI ავტომატურად გააანალიზებს და გაანაწილებს მონაცემებს</p>
           </div>
         )}
       </CardContent>

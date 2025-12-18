@@ -241,3 +241,10 @@
 - [x] Reviews Dashboard: Reviews Command Center (cyan) + მიმოხილვების ცენტრი / subtitle (white)
 - [x] Logistics Dashboard: Logistics Command Center (cyan) + ლოჯისტიკის ცენტრი / subtitle (white)
 - [x] All headers follow exact format from reference image
+
+## Main AI Agent Bilingual Update
+- [x] Title: Main AI Agent + მთავარი AI აგენტი
+- [x] Subtitle: Intelligent Data Distribution + ინტელექტუალური მონაცემების განაწილება
+- [x] Description text bilingual
+- [x] Upload button text bilingual
+- [x] All helper text bilingual
