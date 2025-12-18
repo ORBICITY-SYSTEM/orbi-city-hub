@@ -36,6 +36,7 @@ import {
   Trash2
 } from "lucide-react";
 import { format } from "date-fns";
+import { AIReviewResponseQueue } from "@/components/ai-review-response";
 
 // Platform icons/colors
 const platformConfig: Record<string, { color: string; bgColor: string; icon: string }> = {
@@ -403,8 +404,12 @@ const ReviewsDashboard = () => {
       </Card>
 
       {/* Main Content Tabs */}
-      <Tabs defaultValue="reviews" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-3 lg:w-[400px]">
+      <Tabs defaultValue="ai-responses" className="space-y-4">
+        <TabsList className="grid w-full grid-cols-4 lg:w-[550px]">
+          <TabsTrigger value="ai-responses" className="flex items-center gap-2">
+            <Sparkles className="h-4 w-4" />
+            {t("AI პასუხები", "AI Responses")}
+          </TabsTrigger>
           <TabsTrigger value="reviews" className="flex items-center gap-2">
             <MessageSquare className="h-4 w-4" />
             {t("მიმოხილვები", "Reviews")}
@@ -418,6 +423,11 @@ const ReviewsDashboard = () => {
             {t("თემები", "Topics")}
           </TabsTrigger>
         </TabsList>
+
+        {/* AI Response Queue - NEW */}
+        <TabsContent value="ai-responses">
+          <AIReviewResponseQueue />
+        </TabsContent>
 
         {/* Reviews List */}
         <TabsContent value="reviews" className="space-y-4">

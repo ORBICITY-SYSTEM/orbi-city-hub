@@ -10,6 +10,80 @@ import { invokeLLM } from "./_core/llm";
 import * as butlerDb from "./butlerDb";
 import { BUTLER_KNOWLEDGE, AI_PROMPTS } from "./butler-knowledge";
 
+// AI Response Generation for Regenerate feature
+async function generateNewAIResponse(params: {
+  reviewerName: string;
+  rating: number;
+  content: string;
+  language: string;
+  source: string;
+}): Promise<string> {
+  const { reviewerName, rating, content, language, source } = params;
+  
+  let tone = "grateful, warm, inviting";
+  if (rating <= 2) tone = "apologetic, empathetic, solution-focused";
+  else if (rating <= 4) tone = "professional, appreciative, improvement-oriented";
+  
+  const greetings: Record<string, string> = {
+    ka: "მოგესალმებით",
+    ru: "Здравствуйте",
+    tr: "Merhaba",
+    en: "Dear"
+  };
+  const greeting = greetings[language] || greetings.en;
+  
+  const prompt = `You are the customer service manager for ${BUTLER_KNOWLEDGE.property.name}.
+Generate a NEW, DIFFERENT professional response to this ${source} review.
+Make it unique and fresh, not similar to previous responses.
+
+Review Details:
+- Guest: ${reviewerName}
+- Rating: ${rating}/5 stars
+- Review: "${content}"
+- Language: ${language}
+
+Guidelines:
+- Write ONLY in ${language === 'ka' ? 'Georgian' : language === 'ru' ? 'Russian' : language === 'tr' ? 'Turkish' : 'English'} language
+- Start with "${greeting} ${reviewerName}"
+- Tone: ${tone}
+- ${rating <= 2 ? 'Apologize sincerely and offer 20% discount on next stay' : ''}
+- ${rating >= 4 ? 'Thank them warmly and invite them back' : ''}
+- Keep response under 150 words
+- Sign as "Orbi City Team"
+- Be creative and personal!
+
+Generate the response:`;
+
+  try {
+    const response = await invokeLLM({
+      messages: [
+        { role: 'system', content: 'You are a professional hotel customer service manager.' },
+        { role: 'user', content: prompt }
+      ],
+      temperature: 0.9 // Higher for more variety
+    });
+    
+    return response.choices[0]?.message?.content || getDefaultResponse(reviewerName, rating, language);
+  } catch (error) {
+    console.error('[Butler] AI regeneration error:', error);
+    return getDefaultResponse(reviewerName, rating, language);
+  }
+}
+
+function getDefaultResponse(guestName: string, rating: number, language: string): string {
+  if (rating <= 2) {
+    if (language === 'ka') {
+      return `მოგესალმებით ${guestName},\n\nგმადლობთ თქვენი გულწრფელი შეფასებისთვის. ღრმად ვწუხვარ რომ თქვენმა მოლოდინი ვერ გაამართლა.\n\nროგორც კომპენსაცია, გთავაზობთ 20% ფასდაკლებას თქვენს შემდეგ ვიზიტზე.\n\nპატივისცემით,\nOrbi City Team`;
+    }
+    return `Dear ${guestName},\n\nThank you for your honest feedback. We sincerely apologize that your experience did not meet your expectations.\n\nAs compensation, we offer you a 20% discount on your next stay.\n\nBest regards,\nOrbi City Team`;
+  }
+  
+  if (language === 'ka') {
+    return `გმადლობთ ${guestName}!\n\nძალიან გვიხარია რომ მოგეწონათ ჩვენთან ყოფნა! თქვენი თბილი სიტყვები დიდი მოტივაციაა ჩვენი გუნდისთვის.\n\nველოდებით თქვენს მომავალ ვიზიტს!\n\nOrbi City Team`;
+  }
+  return `Dear ${guestName},\n\nThank you so much for your wonderful review! We're delighted that you enjoyed your stay with us.\n\nWe look forward to welcoming you back!\n\nBest regards,\nOrbi City Team`;
+}
+
 export const butlerRouter = router({
   // ============================================
   // GET PENDING TASKS
@@ -124,12 +198,13 @@ Customize this template to specifically address the guest's concerns while maint
     }),
 
   // ============================================
-  // APPROVE BUTLER TASK
+  // APPROVE BUTLER TASK (with N8N webhook)
   // ============================================
   approve: protectedProcedure
     .input(z.object({
       taskId: z.string(),
-      modifiedContent: z.any().optional()
+      modifiedContent: z.any().optional(),
+      sendToN8N: z.boolean().optional().default(true)
     }))
     .mutation(async ({ ctx, input }) => {
       await butlerDb.approveButlerTask(input.taskId, ctx.user.id, input.modifiedContent);
@@ -138,16 +213,88 @@ Customize this template to specifically address the guest's concerns while maint
       const task = await butlerDb.getButlerTaskById(input.taskId);
       if (!task) throw new Error("Task not found");
 
+      let n8nResult = null;
+
       // Execute based on task type
       if (task.task_type === 'review_response') {
-        const { reviewId, responseText } = task.ai_suggestion;
-        await butlerDb.updateReviewResponse(reviewId, responseText, true);
+        const { reviewId, responseText, source, reviewerName, rating, originalReview } = task.ai_suggestion;
+        const finalResponse = input.modifiedContent?.responseText || responseText;
+        
+        // Update review response in database
+        await butlerDb.updateReviewResponse(reviewId, finalResponse, true);
+        
+        // Send to N8N webhook for OTA posting
+        if (input.sendToN8N) {
+          try {
+            const n8nWebhookUrl = process.env.N8N_REVIEW_RESPONSE_WEBHOOK;
+            if (n8nWebhookUrl) {
+              const n8nResponse = await fetch(n8nWebhookUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  action: 'post_review_response',
+                  source: source || 'google',
+                  reviewId,
+                  reviewerName,
+                  rating,
+                  originalReview,
+                  responseText: finalResponse,
+                  approvedBy: ctx.user.name || ctx.user.email,
+                  approvedAt: new Date().toISOString(),
+                  taskId: input.taskId
+                })
+              });
+              n8nResult = { sent: true, status: n8nResponse.status };
+              console.log(`[Butler] Sent review response to N8N webhook: ${n8nResponse.status}`);
+            } else {
+              n8nResult = { sent: false, reason: 'N8N webhook URL not configured' };
+            }
+          } catch (n8nError) {
+            console.error('[Butler] N8N webhook error:', n8nError);
+            n8nResult = { sent: false, error: String(n8nError) };
+          }
+        }
       }
 
       // Mark as completed
       await butlerDb.completeButlerTask(input.taskId);
 
-      return { success: true };
+      return { success: true, n8nResult };
+    }),
+
+  // ============================================
+  // REGENERATE AI RESPONSE
+  // ============================================
+  regenerateResponse: protectedProcedure
+    .input(z.object({
+      taskId: z.string()
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const task = await butlerDb.getButlerTaskById(input.taskId);
+      if (!task) throw new Error("Task not found");
+      if (task.task_type !== 'review_response') throw new Error("Not a review response task");
+
+      const { reviewerName, rating, originalReview, language, source } = task.ai_suggestion;
+      
+      // Generate new AI response
+      const newResponse = await generateNewAIResponse({
+        reviewerName,
+        rating,
+        content: originalReview,
+        language: language || 'en',
+        source: source || 'Google'
+      });
+
+      // Update task with new suggestion
+      const db = await butlerDb.getDb();
+      if (db) {
+        await db.execute(
+          `UPDATE butler_tasks SET ai_suggestion = ? WHERE id = ?`,
+          [JSON.stringify({ ...task.ai_suggestion, responseText: newResponse }), input.taskId]
+        );
+      }
+
+      return { success: true, newResponse };
     }),
 
   // ============================================
