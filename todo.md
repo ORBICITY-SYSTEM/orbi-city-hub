@@ -232,3 +232,12 @@
 - [x] Convert all page titles to Georgian language
 - [x] Apply consistent header styling across all modules
 - [x] Test and verify all pages have unified design
+
+## Bilingual Headers (English Cyan + Georgian White)
+- [x] Home page header: ORBI City Hub (cyan) + ორბი სითი ჰაბი / subtitle (white)
+- [x] OTA Dashboard: Orbi OTA Command Center (cyan) + OTA სარდლობის ცენტრი / subtitle (white)
+- [x] Finance Dashboard: Financial Intelligence (cyan) + ფინანსური ინტელექტი / subtitle (white)
+- [x] Marketing Dashboard: Marketing Control Center (cyan) + მარკეტინგის ცენტრი / subtitle (white)
+- [x] Reviews Dashboard: Reviews Command Center (cyan) + მიმოხილვების ცენტრი / subtitle (white)
+- [x] Logistics Dashboard: Logistics Command Center (cyan) + ლოჯისტიკის ცენტრი / subtitle (white)
+- [x] All headers follow exact format from reference image

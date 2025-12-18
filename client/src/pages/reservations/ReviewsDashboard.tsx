@@ -194,10 +194,10 @@ const ReviewsDashboard = () => {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl md:text-4xl font-bold text-cyan-400 tracking-tight">
-                {t("მიმოხილვების ცენტრი", "მიმოხილვების ცენტრი")}
+                Reviews Command Center
               </h1>
-              <p className="text-lg text-cyan-300/80 mt-2 font-medium">
-                {t("ყველა პლატფორმის მიმოხილვები ერთ ადგილას", "ყველა პლატფორმის მიმოხილვები ერთ ადგილას")}
+              <p className="text-lg text-white/90 mt-2 font-medium">
+                მიმოხილვების ცენტრი / ყველა პლატფორმის მიმოხილვები ერთ ადგილას
               </p>
             </div>
             <div className="flex gap-2 items-center">

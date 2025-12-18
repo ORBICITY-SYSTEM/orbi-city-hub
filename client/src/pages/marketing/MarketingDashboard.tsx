@@ -367,8 +367,8 @@ const Marketing = () => {
                 </Button>
               )}
               <div>
-                <h1 className="text-3xl md:text-4xl font-bold text-cyan-400 tracking-tight">მარკეტინგის ცენტრი</h1>
-                <p className="text-lg text-cyan-300/80 mt-1 font-medium">კამპანიების მართვა და ანალიტიკა</p>
+                <h1 className="text-3xl md:text-4xl font-bold text-cyan-400 tracking-tight">Marketing Control Center</h1>
+                <p className="text-lg text-white/90 mt-1 font-medium">მარკეტინგის ცენტრი / კამპანიების მართვა და ანალიტიკა</p>
               </div>
             </div>
             <Badge className="bg-cyan-500/20 text-cyan-300 border-cyan-500/30">

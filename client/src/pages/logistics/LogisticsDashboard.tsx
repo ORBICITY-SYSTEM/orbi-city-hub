@@ -46,10 +46,10 @@ const Logistics = () => {
               </div>
               <div>
                 <h1 className="text-3xl md:text-4xl font-bold text-cyan-400 tracking-tight">
-                  {t("ლოჯისტიკის ცენტრი", "ლოჯისტიკის ცენტრი")}
+                  Logistics Command Center
                 </h1>
-                <p className="text-lg text-cyan-300/80 mt-1 font-medium">
-                  {t("სტუდიოების ინვენტარის მართვა და ანალიტიკა", "სტუდიოების ინვენტარის მართვა და ანალიტიკა")}
+                <p className="text-lg text-white/90 mt-1 font-medium">
+                  ლოჯისტიკის ცენტრი / სტუდიოების ინვენტარის მართვა და ანალიტიკა
                 </p>
               </div>
             </div>

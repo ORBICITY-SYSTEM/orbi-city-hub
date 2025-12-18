@@ -57,8 +57,8 @@ export default function Home() {
           <h1 className="text-4xl md:text-5xl font-bold text-cyan-400 tracking-tight mb-2">
             ORBI City Hub
           </h1>
-          <p className="text-lg text-cyan-300/80 font-medium">
-            საზღვაო აპარტჰოტელის მართვის პლატფორმა
+          <p className="text-lg text-white/90 font-medium">
+            ორბი სითი ჰაბი / საზღვაო აპარტჰოტელის მართვის პლატფორმა
           </p>
         </div>
         {/* Ocean Wave SVG */}

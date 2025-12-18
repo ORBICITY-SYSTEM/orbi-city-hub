@@ -34,12 +34,12 @@ const Finance = () => {
                 <TrendingUp className="h-6 w-6 text-white" />
               </div>
               <div>
-                <h1 className="text-3xl md:text-4xl font-bold text-cyan-400 tracking-tight">
-                  ფინანსური ინტელექტი
-                </h1>
-                <p className="text-lg text-cyan-300/80 mt-1 font-medium">
-                  ორბი სითის ფინანსური მოდულები
-                </p>
+          <h1 className="text-3xl md:text-4xl font-bold text-cyan-400 tracking-tight">
+            Financial Intelligence
+          </h1>
+          <p className="text-lg text-white/90 mt-2 font-medium">
+            ფინანსური ინტელექტი / შემოსავლები, ხარჯები და ფინანსური ანალიტიკა
+          </p>
               </div>
             </div>
           </div>
