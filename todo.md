@@ -282,3 +282,12 @@
 - [x] Home page - all module cards and stats
 - [x] Fix all mixed language issues
 - [x] Push to GitHub
+
+## CEO Dashboard Redesign (Home Page)
+- [x] Move WhatsApp Bot from separate module to Reservations submenu
+- [x] Main AI Agent - only button with 🤖 emoji (opens modal on click)
+- [x] Add 4 module KPIs compactly displayed
+- [x] Add CEO-relevant metrics (today's revenue, active bookings, pending reviews, today's tasks)
+- [x] Clean up Home page layout
+- [x] Add all translations (EN/KA)
+- [ ] Push to GitHub

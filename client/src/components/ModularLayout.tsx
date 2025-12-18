@@ -83,6 +83,7 @@ const modules: ModuleItem[] = [
       { nameKey: "submenu.email", path: "/reservations/email", icon: Mail },
       { nameKey: "submenu.reviews", path: "/reservations/guests", icon: Users },
       { nameKey: "submenu.otaCommand", path: "/reservations/ota", icon: Globe },
+      { nameKey: "submenu.whatsappBot", path: "/reservations/whatsapp", icon: MessageCircle },
     ]
   },
   {
@@ -95,20 +96,7 @@ const modules: ModuleItem[] = [
       { nameKey: "submenu.maintenance", path: "/logistics/maintenance", icon: Wrench },
     ]
   },
-  {
-    nameKey: "nav.whatsappBot",
-    icon: MessageCircle,
-    color: "text-cyan-400",
-    subItems: [
-      { nameKey: "submenu.quickStart", path: "/whatsapp/quick-start", icon: Rocket },
-      { nameKey: "submenu.implementation", path: "/whatsapp/implementation", icon: Code },
-      { nameKey: "submenu.codeExamples", path: "/whatsapp/code-examples", icon: FileText },
-      { nameKey: "submenu.systemPrompt", path: "/whatsapp/system-prompt", icon: MessageCircle },
-      { nameKey: "submenu.testing", path: "/whatsapp/testing", icon: TestTube },
-      { nameKey: "submenu.resources", path: "/whatsapp/resources", icon: BookOpen },
-      { nameKey: "submenu.deployment", path: "/whatsapp/deployment", icon: Rocket },
-    ]
-  }
+
 ];
 
 export default function ModularLayout({ children }: { children: React.ReactNode }) {
@@ -116,7 +104,7 @@ export default function ModularLayout({ children }: { children: React.ReactNode 
   const { t } = useLanguage();
   const [location] = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [expandedModules, setExpandedModules] = useState<string[]>(["nav.finance", "nav.marketing", "nav.reservations", "nav.logistics", "nav.whatsappBot"]);
+  const [expandedModules, setExpandedModules] = useState<string[]>(["nav.finance", "nav.marketing", "nav.reservations", "nav.logistics"]);
 
   // Auto-expand module based on current route
   useEffect(() => {

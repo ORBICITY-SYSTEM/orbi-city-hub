@@ -35,6 +35,7 @@ export const ka: Translations = {
     email: "ელფოსტა",
     reviews: "მიმოხილვები",
     otaCommand: "OTA მართვა",
+    whatsappBot: "WhatsApp ბოტი",
     
     // Logistics
     logisticsDashboard: "მთავარი",

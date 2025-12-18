@@ -33,6 +33,7 @@ export const en = {
     email: "Email",
     reviews: "Reviews",
     otaCommand: "OTA Command",
+    whatsappBot: "WhatsApp Bot",
     
     // Logistics
     logisticsDashboard: "Dashboard",
