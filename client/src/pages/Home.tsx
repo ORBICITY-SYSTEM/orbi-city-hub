@@ -15,9 +15,11 @@ import {
   AlertCircle,
   ArrowUpRight,
   ArrowDownRight,
-  Loader2
+  Loader2,
+  Puzzle
 } from "lucide-react";
 import { MainAIAgent } from "@/components/MainAIAgent";
+import { IntegrationsShowcase } from "@/components/IntegrationsShowcase";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -26,6 +28,7 @@ import { trpc } from "@/lib/trpc";
 export default function Home() {
   const { t, language } = useLanguage();
   const [showAIAgent, setShowAIAgent] = useState(false);
+  const [showIntegrations, setShowIntegrations] = useState(false);
 
   // Fetch real-time CEO Dashboard data
   const { data: todayOverview, isLoading: overviewLoading } = trpc.ceoDashboard.getTodayOverview.useQuery(undefined, {
@@ -183,16 +186,29 @@ export default function Home() {
                 {language === 'ka' ? "ORBI City Sea View / რეალ-ტაიმ მენეჯმენტი" : "ORBI City Sea View / Real-time Management"}
               </p>
             </div>
-            {/* AI Agent Button */}
-            <Button
-              onClick={() => setShowAIAgent(true)}
-              className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white px-6 py-3 rounded-xl flex items-center gap-2 shadow-lg shadow-cyan-500/25"
-            >
-              <Bot className="w-5 h-5" />
-              <span className="font-medium">
-                {language === 'ka' ? "AI აგენტი" : "AI Agent"}
-              </span>
-            </Button>
+            {/* Action Buttons */}
+            <div className="flex items-center gap-3">
+              {/* Integrations Button */}
+              <Button
+                onClick={() => setShowIntegrations(true)}
+                className="bg-gradient-to-r from-purple-500 to-violet-500 hover:from-purple-600 hover:to-violet-600 text-white px-5 py-3 rounded-xl flex items-center gap-2 shadow-lg shadow-purple-500/25"
+              >
+                <Puzzle className="w-5 h-5" />
+                <span className="font-medium">
+                  {language === 'ka' ? "ინტეგრაციები" : "Integrations"}
+                </span>
+              </Button>
+              {/* AI Agent Button */}
+              <Button
+                onClick={() => setShowAIAgent(true)}
+                className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white px-6 py-3 rounded-xl flex items-center gap-2 shadow-lg shadow-cyan-500/25"
+              >
+                <Bot className="w-5 h-5" />
+                <span className="font-medium">
+                  {language === 'ka' ? "AI აგენტი" : "AI Agent"}
+                </span>
+              </Button>
+            </div>
           </div>
         </div>
         {/* Ocean Wave SVG */}
@@ -345,6 +361,12 @@ export default function Home() {
           </div>
         </div>
       )}
+
+      {/* Integrations Showcase Modal */}
+      <IntegrationsShowcase 
+        open={showIntegrations} 
+        onOpenChange={setShowIntegrations} 
+      />
     </div>
   );
 }
