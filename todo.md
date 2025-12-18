@@ -290,4 +290,15 @@
 - [x] Add CEO-relevant metrics (today's revenue, active bookings, pending reviews, today's tasks)
 - [x] Clean up Home page layout
 - [x] Add all translations (EN/KA)
+- [x] Push to GitHub
+
+## CEO Dashboard Real-Time Data Connection
+- [x] Create API endpoint for today's revenue (from OTA bookings)
+- [x] Create API endpoint for active bookings (today's check-in/check-out)
+- [x] Create API endpoint for pending reviews (unanswered reviews)
+- [x] Create API endpoint for today's tasks (Butler AI tasks)
+- [x] Update Home.tsx to fetch real-time data
+- [x] Add loading states and error handling
+- [x] Test and verify all KPIs show live data
+- [x] Add vitest tests for CEO Dashboard router
 - [ ] Push to GitHub

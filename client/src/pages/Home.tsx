@@ -14,27 +14,61 @@ import {
   CheckCircle2,
   AlertCircle,
   ArrowUpRight,
-  ArrowDownRight
+  ArrowDownRight,
+  Loader2
 } from "lucide-react";
 import { MainAIAgent } from "@/components/MainAIAgent";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { trpc } from "@/lib/trpc";
 
 export default function Home() {
   const { t, language } = useLanguage();
   const [showAIAgent, setShowAIAgent] = useState(false);
 
+  // Fetch real-time CEO Dashboard data
+  const { data: todayOverview, isLoading: overviewLoading } = trpc.ceoDashboard.getTodayOverview.useQuery(undefined, {
+    refetchInterval: 60000, // Refresh every minute
+  });
+
+  const { data: moduleSummaries, isLoading: summariesLoading } = trpc.ceoDashboard.getModuleSummaries.useQuery(undefined, {
+    refetchInterval: 60000,
+  });
+
+  // Format currency
+  const formatCurrency = (value: number) => {
+    if (value >= 1000000) return `₾${(value / 1000000).toFixed(1)}M`;
+    if (value >= 1000) return `₾${(value / 1000).toFixed(0)}K`;
+    return `₾${value.toLocaleString()}`;
+  };
+
   // CEO Dashboard KPIs - Real-time metrics
   const ceoMetrics = {
-    todayRevenue: { value: "₾12,450", change: "+18%", positive: true },
-    activeBookings: { value: "23", change: "+5", positive: true },
-    pendingReviews: { value: "4", change: "-2", positive: true },
-    todayTasks: { value: "8", change: "3 done", positive: true },
+    todayRevenue: { 
+      value: todayOverview ? formatCurrency(todayOverview.todayRevenue.value) : "₾0", 
+      change: todayOverview?.todayRevenue.changePercent || "+0%", 
+      positive: (todayOverview?.todayRevenue.change || 0) >= 0 
+    },
+    activeBookings: { 
+      value: todayOverview?.activeBookings.value.toString() || "0", 
+      change: `${(todayOverview?.activeBookings.change || 0) >= 0 ? '+' : ''}${todayOverview?.activeBookings.change || 0}`, 
+      positive: (todayOverview?.activeBookings.change || 0) >= 0 
+    },
+    pendingReviews: { 
+      value: todayOverview?.pendingReviews.value.toString() || "0", 
+      change: todayOverview?.pendingReviews.change ? `+${todayOverview.pendingReviews.change} new` : "0 new", 
+      positive: true 
+    },
+    todayTasks: { 
+      value: todayOverview?.todayTasks.value.toString() || "0", 
+      change: `${todayOverview?.todayTasks.completed || 0} done`, 
+      positive: true 
+    },
   };
 
   // Module summaries for CEO overview
-  const moduleSummaries = [
+  const moduleData = [
     {
       key: "finance",
       icon: DollarSign,
@@ -42,9 +76,21 @@ export default function Home() {
       borderColor: "border-emerald-500/30",
       path: "/finance",
       metrics: [
-        { label: language === 'ka' ? "წლიური შემოსავალი" : "Annual Revenue", value: "₾999,543", trend: "+297%" },
-        { label: language === 'ka' ? "წლიური მოგება" : "Annual Profit", value: "₾778,732", trend: "+358%" },
-        { label: language === 'ka' ? "მოგების მარჟა" : "Profit Margin", value: "78%", trend: "+12%" },
+        { 
+          label: language === 'ka' ? "წლიური შემოსავალი" : "Annual Revenue", 
+          value: moduleSummaries ? formatCurrency(moduleSummaries.finance.annualRevenue) : "₾0", 
+          trend: "+297%" 
+        },
+        { 
+          label: language === 'ka' ? "წლიური მოგება" : "Annual Profit", 
+          value: moduleSummaries ? formatCurrency(moduleSummaries.finance.annualProfit) : "₾0", 
+          trend: "+358%" 
+        },
+        { 
+          label: language === 'ka' ? "მოგების მარჟა" : "Profit Margin", 
+          value: `${moduleSummaries?.finance.profitMargin || 0}%`, 
+          trend: "+12%" 
+        },
       ]
     },
     {
@@ -54,9 +100,21 @@ export default function Home() {
       borderColor: "border-blue-500/30",
       path: "/marketing",
       metrics: [
-        { label: language === 'ka' ? "საშ. დატვირთვა" : "Avg. Occupancy", value: "74%", trend: "+14%" },
-        { label: language === 'ka' ? "ვებ ლიდები" : "Web Leads", value: "156", trend: "+23%" },
-        { label: language === 'ka' ? "კონვერსია" : "Conversion", value: "12%", trend: "+3%" },
+        { 
+          label: language === 'ka' ? "საშ. დატვირთვა" : "Avg. Occupancy", 
+          value: `${moduleSummaries?.marketing.avgOccupancy || 74}%`, 
+          trend: "+14%" 
+        },
+        { 
+          label: language === 'ka' ? "ვებ ლიდები" : "Web Leads", 
+          value: (moduleSummaries?.marketing.webLeads || 156).toString(), 
+          trend: "+23%" 
+        },
+        { 
+          label: language === 'ka' ? "კონვერსია" : "Conversion", 
+          value: `${moduleSummaries?.marketing.conversion || 12}%`, 
+          trend: "+3%" 
+        },
       ]
     },
     {
@@ -66,9 +124,21 @@ export default function Home() {
       borderColor: "border-purple-500/30",
       path: "/reservations",
       metrics: [
-        { label: language === 'ka' ? "აქტიური სტუდიოები" : "Active Studios", value: "75", trend: "+41" },
-        { label: language === 'ka' ? "ჯავშნები დღეს" : "Bookings Today", value: "8", trend: "+3" },
-        { label: language === 'ka' ? "საშ. რეიტინგი" : "Avg. Rating", value: "4.8", trend: "★" },
+        { 
+          label: language === 'ka' ? "აქტიური სტუდიოები" : "Active Studios", 
+          value: (moduleSummaries?.reservations.activeStudios || 75).toString(), 
+          trend: "+41" 
+        },
+        { 
+          label: language === 'ka' ? "ჯავშნები დღეს" : "Bookings Today", 
+          value: (moduleSummaries?.reservations.todayBookings || 0).toString(), 
+          trend: "+3" 
+        },
+        { 
+          label: language === 'ka' ? "საშ. რეიტინგი" : "Avg. Rating", 
+          value: moduleSummaries?.reservations.avgRating?.toString() || "4.8", 
+          trend: "★" 
+        },
       ]
     },
     {
@@ -78,12 +148,26 @@ export default function Home() {
       borderColor: "border-orange-500/30",
       path: "/logistics",
       metrics: [
-        { label: language === 'ka' ? "დღევანდელი ამოცანები" : "Today's Tasks", value: "12", trend: "8 done" },
-        { label: language === 'ka' ? "დალაგება" : "Housekeeping", value: "6", trend: "4 done" },
-        { label: language === 'ka' ? "მოვლა" : "Maintenance", value: "3", trend: "1 urgent" },
+        { 
+          label: language === 'ka' ? "დღევანდელი ამოცანები" : "Today's Tasks", 
+          value: (moduleSummaries?.logistics.todayTasks || 12).toString(), 
+          trend: "8 done" 
+        },
+        { 
+          label: language === 'ka' ? "დალაგება" : "Housekeeping", 
+          value: (moduleSummaries?.logistics.housekeeping || 6).toString(), 
+          trend: "4 done" 
+        },
+        { 
+          label: language === 'ka' ? "მოვლა" : "Maintenance", 
+          value: (moduleSummaries?.logistics.maintenance || 3).toString(), 
+          trend: "1 urgent" 
+        },
       ]
     }
   ];
+
+  const isLoading = overviewLoading || summariesLoading;
 
   return (
     <div className="space-y-6">
@@ -124,16 +208,17 @@ export default function Home() {
 
       {/* CEO Quick Metrics - Today's Overview */}
       <div className="px-6">
-        <h2 className="text-lg font-semibold text-white/80 mb-3">
+        <h2 className="text-lg font-semibold text-white/80 mb-3 flex items-center gap-2">
           {language === 'ka' ? "📊 დღევანდელი მიმოხილვა" : "📊 Today's Overview"}
+          {isLoading && <Loader2 className="w-4 h-4 animate-spin text-cyan-400" />}
         </h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="bg-gradient-to-br from-emerald-500/20 to-emerald-600/10 border border-emerald-500/30 rounded-xl p-4">
             <div className="flex items-center justify-between mb-2">
               <DollarSign className="w-5 h-5 text-emerald-400" />
-              <span className="text-xs font-medium text-emerald-400 flex items-center gap-1">
+              <span className={`text-xs font-medium flex items-center gap-1 ${ceoMetrics.todayRevenue.positive ? 'text-emerald-400' : 'text-red-400'}`}>
                 {ceoMetrics.todayRevenue.change}
-                <ArrowUpRight className="w-3 h-3" />
+                {ceoMetrics.todayRevenue.positive ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
               </span>
             </div>
             <div className="text-2xl font-bold text-white">{ceoMetrics.todayRevenue.value}</div>
@@ -145,9 +230,9 @@ export default function Home() {
           <div className="bg-gradient-to-br from-blue-500/20 to-blue-600/10 border border-blue-500/30 rounded-xl p-4">
             <div className="flex items-center justify-between mb-2">
               <Calendar className="w-5 h-5 text-blue-400" />
-              <span className="text-xs font-medium text-blue-400 flex items-center gap-1">
+              <span className={`text-xs font-medium flex items-center gap-1 ${ceoMetrics.activeBookings.positive ? 'text-blue-400' : 'text-red-400'}`}>
                 {ceoMetrics.activeBookings.change}
-                <ArrowUpRight className="w-3 h-3" />
+                {ceoMetrics.activeBookings.positive ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
               </span>
             </div>
             <div className="text-2xl font-bold text-white">{ceoMetrics.activeBookings.value}</div>
@@ -161,7 +246,6 @@ export default function Home() {
               <Star className="w-5 h-5 text-amber-400" />
               <span className="text-xs font-medium text-amber-400 flex items-center gap-1">
                 {ceoMetrics.pendingReviews.change}
-                <ArrowDownRight className="w-3 h-3" />
               </span>
             </div>
             <div className="text-2xl font-bold text-white">{ceoMetrics.pendingReviews.value}</div>
@@ -191,7 +275,7 @@ export default function Home() {
           {language === 'ka' ? "🏢 მოდულების მიმოხილვა" : "🏢 Module Overview"}
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {moduleSummaries.map((module) => (
+          {moduleData.map((module) => (
             <Link key={module.key} href={module.path}>
               <div className={`bg-slate-800/50 border ${module.borderColor} rounded-xl p-5 hover:bg-slate-800/70 transition-all cursor-pointer group`}>
                 <div className="flex items-center justify-between mb-4">
