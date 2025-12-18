@@ -108,6 +108,7 @@ function RouterContent() {
         <Route path="/reservations/ota" component={OTADashboard} />
         <Route path="/reservations/automations" component={Automations} />
         <Route path="/reservations/ai-responses" component={AIResponseQueue} />
+        <Route path="/reservations/whatsapp-bot" component={WhatsAppQuickStart} />
 
         {/* Email Management Module */}
         <Route path="/email-management" component={EmailManagement} />

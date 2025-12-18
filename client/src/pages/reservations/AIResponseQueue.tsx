@@ -76,20 +76,17 @@ export default function AIResponseQueue() {
             <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center shadow-lg">
               <MessageSquare className="h-6 w-6 text-white" />
             </div>
-            {t("AI პასუხების რიგი", "AI Response Queue")}
+            {t("aiQueue.title")}
           </h1>
           <p className="text-muted-foreground mt-2">
-            {t(
-              "მარტივი 3 ნაბიჯი: კოპირება → გახსნა → დასრულება",
-              "Simple 3 steps: Copy → Open → Done"
-            )}
+            {t("aiQueue.subtitle")}
           </p>
         </div>
         
         <div className="flex items-center gap-3">
           <Badge variant="outline" className="text-lg px-4 py-2 bg-emerald-50 dark:bg-emerald-950 border-emerald-500">
             <Clock className="h-4 w-4 mr-2 text-emerald-600" />
-            {filteredTasks.length} {t("მოლოდინში", "Pending")}
+            {filteredTasks.length} {t("reviews.pending")}
           </Badge>
         </div>
       </div>
@@ -101,7 +98,7 @@ export default function AIResponseQueue() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-blue-600 dark:text-blue-400">
-                  {t("დღეს დასრულებული", "Completed Today")}
+                  {t("aiQueue.completedToday")}
                 </p>
                 <p className="text-3xl font-bold text-blue-900 dark:text-blue-100">
                   {metrics?.dailyStats?.[0]?.approved || 0}
@@ -117,7 +114,7 @@ export default function AIResponseQueue() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-emerald-600 dark:text-emerald-400">
-                  {t("დამტკიცების %", "Approval Rate")}
+                  {t("aiQueue.approvalRate")}
                 </p>
                 <p className="text-3xl font-bold text-emerald-900 dark:text-emerald-100">
                   {metrics?.approvalRate || 0}%
@@ -133,7 +130,7 @@ export default function AIResponseQueue() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-purple-600 dark:text-purple-400">
-                  {t("AI გენერაციის დრო", "AI Gen Time")}
+                  {t("aiQueue.aiGenTime")}
                 </p>
                 <p className="text-3xl font-bold text-purple-900 dark:text-purple-100">
                   {metrics?.avgGenerationTime || 0}s
@@ -149,7 +146,7 @@ export default function AIResponseQueue() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-amber-600 dark:text-amber-400">
-                  {t("სულ პასუხები", "Total Responses")}
+                  {t("aiQueue.totalResponses")}
                 </p>
                 <p className="text-3xl font-bold text-amber-900 dark:text-amber-100">
                   {metrics?.totalResponses || 0}
@@ -166,7 +163,7 @@ export default function AIResponseQueue() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <TabsList className="bg-muted/50">
             <TabsTrigger value="all" className="flex items-center gap-2">
-              {t("ყველა", "All")}
+              {t("reviews.all")}
               <Badge variant="secondary" className="ml-1">{reviewTasks.length}</Badge>
             </TabsTrigger>
             <TabsTrigger value="google" className="flex items-center gap-2">
@@ -191,14 +188,14 @@ export default function AIResponseQueue() {
           <Select value={priorityFilter} onValueChange={setPriorityFilter}>
             <SelectTrigger className="w-[180px]">
               <Filter className="h-4 w-4 mr-2" />
-              <SelectValue placeholder={t("პრიორიტეტი", "Priority")} />
+              <SelectValue placeholder={t("logistics.priority")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">{t("ყველა პრიორიტეტი", "All Priorities")}</SelectItem>
-              <SelectItem value="urgent">{t("სასწრაფო", "Urgent")}</SelectItem>
-              <SelectItem value="high">{t("მაღალი", "High")}</SelectItem>
-              <SelectItem value="medium">{t("საშუალო", "Medium")}</SelectItem>
-              <SelectItem value="low">{t("დაბალი", "Low")}</SelectItem>
+              <SelectItem value="all">{t("aiQueue.allPriorities")}</SelectItem>
+              <SelectItem value="urgent">{t("aiQueue.urgent")}</SelectItem>
+              <SelectItem value="high">{t("aiQueue.high")}</SelectItem>
+              <SelectItem value="medium">{t("aiQueue.medium")}</SelectItem>
+              <SelectItem value="low">{t("aiQueue.low")}</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -267,7 +264,7 @@ function TaskList({
   tasks: any[]; 
   isLoading: boolean; 
   onComplete: () => void;
-  t: (ka: string, en: string) => string;
+  t: (key: string) => string;
 }) {
   if (isLoading) {
     return (
@@ -296,13 +293,10 @@ function TaskList({
         <CardContent className="py-16 text-center">
           <CheckCircle2 className="h-16 w-16 mx-auto text-emerald-500 mb-4" />
           <h3 className="text-xl font-semibold mb-2">
-            {t("ყველა პასუხი გაგზავნილია! 🎉", "All responses sent! 🎉")}
+            {t("aiQueue.allResponsesSent")}
           </h3>
           <p className="text-muted-foreground">
-            {t(
-              "ახალი მიმოხილვების მოსვლისას აქ გამოჩნდება",
-              "New reviews will appear here when they arrive"
-            )}
+            {t("aiQueue.newReviewsWillAppear")}
           </p>
         </CardContent>
       </Card>

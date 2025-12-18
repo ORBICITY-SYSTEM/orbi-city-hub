@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode, useCallback } from "react";
+import { createContext, useContext, useState, ReactNode, useMemo } from "react";
 import { en, ka, type Translations } from "@/lib/translations";
 
 type Language = "en" | "ka";
@@ -6,7 +6,7 @@ type Language = "en" | "ka";
 interface LanguageContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
-  t: (key: string) => string;
+  t: (keyOrKa: string, enText?: string) => string;
   translations: Translations;
 }
 
@@ -48,15 +48,39 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const translations = translationsMap[language];
+  // Memoize translations based on language
+  const translations = useMemo(() => translationsMap[language], [language]);
   
-  // Translation function that supports dot notation for nested keys
-  const t = useCallback((key: string): string => {
-    return getNestedValue(translations, key);
-  }, [translations]);
+  /**
+   * Translation function that supports two modes:
+   * 1. Key-based: t("reviews.title") - looks up in translations object
+   * 2. Inline: t("ქართული ტექსტი", "English text") - returns based on current language
+   * 
+   * The inline mode is detected by checking if the second argument exists.
+   * This allows backward compatibility while transitioning to key-based translations.
+   */
+  const t = useMemo(() => {
+    return (keyOrKa: string, enText?: string): string => {
+      // If second argument provided, use inline mode (ka, en)
+      if (enText !== undefined) {
+        return language === "ka" ? keyOrKa : enText;
+      }
+      
+      // Otherwise use key-based lookup from current language translations
+      const currentTranslations = translationsMap[language];
+      return getNestedValue(currentTranslations, keyOrKa);
+    };
+  }, [language]);
+
+  const contextValue = useMemo(() => ({
+    language,
+    setLanguage,
+    t,
+    translations,
+  }), [language, t, translations]);
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t, translations }}>
+    <LanguageContext.Provider value={contextValue}>
       {children}
     </LanguageContext.Provider>
   );

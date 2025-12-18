@@ -83,7 +83,7 @@ const modules: ModuleItem[] = [
       { nameKey: "submenu.email", path: "/reservations/email", icon: Mail },
       { nameKey: "submenu.reviews", path: "/reservations/guests", icon: Users },
       { nameKey: "submenu.otaCommand", path: "/reservations/ota", icon: Globe },
-      { nameKey: "submenu.whatsappBot", path: "/reservations/whatsapp", icon: MessageCircle },
+      { nameKey: "submenu.whatsappBot", path: "/whatsapp", icon: MessageCircle },
     ]
   },
   {

@@ -14,11 +14,12 @@ import {
   Settings
 } from "lucide-react";
 import { toast } from "sonner";
+import { useLanguage } from "@/contexts/LanguageContext";
 
-const downloadableFiles = [
+const getDownloadableFiles = (t: (key: string) => string) => [
   {
     title: "ORBI_CITY_COMPLETE_IMPLEMENTATION.md",
-    description: "სრული ნაბიჯ-ნაბიჯ ინსტრუქციები",
+    descriptionKey: "whatsapp.fullInstructions",
     icon: FileText,
     content: `# ORBI CITY WhatsApp Bot - სრული იმპლემენტაციის გეგმა
 
@@ -111,7 +112,7 @@ WhatsApp User → Meta API → Apps Script → Gemini AI → Response
   },
   {
     title: "whatsapp_gemini_bot.gs",
-    description: "სრული Google Apps Script კოდი",
+    descriptionKey: "whatsapp.fullCode",
     icon: Code,
     content: `// ⚙️ Configuration
 const CONFIG = {
@@ -280,7 +281,7 @@ function sendWhatsApp(recipientId, message) {
   },
   {
     title: "META_WHATSAPP_SETUP_GUIDE.md",
-    description: "Meta Business Setup სახელმძღვანელო",
+    descriptionKey: "whatsapp.metaGuide",
     icon: Settings,
     content: `# Meta WhatsApp Business Setup
 
@@ -362,7 +363,7 @@ function sendWhatsApp(recipientId, message) {
   },
   {
     title: "ORBI_CITY_BOT_QUICK_REFERENCE.md",
-    description: "სწრაფი მითითებები და Troubleshooting",
+    descriptionKey: "whatsapp.quickRef",
     icon: Rocket,
     content: `# ORBI CITY WhatsApp Bot - Quick Reference
 
@@ -520,6 +521,8 @@ function testGemini() {
 ];
 
 export default function QuickStart() {
+  const { t } = useLanguage();
+  
   const downloadFile = (filename: string, content: string) => {
     const blob = new Blob([content], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
@@ -530,12 +533,12 @@ export default function QuickStart() {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    toast.success(`${filename} ჩამოტვირთულია!`);
+    toast.success(`${filename} ${t('whatsapp.downloaded')}`);
   };
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
-    toast.success("დაკოპირებულია!");
+    toast.success(t('whatsapp.copied'));
   };
 
   return (
@@ -544,13 +547,13 @@ export default function QuickStart() {
         <div className="text-center mb-12 animate-fade-in">
           <Badge className="mb-4 px-4 py-1.5">
             <Rocket className="h-3 w-3 mr-1.5" />
-            სწრაფი დაწყება
+            {t('whatsapp.quickStart')}
           </Badge>
           <h1 className="text-4xl md:text-5xl font-bold mb-4 text-gradient">
-            დოკუმენტაცია და ფაილები
+            {t('whatsapp.documentation')}
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            ჩამოტვირთეთ სრული დოკუმენტაცია და კოდი
+            {t('whatsapp.downloadDocs')}
           </p>
         </div>
 
@@ -559,15 +562,15 @@ export default function QuickStart() {
           <Card className="shadow-elegant">
             <CardHeader>
               <Code className="h-8 w-8 text-primary mb-2" />
-              <CardTitle className="text-lg">Deployment Wizard</CardTitle>
+              <CardTitle className="text-lg">{t('whatsapp.deploymentWizard')}</CardTitle>
               <CardDescription>
-                ნაბიჯ-ნაბიჯ გაშვების ინსტრუქცია
+                {t('whatsapp.stepByStep')}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <Button asChild className="w-full">
                 <a href="/deployment-wizard">
-                  დაწყება
+                  {t('whatsapp.start')}
                   <ExternalLink className="ml-2 h-4 w-4" />
                 </a>
               </Button>
@@ -579,13 +582,13 @@ export default function QuickStart() {
               <Cloud className="h-8 w-8 text-blue-500 mb-2" />
               <CardTitle className="text-lg">Google Cloud</CardTitle>
               <CardDescription>
-                orbi-city-hub პროექტი
+                orbi-city-hub {t('whatsapp.project')}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <Button asChild variant="outline" className="w-full">
                 <a href="https://console.cloud.google.com/welcome?project=orbi-city-hub" target="_blank" rel="noopener noreferrer">
-                  გახსნა
+                  {t('whatsapp.open')}
                   <ExternalLink className="ml-2 h-4 w-4" />
                 </a>
               </Button>
@@ -597,13 +600,13 @@ export default function QuickStart() {
               <Settings className="h-8 w-8 text-green-500 mb-2" />
               <CardTitle className="text-lg">Meta Developers</CardTitle>
               <CardDescription>
-                WhatsApp კონფიგურაცია
+                {t('whatsapp.whatsappConfig')}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <Button asChild variant="outline" className="w-full">
                 <a href="https://developers.facebook.com" target="_blank" rel="noopener noreferrer">
-                  გახსნა
+                  {t('whatsapp.open')}
                   <ExternalLink className="ml-2 h-4 w-4" />
                 </a>
               </Button>
@@ -613,9 +616,9 @@ export default function QuickStart() {
 
         {/* Downloadable Files */}
         <div className="space-y-6">
-          <h2 className="text-2xl font-bold">ჩამოსატვირთი ფაილები</h2>
+          <h2 className="text-2xl font-bold">{t('whatsapp.downloadableFiles')}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {downloadableFiles.map((file, idx) => {
+            {getDownloadableFiles(t).map((file, idx) => {
               const FileIcon = file.icon;
               
               return (
@@ -625,7 +628,7 @@ export default function QuickStart() {
                       <FileIcon className="h-8 w-8 text-primary mt-1" />
                       <div className="flex-1">
                         <CardTitle className="text-lg">{file.title}</CardTitle>
-                        <CardDescription>{file.description}</CardDescription>
+                        <CardDescription>{t(file.descriptionKey)}</CardDescription>
                       </div>
                     </div>
                   </CardHeader>
@@ -635,7 +638,7 @@ export default function QuickStart() {
                       onClick={() => downloadFile(file.title, file.content)}
                     >
                       <Download className="mr-2 h-4 w-4" />
-                      ჩამოტვირთვა
+                      {t('whatsapp.download')}
                     </Button>
                     <Button
                       variant="outline"
@@ -643,7 +646,7 @@ export default function QuickStart() {
                       onClick={() => copyToClipboard(file.content)}
                     >
                       <Copy className="mr-2 h-4 w-4" />
-                      კოდის კოპირება
+                      {t('whatsapp.copyCode')}
                     </Button>
                   </CardContent>
                 </Card>
@@ -655,16 +658,16 @@ export default function QuickStart() {
         {/* Quick Reference */}
         <Card className="mt-12 shadow-elegant-lg">
           <CardHeader>
-            <CardTitle className="text-2xl">⚡ სწრაფი მითითებები</CardTitle>
+            <CardTitle className="text-2xl">⚡ {t('whatsapp.quickReference')}</CardTitle>
             <CardDescription>
-              ყველაზე მნიშვნელოვანი ინფორმაცია ერთ ადგილას
+              {t('whatsapp.importantInfo')}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div>
               <h3 className="font-semibold mb-3 flex items-center gap-2">
                 <CheckCircle2 className="h-5 w-5 text-green-500" />
-                უკვე კონფიგურირებული
+                {t('whatsapp.alreadyConfigured')}
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div className="bg-secondary p-3 rounded-lg">
@@ -687,7 +690,7 @@ export default function QuickStart() {
             </div>
 
             <div>
-              <h3 className="font-semibold mb-3">📝 საჭირო Credentials</h3>
+              <h3 className="font-semibold mb-3">📝 {t('whatsapp.requiredCredentials')}</h3>
               <Alert>
                 <AlertDescription>
                   <ul className="list-disc list-inside space-y-1 text-sm">
@@ -701,11 +704,11 @@ export default function QuickStart() {
             </div>
 
             <div>
-              <h3 className="font-semibold mb-3">🚀 შემდეგი ნაბიჯები</h3>
+              <h3 className="font-semibold mb-3">🚀 {t('whatsapp.nextSteps')}</h3>
               <div className="flex flex-col gap-2">
                 <Button asChild>
                   <a href="/deployment-wizard">
-                    დაიწყეთ Deployment Wizard-ით
+                    {t('whatsapp.startWithWizard')}
                     <ExternalLink className="ml-2 h-4 w-4" />
                   </a>
                 </Button>
