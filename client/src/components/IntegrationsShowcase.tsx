@@ -207,7 +207,7 @@ export function IntegrationsShowcase({ open, onOpenChange }: IntegrationsShowcas
   const [error, setError] = useState("");
   const [activeTab, setActiveTab] = useState<"active" | "coming">("active");
   
-  const SHOWCASE_PASSWORD = "orbi2024";
+  const SHOWCASE_PASSWORD = "SHAKOniniamasho1!";
 
   const handlePasswordSubmit = (e: React.FormEvent) => {
     e.preventDefault();
