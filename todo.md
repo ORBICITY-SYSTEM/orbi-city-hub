@@ -335,7 +335,7 @@
 - [x] Add navigation link in sidebar
 - [ ] Add Telegram to Integrations Showcase as active
 - [x] Test sending messages via Telegram (20 tests passed)
-- [ ] Save checkpoint and push to GitHub
+- [x] Save checkpoint and push to GitHub
 
 
 ## Menu & Dashboard Restructure
@@ -345,4 +345,14 @@
 - [ ] Each module dashboard: summary stats + AI Agent button
 - [x] Remove duplicate/unnecessary menu items
 - [x] Test all navigation links
-- [ ] Save checkpoint
+- [x] Save checkpoint
+
+## New Tasks - Dec 19
+- [x] Fix bilingual translations: Hotel Management System (EN) / სასტუმროს მართვის სისტემა (KA)
+- [x] Fix created_at database error in CEO Dashboard (fixed table/column names)
+- [x] Add AI Agent buttons to each module dashboard (Finance AI, Reservations AI, Marketing AI, Logistics AI)
+- [x] Create Campaigns page (/marketing/campaigns)
+- [x] Create Social Media page (/marketing/social)
+- [x] Create Owner Payouts page (/finance/payouts)
+- [x] Create Task Management page (/logistics/tasks)
+- [x] Save checkpoint

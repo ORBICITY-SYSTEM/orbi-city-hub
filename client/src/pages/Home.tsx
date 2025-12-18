@@ -180,7 +180,7 @@ export default function Home() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-4xl md:text-5xl font-bold text-cyan-400 tracking-tight mb-2">
-                Hotel Management System
+                {language === 'ka' ? "სასტუმროს მართვის სისტემა" : "Hotel Management System"}
               </h1>
               <p className="text-sm text-white/60 font-medium">
                 {language === 'ka' ? "ყველაფერი ერთ სივრცეში CEO-სთვის" : "All in one for CEO"}

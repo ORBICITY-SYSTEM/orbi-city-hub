@@ -30,6 +30,8 @@ const PowerBIFinanceDashboard = lazy(() => import("./pages/finance/PowerBIFinanc
 const MarketingDashboard = lazy(() => import("./pages/marketing/MarketingDashboard"));
 const OTAChannels = lazy(() => import("./pages/marketing/OTAChannels"));
 const WebsiteLeads = lazy(() => import("./pages/marketing/WebsiteLeads"));
+const Campaigns = lazy(() => import("./pages/marketing/Campaigns"));
+const SocialMedia = lazy(() => import("./pages/marketing/SocialMedia"));
 
 // Reservations Module - Lazy
 const EmailInbox = lazy(() => import("./pages/reservations/EmailInbox"));
@@ -53,6 +55,10 @@ const Settings = lazy(() => import("./pages/Settings"));
 // Logistics Module - Lazy
 const LogisticsDashboard = lazy(() => import("./pages/logistics/LogisticsDashboard"));
 const Housekeeping = lazy(() => import("./pages/logistics/Housekeeping"));
+const Tasks = lazy(() => import("./pages/logistics/Tasks"));
+
+// Finance Module - Additional
+const OwnerPayouts = lazy(() => import("./pages/finance/OwnerPayouts"));
 
 // WhatsApp Bot Module - Lazy
 const WhatsAppImplementation = lazy(() => import("./pages/Implementation"));
@@ -95,11 +101,14 @@ function RouterContent() {
         <Route path="/finance/otelms" component={FinanceOTELMS} />
         <Route path="/finance/expenses" component={FinanceDevelopmentExpenses} />
         <Route path="/finance/powerbi" component={PowerBIFinanceDashboard} />
+        <Route path="/finance/payouts" component={OwnerPayouts} />
 
         {/* Marketing Module */}
         <Route path="/marketing" component={MarketingDashboard} />
         <Route path="/marketing/ota" component={OTAChannels} />
         <Route path="/marketing/leads" component={WebsiteLeads} />
+        <Route path="/marketing/campaigns" component={Campaigns} />
+        <Route path="/marketing/social" component={SocialMedia} />
 
         {/* Reservations Module */}
         <Route path="/reservations" component={OTADashboard} />
@@ -124,6 +133,7 @@ function RouterContent() {
         {/* Logistics Module */}
         <Route path="/logistics" component={LogisticsDashboard} />
         <Route path="/logistics/housekeeping" component={Housekeeping} />
+        <Route path="/logistics/tasks" component={Tasks} />
 
         {/* AI Agent Module */}
         <Route path="/ai-agent" component={MirrorEffectAgent} />

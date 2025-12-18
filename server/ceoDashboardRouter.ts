@@ -37,7 +37,7 @@ export const ceoDashboardRouter = router({
     let yesterdayRevenue = 0;
     try {
       const todayRevenueResult = await db.execute(sql`
-        SELECT COALESCE(SUM(total_amount), 0) as revenue 
+        SELECT COALESCE(SUM(amount), 0) as revenue 
         FROM ota_bookings 
         WHERE check_in >= ${todayStart.toISOString()} 
         AND check_in < ${todayEnd.toISOString()}
@@ -45,7 +45,7 @@ export const ceoDashboardRouter = router({
       todayRevenue = Number((todayRevenueResult[0] as any[])?.[0]?.revenue || 0);
 
       const yesterdayRevenueResult = await db.execute(sql`
-        SELECT COALESCE(SUM(total_amount), 0) as revenue 
+        SELECT COALESCE(SUM(amount), 0) as revenue 
         FROM ota_bookings 
         WHERE check_in >= ${yesterdayStart.toISOString()} 
         AND check_in < ${todayStart.toISOString()}
@@ -89,16 +89,16 @@ export const ceoDashboardRouter = router({
     try {
       const pendingResult = await db.execute(sql`
         SELECT COUNT(*) as count 
-        FROM guest_reviews 
-        WHERE has_reply = false OR has_reply IS NULL
+        FROM guestReviews 
+        WHERE hasReply = false OR hasReply IS NULL
       `);
       pendingReviews = Number((pendingResult[0] as any[])?.[0]?.count || 0);
 
       // Reviews added today
       const newReviewsResult = await db.execute(sql`
         SELECT COUNT(*) as count 
-        FROM guest_reviews 
-        WHERE created_at >= ${todayStart.toISOString()}
+        FROM guestReviews 
+        WHERE importedAt >= ${todayStart.toISOString()}
       `);
       reviewsChange = Number((newReviewsResult[0] as any[])?.[0]?.count || 0);
     } catch (e) {
@@ -113,8 +113,8 @@ export const ceoDashboardRouter = router({
         SELECT 
           COUNT(*) as total,
           SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) as completed
-        FROM butler_tasks 
-        WHERE created_at >= ${todayStart.toISOString()}
+        FROM housekeepingTasks 
+        WHERE scheduledFor >= ${todayStart.toISOString()}
       `);
       todayTasks = Number((tasksResult[0] as any[])?.[0]?.total || 0);
       completedTasks = Number((tasksResult[0] as any[])?.[0]?.completed || 0);
@@ -218,10 +218,10 @@ export const ceoDashboardRouter = router({
       const tasksResult = await db.execute(sql`
         SELECT 
           COUNT(*) as total,
-          SUM(CASE WHEN task_type = 'housekeeping' THEN 1 ELSE 0 END) as housekeeping,
-          SUM(CASE WHEN task_type = 'maintenance' THEN 1 ELSE 0 END) as maintenance
-        FROM butler_tasks 
-        WHERE created_at >= ${todayStart.toISOString()}
+          SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as housekeeping,
+          SUM(CASE WHEN status = 'in_progress' THEN 1 ELSE 0 END) as maintenance
+        FROM housekeepingTasks 
+        WHERE scheduledFor >= ${todayStart.toISOString()}
       `);
       const row = (tasksResult[0] as any[])?.[0];
       if (row) {

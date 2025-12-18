@@ -1,0 +1,52 @@
+{
+  "query": "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'ota_bookings'",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user c2qSkVB4gKtEmor.991468648419 --database 4ExKc24KNHdr4pKbTUzsoU --execute SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'ota_bookings'",
+  "rows": [
+    {
+      "COLUMN_NAME": "id"
+    },
+    {
+      "COLUMN_NAME": "booking_number"
+    },
+    {
+      "COLUMN_NAME": "room_number"
+    },
+    {
+      "COLUMN_NAME": "guest_name"
+    },
+    {
+      "COLUMN_NAME": "channel"
+    },
+    {
+      "COLUMN_NAME": "check_in"
+    },
+    {
+      "COLUMN_NAME": "check_out"
+    },
+    {
+      "COLUMN_NAME": "nights"
+    },
+    {
+      "COLUMN_NAME": "amount"
+    },
+    {
+      "COLUMN_NAME": "amount_paid"
+    },
+    {
+      "COLUMN_NAME": "balance"
+    },
+    {
+      "COLUMN_NAME": "status"
+    },
+    {
+      "COLUMN_NAME": "created_at"
+    },
+    {
+      "COLUMN_NAME": "updated_at"
+    }
+  ],
+  "messages": [],
+  "stdout": "COLUMN_NAME\nid\nbooking_number\nroom_number\nguest_name\nchannel\ncheck_in\ncheck_out\nnights\namount\namount_paid\nbalance\nstatus\ncreated_at\nupdated_at\n",
+  "stderr": "",
+  "execution_time_ms": 56
+}

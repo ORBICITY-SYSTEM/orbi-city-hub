@@ -371,10 +371,19 @@ const Marketing = () => {
                 <p className="text-lg text-white/90 mt-1 font-medium">{t('marketing.subtitle')}</p>
               </div>
             </div>
-            <Badge className="bg-cyan-500/20 text-cyan-300 border-cyan-500/30">
-              <Zap className="h-3 w-3 mr-1" />
-              AI-Powered
-            </Badge>
+            <div className="flex items-center gap-3">
+              <Button
+                className="bg-gradient-to-r from-purple-500 to-purple-700 hover:from-purple-600 hover:to-purple-800 text-white gap-2 shadow-lg"
+                onClick={() => alert(language === 'ka' ? 'Marketing AI აგენტი მალე დაემატება!' : 'Marketing AI Agent coming soon!')}
+              >
+                <Bot className="w-5 h-5" />
+                Marketing AI
+              </Button>
+              <Badge className="bg-cyan-500/20 text-cyan-300 border-cyan-500/30">
+                <Zap className="h-3 w-3 mr-1" />
+                AI-Powered
+              </Badge>
+            </div>
           </div>
         </div>
         {/* Ocean Wave SVG */}

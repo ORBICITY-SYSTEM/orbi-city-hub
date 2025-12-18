@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Package, ArrowLeft, BarChart3, ClipboardList, Wrench, History } from "lucide-react";
+import { Package, ArrowLeft, BarChart3, ClipboardList, Wrench, History, Bot } from "lucide-react";
 import { useLocation } from "wouter";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { InventoryDashboardStats } from "@/components/InventoryDashboardStats";
@@ -33,26 +33,35 @@ const Logistics = () => {
       {/* Header with Ocean Wave */}
       <div className="relative rounded-2xl overflow-hidden mx-6 mt-6 mb-8">
         <div className="relative z-10 px-8 pt-8 pb-20">
-          <div className="flex items-center gap-4">
-            {isAuthenticated && (
-              <Button variant="ghost" size="sm" onClick={() => setLocation("/")} className="text-cyan-300 hover:text-white hover:bg-white/10">
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                {t('nav.home')}
-              </Button>
-            )}
-            <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-500 to-cyan-600 shadow-lg">
-                <Package className="h-6 w-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-3xl md:text-4xl font-bold text-cyan-400 tracking-tight">
-                  {t('logistics.title')}
-                </h1>
-                <p className="text-lg text-white/90 mt-1 font-medium">
-                  {t('logistics.subtitle')}
-                </p>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              {isAuthenticated && (
+                <Button variant="ghost" size="sm" onClick={() => setLocation("/")} className="text-cyan-300 hover:text-white hover:bg-white/10">
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  {t('nav.home')}
+                </Button>
+              )}
+              <div className="flex items-center gap-3">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-500 to-cyan-600 shadow-lg">
+                  <Package className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-3xl md:text-4xl font-bold text-cyan-400 tracking-tight">
+                    {t('logistics.title')}
+                  </h1>
+                  <p className="text-lg text-white/90 mt-1 font-medium">
+                    {t('logistics.subtitle')}
+                  </p>
+                </div>
               </div>
             </div>
+            <Button
+              className="bg-gradient-to-r from-purple-500 to-purple-700 hover:from-purple-600 hover:to-purple-800 text-white gap-2 shadow-lg"
+              onClick={() => alert(language === 'ka' ? 'Logistics AI აგენტი მალე დაემატება!' : 'Logistics AI Agent coming soon!')}
+            >
+              <Bot className="w-5 h-5" />
+              Logistics AI
+            </Button>
           </div>
         </div>
         {/* Ocean Wave SVG */}

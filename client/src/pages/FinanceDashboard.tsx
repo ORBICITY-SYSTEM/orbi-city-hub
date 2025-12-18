@@ -1,7 +1,8 @@
 import { useState, useMemo } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Download, Filter, TrendingUp, BarChart3 } from "lucide-react";
+import { Download, Filter, TrendingUp, BarChart3, Bot } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { trpc } from "@/lib/trpc";
 import {
   Select,
@@ -13,6 +14,7 @@ import {
 import { FinanceCharts } from "@/components/FinanceCharts";
 
 export default function FinanceDashboard() {
+  const { language } = useLanguage();
   const { data: summary, isLoading } = trpc.realFinance.getSummary.useQuery();
   const { data: monthlyData } = trpc.realFinance.getMonthlyData.useQuery();
 
@@ -118,10 +120,23 @@ export default function FinanceDashboard() {
     <div className="min-h-screen bg-gradient-to-br from-[oklch(0.12_0.10_240)] to-[oklch(0.18_0.10_240)] p-6">
       {/* Header */}
       <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-8 rounded-lg mb-6 shadow-xl">
-        <h1 className="text-4xl font-bold mb-2">💰 Finance Dashboard</h1>
-        <p className="text-white/90 font-bold">
-          Real Data from Excel • October 2024 - September 2025
-        </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-4xl font-bold mb-2">
+              {language === 'ka' ? '💰 ფინანსების დეშბორდი' : '💰 Finance Dashboard'}
+            </h1>
+            <p className="text-white/90 font-bold">
+              {language === 'ka' ? 'რეალური მონაცემები • ოქტომბერი 2024 - სექტემბერი 2025' : 'Real Data from Excel • October 2024 - September 2025'}
+            </p>
+          </div>
+          <Button
+            className="bg-gradient-to-r from-purple-500 to-purple-700 hover:from-purple-600 hover:to-purple-800 text-white gap-2 shadow-lg"
+            onClick={() => window.alert(language === 'ka' ? 'Finance AI აგენტი მალე დაემატება!' : 'Finance AI Agent coming soon!')}
+          >
+            <Bot className="w-5 h-5" />
+            Finance AI
+          </Button>
+        </div>
       </div>
 
       {/* Filters Section */}

@@ -4,7 +4,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { RefreshCw, TrendingUp, TrendingDown, Calendar, Building2, Activity, BarChart3, Search, Filter, ChevronLeft, ChevronRight, User, MapPin, Clock, Download, Brain, Sparkles, ArrowUpRight, ArrowDownRight, Minus, Banknote, X, Check, ChevronsUpDown } from "lucide-react";
+import { RefreshCw, TrendingUp, TrendingDown, Calendar, Building2, Activity, BarChart3, Search, Filter, ChevronLeft, ChevronRight, User, MapPin, Clock, Download, Brain, Sparkles, ArrowUpRight, ArrowDownRight, Minus, Banknote, X, Check, ChevronsUpDown, Bot } from "lucide-react";
 import * as XLSX from "xlsx";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -248,14 +248,23 @@ export default function OTADashboard() {
                 </h1>
                 <p className="text-lg text-white/90 mt-2 font-medium">{t('ota.subtitle')}</p>
               </div>
-              <Button 
-                onClick={handleSync} 
-                disabled={syncing}
-                className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white shadow-lg"
-              >
-                <RefreshCw className={`h-4 w-4 mr-2 ${syncing ? 'animate-spin' : ''}`} />
-                {syncing ? t('ota.syncing') : t('ota.sync')}
-              </Button>
+              <div className="flex items-center gap-3">
+                <Button
+                  className="bg-gradient-to-r from-purple-500 to-purple-700 hover:from-purple-600 hover:to-purple-800 text-white gap-2 shadow-lg"
+                  onClick={() => toast.info(language === 'ka' ? 'Reservations AI აგენტი მალე დაემატება!' : 'Reservations AI Agent coming soon!')}
+                >
+                  <Bot className="w-5 h-5" />
+                  Reservations AI
+                </Button>
+                <Button 
+                  onClick={handleSync} 
+                  disabled={syncing}
+                  className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white shadow-lg"
+                >
+                  <RefreshCw className={`h-4 w-4 mr-2 ${syncing ? 'animate-spin' : ''}`} />
+                  {syncing ? t('ota.syncing') : t('ota.sync')}
+                </Button>
+              </div>
             </div>
           </div>
           {/* Ocean Wave SVG */}
