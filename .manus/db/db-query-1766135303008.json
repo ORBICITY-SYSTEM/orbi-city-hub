@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS butler_tasks (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  taskType VARCHAR(64) NOT NULL,\n  status VARCHAR(32) DEFAULT 'pending',\n  priority VARCHAR(16) DEFAULT 'normal',\n  description TEXT,\n  assignedTo VARCHAR(128),\n  roomNumber VARCHAR(16),\n  guestName VARCHAR(128),\n  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n  updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  completedAt TIMESTAMP NULL\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user c2qSkVB4gKtEmor.991468648419 --database 4ExKc24KNHdr4pKbTUzsoU --execute CREATE TABLE IF NOT EXISTS butler_tasks (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  taskType VARCHAR(64) NOT NULL,\n  status VARCHAR(32) DEFAULT 'pending',\n  priority VARCHAR(16) DEFAULT 'normal',\n  description TEXT,\n  assignedTo VARCHAR(128),\n  roomNumber VARCHAR(16),\n  guestName VARCHAR(128),\n  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n  updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  completedAt TIMESTAMP NULL\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 173
+}

@@ -1,0 +1,16 @@
+{
+  "query": "SELECT COUNT(DISTINCT channel) as channels, SUM(bookings) as total_bookings, SUM(revenue) as total_revenue, SUM(nights) as total_nights FROM ota_monthly_stats;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user c2qSkVB4gKtEmor.991468648419 --database 4ExKc24KNHdr4pKbTUzsoU --execute SELECT COUNT(DISTINCT channel) as channels, SUM(bookings) as total_bookings, SUM(revenue) as total_revenue, SUM(nights) as total_nights FROM ota_monthly_stats;",
+  "rows": [
+    {
+      "channels": "8",
+      "total_bookings": "1413",
+      "total_revenue": "463177.80",
+      "total_nights": "4699"
+    }
+  ],
+  "messages": [],
+  "stdout": "channels\ttotal_bookings\ttotal_revenue\ttotal_nights\n8\t1413\t463177.80\t4699\n",
+  "stderr": "",
+  "execution_time_ms": 62
+}

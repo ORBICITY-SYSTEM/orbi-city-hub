@@ -5,7 +5,7 @@
  * Used in the Integrations Marketplace page
  */
 
-export type IntegrationCategory = 'pms' | 'ota' | 'payment' | 'marketing' | 'email' | 'analytics';
+export type IntegrationCategory = 'pms' | 'ota' | 'payment' | 'marketing' | 'email' | 'analytics' | 'support';
 export type IntegrationStatus = 'available' | 'requires_setup' | 'coming_soon';
 export type SetupTime = '10 min' | '30 min' | '1 day' | '1 week';
 export type PlanTier = 'starter' | 'pro' | 'enterprise';
@@ -25,6 +25,25 @@ export interface Integration {
 
 export const integrations: Integration[] = [
   // ✅ AVAILABLE (Already Integrated)
+  {
+    id: 'tawkto',
+    name: 'Tawk.to Live Chat',
+    category: 'support',
+    status: 'available',
+    setupTime: '10 min',
+    planTier: 'starter',
+    description: 'Live chat, ticketing, and knowledge base for guest support',
+    features: [
+      'Live chat widget on website',
+      'Ticketing system',
+      'Knowledge base articles',
+      'WhatsApp integration',
+      'Visitor monitoring',
+      'Chat analytics'
+    ],
+    demoUrl: 'https://dashboard.tawk.to',
+    icon: '💬'
+  },
   {
     id: 'gmail',
     name: 'Gmail Inbox AI',

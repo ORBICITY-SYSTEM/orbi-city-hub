@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS guest_reviews (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  platform VARCHAR(64) NOT NULL,\n  reviewer_name VARCHAR(128),\n  rating DECIMAL(3,1),\n  review_text TEXT,\n  language VARCHAR(8),\n  sentiment VARCHAR(16),\n  has_reply BOOLEAN DEFAULT FALSE,\n  reply_text TEXT,\n  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n  replied_at TIMESTAMP NULL\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user c2qSkVB4gKtEmor.991468648419 --database 4ExKc24KNHdr4pKbTUzsoU --execute CREATE TABLE IF NOT EXISTS guest_reviews (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  platform VARCHAR(64) NOT NULL,\n  reviewer_name VARCHAR(128),\n  rating DECIMAL(3,1),\n  review_text TEXT,\n  language VARCHAR(8),\n  sentiment VARCHAR(16),\n  has_reply BOOLEAN DEFAULT FALSE,\n  reply_text TEXT,\n  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n  replied_at TIMESTAMP NULL\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 289
+}
