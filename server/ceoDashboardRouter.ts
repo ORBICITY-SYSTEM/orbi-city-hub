@@ -89,16 +89,16 @@ export const ceoDashboardRouter = router({
     try {
       const pendingResult = await db.execute(sql`
         SELECT COUNT(*) as count 
-        FROM guest_reviews 
-        WHERE has_reply = false OR has_reply IS NULL
+        FROM guestReviews 
+        WHERE hasReply = false OR hasReply IS NULL
       `);
       pendingReviews = Number((pendingResult[0] as any[])?.[0]?.count || 0);
 
       // Reviews added today
       const newReviewsResult = await db.execute(sql`
         SELECT COUNT(*) as count 
-        FROM guest_reviews 
-        WHERE created_at >= ${todayStart.toISOString()}
+        FROM guestReviews 
+        WHERE importedAt >= ${todayStart.toISOString()}
       `);
       reviewsChange = Number((newReviewsResult[0] as any[])?.[0]?.count || 0);
     } catch (e) {
@@ -114,7 +114,7 @@ export const ceoDashboardRouter = router({
           COUNT(*) as total,
           SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) as completed
         FROM butler_tasks 
-        WHERE created_at >= ${todayStart.toISOString()}
+        WHERE createdAt >= ${todayStart.toISOString()}
       `);
       todayTasks = Number((tasksResult[0] as any[])?.[0]?.total || 0);
       completedTasks = Number((tasksResult[0] as any[])?.[0]?.completed || 0);
@@ -202,7 +202,7 @@ export const ceoDashboardRouter = router({
       reservationsMetrics.todayBookings = Number((bookingsResult[0] as any[])?.[0]?.count || 0);
 
       const ratingResult = await db.execute(sql`
-        SELECT AVG(rating) as avg_rating FROM guest_reviews
+        SELECT AVG(rating) as avg_rating FROM guestReviews
       `);
       reservationsMetrics.avgRating = Number((ratingResult[0] as any[])?.[0]?.avg_rating || 4.8).toFixed(1) as any;
     } catch (e) {
@@ -218,10 +218,10 @@ export const ceoDashboardRouter = router({
       const tasksResult = await db.execute(sql`
         SELECT 
           COUNT(*) as total,
-          SUM(CASE WHEN task_type = 'housekeeping' THEN 1 ELSE 0 END) as housekeeping,
-          SUM(CASE WHEN task_type = 'maintenance' THEN 1 ELSE 0 END) as maintenance
+          SUM(CASE WHEN taskType = 'housekeeping' THEN 1 ELSE 0 END) as housekeeping,
+          SUM(CASE WHEN taskType = 'maintenance' THEN 1 ELSE 0 END) as maintenance
         FROM butler_tasks 
-        WHERE created_at >= ${todayStart.toISOString()}
+        WHERE createdAt >= ${todayStart.toISOString()}
       `);
       const row = (tasksResult[0] as any[])?.[0];
       if (row) {

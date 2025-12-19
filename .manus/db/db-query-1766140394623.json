@@ -1,0 +1,15 @@
+{
+  "query": "SELECT platform, COUNT(*) as count, AVG(rating) as avg_rating FROM guest_reviews GROUP BY platform;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user c2qSkVB4gKtEmor.991468648419 --database 4ExKc24KNHdr4pKbTUzsoU --execute SELECT platform, COUNT(*) as count, AVG(rating) as avg_rating FROM guest_reviews GROUP BY platform;",
+  "rows": [
+    {
+      "platform": "google",
+      "count": "50",
+      "avg_rating": "2.42000"
+    }
+  ],
+  "messages": [],
+  "stdout": "platform\tcount\tavg_rating\ngoogle\t50\t2.42000\n",
+  "stderr": "",
+  "execution_time_ms": 55
+}

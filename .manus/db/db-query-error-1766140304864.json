@@ -1,0 +1,8 @@
+{
+  "query": "ALTER TABLE guest_reviews ADD COLUMN IF NOT EXISTS review_id VARCHAR(255) UNIQUE;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user c2qSkVB4gKtEmor.991468648419 --database 4ExKc24KNHdr4pKbTUzsoU --execute ALTER TABLE guest_reviews ADD COLUMN IF NOT EXISTS review_id VARCHAR(255) UNIQUE;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 8200 (HY000) at line 1: unsupported add column 'review_id' constraint UNIQUE KEY when altering '4ExKc24KNHdr4pKbTUzsoU.guest_reviews'"
+  ]
+}
