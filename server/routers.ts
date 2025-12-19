@@ -43,9 +43,6 @@ import { notificationsRouter } from "./routers/notificationsRouter";
 import { analyticsRouter } from "./routers/analyticsRouter";
 import { whitelabelRouter } from "./routers/whitelabelRouter";
 import { otaRouter } from "./routers/otaRouter";
-import { reviewsRouter } from "./routers/reviewsRouter";
-import { ceoDashboardRouter } from "./ceoDashboardRouter";
-import { telegramRouter } from "./routers/telegramRouter";
 
 export const appRouter = router({
   realFinance: realFinanceRouter,
@@ -84,9 +81,6 @@ export const appRouter = router({
   analytics: analyticsRouter,
   whitelabel: whitelabelRouter,
   ota: otaRouter,
-  reviews: reviewsRouter,
-  ceoDashboard: ceoDashboardRouter,
-  telegram: telegramRouter,
   system: systemRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),

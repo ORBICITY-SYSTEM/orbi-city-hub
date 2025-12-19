@@ -1,7 +1,5 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { APP_LOGO, APP_TITLE, getLoginUrl } from "@/const";
-import { LanguageSwitcher } from "@/components/LanguageSwitcher";
-import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { 
   LayoutDashboard, 
@@ -25,121 +23,101 @@ import {
   Package,
   Wrench,
   MessageCircle,
-  Sparkles,
-  Bot,
-  Send,
-  Star,
-  ClipboardList,
-  CalendarCheck,
-  BedDouble,
-  Target,
-  PieChart,
-  Wallet,
-  Receipt,
-  CreditCard,
-  Building2,
-  Percent,
-  ShoppingCart,
-  Megaphone as Campaign,
-  Share2,
-  MousePointerClick,
-  CheckSquare,
-  Hammer,
-  Boxes,
-  ClipboardCheck,
-  Settings
+  Code,
+  TestTube,
+  BookOpen,
+  Rocket
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
 
 interface SubMenuItem {
-  nameKey: string;
+  name: string;
   path: string;
   icon: React.ComponentType<{ className?: string }>;
 }
 
 interface ModuleItem {
-  nameKey: string;
+  name: string;
   icon: React.ComponentType<{ className?: string }>;
   color: string;
   subItems: SubMenuItem[];
 }
 
-// New Professional Menu Structure - 4 Main Modules with 4-7 Submodules each
-// Order: Reservations → Marketing → Finance → Logistics
 const modules: ModuleItem[] = [
-  // 1. RESERVATIONS MODULE (7 submodules)
   {
-    nameKey: "nav.reservations",
-    icon: Calendar,
-    color: "text-cyan-400",
-    subItems: [
-      { nameKey: "submenu.reservationsDashboard", path: "/reservations", icon: LayoutDashboard },
-      { nameKey: "submenu.otaChannels", path: "/reservations/ota", icon: Globe },
-      { nameKey: "submenu.reviews", path: "/reservations/guests", icon: Star },
-      { nameKey: "submenu.aiResponses", path: "/reservations/ai-responses", icon: Sparkles },
-      { nameKey: "submenu.butlerAI", path: "/reservations/automations", icon: Bot },
-      { nameKey: "submenu.telegramBot", path: "/reservations/telegram-bot", icon: Send },
-      { nameKey: "submenu.email", path: "/reservations/email", icon: Mail },
-    ]
-  },
-  // 2. MARKETING MODULE (5 submodules)
-  {
-    nameKey: "nav.marketing",
-    icon: Megaphone,
-    color: "text-cyan-400",
-    subItems: [
-      { nameKey: "submenu.marketingDashboard", path: "/marketing", icon: LayoutDashboard },
-      { nameKey: "submenu.otaPerformance", path: "/marketing/ota", icon: Globe },
-      { nameKey: "submenu.webLeads", path: "/marketing/leads", icon: MousePointerClick },
-      { nameKey: "submenu.campaigns", path: "/marketing/campaigns", icon: Target },
-      { nameKey: "submenu.socialMedia", path: "/marketing/social", icon: Share2 },
-    ]
-  },
-  // 3. FINANCE MODULE (6 submodules)
-  {
-    nameKey: "nav.finance",
+    name: "Finance",
     icon: DollarSign,
-    color: "text-cyan-400",
+    color: "text-blue-500",
     subItems: [
-      { nameKey: "submenu.financeDashboard", path: "/finance", icon: LayoutDashboard },
-      { nameKey: "submenu.revenueAnalytics", path: "/finance/analytics", icon: TrendingUp },
-      { nameKey: "submenu.monthlyReports", path: "/finance/reports", icon: FileText },
-      { nameKey: "submenu.expenses", path: "/finance/expenses", icon: Receipt },
-      { nameKey: "submenu.ownerPayouts", path: "/finance/payouts", icon: Wallet },
-      { nameKey: "submenu.otelms", path: "/finance/otelms", icon: Database },
+      { name: "Dashboard", path: "/finance", icon: LayoutDashboard },
+      { name: "Analytics", path: "/finance/analytics", icon: TrendingUp },
+      { name: "Monthly Reports", path: "/finance/reports", icon: FileText },
+      { name: "OTELMS", path: "/finance/otelms", icon: Database },
+      { name: "Dev Expenses", path: "/finance/expenses", icon: BarChart3 },
     ]
   },
-  // 4. LOGISTICS MODULE (5 submodules)
   {
-    nameKey: "nav.logistics",
-    icon: Truck,
-    color: "text-cyan-400",
+    name: "Marketing",
+    icon: Megaphone,
+    color: "text-green-500",
     subItems: [
-      { nameKey: "submenu.logisticsDashboard", path: "/logistics", icon: LayoutDashboard },
-      { nameKey: "submenu.housekeeping", path: "/logistics/housekeeping", icon: CheckSquare },
-      { nameKey: "submenu.maintenance", path: "/logistics/maintenance", icon: Hammer },
-      { nameKey: "submenu.inventory", path: "/logistics/inventory", icon: Boxes },
-      { nameKey: "submenu.taskManagement", path: "/logistics/tasks", icon: ClipboardCheck },
+      { name: "Dashboard", path: "/marketing", icon: LayoutDashboard },
+      { name: "OTA Channels", path: "/marketing/ota", icon: Globe },
+      { name: "Website Leads", path: "/marketing/leads", icon: Users },
     ]
   },
+  {
+    name: "Reservations",
+    icon: Calendar,
+    color: "text-purple-500",
+    subItems: [
+      { name: "Dashboard", path: "/reservations", icon: LayoutDashboard },
+      { name: "Email Inbox", path: "/reservations/email", icon: Mail },
+      { name: "Guest Communication", path: "/reservations/guests", icon: Users },
+      { name: "OTA Dashboard", path: "/reservations/ota", icon: Globe },
+    ]
+  },
+  {
+    name: "Logistics",
+    icon: Truck,
+    color: "text-orange-500",
+    subItems: [
+      { name: "Dashboard", path: "/logistics", icon: LayoutDashboard },
+      { name: "Housekeeping", path: "/logistics/housekeeping", icon: Package },
+      { name: "Maintenance", path: "/logistics/maintenance", icon: Wrench },
+    ]
+  },
+  {
+    name: "WhatsApp Bot",
+    icon: MessageCircle,
+    color: "text-pink-500",
+    subItems: [
+      { name: "Quick Start", path: "/whatsapp/quick-start", icon: Rocket },
+      { name: "Implementation", path: "/whatsapp/implementation", icon: Code },
+      { name: "Code Examples", path: "/whatsapp/code-examples", icon: FileText },
+      { name: "System Prompt", path: "/whatsapp/system-prompt", icon: MessageCircle },
+      { name: "Testing", path: "/whatsapp/testing", icon: TestTube },
+      { name: "Resources", path: "/whatsapp/resources", icon: BookOpen },
+      { name: "Deployment", path: "/whatsapp/deployment", icon: Rocket },
+    ]
+  }
 ];
 
 export default function ModularLayout({ children }: { children: React.ReactNode }) {
   const { user, loading, isAuthenticated, logout } = useAuth();
-  const { t } = useLanguage();
   const [location] = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [expandedModules, setExpandedModules] = useState<string[]>(["nav.reservations", "nav.marketing", "nav.finance", "nav.logistics"]);
+  const [expandedModules, setExpandedModules] = useState<string[]>(["Finance", "Marketing", "Reservations", "Logistics", "WhatsApp Bot"]);
 
   // Auto-expand module based on current route
   useEffect(() => {
     const currentModule = modules.find(m => 
       m.subItems.some(item => location.startsWith(item.path))
     );
-    if (currentModule && !expandedModules.includes(currentModule.nameKey)) {
-      setExpandedModules(prev => [...prev, currentModule.nameKey]);
+    if (currentModule && !expandedModules.includes(currentModule.name)) {
+      setExpandedModules(prev => [...prev, currentModule.name]);
     }
   }, [location]);
 
@@ -148,159 +126,181 @@ export default function ModularLayout({ children }: { children: React.ReactNode 
     setSidebarOpen(false);
   }, [location]);
 
-  const toggleModule = (moduleNameKey: string) => {
+  const toggleModule = (moduleName: string) => {
     setExpandedModules(prev => 
-      prev.includes(moduleNameKey) 
-        ? prev.filter(name => name !== moduleNameKey)
-        : [...prev, moduleNameKey]
+      prev.includes(moduleName) 
+        ? prev.filter(name => name !== moduleName)
+        : [...prev, moduleName]
     );
   };
 
+  // Authentication disabled - public access
+  // if (loading) {
+  //   return (
+  //     <div className="min-h-screen flex items-center justify-center bg-black">
+  //       <div className="text-center">
+  //         <Loader2 className="w-12 h-12 animate-spin text-green-500 mx-auto mb-4" />
+  //         <p className="text-gray-400">Loading ORBI City Hub...</p>
+  //       </div>
+  //     </div>
+  //   );
+  // }
+
+  // if (!isAuthenticated) {
+  //   return (
+  //     <div className="min-h-screen flex items-center justify-center bg-black px-4">
+  //       <div className="max-w-md w-full">
+  //         <div className="bg-gray-900 rounded-2xl shadow-xl p-8 border border-gray-800">
+  //           <div className="text-center mb-8">
+  //             <img 
+  //               src={APP_LOGO} 
+  //               alt={APP_TITLE} 
+  //               className="h-16 mx-auto mb-4"
+  //             />
+  //             <h1 className="text-3xl font-bold text-white mb-2">
+  //               {APP_TITLE}
+  //             </h1>
+  //             <p className="text-gray-400">
+  //               Enterprise Management Platform
+  //             </p>
+  //           </div>
+  //           
+  //           <div className="space-y-4">
+  //             <div className="bg-green-950 rounded-lg p-4 border border-green-800">
+  //               <h3 className="font-semibold text-green-400 mb-2">4 Core Modules:</h3>
+  //               <ul className="text-sm text-green-300 space-y-1">
+  //                 <li>• Finance & Analytics</li>
+  //                 <li>• Marketing & OTA</li>
+  //                 <li>• Reservations & Guests</li>
+  //                 <li>• Logistics & Operations</li>
+  //               </ul>
+  //             </div>
+  //             
+  //             <Button 
+  //               onClick={() => window.location.href = getLoginUrl()}
+  //               className="w-full bg-green-600 hover:bg-green-700 text-white py-6 text-lg font-semibold"
+  //             >
+  //               Sign In with Manus
+  //             </Button>
+  //           </div>
+  //         </div>
+  //       </div>
+  //     </div>
+  //   );
+  // }
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-      {/* Mobile Header */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-slate-900/95 backdrop-blur-sm border-b border-cyan-500/20">
-        <div className="flex items-center justify-between px-4 py-3">
-          <Link href="/" className="flex items-center gap-2">
-            <img src={APP_LOGO} alt={APP_TITLE} className="w-8 h-8" />
-            <span className="font-bold text-white">{APP_TITLE}</span>
-          </Link>
-          <div className="flex items-center gap-2">
-            <LanguageSwitcher />
-            <Button
-              variant="ghost"
-              size="icon"
+    <div className="min-h-screen bg-black text-white">
+      {/* Header */}
+      <header className="fixed top-0 left-0 right-0 h-16 bg-gray-900 border-b border-gray-800 z-50">
+        <div className="h-full px-4 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="text-white"
+              className="lg:hidden p-2 hover:bg-gray-800 rounded-lg"
             >
-              {sidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+            
+            <Link href="/">
+              <a className="flex items-center gap-3">
+                <img src={APP_LOGO} alt={APP_TITLE} className="h-8" />
+                <span className="font-bold text-lg hidden sm:inline">{APP_TITLE}</span>
+              </a>
+            </Link>
+          </div>
+
+          <div className="flex items-center gap-4">
+            <div className="text-sm text-gray-400 hidden sm:block">
+              {user?.name || user?.email}
+            </div>
+            <Button
+              onClick={logout}
+              variant="ghost"
+              size="sm"
+              className="text-gray-400 hover:text-white"
+            >
+              <LogOut className="w-4 h-4 mr-2" />
+              Logout
             </Button>
           </div>
         </div>
-      </div>
+      </header>
 
       {/* Sidebar */}
       <aside className={cn(
-        "fixed top-0 left-0 z-40 h-screen bg-gradient-to-b from-slate-900 to-slate-950 border-r border-cyan-500/20 transition-transform duration-300",
-        "w-64 lg:translate-x-0",
-        sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        "fixed top-16 left-0 bottom-0 w-64 bg-gray-900 border-r border-gray-800 overflow-y-auto z-40 transition-transform duration-300",
+        sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
       )}>
-        {/* Logo */}
-        <div className="hidden lg:flex items-center gap-3 px-6 py-4 border-b border-cyan-500/20">
-          <Link href="/" className="flex items-center gap-3">
-            <img src={APP_LOGO} alt={APP_TITLE} className="w-10 h-10" />
-            <span className="font-bold text-xl text-white">{APP_TITLE}</span>
-          </Link>
-        </div>
-
-        {/* Navigation */}
-        <nav className="px-4 py-6 space-y-2 overflow-y-auto h-[calc(100vh-80px)] lg:h-[calc(100vh-72px)] mt-16 lg:mt-0">
+        <nav className="p-4 space-y-2">
           {/* Home */}
           <Link href="/">
-            <div className={cn(
-              "flex items-center gap-3 px-4 py-3 rounded-lg transition-all cursor-pointer",
+            <a className={cn(
+              "flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
               location === "/" 
-                ? "bg-cyan-500/20 text-cyan-400" 
-                : "text-white/70 hover:bg-slate-800/50 hover:text-white"
+                ? "bg-green-600 text-white" 
+                : "text-gray-400 hover:bg-gray-800 hover:text-white"
             )}>
               <LayoutDashboard className="w-5 h-5" />
-              <span className="font-medium">{t("nav.home")}</span>
-            </div>
+              <span className="font-medium">Home</span>
+            </a>
           </Link>
 
-          {/* Modules */}
-          {modules.map((module) => (
-            <div key={module.nameKey}>
-              <button
-                onClick={() => toggleModule(module.nameKey)}
-                className={cn(
-                  "w-full flex items-center justify-between px-4 py-3 rounded-lg transition-all",
-                  module.subItems.some(item => location.startsWith(item.path))
-                    ? "bg-cyan-500/10 text-cyan-400"
-                    : "text-white/70 hover:bg-slate-800/50 hover:text-white"
-                )}
-              >
-                <div className="flex items-center gap-3">
-                  <module.icon className={cn("w-5 h-5", module.color)} />
-                  <span className="font-medium">{t(module.nameKey)}</span>
-                </div>
-                {expandedModules.includes(module.nameKey) ? (
-                  <ChevronDown className="w-4 h-4" />
-                ) : (
-                  <ChevronRight className="w-4 h-4" />
-                )}
-              </button>
-              
-              {/* Sub-items */}
-              {expandedModules.includes(module.nameKey) && (
-                <div className="ml-4 mt-1 space-y-1 border-l border-slate-700/50 pl-4">
-                  {module.subItems.map((item) => (
-                    <Link key={item.path} href={item.path}>
-                      <div className={cn(
-                        "flex items-center gap-3 px-3 py-2 rounded-lg transition-all cursor-pointer text-sm",
-                        location === item.path || (item.path !== "/" && location.startsWith(item.path) && item.path.split("/").length >= location.split("/").length)
-                          ? "bg-cyan-500/20 text-cyan-400"
-                          : "text-white/60 hover:bg-slate-800/50 hover:text-white"
-                      )}>
-                        <item.icon className="w-4 h-4" />
-                        <span>{t(item.nameKey)}</span>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
-          ))}
-        </nav>
+          <div className="h-px bg-gray-800 my-4" />
 
-        {/* User Footer */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-cyan-500/20 bg-slate-900/95">
-          {loading ? (
-            <div className="flex items-center justify-center py-2">
-              <Loader2 className="w-5 h-5 animate-spin text-cyan-400" />
-            </div>
-          ) : user ? (
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-cyan-500/20 flex items-center justify-center">
-                  <span className="text-sm font-medium text-cyan-400">
-                    {user.name?.charAt(0).toUpperCase() || "U"}
-                  </span>
-                </div>
-                <div className="hidden lg:block">
-                  <p className="text-sm font-medium text-white truncate max-w-[120px]">{user.name}</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <LanguageSwitcher />
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={logout}
-                  className="text-white/60 hover:text-red-400 hover:bg-red-500/10"
+          {/* Modules */}
+          {modules.map((module) => {
+            const isExpanded = expandedModules.includes(module.name);
+            const isActive = module.subItems.some(item => location.startsWith(item.path));
+            
+            return (
+              <div key={module.name} className="space-y-1">
+                <button
+                  onClick={() => toggleModule(module.name)}
+                  className={cn(
+                    "w-full flex items-center justify-between px-4 py-3 rounded-lg transition-colors",
+                    isActive 
+                      ? "bg-gray-800 text-white" 
+                      : "text-gray-400 hover:bg-gray-800 hover:text-white"
+                  )}
                 >
-                  <LogOut className="w-4 h-4" />
-                </Button>
+                  <div className="flex items-center gap-3">
+                    <module.icon className={cn("w-5 h-5", module.color)} />
+                    <span className="font-medium">{module.name}</span>
+                  </div>
+                  {isExpanded ? (
+                    <ChevronDown className="w-4 h-4" />
+                  ) : (
+                    <ChevronRight className="w-4 h-4" />
+                  )}
+                </button>
+
+                {isExpanded && (
+                  <div className="ml-4 pl-4 border-l border-gray-800 space-y-1">
+                    {module.subItems.map((item) => (
+                      <Link key={item.path} href={item.path}>
+                        <a className={cn(
+                          "flex items-center gap-3 px-4 py-2 rounded-lg transition-colors text-sm",
+                          location === item.path
+                            ? "bg-gray-800 text-white"
+                            : "text-gray-500 hover:bg-gray-800 hover:text-white"
+                        )}>
+                          <item.icon className="w-4 h-4" />
+                          <span>{item.name}</span>
+                        </a>
+                      </Link>
+                    ))}
+                  </div>
+                )}
               </div>
-            </div>
-          ) : (
-            <Button
-              onClick={() => window.location.href = getLoginUrl()}
-              className="w-full bg-cyan-500 hover:bg-cyan-600"
-            >
-              {t("login") || "Sign In"}
-            </Button>
-          )}
-        </div>
+            );
+          })}
+        </nav>
       </aside>
 
       {/* Main Content */}
-      <main className={cn(
-        "transition-all duration-300",
-        "lg:ml-64",
-        "pt-16 lg:pt-0"
-      )}>
-        <div className="p-4 lg:p-6">
+      <main className="lg:ml-64 pt-16 min-h-screen">
+        <div className="p-6">
           {children}
         </div>
       </main>
@@ -308,7 +308,7 @@ export default function ModularLayout({ children }: { children: React.ReactNode 
       {/* Mobile Overlay */}
       {sidebarOpen && (
         <div 
-          className="lg:hidden fixed inset-0 bg-black/50 z-30"
+          className="fixed inset-0 bg-black/50 z-30 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}

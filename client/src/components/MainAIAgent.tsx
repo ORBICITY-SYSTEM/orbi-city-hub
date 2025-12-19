@@ -9,7 +9,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Upload, Loader2, CheckCircle2, AlertCircle, TrendingUp, Users, DollarSign, Package } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
-import { useLanguage } from "@/contexts/LanguageContext";
 
 interface AnalysisResult {
   fileType: string;
@@ -41,14 +40,13 @@ const MODULE_ICONS: Record<string, any> = {
 };
 
 const MODULE_COLORS: Record<string, string> = {
-  finance: "text-cyan-400",
-  marketing: "text-cyan-400",
-  reservations: "text-cyan-400",
-  logistics: "text-cyan-400",
+  finance: "text-blue-500",
+  marketing: "text-green-500",
+  reservations: "text-purple-500",
+  logistics: "text-orange-500",
 };
 
 export function MainAIAgent() {
-  const { t } = useLanguage();
   const [file, setFile] = useState<File | null>(null);
   const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -82,26 +80,26 @@ export function MainAIAgent() {
         });
 
         setAnalysis(result);
-        toast.success(t("aiAgent.analysisSuccess"));
+        toast.success("File analyzed successfully!");
       };
       reader.readAsDataURL(file);
     } catch (error) {
       console.error("Error analyzing file:", error);
-      toast.error(t("aiAgent.analysisFailed"));
+      toast.error("Failed to analyze file");
     } finally {
       setIsAnalyzing(false);
     }
   };
 
   return (
-    <Card className="w-full border-cyan-500/30 bg-slate-900/50">
+    <Card className="w-full">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <span className="text-cyan-400">🤖 {t("aiAgent.title")}</span>
-          <span className="text-sm font-normal text-white/80">{t("aiAgent.subtitle")}</span>
+          🤖 Main AI Agent
+          <span className="text-sm font-normal text-muted-foreground">Intelligent Data Distribution</span>
         </CardTitle>
-        <CardDescription className="text-cyan-300/60">
-          {t("aiAgent.description")}
+        <CardDescription>
+          Upload Excel/PDF files and AI will automatically analyze and distribute data to the right modules
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -109,11 +107,11 @@ export function MainAIAgent() {
         <div className="flex items-center gap-4">
           <label
             htmlFor="file-upload"
-            className="flex-1 flex items-center justify-center gap-2 border-2 border-dashed border-cyan-500/30 rounded-lg p-8 cursor-pointer hover:border-cyan-400 transition-colors bg-slate-800/30"
+            className="flex-1 flex items-center justify-center gap-2 border-2 border-dashed border-border rounded-lg p-8 cursor-pointer hover:border-primary transition-colors"
           >
-            <Upload className="w-6 h-6 text-cyan-400" />
-            <span className="text-sm text-white/70">
-              {file ? file.name : t("aiAgent.uploadPrompt")}
+            <Upload className="w-6 h-6 text-muted-foreground" />
+            <span className="text-sm text-muted-foreground">
+              {file ? file.name : "Click to upload Excel or PDF"}
             </span>
             <input
               id="file-upload"
@@ -127,17 +125,16 @@ export function MainAIAgent() {
             onClick={handleAnalyze}
             disabled={!file || isAnalyzing}
             size="lg"
-            className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white"
           >
             {isAnalyzing ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                {t("aiAgent.analyzing")}
+                Analyzing...
               </>
             ) : (
               <>
                 <CheckCircle2 className="w-4 h-4 mr-2" />
-                {t("aiAgent.analyze")}
+                Analyze
               </>
             )}
           </Button>
@@ -147,15 +144,15 @@ export function MainAIAgent() {
         {analysis && (
           <div className="space-y-4">
             {/* Summary */}
-            <div className="bg-slate-800/50 rounded-lg p-4 border border-cyan-500/20">
+            <div className="bg-muted/50 rounded-lg p-4">
               <div className="flex items-start gap-3">
-                <CheckCircle2 className="w-5 h-5 text-cyan-400 mt-0.5" />
+                <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5" />
                 <div className="flex-1">
-                  <h4 className="font-semibold mb-1 text-cyan-400">{t("aiAgent.analysisComplete")}</h4>
-                  <p className="text-sm text-white/70">{analysis.summary}</p>
-                  <div className="flex items-center gap-4 mt-2 text-xs text-white/50">
-                    <span>{t("aiAgent.type")}: {analysis.fileType.replace("_", " ")}</span>
-                    <span>{t("aiAgent.confidence")}: {(analysis.confidence * 100).toFixed(0)}%</span>
+                  <h4 className="font-semibold mb-1">Analysis Complete</h4>
+                  <p className="text-sm text-muted-foreground">{analysis.summary}</p>
+                  <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
+                    <span>Type: {analysis.fileType.replace("_", " ")}</span>
+                    <span>Confidence: {(analysis.confidence * 100).toFixed(0)}%</span>
                   </div>
                 </div>
               </div>
@@ -163,40 +160,40 @@ export function MainAIAgent() {
 
             {/* Data Distributions */}
             <div>
-              <h4 className="font-semibold mb-3 text-cyan-400">📊 {t("aiAgent.dataDistribution")}</h4>
+              <h4 className="font-semibold mb-3">📊 Data Distribution</h4>
               <div className="grid gap-3">
                 {analysis.distributions.map((dist, idx) => {
                   const Icon = MODULE_ICONS[dist.module] || Package;
-                  const colorClass = MODULE_COLORS[dist.module] || "text-cyan-400";
+                  const colorClass = MODULE_COLORS[dist.module] || "text-gray-500";
 
                   return (
                     <div
                       key={idx}
-                      className="flex items-center gap-3 bg-slate-800/50 border border-cyan-500/20 rounded-lg p-3"
+                      className="flex items-center gap-3 bg-card border border-border rounded-lg p-3"
                     >
                       <Icon className={`w-5 h-5 ${colorClass}`} />
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
-                          <span className="font-medium capitalize text-white">{t(`modules.${dist.module}`)}</span>
-                          <span className="text-xs text-white/30">→</span>
-                          <span className="text-sm text-white/60">{dist.category}</span>
+                          <span className="font-medium capitalize">{dist.module}</span>
+                          <span className="text-xs text-muted-foreground">→</span>
+                          <span className="text-sm text-muted-foreground">{dist.category}</span>
                         </div>
                         <div className="text-sm mt-1">
-                          <span className="font-semibold text-white/80">{dist.data.fieldName}:</span>{" "}
-                          <span className="text-cyan-400">
+                          <span className="font-semibold">{dist.data.fieldName}:</span>{" "}
+                          <span className="text-primary">
                             {typeof dist.data.value === "number"
                               ? dist.data.value.toLocaleString()
                               : dist.data.value}
                             {dist.data.unit && ` ${dist.data.unit}`}
                           </span>
                           {dist.data.period && (
-                            <span className="text-xs text-white/50 ml-2">
+                            <span className="text-xs text-muted-foreground ml-2">
                               ({dist.data.period})
                             </span>
                           )}
                         </div>
                       </div>
-                      <span className="text-xs text-white/50">
+                      <span className="text-xs text-muted-foreground">
                         {(dist.confidence * 100).toFixed(0)}%
                       </span>
                     </div>
@@ -208,19 +205,19 @@ export function MainAIAgent() {
             {/* Suggestions */}
             {analysis.suggestions.length > 0 && (
               <div>
-                <h4 className="font-semibold mb-3 text-cyan-400">💡 {t("aiAgent.suggestions")}</h4>
+                <h4 className="font-semibold mb-3">💡 AI Suggestions</h4>
                 <div className="space-y-2">
                   {analysis.suggestions.map((suggestion, idx) => (
                     <div
                       key={idx}
-                      className="flex items-start gap-3 bg-slate-800/30 border border-cyan-500/10 rounded-lg p-3"
+                      className="flex items-start gap-3 bg-muted/30 rounded-lg p-3"
                     >
-                      <AlertCircle className="w-4 h-4 text-cyan-400 mt-0.5" />
+                      <AlertCircle className="w-4 h-4 text-blue-500 mt-0.5" />
                       <div className="flex-1">
-                        <div className="text-sm font-medium capitalize text-white/80">
+                        <div className="text-sm font-medium capitalize">
                           {suggestion.action.replace(/_/g, " ")}
                         </div>
-                        <div className="text-sm text-white/60 mt-1">
+                        <div className="text-sm text-muted-foreground mt-1">
                           {suggestion.description}
                         </div>
                       </div>
@@ -234,9 +231,9 @@ export function MainAIAgent() {
 
         {/* Info */}
         {!analysis && !isAnalyzing && (
-          <div className="text-center text-sm py-8">
-            <p className="text-white/70">{t("aiAgent.uploadHint")}</p>
-            <p className="text-cyan-300/60 mt-3">{t("aiAgent.autoDistribute")}</p>
+          <div className="text-center text-sm text-muted-foreground py-8">
+            <p>Upload a financial report, booking list, or inventory sheet</p>
+            <p className="mt-1">AI will analyze and distribute data automatically</p>
           </div>
         )}
       </CardContent>
