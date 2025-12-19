@@ -27,6 +27,7 @@ export const ka: Translations = {
     marketingDashboard: "მთავარი",
     otaChannels: "OTA არხები",
     webLeads: "ვებ ლიდები",
+    liveChat: "ლაივ ჩატი",
     
     // Reservations
     otaDashboard: "მთავარი",

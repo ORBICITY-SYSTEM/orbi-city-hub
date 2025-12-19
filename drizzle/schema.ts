@@ -701,3 +701,38 @@ export const reviewNotifications = mysqlTable("reviewNotifications", {
 
 export type ReviewNotification = typeof reviewNotifications.$inferSelect;
 export type InsertReviewNotification = typeof reviewNotifications.$inferInsert;
+
+
+/**
+ * Tawk.to Live Chat Messages
+ * Stores messages received via Tawk.to webhooks for real-time display
+ */
+export const tawktoMessages = mysqlTable("tawktoMessages", {
+  id: int("id").autoincrement().primaryKey(),
+  chatId: varchar("chatId", { length: 255 }).notNull(),
+  messageId: varchar("messageId", { length: 255 }),
+  eventType: mysqlEnum("eventType", [
+    "chat:start", 
+    "chat:end", 
+    "ticket:create",
+    "chat:transcript"
+  ]).notNull(),
+  visitorName: varchar("visitorName", { length: 255 }),
+  visitorEmail: varchar("visitorEmail", { length: 320 }),
+  visitorPhone: varchar("visitorPhone", { length: 50 }),
+  visitorCountry: varchar("visitorCountry", { length: 100 }),
+  visitorCity: varchar("visitorCity", { length: 100 }),
+  message: text("message"),
+  agentName: varchar("agentName", { length: 255 }),
+  agentId: varchar("agentId", { length: 255 }),
+  propertyId: varchar("propertyId", { length: 255 }),
+  isRead: boolean("isRead").default(false),
+  status: mysqlEnum("status", ["active", "ended", "missed"]).default("active"),
+  metadata: json("metadata"),
+  chatStartedAt: timestamp("chatStartedAt"),
+  chatEndedAt: timestamp("chatEndedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type TawktoMessage = typeof tawktoMessages.$inferSelect;
+export type InsertTawktoMessage = typeof tawktoMessages.$inferInsert;

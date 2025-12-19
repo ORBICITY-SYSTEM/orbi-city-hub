@@ -71,6 +71,7 @@ const modules: ModuleItem[] = [
       { nameKey: "submenu.marketingDashboard", path: "/marketing", icon: LayoutDashboard },
       { nameKey: "submenu.otaChannels", path: "/marketing/ota", icon: Globe },
       { nameKey: "submenu.webLeads", path: "/marketing/leads", icon: Users },
+      { nameKey: "submenu.liveChat", path: "/marketing/live-chat", icon: MessageCircle },
     ]
   },
   {

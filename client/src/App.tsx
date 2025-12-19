@@ -30,6 +30,7 @@ const PowerBIFinanceDashboard = lazy(() => import("./pages/finance/PowerBIFinanc
 const MarketingDashboard = lazy(() => import("./pages/marketing/MarketingDashboard"));
 const OTAChannels = lazy(() => import("./pages/marketing/OTAChannels"));
 const WebsiteLeads = lazy(() => import("./pages/marketing/WebsiteLeads"));
+const LiveChat = lazy(() => import("./pages/marketing/LiveChat"));
 
 // Reservations Module - Lazy
 const EmailInbox = lazy(() => import("./pages/reservations/EmailInbox"));
@@ -100,6 +101,7 @@ function RouterContent() {
         <Route path="/marketing" component={MarketingDashboard} />
         <Route path="/marketing/ota" component={OTAChannels} />
         <Route path="/marketing/leads" component={WebsiteLeads} />
+        <Route path="/marketing/live-chat" component={LiveChat} />
 
         {/* Reservations Module */}
         <Route path="/reservations" component={OTADashboard} />

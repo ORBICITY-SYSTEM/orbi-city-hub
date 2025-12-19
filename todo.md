@@ -390,3 +390,15 @@
 - [ ] Add Tawk.to widget script to the application
 - [ ] Configure Tawk.to settings
 - [ ] Test live chat functionality
+
+
+## Tawk.to Webhook Integration (Real-time Live Chat)
+- [x] Create webhook endpoint in server to receive Tawk.to events
+- [x] Create tawktoMessages table in database
+- [x] Configure Tawk.to webhook in dashboard (Secret: 922e01520e76c1eb...)
+- [x] Create Live Chat page in ORBI Hub frontend (/marketing/live-chat)
+- [x] Add real-time notifications for new messages (CEO Dashboard card)
+- [x] Test end-to-end webhook flow
+- [x] Add tRPC routes for Tawk.to data (getAll, getStats, markAsRead, getUnread)
+- [x] Add Live Chat to sidebar navigation (Marketing > Live Chat)
+- [x] Add translations (EN/KA)

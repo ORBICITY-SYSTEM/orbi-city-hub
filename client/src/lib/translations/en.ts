@@ -25,6 +25,7 @@ export const en = {
     marketingDashboard: "Dashboard",
     otaChannels: "OTA Channels",
     webLeads: "Web Leads",
+    liveChat: "Live Chat",
     
     // Reservations
     otaDashboard: "Dashboard",

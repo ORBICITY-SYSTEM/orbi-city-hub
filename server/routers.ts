@@ -46,6 +46,7 @@ import { otaRouter } from "./routers/otaRouter";
 import { reviewsRouter } from "./routers/reviewsRouter";
 import { ceoDashboardRouter } from "./ceoDashboardRouter";
 import { telegramRouter } from "./routers/telegramRouter";
+import { tawktoRouter } from "./routers/tawktoRouter";
 
 export const appRouter = router({
   realFinance: realFinanceRouter,
@@ -87,6 +88,7 @@ export const appRouter = router({
   reviews: reviewsRouter,
   ceoDashboard: ceoDashboardRouter,
   telegram: telegramRouter,
+  tawkto: tawktoRouter,
   system: systemRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),

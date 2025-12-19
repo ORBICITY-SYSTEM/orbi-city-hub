@@ -16,7 +16,8 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   Loader2,
-  Puzzle
+  Puzzle,
+  MessageCircle
 } from "lucide-react";
 import { MainAIAgent } from "@/components/MainAIAgent";
 import { IntegrationsShowcase } from "@/components/IntegrationsShowcase";
@@ -37,6 +38,11 @@ export default function Home() {
 
   const { data: moduleSummaries, isLoading: summariesLoading } = trpc.ceoDashboard.getModuleSummaries.useQuery(undefined, {
     refetchInterval: 60000,
+  });
+
+  // Fetch Live Chat stats
+  const { data: liveChatStats } = trpc.tawkto.getStats.useQuery(undefined, {
+    refetchInterval: 30000, // Refresh every 30 seconds
   });
 
   // Format currency
@@ -282,6 +288,23 @@ export default function Home() {
               {language === 'ka' ? "დღევანდელი ამოცანები" : "Today's Tasks"}
             </div>
           </div>
+
+          {/* Live Chat Card */}
+          <Link href="/marketing/live-chat">
+            <div className="bg-gradient-to-br from-cyan-500/20 to-cyan-600/10 border border-cyan-500/30 rounded-xl p-4 cursor-pointer hover:bg-cyan-500/30 transition-all">
+              <div className="flex items-center justify-between mb-2">
+                <MessageCircle className="w-5 h-5 text-cyan-400" />
+                <span className="text-xs font-medium text-cyan-400 flex items-center gap-1">
+                  {liveChatStats?.unread || 0} {language === 'ka' ? 'ახალი' : 'new'}
+                  <ArrowUpRight className="w-3 h-3" />
+                </span>
+              </div>
+              <div className="text-2xl font-bold text-white">{liveChatStats?.todayCount || 0}</div>
+              <div className="text-sm text-white/60">
+                {language === 'ka' ? "ლაივ ჩატი დღეს" : "Live Chat Today"}
+              </div>
+            </div>
+          </Link>
         </div>
       </div>
 

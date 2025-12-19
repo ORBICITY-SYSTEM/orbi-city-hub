@@ -341,6 +341,55 @@ async function startServer() {
     }
   });
 
+  // Tawk.to Webhook endpoint (raw POST, not tRPC)
+  app.post("/api/webhooks/tawkto", express.json(), async (req, res) => {
+    console.log("[Tawk.to Webhook] Received event:", req.body?.event);
+    
+    try {
+      const { event, chatId, visitor, agent, property, message, ticket, time } = req.body;
+      
+      let eventType = "chat:start";
+      if (event === "chat:start") eventType = "chat:start";
+      else if (event === "chat:end") eventType = "chat:end";
+      else if (event === "ticket:create") eventType = "ticket:create";
+      else if (event === "chat:transcript") eventType = "chat:transcript";
+      
+      // Import db and schema
+      const { getDb } = await import("../db");
+      const { tawktoMessages } = await import("../../drizzle/schema");
+      
+      const db = await getDb();
+      if (!db) {
+        console.error("[Tawk.to Webhook] Database not available");
+        return res.status(500).json({ success: false, error: "Database not available" });
+      }
+      
+      await db.insert(tawktoMessages).values({
+        chatId: chatId || `chat_${Date.now()}`,
+        eventType: eventType as any,
+        visitorName: visitor?.name || null,
+        visitorEmail: visitor?.email || null,
+        visitorPhone: visitor?.phone || null,
+        visitorCountry: visitor?.country || null,
+        visitorCity: visitor?.city || null,
+        message: message?.text || ticket?.message || null,
+        agentName: agent?.name || null,
+        agentId: agent?.id || null,
+        propertyId: property?.id || null,
+        status: event === "chat:end" ? "ended" : "active",
+        metadata: req.body,
+        chatStartedAt: event === "chat:start" ? new Date() : null,
+        chatEndedAt: event === "chat:end" ? new Date() : null,
+      });
+      
+      console.log("[Tawk.to Webhook] Event saved successfully");
+      res.json({ success: true });
+    } catch (error) {
+      console.error("[Tawk.to Webhook] Error:", error);
+      res.status(500).json({ success: false, error: String(error) });
+    }
+  });
+
   // tRPC API
   app.use(
     "/api/trpc",
