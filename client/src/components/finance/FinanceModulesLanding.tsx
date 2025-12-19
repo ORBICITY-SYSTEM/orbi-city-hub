@@ -1,15 +1,17 @@
 import { Card } from "@/components/ui/card";
 import { TrendingUp, Building2, Calendar, Wallet, BarChart3, Sparkles } from "lucide-react";
 import { useLocation } from "wouter";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export const FinanceModulesLanding = () => {
   const [, navigate] = useLocation();
+  const { language } = useLanguage();
 
   const modules = [
     {
       id: "powerbi",
-      title: "📊 Power BI ანალიტიკა",
-      description: "ინტერაქტიული დეშბორდი - ფილტრები, გრაფიკები, რეალური მონაცემები",
+      title: language === 'ka' ? '📊 Power BI ანალიტიკა' : '📊 Power BI Analytics',
+      description: language === 'ka' ? 'ინტერაქტიული დეშბორდი - ფილტრები, გრაფიკები, რეალური მონაცემები' : 'Interactive dashboard - filters, charts, real-time data',
       icon: BarChart3,
       path: "/finance/powerbi",
       gradient: "from-emerald-500 to-teal-500",
@@ -17,32 +19,32 @@ export const FinanceModulesLanding = () => {
     },
     {
       id: "analytics",
-      title: "ფინანსური ანალიზი",
-      description: "შემოსავლები, ხარჯები და მოგების ანალიზი",
+      title: language === 'ka' ? 'ფინანსური ანალიზი' : 'Financial Analysis',
+      description: language === 'ka' ? 'შემოსავლები, ხარჯები და მოგების ანალიზი' : 'Revenue, expenses and profit analysis',
       icon: TrendingUp,
       path: "/finance/analytics",
       gradient: "from-blue-500 to-cyan-500",
     },
     {
       id: "otelms",
-      title: "OtelMS",
-      description: "სასტუმროს მართვის სისტემა",
+      title: 'OtelMS',
+      description: language === 'ka' ? 'სასტუმროს მართვის სისტემა' : 'Hotel Management System',
       icon: Building2,
       path: "/finance/otelms",
       gradient: "from-purple-500 to-pink-500",
     },
     {
       id: "monthly",
-      title: "თვეების ანალიზი",
-      description: "თვიური ფინანსური რეპორტები",
+      title: language === 'ka' ? 'თვეების ანალიზი' : 'Monthly Analysis',
+      description: language === 'ka' ? 'თვიური ფინანსური რეპორტები' : 'Monthly financial reports',
       icon: Calendar,
       path: "/finance/reports",
       gradient: "from-green-500 to-emerald-500",
     },
     {
       id: "development",
-      title: "განვითარების ხარჯი",
-      description: "ინვესტიციები და განვითარების ბიუჯეტი",
+      title: language === 'ka' ? 'განვითარების ხარჯი' : 'Development Expenses',
+      description: language === 'ka' ? 'ინვესტიციები და განვითარების ბიუჯეტი' : 'Investments and development budget',
       icon: Wallet,
       path: "/finance/expenses",
       gradient: "from-orange-500 to-red-500",
@@ -87,10 +89,10 @@ export const FinanceModulesLanding = () => {
                 </p>
                 {isPowerBI && (
                   <div className="mt-4 flex flex-wrap gap-2">
-                    <span className="px-3 py-1 text-xs bg-emerald-900/50 text-emerald-300 rounded-full">ფილტრები</span>
-                    <span className="px-3 py-1 text-xs bg-blue-900/50 text-blue-300 rounded-full">გრაფიკები</span>
-                    <span className="px-3 py-1 text-xs bg-purple-900/50 text-purple-300 rounded-full">სორტირება</span>
-                    <span className="px-3 py-1 text-xs bg-amber-900/50 text-amber-300 rounded-full">13 თვის მონაცემები</span>
+                    <span className="px-3 py-1 text-xs bg-emerald-900/50 text-emerald-300 rounded-full">{language === 'ka' ? 'ფილტრები' : 'Filters'}</span>
+                    <span className="px-3 py-1 text-xs bg-blue-900/50 text-blue-300 rounded-full">{language === 'ka' ? 'გრაფიკები' : 'Charts'}</span>
+                    <span className="px-3 py-1 text-xs bg-purple-900/50 text-purple-300 rounded-full">{language === 'ka' ? 'სორტირება' : 'Sorting'}</span>
+                    <span className="px-3 py-1 text-xs bg-amber-900/50 text-amber-300 rounded-full">{language === 'ka' ? '13 თვის მონაცემები' : '13 months data'}</span>
                   </div>
                 )}
               </div>

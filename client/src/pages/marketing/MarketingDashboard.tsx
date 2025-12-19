@@ -42,7 +42,7 @@ interface SalesChannel {
 
 const Marketing = () => {
   const navigate = useLocation();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   
   const [salesChannels, setSalesChannels] = useState<SalesChannel[]>(() => {
@@ -350,10 +350,10 @@ const Marketing = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-6 py-4">
+    <div className="min-h-screen">
+      {/* Header with Ocean Wave */}
+      <div className="relative rounded-2xl overflow-hidden mx-6 mt-6 mb-8">
+        <div className="relative z-10 px-8 pt-8 pb-20">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               {isAuthenticated && (
@@ -361,30 +361,40 @@ const Marketing = () => {
                   variant="ghost"
                   size="icon"
                   onClick={() => setLocation("/")}
-                  className="hover:bg-secondary"
+                  className="text-cyan-300 hover:text-white hover:bg-white/10"
                 >
                   <ArrowLeft className="h-5 w-5" />
                 </Button>
               )}
               <div>
-                <h1 className="text-2xl font-bold text-foreground">Marketing Control</h1>
-                <p className="text-sm text-muted-foreground">Campaign management & analytics</p>
+                <h1 className="text-3xl md:text-4xl font-bold text-cyan-400 tracking-tight">{t('marketing.title')}</h1>
+                <p className="text-lg text-white/90 mt-1 font-medium">{t('marketing.subtitle')}</p>
               </div>
             </div>
-            <Badge className="bg-ocean/10 text-ocean border-ocean/20">
+            <Badge className="bg-cyan-500/20 text-cyan-300 border-cyan-500/30">
               <Zap className="h-3 w-3 mr-1" />
               AI-Powered
             </Badge>
           </div>
         </div>
-      </header>
+        {/* Ocean Wave SVG */}
+        <div className="absolute bottom-0 left-0 right-0">
+          <svg viewBox="0 0 1200 120" preserveAspectRatio="none" className="relative block w-full h-[60px]" style={{ transform: 'rotate(180deg)' }}>
+            <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" className="fill-[#0a1628]/80" opacity=".25" />
+            <path d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V0Z" className="fill-[#0d2847]/60" opacity=".5" />
+            <path d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V0Z" className="fill-[#0f3460]" />
+          </svg>
+        </div>
+        {/* Background */}
+        <div className="absolute inset-0 -z-10" style={{ background: 'linear-gradient(135deg, #0a1628 0%, #0d2847 50%, #0f3460 100%)' }} />
+      </div>
 
       <main className="container mx-auto px-6 py-8">
         <Tabs defaultValue="dashboard" className="space-y-6">
           <TabsList className="grid w-full grid-cols-7 lg:w-auto lg:inline-grid">
             <TabsTrigger value="dashboard" className="gap-2">
               <LayoutDashboard className="h-4 w-4" />
-              {t("დეშბორდი", "Dashboard")}
+              {t('common.overview')}
             </TabsTrigger>
             <TabsTrigger value="command-center" className="gap-2">
               <Zap className="h-4 w-4" />
@@ -392,19 +402,19 @@ const Marketing = () => {
             </TabsTrigger>
             <TabsTrigger value="sales-channels" className="gap-2">
               <ShoppingCart className="h-4 w-4" />
-              {t("გაყიდვების არხები", "Sales Channels")}
+              {t('submenu.otaChannels')}
             </TabsTrigger>
             <TabsTrigger value="photos" className="gap-2">
               <Image className="h-4 w-4" />
-              {t("ფოტოები", "Photos")}
+              {t('common.details')}
             </TabsTrigger>
             <TabsTrigger value="videos" className="gap-2">
               <Video className="h-4 w-4" />
-              {t("ვიდეოები", "Videos")}
+              {t('common.more')}
             </TabsTrigger>
             <TabsTrigger value="expenses" className="gap-2">
               <DollarSign className="h-4 w-4" />
-              {t("ხარჯები", "Expenses")}
+              {t('finance.totalExpenses')}
             </TabsTrigger>
             <TabsTrigger value="emails" className="gap-2">
               <Mail className="h-4 w-4" />
@@ -424,7 +434,7 @@ const Marketing = () => {
                   <span className="text-xs text-success">+18%</span>
                 </div>
                 <div className="text-2xl font-bold text-foreground">€68.1K</div>
-                <div className="text-sm text-muted-foreground">Revenue MTD</div>
+                <div className="text-sm text-muted-foreground">{language === 'ka' ? 'შემოსავალი თვის დასაწყისიდან' : 'Revenue MTD'}</div>
               </Card>
 
               <Card className="p-6 border-border bg-gradient-card hover:border-ocean/30 transition-colors">
@@ -435,7 +445,7 @@ const Marketing = () => {
                   <span className="text-xs text-success">+24%</span>
                 </div>
                 <div className="text-2xl font-bold text-foreground">546</div>
-                <div className="text-sm text-muted-foreground">Total Bookings</div>
+                <div className="text-sm text-muted-foreground">{language === 'ka' ? 'სულ ჯავშნები' : 'Total Bookings'}</div>
               </Card>
 
               <Card className="p-6 border-border bg-gradient-card hover:border-ocean/30 transition-colors">
@@ -446,7 +456,7 @@ const Marketing = () => {
                   <span className="text-xs text-success">+8%</span>
                 </div>
                 <div className="text-2xl font-bold text-foreground">87%</div>
-                <div className="text-sm text-muted-foreground">Occupancy Rate</div>
+                <div className="text-sm text-muted-foreground">{language === 'ka' ? 'დაკავების მაჩვენებელი' : 'Occupancy Rate'}</div>
               </Card>
 
               <Card className="p-6 border-border bg-gradient-card hover:border-ocean/30 transition-colors">
@@ -457,17 +467,17 @@ const Marketing = () => {
                   <span className="text-xs text-info">12.4K</span>
                 </div>
                 <div className="text-2xl font-bold text-foreground">4.2K</div>
-                <div className="text-sm text-muted-foreground">Website Visits</div>
+                <div className="text-sm text-muted-foreground">{language === 'ka' ? 'საიტის ვიზიტები' : 'Website Visits'}</div>
               </Card>
             </div>
 
             {/* Active Campaigns */}
             <div>
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-bold text-foreground">Active Campaigns</h2>
+                <h2 className="text-xl font-bold text-foreground">{language === 'ka' ? 'აქტიური კამპანიები' : 'Active Campaigns'}</h2>
                 <Button variant="outline" className="border-ocean/30 hover:bg-ocean/10 hover:text-ocean">
                   <Calendar className="h-4 w-4 mr-2" />
-                  New Campaign
+                  {language === 'ka' ? 'ახალი კამპანია' : 'New Campaign'}
                 </Button>
               </div>
               
@@ -487,11 +497,11 @@ const Marketing = () => {
                       
                       <div className="flex items-center gap-8">
                         <div className="text-right">
-                          <div className="text-sm text-muted-foreground">Performance</div>
+                          <div className="text-sm text-muted-foreground">{language === 'ka' ? 'შესრულება' : 'Performance'}</div>
                           <div className="text-lg font-bold text-success">{campaign.performance}</div>
                         </div>
                         <div className="text-right">
-                          <div className="text-sm text-muted-foreground">Budget</div>
+                          <div className="text-sm text-muted-foreground">{language === 'ka' ? 'ბიუჯეტი' : 'Budget'}</div>
                           <div className="text-lg font-bold text-foreground">{campaign.budget}</div>
                         </div>
                         <Badge 
@@ -511,7 +521,7 @@ const Marketing = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* OTA Performance */}
               <div>
-                <h2 className="text-xl font-bold text-foreground mb-4">OTA Performance</h2>
+                <h2 className="text-xl font-bold text-foreground mb-4">{language === 'ka' ? 'OTA შესრულება' : 'OTA Performance'}</h2>
                 <Card className="p-6 border-border bg-gradient-card">
                   <div className="space-y-4">
                     {otaPerformance.map((ota, index) => (
@@ -532,7 +542,7 @@ const Marketing = () => {
 
               {/* Social Media */}
               <div>
-                <h2 className="text-xl font-bold text-foreground mb-4">Social Media</h2>
+                <h2 className="text-xl font-bold text-foreground mb-4">{language === 'ka' ? 'სოციალური მედია' : 'Social Media'}</h2>
                 <div className="space-y-4">
                   {socialStats.map((social, index) => (
                     <Card key={index} className="p-6 border-border bg-card hover:border-ocean/20 transition-colors">

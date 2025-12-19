@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
@@ -54,6 +55,7 @@ export default function OTADashboard() {
   const [bookingsPage, setBookingsPage] = useState(1);
   const [activeTab, setActiveTab] = useState<'overview' | 'monthly' | 'channels' | 'ai'>('overview');
   const [monthFilterOpen, setMonthFilterOpen] = useState(false);
+  const { t, language } = useLanguage();
 
   // Fetch OTA data
   const { data: channelsData, isLoading: channelsLoading, refetch } = trpc.ota.getChannels.useQuery();
@@ -219,7 +221,7 @@ export default function OTADashboard() {
     await new Promise(resolve => setTimeout(resolve, 2000));
     await refetch();
     setSyncing(false);
-    toast.success('სინქრონიზაცია დასრულდა', { description: 'ყველა OTA არხი განახლდა' });
+    toast.success(t('toast.syncComplete'), { description: t('ota.syncSuccess') });
   };
 
   const totalRevenue = totals.revenue;
@@ -234,24 +236,38 @@ export default function OTADashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-6">
+    <div className="min-h-screen p-6">
       <div className="max-w-7xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-emerald-400 bg-clip-text text-transparent">
-              Orbi OTA Command Center
-            </h1>
-            <p className="text-muted-foreground mt-1">რეალური ჯავშნების ანალიტიკა ყველა არხზე</p>
+        {/* Header with Ocean Wave */}
+        <div className="relative rounded-2xl overflow-hidden mb-8">
+          <div className="relative z-10 px-8 pt-8 pb-20">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-3xl md:text-4xl font-bold text-cyan-400 tracking-tight">
+                  {t('ota.title')}
+                </h1>
+                <p className="text-lg text-white/90 mt-2 font-medium">{t('ota.subtitle')}</p>
+              </div>
+              <Button 
+                onClick={handleSync} 
+                disabled={syncing}
+                className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white shadow-lg"
+              >
+                <RefreshCw className={`h-4 w-4 mr-2 ${syncing ? 'animate-spin' : ''}`} />
+                {syncing ? t('ota.syncing') : t('ota.sync')}
+              </Button>
+            </div>
           </div>
-          <Button 
-            onClick={handleSync} 
-            disabled={syncing}
-            className="bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-600 hover:to-emerald-600"
-          >
-            <RefreshCw className={`h-4 w-4 mr-2 ${syncing ? 'animate-spin' : ''}`} />
-            {syncing ? 'სინქრონიზაცია...' : 'სინქრონიზაცია'}
-          </Button>
+          {/* Ocean Wave SVG */}
+          <div className="absolute bottom-0 left-0 right-0">
+            <svg viewBox="0 0 1200 120" preserveAspectRatio="none" className="relative block w-full h-[60px]" style={{ transform: 'rotate(180deg)' }}>
+              <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" className="fill-[#0a1628]/80" opacity=".25" />
+              <path d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V0Z" className="fill-[#0d2847]/60" opacity=".5" />
+              <path d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V0Z" className="fill-[#0f3460]" />
+            </svg>
+          </div>
+          {/* Background */}
+          <div className="absolute inset-0 -z-10" style={{ background: 'linear-gradient(135deg, #0a1628 0%, #0d2847 50%, #0f3460 100%)' }} />
         </div>
 
         {/* Month Filter - Professional Dropdown */}
@@ -260,17 +276,17 @@ export default function OTADashboard() {
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
                 <Filter className="h-5 w-5 text-cyan-400" />
-                <span className="text-sm font-medium text-slate-300">თვის ფილტრი:</span>
+                <span className="text-sm font-medium text-slate-300">{t('ota.monthFilter')}:</span>
               </div>
               <Select value={selectedMonth} onValueChange={setSelectedMonth}>
                 <SelectTrigger className="w-[280px] bg-slate-800 border-slate-700 focus:border-cyan-500">
-                  <SelectValue placeholder="აირჩიეთ თვე" />
+                  <SelectValue placeholder={t('ota.selectMonth')} />
                 </SelectTrigger>
                 <SelectContent className="bg-slate-800 border-slate-700">
                   <SelectItem value="all" className="focus:bg-cyan-500/20">
                     <span className="flex items-center gap-2">
                       <Calendar className="h-4 w-4" />
-                      ყველა თვე
+                      {t('ota.allMonths')}
                     </span>
                   </SelectItem>
                   {MONTHS.map(month => (
@@ -288,7 +304,7 @@ export default function OTADashboard() {
                   className="text-cyan-400 hover:text-cyan-300"
                 >
                   <X className="h-4 w-4 mr-1" />
-                  გასუფთავება
+                  {t('ota.clear')}
                 </Button>
               )}
             </div>
@@ -301,7 +317,7 @@ export default function OTADashboard() {
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">სულ ჯავშნები</p>
+                  <p className="text-sm text-muted-foreground">{t('ota.totalBookings')}</p>
                   <p className="text-3xl font-bold text-white">{totals.bookings.toLocaleString()}</p>
                 </div>
                 <Calendar className="h-10 w-10 text-cyan-400 opacity-80" />
@@ -313,11 +329,11 @@ export default function OTADashboard() {
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">სულ შემოსავალი</p>
+                  <p className="text-sm text-muted-foreground">{t('ota.totalRevenue')}</p>
                   <p className="text-3xl font-bold text-emerald-400">
                     ₾{totals.revenue.toLocaleString('ka-GE', { maximumFractionDigits: 0 })}
                   </p>
-                  <p className="text-xs text-muted-foreground">საშ: ₾{avgRevenue.toFixed(0)}</p>
+                  <p className="text-xs text-muted-foreground">{t('ota.avg')}: ₾{avgRevenue.toFixed(0)}</p>
                 </div>
                 <Banknote className="h-10 w-10 text-emerald-400 opacity-80" />
               </div>
@@ -328,9 +344,9 @@ export default function OTADashboard() {
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">სულ ღამეები</p>
+                  <p className="text-sm text-muted-foreground">{t('ota.totalNights')}</p>
                   <p className="text-3xl font-bold text-purple-400">{totals.nights.toLocaleString()}</p>
-                  <p className="text-xs text-muted-foreground">საშ: ₾{totals.nights > 0 ? (totals.revenue / totals.nights).toFixed(0) : 0}/ღამე</p>
+                  <p className="text-xs text-muted-foreground">{t('ota.avg')}: ₾{totals.nights > 0 ? (totals.revenue / totals.nights).toFixed(0) : 0}/{language === 'ka' ? 'ღამე' : 'night'}</p>
                 </div>
                 <Building2 className="h-10 w-10 text-purple-400 opacity-80" />
               </div>
@@ -341,9 +357,9 @@ export default function OTADashboard() {
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">აქტიური არხები</p>
+                  <p className="text-sm text-muted-foreground">{t('ota.activeChannels')}</p>
                   <p className="text-3xl font-bold text-orange-400">{totals.activeChannels}</p>
-                  <p className="text-xs text-muted-foreground">OTA პლატფორმა</p>
+                  <p className="text-xs text-muted-foreground">{language === 'ka' ? 'OTA პლატფორმა' : 'OTA Platforms'}</p>
                 </div>
                 <Activity className="h-10 w-10 text-orange-400 opacity-80" />
               </div>
@@ -354,10 +370,10 @@ export default function OTADashboard() {
         {/* Tabs */}
         <div className="flex gap-2 flex-wrap">
           {[
-            { id: 'overview', label: 'მიმოხილვა', icon: BarChart3 },
-            { id: 'monthly', label: 'თვიური ანალიზი', icon: Calendar },
-            { id: 'channels', label: 'არხების შედარება', icon: TrendingUp },
-            { id: 'ai', label: 'AI ანალიზი', icon: Brain }
+            { id: 'overview', label: language === 'ka' ? 'მიმოხილვა' : 'Overview', icon: BarChart3 },
+            { id: 'monthly', label: language === 'ka' ? 'თვიური ანალიზი' : 'Monthly Analysis', icon: Calendar },
+            { id: 'channels', label: language === 'ka' ? 'არხების შედარება' : 'Channel Comparison', icon: TrendingUp },
+            { id: 'ai', label: language === 'ka' ? 'AI ანალიზი' : 'AI Analysis', icon: Brain }
           ].map(tab => (
             <Button
               key={tab.id}
@@ -380,7 +396,7 @@ export default function OTADashboard() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Card className="border-slate-700 bg-slate-900/50">
                 <CardHeader>
-                  <CardTitle className="text-lg">შემოსავალი არხების მიხედვით</CardTitle>
+                  <CardTitle className="text-lg">{t('ota.revenueByChannel')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <ResponsiveContainer width="100%" height={300}>
@@ -389,7 +405,7 @@ export default function OTADashboard() {
                       <XAxis type="number" stroke="#94a3b8" tickFormatter={(v) => `₾${(v/1000).toFixed(0)}k`} />
                       <YAxis type="category" dataKey="name" stroke="#94a3b8" width={100} />
                       <Tooltip 
-                        formatter={(value: number) => [`₾${value.toLocaleString('ka-GE', { maximumFractionDigits: 0 })}`, 'შემოსავალი']}
+                        formatter={(value: number) => [`₾${value.toLocaleString('ka-GE', { maximumFractionDigits: 0 })}`, language === 'ka' ? 'შემოსავალი' : 'Revenue']}
                         contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155' }}
                       />
                       <Bar dataKey="revenue" fill="#22d3ee">
@@ -404,7 +420,7 @@ export default function OTADashboard() {
 
               <Card className="border-slate-700 bg-slate-900/50">
                 <CardHeader>
-                  <CardTitle className="text-lg">შემოსავლის განაწილება</CardTitle>
+                  <CardTitle className="text-lg">{language === 'ka' ? 'შემოსავლის განაწილება' : 'Revenue Distribution'}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <ResponsiveContainer width="100%" height={300}>
@@ -424,7 +440,7 @@ export default function OTADashboard() {
                         ))}
                       </Pie>
                       <Tooltip 
-                        formatter={(value: number) => [`₾${value.toLocaleString('ka-GE', { maximumFractionDigits: 0 })}`, 'შემოსავალი']}
+                        formatter={(value: number) => [`₾${value.toLocaleString('ka-GE', { maximumFractionDigits: 0 })}`, language === 'ka' ? 'შემოსავალი' : 'Revenue']}
                         contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155' }}
                       />
                     </PieChart>
@@ -436,20 +452,20 @@ export default function OTADashboard() {
             {/* Channel Statistics Table */}
             <Card className="border-slate-700 bg-slate-900/50">
               <CardHeader>
-                <CardTitle className="text-lg">დეტალური არხების სტატისტიკა</CardTitle>
-                <CardDescription>სრული ანალიზი ყველა OTA არხზე</CardDescription>
+                <CardTitle className="text-lg">{language === 'ka' ? 'დეტალური არხების სტატისტიკა' : 'Detailed Channel Statistics'}</CardTitle>
+                <CardDescription>{language === 'ka' ? 'სრული ანალიზი ყველა OTA არხზე' : 'Full analysis across all OTA channels'}</CardDescription>
               </CardHeader>
               <CardContent>
                 <Table>
                   <TableHeader>
                     <TableRow className="border-slate-700">
-                      <TableHead>არხი</TableHead>
-                      <TableHead className="text-right">ჯავშნები</TableHead>
-                      <TableHead className="text-right">შემოსავალი</TableHead>
-                      <TableHead className="text-right">ღამეები</TableHead>
-                      <TableHead className="text-right">საშ/ჯავშანი</TableHead>
-                      <TableHead className="text-right">საშ/ღამე</TableHead>
-                      <TableHead className="text-right">წილი</TableHead>
+                      <TableHead>{language === 'ka' ? 'არხი' : 'Channel'}</TableHead>
+                      <TableHead className="text-right">{language === 'ka' ? 'ჯავშნები' : 'Bookings'}</TableHead>
+                      <TableHead className="text-right">{language === 'ka' ? 'შემოსავალი' : 'Revenue'}</TableHead>
+                      <TableHead className="text-right">{language === 'ka' ? 'ღამეები' : 'Nights'}</TableHead>
+                      <TableHead className="text-right">{language === 'ka' ? 'საშ/ჯავშანი' : 'Avg/Booking'}</TableHead>
+                      <TableHead className="text-right">{language === 'ka' ? 'საშ/ღამე' : 'Avg/Night'}</TableHead>
+                      <TableHead className="text-right">{language === 'ka' ? 'წილი' : 'Share'}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -470,7 +486,7 @@ export default function OTADashboard() {
                       </TableRow>
                     ))}
                     <TableRow className="border-slate-700 font-bold bg-slate-800/50">
-                      <TableCell>სულ</TableCell>
+                      <TableCell>{language === 'ka' ? 'სულ' : 'Total'}</TableCell>
                       <TableCell className="text-right">{totals.bookings.toLocaleString()}</TableCell>
                       <TableCell className="text-right text-emerald-400">₾{totals.revenue.toLocaleString('ka-GE', { maximumFractionDigits: 0 })}</TableCell>
                       <TableCell className="text-right">{totals.nights.toLocaleString()}</TableCell>
@@ -487,7 +503,7 @@ export default function OTADashboard() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Card className="border-slate-700 bg-slate-900/50">
                 <CardHeader>
-                  <CardTitle className="text-lg">საშუალო ფასი ღამეში (არხების მიხედვით)</CardTitle>
+                  <CardTitle className="text-lg">{language === 'ka' ? 'საშუალო ფასი ღამეში (არხების მიხედვით)' : 'Average Price per Night (by Channel)'}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <ResponsiveContainer width="100%" height={300}>
@@ -496,7 +512,7 @@ export default function OTADashboard() {
                       <XAxis dataKey="name" stroke="#94a3b8" angle={-45} textAnchor="end" height={80} />
                       <YAxis stroke="#94a3b8" tickFormatter={(v) => `₾${v}`} />
                       <Tooltip 
-                        formatter={(value: number) => [`₾${value.toFixed(0)}`, 'საშ/ღამე']}
+                        formatter={(value: number) => [`₾${value.toFixed(0)}`, language === 'ka' ? 'საშ/ღამე' : 'Avg/Night']}
                         contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155' }}
                       />
                       <Bar dataKey="avgPerNight" fill="#a855f7">
@@ -511,7 +527,7 @@ export default function OTADashboard() {
 
               <Card className="border-slate-700 bg-slate-900/50">
                 <CardHeader>
-                  <CardTitle className="text-lg">ჯავშნები vs შემოსავალი</CardTitle>
+                  <CardTitle className="text-lg">{language === 'ka' ? 'ჯავშნები vs შემოსავალი' : 'Bookings vs Revenue'}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <ResponsiveContainer width="100%" height={300}>
@@ -522,8 +538,8 @@ export default function OTADashboard() {
                       <YAxis yAxisId="right" orientation="right" stroke="#94a3b8" tickFormatter={(v) => `₾${(v/1000).toFixed(0)}k`} />
                       <Tooltip contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155' }} />
                       <Legend />
-                      <Bar yAxisId="left" dataKey="bookings" name="ჯავშნები" fill="#22d3ee" />
-                      <Line yAxisId="right" type="monotone" dataKey="revenue" name="შემოსავალი" stroke="#10b981" strokeWidth={2} />
+                      <Bar yAxisId="left" dataKey="bookings" name={language === 'ka' ? 'ჯავშნები' : 'Bookings'} fill="#22d3ee" />
+                      <Line yAxisId="right" type="monotone" dataKey="revenue" name={language === 'ka' ? 'შემოსავალი' : 'Revenue'} stroke="#10b981" strokeWidth={2} />
                     </ComposedChart>
                   </ResponsiveContainer>
                 </CardContent>
@@ -539,7 +555,7 @@ export default function OTADashboard() {
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
                   <TrendingUp className="h-5 w-5 text-emerald-400" />
-                  თვიური შემოსავლის ტრენდი
+                  {language === 'ka' ? 'თვიური შემოსავლის ტრენდი' : 'Monthly Revenue Trend'}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -551,7 +567,7 @@ export default function OTADashboard() {
                     <Tooltip 
                       formatter={(value: number, name: string) => [
                         `₾${value.toLocaleString('ka-GE', { maximumFractionDigits: 0 })}`,
-                        name === 'revenue' ? 'შემოსავალი' : name
+                        name === 'revenue' ? (language === 'ka' ? 'შემოსავალი' : 'Revenue') : name
                       ]}
                       contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155' }}
                     />
@@ -565,7 +581,7 @@ export default function OTADashboard() {
               {/* Monthly Bookings */}
               <Card className="border-slate-700 bg-slate-900/50">
                 <CardHeader>
-                  <CardTitle className="text-lg">თვიური ჯავშნები</CardTitle>
+                  <CardTitle className="text-lg">{language === 'ka' ? 'თვიური ჯავშნები' : 'Monthly Bookings'}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <ResponsiveContainer width="100%" height={250}>
@@ -574,7 +590,7 @@ export default function OTADashboard() {
                       <XAxis dataKey="label" stroke="#94a3b8" />
                       <YAxis stroke="#94a3b8" />
                       <Tooltip contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155' }} />
-                      <Bar dataKey="bookings" fill="#a855f7" name="ჯავშნები" />
+                      <Bar dataKey="bookings" fill="#a855f7" name={language === 'ka' ? 'ჯავშნები' : 'Bookings'} />
                     </BarChart>
                   </ResponsiveContainer>
                 </CardContent>
@@ -583,7 +599,7 @@ export default function OTADashboard() {
               {/* Average Price per Night */}
               <Card className="border-slate-700 bg-slate-900/50">
                 <CardHeader>
-                  <CardTitle className="text-lg">საშუალო ფასი ღამეში (თვეების მიხედვით)</CardTitle>
+                  <CardTitle className="text-lg">{language === 'ka' ? 'საშუალო ფასი ღამეში (თვეების მიხედვით)' : 'Average Price per Night (by Month)'}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <ResponsiveContainer width="100%" height={250}>
@@ -592,7 +608,7 @@ export default function OTADashboard() {
                       <XAxis dataKey="label" stroke="#94a3b8" />
                       <YAxis stroke="#94a3b8" tickFormatter={(v) => `₾${v}`} />
                       <Tooltip 
-                        formatter={(value: number) => [`₾${value.toFixed(0)}`, 'საშ/ღამე']}
+                        formatter={(value: number) => [`₾${value.toFixed(0)}`, language === 'ka' ? 'საშ/ღამე' : 'Avg/Night']}
                         contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155' }}
                       />
                       <Line type="monotone" dataKey="avgPerNight" stroke="#22d3ee" strokeWidth={2} dot={{ fill: '#22d3ee' }} />
@@ -605,18 +621,18 @@ export default function OTADashboard() {
             {/* Monthly Details Table */}
             <Card className="border-slate-700 bg-slate-900/50">
               <CardHeader>
-                <CardTitle className="text-lg">თვიური დეტალური ცხრილი</CardTitle>
+                <CardTitle className="text-lg">{language === 'ka' ? 'თვიური დეტალური ცხრილი' : 'Monthly Details Table'}</CardTitle>
               </CardHeader>
               <CardContent>
                 <Table>
                   <TableHeader>
                     <TableRow className="border-slate-700">
-                      <TableHead>თვე</TableHead>
-                      <TableHead className="text-right">ჯავშნები</TableHead>
-                      <TableHead className="text-right">შემოსავალი</TableHead>
-                      <TableHead className="text-right">ღამეები</TableHead>
-                      <TableHead className="text-right">საშ/ღამე</TableHead>
-                      <TableHead className="text-right">ცვლილება</TableHead>
+                      <TableHead>{language === 'ka' ? 'თვე' : 'Month'}</TableHead>
+                      <TableHead className="text-right">{language === 'ka' ? 'ჯავშნები' : 'Bookings'}</TableHead>
+                      <TableHead className="text-right">{language === 'ka' ? 'შემოსავალი' : 'Revenue'}</TableHead>
+                      <TableHead className="text-right">{language === 'ka' ? 'ღამეები' : 'Nights'}</TableHead>
+                      <TableHead className="text-right">{language === 'ka' ? 'საშ/ღამე' : 'Avg/Night'}</TableHead>
+                      <TableHead className="text-right">{language === 'ka' ? 'ცვლილება' : 'Change'}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -653,7 +669,7 @@ export default function OTADashboard() {
             {/* Channel Performance Over Time */}
             <Card className="border-slate-700 bg-slate-900/50">
               <CardHeader>
-                <CardTitle className="text-lg">არხების შემოსავალი დროში</CardTitle>
+                <CardTitle className="text-lg">{language === 'ka' ? 'არხების შემოსავალი დროში' : 'Channel Revenue Over Time'}</CardTitle>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={400}>
@@ -669,7 +685,7 @@ export default function OTADashboard() {
                       contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155' }}
                     />
                     <Legend />
-                    <Line type="monotone" dataKey="revenue" name="შემოსავალი" stroke="#10b981" strokeWidth={2} />
+                    <Line type="monotone" dataKey="revenue" name={language === 'ka' ? 'შემოსავალი' : 'Revenue'} stroke="#10b981" strokeWidth={2} />
                   </LineChart>
                 </ResponsiveContainer>
               </CardContent>
@@ -688,8 +704,8 @@ export default function OTADashboard() {
                   <CardContent>
                     <p className="text-2xl font-bold text-emerald-400">₾{channel.revenue.toLocaleString('ka-GE', { maximumFractionDigits: 0 })}</p>
                     <div className="flex justify-between text-xs text-muted-foreground mt-2">
-                      <span>{channel.bookings} ჯავშანი</span>
-                      <span>₾{channel.avgPerNight.toFixed(0)}/ღამე</span>
+                      <span>{channel.bookings} {language === 'ka' ? 'ჯავშანი' : 'bookings'}</span>
+                      <span>₾{channel.avgPerNight.toFixed(0)}/{language === 'ka' ? 'ღამე' : 'night'}</span>
                     </div>
                   </CardContent>
                 </Card>
@@ -704,9 +720,9 @@ export default function OTADashboard() {
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
                   <Sparkles className="h-5 w-5 text-cyan-400" />
-                  AI ანალიზი - OTA არხების ისტორია
+                  {language === 'ka' ? 'AI ანალიზი - OTA არხების ისტორია' : 'AI Analysis - OTA Channel History'}
                 </CardTitle>
-                <CardDescription>თითოეული არხის პირველი ჯავშნიდან დღემდე დეტალური ანალიზი</CardDescription>
+                <CardDescription>{language === 'ka' ? 'თითოეული არხის პირველი ჯავშნიდან დღემდე დეტალური ანალიზი' : 'Detailed analysis from first booking to today for each channel'}</CardDescription>
               </CardHeader>
             </Card>
 
@@ -718,31 +734,31 @@ export default function OTADashboard() {
                       <div className="w-4 h-4 rounded-full" style={{ backgroundColor: analysis.color }} />
                       <CardTitle className="text-xl">{analysis.channel}</CardTitle>
                       <Badge variant="outline" className="border-cyan-500/50 text-cyan-400">
-                        აქტიური {analysis.daysActive} დღე
+                        {language === 'ka' ? `აქტიური ${analysis.daysActive} დღე` : `Active ${analysis.daysActive} days`}
                       </Badge>
                     </div>
                     <div className="text-right">
                       <p className="text-2xl font-bold text-emerald-400">₾{analysis.totalRevenue.toLocaleString('ka-GE', { maximumFractionDigits: 0 })}</p>
-                      <p className="text-sm text-muted-foreground">სულ შემოსავალი</p>
+                      <p className="text-sm text-muted-foreground">{t('ota.totalRevenue')}</p>
                     </div>
                   </div>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                     <div className="bg-slate-800/50 p-3 rounded-lg">
-                      <p className="text-xs text-muted-foreground">პირველი ჯავშანი</p>
+                      <p className="text-xs text-muted-foreground">{language === 'ka' ? 'პირველი ჯავშანი' : 'First Booking'}</p>
                       <p className="text-lg font-semibold">{analysis.firstDate}</p>
                     </div>
                     <div className="bg-slate-800/50 p-3 rounded-lg">
-                      <p className="text-xs text-muted-foreground">სულ ჯავშნები</p>
+                      <p className="text-xs text-muted-foreground">{language === 'ka' ? 'სულ ჯავშნები' : 'Total Bookings'}</p>
                       <p className="text-lg font-semibold">{analysis.totalBookings}</p>
                     </div>
                     <div className="bg-slate-800/50 p-3 rounded-lg">
-                      <p className="text-xs text-muted-foreground">საშ. თვეში</p>
+                      <p className="text-xs text-muted-foreground">{language === 'ka' ? 'საშ. თვეში' : 'Avg/Month'}</p>
                       <p className="text-lg font-semibold text-emerald-400">₾{analysis.avgRevenuePerMonth}</p>
                     </div>
                     <div className="bg-slate-800/50 p-3 rounded-lg">
-                      <p className="text-xs text-muted-foreground">საუკეთესო თვე</p>
+                      <p className="text-xs text-muted-foreground">{language === 'ka' ? 'საუკეთესო თვე' : 'Best Month'}</p>
                       <p className="text-lg font-semibold text-cyan-400">{analysis.bestMonth}</p>
                     </div>
                   </div>
@@ -750,7 +766,7 @@ export default function OTADashboard() {
                     <div className="flex items-start gap-2">
                       <Brain className="h-5 w-5 text-cyan-400 mt-0.5" />
                       <div>
-                        <p className="text-sm font-medium text-cyan-400">AI ინსაითი</p>
+                        <p className="text-sm font-medium text-cyan-400">{language === 'ka' ? 'AI ინსაითი' : 'AI Insight'}</p>
                         <p className="text-sm text-slate-300 mt-1">
                           {analysis.channel} არხი აქტიურია {analysis.daysActive} დღის განმავლობაში ({analysis.monthsActive} თვე). 
                           საშუალოდ თვეში მოაქვს ₾{analysis.avgRevenuePerMonth} და {analysis.avgBookingsPerMonth} ჯავშანი. 
@@ -774,8 +790,8 @@ export default function OTADashboard() {
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle className="text-lg">ბოლო ჯავშნები</CardTitle>
-                <CardDescription>ინდივიდუალური ჯავშნების დეტალები</CardDescription>
+                <CardTitle className="text-lg">{language === 'ka' ? 'ბოლო ჯავშნები' : 'Recent Bookings'}</CardTitle>
+                <CardDescription>{language === 'ka' ? 'ინდივიდუალური ჯავშნების დეტალები' : 'Individual booking details'}</CardDescription>
               </div>
               <Button 
                 variant="outline" 
@@ -784,7 +800,7 @@ export default function OTADashboard() {
                 onClick={() => {
                   const dataToExport = bookingsData?.bookings || [];
                   if (dataToExport.length === 0) {
-                    toast.error('ექსპორტისთვის მონაცემები არ არის');
+                    toast.error(language === 'ka' ? 'ექსპორტისთვის მონაცემები არ არის' : 'No data to export');
                     return;
                   }
                   const ws = XLSX.utils.json_to_sheet(dataToExport.map((b: any) => ({
@@ -802,11 +818,11 @@ export default function OTADashboard() {
                   XLSX.utils.book_append_sheet(wb, ws, 'ჯავშნები');
                   const filterInfo = `${bookingsChannel !== 'all' ? bookingsChannel : 'ყველა'}_${bookingsStatus !== 'all' ? bookingsStatus : 'ყველა'}`;
                   XLSX.writeFile(wb, `OTA_ჯავშნები_${filterInfo}_${new Date().toISOString().split('T')[0]}.xlsx`);
-                  toast.success('ექსპორტი დასრულდა', { description: `${dataToExport.length} ჯავშანი ექსპორტირებულია` });
+                  toast.success(language === 'ka' ? 'ექსპორტი დასრულდა' : 'Export complete', { description: language === 'ka' ? `${dataToExport.length} ჯავშანი ექსპორტირებულია` : `${dataToExport.length} bookings exported` });
                 }}
               >
                 <Download className="h-4 w-4 mr-2" />
-                Excel ექსპორტი
+                {language === 'ka' ? 'Excel ექსპორტი' : 'Excel Export'}
               </Button>
             </div>
           </CardHeader>
@@ -815,7 +831,7 @@ export default function OTADashboard() {
             <div className="flex flex-wrap gap-4 mb-4">
               <div className="flex-1 min-w-[200px]">
                 <Input
-                  placeholder="ძებნა..."
+                  placeholder={language === 'ka' ? 'ძებნა...' : 'Search...'}
                   value={bookingsSearch}
                   onChange={(e) => setBookingsSearch(e.target.value)}
                   className="bg-slate-800 border-slate-700"
@@ -823,10 +839,10 @@ export default function OTADashboard() {
               </div>
               <Select value={bookingsChannel} onValueChange={setBookingsChannel}>
                 <SelectTrigger className="w-[180px] bg-slate-800 border-slate-700">
-                  <SelectValue placeholder="არხი" />
+                  <SelectValue placeholder={language === 'ka' ? 'არხი' : 'Channel'} />
                 </SelectTrigger>
                 <SelectContent className="bg-slate-800 border-slate-700">
-                  <SelectItem value="all">ყველა არხი</SelectItem>
+                  <SelectItem value="all">{language === 'ka' ? 'ყველა არხი' : 'All Channels'}</SelectItem>
                   {chartData.map(c => (
                     <SelectItem key={c.name} value={c.name}>{c.name}</SelectItem>
                   ))}
@@ -834,13 +850,13 @@ export default function OTADashboard() {
               </Select>
               <Select value={bookingsStatus} onValueChange={setBookingsStatus}>
                 <SelectTrigger className="w-[180px] bg-slate-800 border-slate-700">
-                  <SelectValue placeholder="სტატუსი" />
+                  <SelectValue placeholder={language === 'ka' ? 'სტატუსი' : 'Status'} />
                 </SelectTrigger>
                 <SelectContent className="bg-slate-800 border-slate-700">
-                  <SelectItem value="all">ყველა</SelectItem>
-                  <SelectItem value="confirmed">დადასტურებული</SelectItem>
-                  <SelectItem value="completed">დასრულებული</SelectItem>
-                  <SelectItem value="cancelled">გაუქმებული</SelectItem>
+                  <SelectItem value="all">{language === 'ka' ? 'ყველა' : 'All'}</SelectItem>
+                  <SelectItem value="confirmed">{language === 'ka' ? 'დადასტურებული' : 'Confirmed'}</SelectItem>
+                  <SelectItem value="completed">{language === 'ka' ? 'დასრულებული' : 'Completed'}</SelectItem>
+                  <SelectItem value="cancelled">{language === 'ka' ? 'გაუქმებული' : 'Cancelled'}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -849,15 +865,15 @@ export default function OTADashboard() {
             <Table>
               <TableHeader>
                 <TableRow className="border-slate-700">
-                  <TableHead>ჯავშნის #</TableHead>
-                  <TableHead>სტუმარი</TableHead>
-                  <TableHead>ოთახი</TableHead>
-                  <TableHead>არხი</TableHead>
+                  <TableHead>{language === 'ka' ? 'ჯავშნის #' : 'Booking #'}</TableHead>
+                  <TableHead>{language === 'ka' ? 'სტუმარი' : 'Guest'}</TableHead>
+                  <TableHead>{language === 'ka' ? 'ოთახი' : 'Room'}</TableHead>
+                  <TableHead>{language === 'ka' ? 'არხი' : 'Channel'}</TableHead>
                   <TableHead>Check-in</TableHead>
                   <TableHead>Check-out</TableHead>
-                  <TableHead className="text-right">ღამეები</TableHead>
-                  <TableHead className="text-right">თანხა</TableHead>
-                  <TableHead>სტატუსი</TableHead>
+                  <TableHead className="text-right">{language === 'ka' ? 'ღამეები' : 'Nights'}</TableHead>
+                  <TableHead className="text-right">{language === 'ka' ? 'თანხა' : 'Amount'}</TableHead>
+                  <TableHead>{language === 'ka' ? 'სტატუსი' : 'Status'}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -897,8 +913,8 @@ export default function OTADashboard() {
                           'bg-red-500/20 text-red-400 border-red-500/50'
                         }
                       >
-                        {booking.status === 'confirmed' ? 'დადასტურებული' : 
-                         booking.status === 'completed' ? 'დასრულებული' : 'გაუქმებული'}
+                        {booking.status === 'confirmed' ? (language === 'ka' ? 'დადასტურებული' : 'Confirmed') : 
+                         booking.status === 'completed' ? (language === 'ka' ? 'დასრულებული' : 'Completed') : (language === 'ka' ? 'გაუქმებული' : 'Cancelled')}
                       </Badge>
                     </TableCell>
                   </TableRow>
@@ -910,7 +926,7 @@ export default function OTADashboard() {
             {bookingsData && bookingsData.totalPages > 1 && (
               <div className="flex items-center justify-between mt-4">
                 <p className="text-sm text-muted-foreground">
-                  ნაჩვენებია {((bookingsPage - 1) * 15) + 1}-{Math.min(bookingsPage * 15, bookingsData.total)} / {bookingsData.total}
+                  {language === 'ka' ? 'ნაჩვენებია' : 'Showing'} {((bookingsPage - 1) * 15) + 1}-{Math.min(bookingsPage * 15, bookingsData.total)} / {bookingsData.total}
                 </p>
                 <div className="flex gap-2">
                   <Button

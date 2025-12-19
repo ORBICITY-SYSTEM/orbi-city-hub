@@ -6,6 +6,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { DemoModeProvider } from "./contexts/DemoModeContext";
 import { RoleProvider } from "./contexts/RoleContext";
+import { LanguageProvider } from "./contexts/LanguageContext";
 import ModularLayout from "./components/ModularLayout";
 import { UniversalChatPopup } from "./components/UniversalChatPopup";
 import { PageLoadingSkeleton } from "./components/LoadingSkeleton";
@@ -37,6 +38,8 @@ const GuestCommunication = lazy(() => import("./pages/reservations/GuestCommunic
 const ReviewsDashboard = lazy(() => import("./pages/reservations/ReviewsDashboard"));
 const OTADashboard = lazy(() => import("./pages/reservations/OTADashboard"));
 const Automations = lazy(() => import("./pages/reservations/Automations"));
+const AIResponseQueue = lazy(() => import("./pages/reservations/AIResponseQueue"));
+const TelegramBot = lazy(() => import("./pages/reservations/TelegramBot"));
 
 // Email Management Module - Lazy
 const EmailManagement = lazy(() => import("./pages/EmailManagement"));
@@ -105,6 +108,9 @@ function RouterContent() {
         <Route path="/reservations/guests" component={ReviewsDashboard} />
         <Route path="/reservations/ota" component={OTADashboard} />
         <Route path="/reservations/automations" component={Automations} />
+        <Route path="/reservations/ai-responses" component={AIResponseQueue} />
+        <Route path="/reservations/whatsapp-bot" component={WhatsAppQuickStart} />
+        <Route path="/reservations/telegram-bot" component={TelegramBot} />
 
         {/* Email Management Module */}
         <Route path="/email-management" component={EmailManagement} />
@@ -150,15 +156,17 @@ function App() {
   return (
     <ErrorBoundary>
       <ThemeProvider defaultTheme="dark">
-        <RoleProvider>
-          <DemoModeProvider>
-            <TooltipProvider>
-              <Toaster />
-              <Router />
-              <UniversalChatPopup />
-            </TooltipProvider>
-          </DemoModeProvider>
-        </RoleProvider>
+        <LanguageProvider>
+          <RoleProvider>
+            <DemoModeProvider>
+              <TooltipProvider>
+                <Toaster />
+                <Router />
+                <UniversalChatPopup />
+              </TooltipProvider>
+            </DemoModeProvider>
+          </RoleProvider>
+        </LanguageProvider>
       </ThemeProvider>
     </ErrorBoundary>
   );
