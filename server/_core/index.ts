@@ -53,6 +53,122 @@ async function startServer() {
   app.use("/api/oauth/", authLimiter);
   // OAuth callback under /api/oauth/callback
   registerOAuthRoutes(app);
+  // Outscraper webhook endpoint (raw Express, not tRPC)
+  app.post("/api/webhooks/outscraper", async (req, res) => {
+    try {
+      const data = req.body;
+      console.log("[Outscraper Webhook] Received data:", JSON.stringify(data).slice(0, 500));
+      
+      // Import database and schema
+      const { getDb } = await import("../db");
+      const { guestReviews, notifications } = await import("../../drizzle/schema");
+      const { eq, and, or } = await import("drizzle-orm");
+      
+      const db = await getDb();
+      if (!db) {
+        return res.status(500).json({ success: false, error: "Database not available" });
+      }
+      
+      // Outscraper sends reviews in different formats
+      let reviews: any[] = [];
+      
+      if (data.data && Array.isArray(data.data)) {
+        // Format: { data: [{ reviews_data: [...] }] }
+        for (const place of data.data) {
+          if (place.reviews_data && Array.isArray(place.reviews_data)) {
+            reviews = reviews.concat(place.reviews_data);
+          }
+        }
+      } else if (Array.isArray(data)) {
+        // Format: direct array of reviews
+        reviews = data;
+      } else if (data.reviews_data) {
+        // Format: { reviews_data: [...] }
+        reviews = data.reviews_data;
+      }
+      
+      console.log(`[Outscraper Webhook] Processing ${reviews.length} reviews`);
+      
+      let imported = 0;
+      let skipped = 0;
+      
+      for (const review of reviews) {
+        // Check if review already exists by reviewer name and source
+        const reviewerName = review.author_title || review.reviewer_name || "Anonymous";
+        const existingReviews = await db.select()
+          .from(guestReviews)
+          .where(and(
+            eq(guestReviews.reviewerName, reviewerName),
+            eq(guestReviews.source, "google")
+          ))
+          .limit(1);
+        
+        if (existingReviews.length > 0) {
+          skipped++;
+          continue;
+        }
+        
+        // Parse rating
+        const rating = review.review_rating || review.rating || 5;
+        
+        // Determine sentiment
+        let sentiment = "neutral";
+        if (rating >= 4) sentiment = "positive";
+        else if (rating <= 2) sentiment = "negative";
+        
+        // Parse date
+        let reviewDate = new Date();
+        if (review.review_datetime_utc) {
+          reviewDate = new Date(review.review_datetime_utc);
+        } else if (review.review_timestamp) {
+          reviewDate = new Date(review.review_timestamp * 1000);
+        }
+        
+        // Insert review (using correct column names from schema)
+        await db.insert(guestReviews).values({
+          reviewerName: reviewerName,
+          source: "google",
+          rating,
+          content: review.review_text || review.text || "",
+          sentiment,
+          language: review.review_language || "en",
+          topics: [],
+          externalId: review.review_id || null,
+          hasReply: !!review.owner_answer,
+          replyContent: review.owner_answer || null,
+          replyDate: review.owner_answer_timestamp_datetime_utc 
+            ? new Date(review.owner_answer_timestamp_datetime_utc) 
+            : null,
+          reviewDate,
+        });
+        
+        imported++;
+        
+        // Create notification for new review
+        const isNegative = rating <= 2;
+        await db.insert(notifications).values({
+          type: isNegative ? "warning" : "info",
+          priority: isNegative ? "urgent" : "normal",
+          title: isNegative ? "⚠️ უარყოფითი მიმოხილვა" : "ახალი Google მიმოხილვა",
+          message: `${reviewerName} - ${rating}⭐: ${(review.review_text || "").slice(0, 100)}...`,
+          isRead: false,
+        });
+      }
+      
+      console.log(`[Outscraper Webhook] Imported: ${imported}, Skipped: ${skipped}`);
+      
+      res.json({ 
+        success: true, 
+        imported, 
+        skipped,
+        total: reviews.length 
+      });
+    } catch (error) {
+      console.error("[Outscraper Webhook] Error:", error);
+      res.status(500).json({ success: false, error: String(error) });
+    }
+  });
+
   // tRPC API
   app.use(
     "/api/trpc",

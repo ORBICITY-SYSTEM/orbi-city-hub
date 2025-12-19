@@ -5,16 +5,40 @@
  * to fetch reviews, ratings, and business information.
  * 
  * API Documentation: https://developers.google.com/my-business/content/review-data
- * 
- * Setup Requirements:
- * 1. Enable Google My Business API in Google Cloud Console
- * 2. Create OAuth 2.0 credentials
- * 3. Add credentials to environment variables:
- *    - GOOGLE_BUSINESS_PROFILE_API_KEY
- *    - GOOGLE_BUSINESS_LOCATION_ID
  */
 
-interface GoogleReview {
+import { google } from 'googleapis';
+
+const CLIENT_ID = process.env.GOOGLE_BUSINESS_CLIENT_ID;
+const CLIENT_SECRET = process.env.GOOGLE_BUSINESS_CLIENT_SECRET;
+const REDIRECT_URI = process.env.GOOGLE_BUSINESS_REDIRECT_URI || 'http://localhost:3000/api/google-business/callback';
+
+// OAuth2 client
+let oauth2Client: any = null;
+
+function getOAuth2Client() {
+  if (!oauth2Client && CLIENT_ID && CLIENT_SECRET) {
+    oauth2Client = new google.auth.OAuth2(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI);
+  }
+  return oauth2Client;
+}
+
+// Store refresh token (in production, save to database)
+let storedRefreshToken: string | null = null;
+
+export function setRefreshToken(token: string) {
+  storedRefreshToken = token;
+  const client = getOAuth2Client();
+  if (client) {
+    client.setCredentials({ refresh_token: token });
+  }
+}
+
+export function getRefreshToken(): string | null {
+  return storedRefreshToken;
+}
+
+export interface GoogleReview {
   reviewId: string;
   reviewer: {
     profilePhotoUrl?: string;
@@ -31,7 +55,7 @@ interface GoogleReview {
   };
 }
 
-interface GoogleBusinessReviewsResponse {
+export interface GoogleBusinessReviewsResponse {
   reviews: GoogleReview[];
   averageRating: number;
   totalReviewCount: number;
@@ -39,98 +63,158 @@ interface GoogleBusinessReviewsResponse {
 }
 
 /**
+ * Get OAuth2 authorization URL
+ */
+export function getAuthUrl(): string {
+  const client = getOAuth2Client();
+  if (!client) {
+    throw new Error('OAuth2 client not configured');
+  }
+  
+  return client.generateAuthUrl({
+    access_type: 'offline',
+    scope: [
+      'https://www.googleapis.com/auth/business.manage',
+    ],
+    prompt: 'consent',
+  });
+}
+
+/**
+ * Exchange authorization code for tokens
+ */
+export async function exchangeCodeForTokens(code: string) {
+  const client = getOAuth2Client();
+  if (!client) {
+    throw new Error('OAuth2 client not configured');
+  }
+  
+  const { tokens } = await client.getToken(code);
+  client.setCredentials(tokens);
+  
+  if (tokens.refresh_token) {
+    storedRefreshToken = tokens.refresh_token;
+  }
+  
+  return tokens;
+}
+
+/**
  * Fetch reviews from Google Business Profile
- * 
- * @param locationId - Google Business Profile location ID (format: accounts/{accountId}/locations/{locationId})
- * @param pageSize - Number of reviews to fetch (max 50)
- * @param pageToken - Token for pagination
- * @returns Reviews data
  */
 export async function fetchGoogleBusinessReviews(
+  accountId: string,
   locationId: string,
-  pageSize: number = 10,
+  pageSize: number = 50,
   pageToken?: string
 ): Promise<GoogleBusinessReviewsResponse> {
-  // Mock data for development
-  // TODO: Replace with actual API call when credentials are configured
+  const client = getOAuth2Client();
   
-  const mockReviews: GoogleReview[] = [
-    {
-      reviewId: "review_1",
-      reviewer: {
-        displayName: "John Smith",
-        isAnonymous: false,
-        profilePhotoUrl: "https://lh3.googleusercontent.com/a/default-user",
-      },
-      starRating: "FIVE",
-      comment: "Amazing location! The apartment was clean, modern, and had a stunning view of the Black Sea. Perfect for a family vacation in Batumi.",
-      createTime: "2025-01-15T10:30:00Z",
-      updateTime: "2025-01-15T10:30:00Z",
-      reviewReply: {
-        comment: "Thank you for your wonderful review! We're thrilled you enjoyed your stay at ORBI City.",
-        updateTime: "2025-01-15T14:20:00Z",
-      },
-    },
-    {
-      reviewId: "review_2",
-      reviewer: {
-        displayName: "Maria Garcia",
-        isAnonymous: false,
-      },
-      starRating: "FIVE",
-      comment: "Excellent service and beautiful apartments. The staff was very helpful and responsive. Highly recommend!",
-      createTime: "2025-01-10T08:15:00Z",
-      updateTime: "2025-01-10T08:15:00Z",
-    },
-    {
-      reviewId: "review_3",
-      reviewer: {
-        displayName: "David Wilson",
-        isAnonymous: false,
-      },
-      starRating: "FOUR",
-      comment: "Great location near the beach. The apartment was spacious and well-equipped. Only minor issue was the Wi-Fi speed.",
-      createTime: "2025-01-05T16:45:00Z",
-      updateTime: "2025-01-05T16:45:00Z",
-      reviewReply: {
-        comment: "Thank you for your feedback! We're working on upgrading our Wi-Fi infrastructure.",
-        updateTime: "2025-01-06T09:00:00Z",
-      },
-    },
-    {
-      reviewId: "review_4",
-      reviewer: {
-        displayName: "Anna Kowalski",
-        isAnonymous: false,
-      },
-      starRating: "FIVE",
-      comment: "Perfect stay! Clean, modern, and the view from the balcony is breathtaking. Will definitely come back!",
-      createTime: "2024-12-28T12:00:00Z",
-      updateTime: "2024-12-28T12:00:00Z",
-    },
-    {
-      reviewId: "review_5",
-      reviewer: {
-        displayName: "Ahmed Hassan",
-        isAnonymous: false,
-      },
-      starRating: "FIVE",
-      comment: "Outstanding property! The management team was professional and the apartment exceeded our expectations.",
-      createTime: "2024-12-20T14:30:00Z",
-      updateTime: "2024-12-20T14:30:00Z",
-    },
-  ];
+  if (!client || !storedRefreshToken) {
+    console.log('Google Business Profile not authenticated, returning empty reviews');
+    return {
+      reviews: [],
+      averageRating: 0,
+      totalReviewCount: 0,
+    };
+  }
 
-  // Calculate average rating
-  const ratingMap = { ONE: 1, TWO: 2, THREE: 3, FOUR: 4, FIVE: 5 };
-  const totalStars = mockReviews.reduce((sum, review) => sum + ratingMap[review.starRating], 0);
-  const averageRating = totalStars / mockReviews.length;
+  try {
+    // Ensure we have valid credentials
+    client.setCredentials({ refresh_token: storedRefreshToken });
+    
+    // Use the My Business API
+    const mybusiness = google.mybusinessaccountmanagement({ version: 'v1', auth: client });
+    
+    // For reviews, we need to use the Business Profile Performance API
+    // or the older My Business API v4
+    const response = await fetch(
+      `https://mybusiness.googleapis.com/v4/accounts/${accountId}/locations/${locationId}/reviews?pageSize=${pageSize}${pageToken ? `&pageToken=${pageToken}` : ''}`,
+      {
+        headers: {
+          'Authorization': `Bearer ${(await client.getAccessToken()).token}`,
+        },
+      }
+    );
 
-  return {
-    reviews: mockReviews,
-    averageRating,
-    totalReviewCount: mockReviews.length,
-  };
+    if (!response.ok) {
+      const error = await response.text();
+      console.error('Google Business API error:', error);
+      throw new Error(`API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    
+    return {
+      reviews: data.reviews || [],
+      averageRating: data.averageRating || 0,
+      totalReviewCount: data.totalReviewCount || 0,
+      nextPageToken: data.nextPageToken,
+    };
+  } catch (error) {
+    console.error('Error fetching Google reviews:', error);
+    return {
+      reviews: [],
+      averageRating: 0,
+      totalReviewCount: 0,
+    };
+  }
+}
+
+/**
+ * List all accounts
+ */
+export async function listAccounts() {
+  const client = getOAuth2Client();
+  
+  if (!client || !storedRefreshToken) {
+    throw new Error('Not authenticated');
+  }
+
+  client.setCredentials({ refresh_token: storedRefreshToken });
+  
+  const response = await fetch(
+    'https://mybusinessaccountmanagement.googleapis.com/v1/accounts',
+    {
+      headers: {
+        'Authorization': `Bearer ${(await client.getAccessToken()).token}`,
+      },
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error(`Failed to list accounts: ${response.status}`);
+  }
+
+  return response.json();
+}
+
+/**
+ * List locations for an account
+ */
+export async function listLocations(accountId: string) {
+  const client = getOAuth2Client();
+  
+  if (!client || !storedRefreshToken) {
+    throw new Error('Not authenticated');
+  }
+
+  client.setCredentials({ refresh_token: storedRefreshToken });
+  
+  const response = await fetch(
+    `https://mybusinessbusinessinformation.googleapis.com/v1/accounts/${accountId}/locations`,
+    {
+      headers: {
+        'Authorization': `Bearer ${(await client.getAccessToken()).token}`,
+      },
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error(`Failed to list locations: ${response.status}`);
+  }
+
+  return response.json();
 }
 
 /**
@@ -143,32 +227,68 @@ export function starRatingToNumber(rating: GoogleReview["starRating"]): number {
 
 /**
  * Reply to a Google Business Profile review
- * 
- * @param reviewName - Full review resource name
- * @param replyText - Reply text
- * @returns Success status
  */
 export async function replyToGoogleReview(
-  reviewName: string,
+  accountId: string,
+  locationId: string,
+  reviewId: string,
   replyText: string
 ): Promise<boolean> {
-  // TODO: Implement actual API call
-  // POST https://mybusiness.googleapis.com/v4/{reviewName}/reply
-  console.log(`Replying to review ${reviewName}: ${replyText}`);
-  return true;
+  const client = getOAuth2Client();
+  
+  if (!client || !storedRefreshToken) {
+    throw new Error('Not authenticated');
+  }
+
+  client.setCredentials({ refresh_token: storedRefreshToken });
+  
+  const response = await fetch(
+    `https://mybusiness.googleapis.com/v4/accounts/${accountId}/locations/${locationId}/reviews/${reviewId}/reply`,
+    {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${(await client.getAccessToken()).token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ comment: replyText }),
+    }
+  );
+
+  return response.ok;
 }
 
 /**
  * Delete a reply to a Google Business Profile review
- * 
- * @param reviewName - Full review resource name
- * @returns Success status
  */
 export async function deleteGoogleReviewReply(
-  reviewName: string
+  accountId: string,
+  locationId: string,
+  reviewId: string
 ): Promise<boolean> {
-  // TODO: Implement actual API call
-  // DELETE https://mybusiness.googleapis.com/v4/{reviewName}/reply
-  console.log(`Deleting reply for review ${reviewName}`);
-  return true;
+  const client = getOAuth2Client();
+  
+  if (!client || !storedRefreshToken) {
+    throw new Error('Not authenticated');
+  }
+
+  client.setCredentials({ refresh_token: storedRefreshToken });
+  
+  const response = await fetch(
+    `https://mybusiness.googleapis.com/v4/accounts/${accountId}/locations/${locationId}/reviews/${reviewId}/reply`,
+    {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${(await client.getAccessToken()).token}`,
+      },
+    }
+  );
+
+  return response.ok;
+}
+
+/**
+ * Check if Google Business Profile is connected
+ */
+export function isConnected(): boolean {
+  return !!(getOAuth2Client() && storedRefreshToken);
 }

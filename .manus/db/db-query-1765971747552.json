@@ -1,0 +1,17 @@
+{
+  "query": "SELECT COUNT(*) as total, AVG(rating) as avgRating, SUM(CASE WHEN sentiment = 'positive' THEN 1 ELSE 0 END) as positive, SUM(CASE WHEN sentiment = 'neutral' THEN 1 ELSE 0 END) as neutral, SUM(CASE WHEN sentiment = 'negative' THEN 1 ELSE 0 END) as negative FROM guestReviews",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user c2qSkVB4gKtEmor.991468648419 --database 4ExKc24KNHdr4pKbTUzsoU --execute SELECT COUNT(*) as total, AVG(rating) as avgRating, SUM(CASE WHEN sentiment = 'positive' THEN 1 ELSE 0 END) as positive, SUM(CASE WHEN sentiment = 'neutral' THEN 1 ELSE 0 END) as neutral, SUM(CASE WHEN sentiment = 'negative' THEN 1 ELSE 0 END) as negative FROM guestReviews",
+  "rows": [
+    {
+      "total": "22",
+      "avgRating": "4.2727",
+      "positive": "17",
+      "neutral": "3",
+      "negative": "2"
+    }
+  ],
+  "messages": [],
+  "stdout": "total\tavgRating\tpositive\tneutral\tnegative\n22\t4.2727\t17\t3\t2\n",
+  "stderr": "",
+  "execution_time_ms": 68
+}

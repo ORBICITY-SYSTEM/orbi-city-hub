@@ -34,6 +34,7 @@ const WebsiteLeads = lazy(() => import("./pages/marketing/WebsiteLeads"));
 const EmailInbox = lazy(() => import("./pages/reservations/EmailInbox"));
 const EmailDetail = lazy(() => import("./pages/reservations/EmailDetail"));
 const GuestCommunication = lazy(() => import("./pages/reservations/GuestCommunication"));
+const ReviewsDashboard = lazy(() => import("./pages/reservations/ReviewsDashboard"));
 const OTADashboard = lazy(() => import("./pages/reservations/OTADashboard"));
 const Automations = lazy(() => import("./pages/reservations/Automations"));
 
@@ -101,7 +102,7 @@ function RouterContent() {
         <Route path="/reservations" component={OTADashboard} />
         <Route path="/reservations/email" component={EmailInbox} />
         <Route path="/reservations/email/:emailId" component={EmailDetail} />
-        <Route path="/reservations/guests" component={GuestCommunication} />
+        <Route path="/reservations/guests" component={ReviewsDashboard} />
         <Route path="/reservations/ota" component={OTADashboard} />
         <Route path="/reservations/automations" component={Automations} />
 

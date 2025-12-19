@@ -1,0 +1,18 @@
+{
+  "query": "SELECT \n  COUNT(*) as total,\n  AVG(rating) as avg_rating,\n  SUM(CASE WHEN sentiment = 'positive' THEN 1 ELSE 0 END) as positive_count,\n  SUM(CASE WHEN sentiment = 'negative' THEN 1 ELSE 0 END) as negative_count,\n  SUM(CASE WHEN hasReply = true THEN 1 ELSE 0 END) as replied_count,\n  SUM(CASE WHEN hasReply = false THEN 1 ELSE 0 END) as pending_count\nFROM guestReviews",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user c2qSkVB4gKtEmor.991468648419 --database 4ExKc24KNHdr4pKbTUzsoU --execute SELECT \n  COUNT(*) as total,\n  AVG(rating) as avg_rating,\n  SUM(CASE WHEN sentiment = 'positive' THEN 1 ELSE 0 END) as positive_count,\n  SUM(CASE WHEN sentiment = 'negative' THEN 1 ELSE 0 END) as negative_count,\n  SUM(CASE WHEN hasReply = true THEN 1 ELSE 0 END) as replied_count,\n  SUM(CASE WHEN hasReply = false THEN 1 ELSE 0 END) as pending_count\nFROM guestReviews",
+  "rows": [
+    {
+      "total": "121",
+      "avg_rating": "3.2231",
+      "positive_count": "63",
+      "negative_count": "50",
+      "replied_count": "55",
+      "pending_count": "66"
+    }
+  ],
+  "messages": [],
+  "stdout": "total\tavg_rating\tpositive_count\tnegative_count\treplied_count\tpending_count\n121\t3.2231\t63\t50\t55\t66\n",
+  "stderr": "",
+  "execution_time_ms": 53
+}

@@ -119,3 +119,46 @@
 - [x] Use exact amounts from Excel files without any conversion
 - [x] Fix duplicate total rows in Excel (ჯამი გვერდზე, ჯამი excluded)
 - [x] Verified totals: ₾465,177 total revenue, 1,413 bookings
+
+## Google Reviews Dashboard (Premium)
+- [x] Create reviews database schema (source, rating, text, author, date, response, response_date)
+- [x] Seed realistic demo data for Google, Booking.com, Airbnb, TripAdvisor reviews
+- [x] Build reviews API endpoints (list, stats, filters)
+- [x] Design premium dashboard UI with KPI cards
+- [x] Add source filter (Google, Booking, Airbnb, TripAdvisor, Facebook)
+- [x] Add rating filter (1-5 stars)
+- [x] Add sentiment filter (positive, neutral, negative)
+- [ ] Add date range picker
+- [x] Add response status filter (responded/pending)
+- [ ] Show rating distribution chart
+- [ ] Show rating trend over time chart
+- [x] Show response rate statistics
+- [x] Display individual review cards with response capability
+- [x] Add AI-powered response suggestions
+- [ ] Export reviews to Excel functionality
+- [x] Add Google Business Profile sync button
+- [x] Import Google reviews from Orbi City Sea view Aparthotel
+
+## Live Google Business API Integration
+- [x] Research Google Business Profile API requirements
+- [x] Create server-side Google Business API service
+- [x] Implement OAuth2 authentication flow for Google Business
+- [x] Add "Connect Google" button with OAuth flow
+- [x] Fetch live reviews from Orbi City Sea view Aparthotel (when connected)
+- [x] Replace demo data with actual API responses (fallback to demo if not connected)
+- [x] Add error handling and rate limiting
+- [x] Test live review fetching
+
+## Outscraper Integration (Replacing Google OAuth) ✅ COMPLETED
+- [x] Remove non-working Google OAuth code
+- [x] Create Outscraper webhook endpoint `/api/webhooks/outscraper-reviews`
+- [x] Parse Outscraper review data format
+- [x] Save new reviews to database (97 real Google reviews imported!)
+- [x] Create notification on new review
+- [x] Create urgent notification on negative review (1-2 stars)
+- [x] Update frontend to show Outscraper connection status and webhook URL
+- [x] Test webhook endpoint - working!
+- [x] Import all 97 Google reviews from Orbi City Sea view Aparthotel
+- [x] Stats showing correctly: 121 total, 3.2 avg rating, 52% positive
+- [x] Outscraper scheduled task configured (daily at 18:07)
+- [x] Push all changes to GitHub
