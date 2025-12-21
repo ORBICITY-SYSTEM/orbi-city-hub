@@ -186,7 +186,7 @@ export default function Home() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-4xl md:text-5xl font-bold text-cyan-400 tracking-tight mb-2">
-                {language === 'ka' ? "CEO Dashboard" : "CEO Dashboard"}
+                {language === 'ka' ? "CEO დაშბორდი" : "CEO Dashboard"}
               </h1>
               <p className="text-lg text-white/90 font-medium">
                 {language === 'ka' ? "ORBI City Sea View / რეალ-ტაიმ მენეჯმენტი" : "ORBI City Sea View / Real-time Management"}

@@ -98,29 +98,30 @@ function RouterContent() {
         <Route path="/finance/expenses" component={FinanceDevelopmentExpenses} />
         <Route path="/finance/powerbi" component={PowerBIFinanceDashboard} />
 
-        {/* Marketing Module */}
+        {/* Marketing Module (restructured) */}
         <Route path="/marketing" component={MarketingDashboard} />
+        <Route path="/marketing/reviews" component={ReviewsDashboard} />
         <Route path="/marketing/ota" component={OTAChannels} />
+        <Route path="/marketing/inbox" component={EmailInbox} />
+        <Route path="/marketing/inbox/:emailId" component={EmailDetail} />
         <Route path="/marketing/leads" component={WebsiteLeads} />
-        <Route path="/marketing/live-chat" component={LiveChat} />
         <Route path="/live-chat" component={LiveChatDashboard} />
 
-        {/* Reservations Module */}
+        {/* Reservations Module (restructured - 5 items only) */}
         <Route path="/reservations" component={OTADashboard} />
-        <Route path="/reservations/email" component={EmailInbox} />
-        <Route path="/reservations/email/:emailId" component={EmailDetail} />
-        <Route path="/reservations/guests" component={ReviewsDashboard} />
-        <Route path="/reservations/ota" component={OTADashboard} />
-        <Route path="/reservations/automations" component={Automations} />
-        <Route path="/reservations/ai-responses" component={AIResponseQueue} />
-        <Route path="/reservations/whatsapp-bot" component={WhatsAppQuickStart} />
-        <Route path="/reservations/telegram-bot" component={TelegramBot} />
+        <Route path="/reservations/list" component={OTADashboard} />
+        <Route path="/reservations/calendar" component={OTADashboard} />
+        <Route path="/reservations/exceptions" component={OTADashboard} />
+        <Route path="/reservations/ai-assistant" component={AIResponseQueue} />
+
+        {/* Integrations Hub (new module) */}
+        <Route path="/integrations" component={Integrations} />
+        <Route path="/integrations/whatsapp" component={WhatsAppQuickStart} />
+        <Route path="/integrations/telegram" component={TelegramBot} />
+        <Route path="/integrations/butler" component={Automations} />
 
         {/* Email Management Module */}
         <Route path="/email-management" component={EmailManagement} />
-
-        {/* Integrations Module */}
-        <Route path="/integrations" component={Integrations} />
 
         {/* Settings Module */}
         <Route path="/settings" component={Settings} />

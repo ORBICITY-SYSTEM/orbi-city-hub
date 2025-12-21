@@ -10,8 +10,8 @@ export const ka: Translations = {
     finance: "ფინანსები",
     marketing: "მარკეტინგი",
     reservations: "რეზერვაციები",
+    integrations: "ინტეგრაციები",
     logistics: "ლოჯისტიკა",
-    whatsappBot: "WhatsApp ბოტი",
   },
   
   // Submenu items
@@ -25,19 +25,23 @@ export const ka: Translations = {
     
     // Marketing
     marketingDashboard: "მთავარი",
-    otaChannels: "OTA არხები",
+    reviewsReputation: "მიმოხილვები და რეპუტაცია",
+    otaPerformance: "OTA შედეგები",
+    communicationsInbox: "კომუნიკაციები",
     webLeads: "ვებ ლიდები",
-    liveChat: "ლაივ ჩატი",
     
-    // Reservations
-    otaDashboard: "მთავარი",
-    aiResponses: "AI პასუხები",
-    butlerAI: "Butler AI",
-    email: "ელფოსტა",
-    reviews: "მიმოხილვები",
-    otaCommand: "OTA მართვა",
+    // Reservations (რესტრუქტურიზებული)
+    reservationsOverview: "მიმოხილვა",
+    reservationsList: "ჯავშნების სია",
+    reservationsCalendar: "კალენდარი / თაიმლაინი",
+    exceptionsIssues: "გამონაკლისები და პრობლემები",
+    aiAssistant: "AI ასისტენტი",
+    
+    // Integrations Hub
+    integrationsHub: "ინტეგრაციების ცენტრი",
     whatsappBot: "WhatsApp ბოტი",
     telegramBot: "Telegram ბოტი",
+    butlerAI: "Butler AI",
     
     // Logistics
     logisticsDashboard: "მთავარი",

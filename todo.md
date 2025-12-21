@@ -476,3 +476,56 @@
 - [ ] Remove Logistics module completely from sidebar
 - [ ] Remove Logistics routes from App.tsx
 - [ ] Keep backend routers intact (no backend changes)
+
+
+## Reservations Module Restructure (Executive Decision 2025-12-21)
+
+### RESERVATIONS - Keep only these 6 items:
+- [ ] Overview (rename from მთავარი)
+- [ ] Reservations List (new - all bookings with filters)
+- [ ] Calendar / Timeline (new - occupancy calendar)
+- [ ] Reservation Details (new - guest profile, payment status)
+- [ ] Exceptions & Issues (new - cancellations, unpaid, overbooking)
+- [ ] AI Assistant (rename from AI პასუხები)
+
+### Move OUT of Reservations:
+- [ ] Butler AI → Operations module
+- [ ] ელფოსტა → Marketing → Communications Inbox
+- [ ] მიმოხილვები → Marketing → Reviews & Reputation
+- [ ] OTA მართვა → Marketing → OTA Performance
+- [ ] WhatsApp ბოტი → Integrations Hub
+- [ ] Telegram ბოტი → Integrations Hub
+
+
+## Reservations Module Restructure (Dec 21, 2025) ✅ COMPLETED
+
+### RESERVATIONS - Now has 5 items only:
+- [x] Overview (მიმოხილვა)
+- [x] Reservations List (ჯავშნების სია)
+- [x] Calendar / Timeline (კალენდარი / თაიმლაინი)
+- [x] Exceptions & Issues (გამონაკლისები და პრობლემები)
+- [x] AI Assistant (AI ასისტენტი)
+
+### Moved OUT of Reservations:
+- [x] Butler AI → Integrations Hub
+- [x] ელფოსტა → Marketing → Communications Inbox (კომუნიკაციები)
+- [x] მიმოხილვები → Marketing → Reviews & Reputation
+- [x] OTA მართვა → Marketing → OTA Performance (შედეგები)
+- [x] WhatsApp ბოტი → Integrations Hub
+- [x] Telegram ბოტი → Integrations Hub
+
+### New Integrations Hub Module Created:
+- [x] Integrations Hub (ინტეგრაციების ცენტრი)
+- [x] WhatsApp Bot
+- [x] Telegram Bot
+- [x] Butler AI
+
+### Marketing Module Updated:
+- [x] Dashboard (მთავარი)
+- [x] Reviews & Reputation (მიმოხილვები და რეპუტაცია)
+- [x] OTA Performance (OTA შედეგები)
+- [x] Communications Inbox (კომუნიკაციები)
+- [x] Web Leads (ვებ ლიდები)
+
+### Logistics Module:
+- [x] Hidden from sidebar (code preserved for future reactivation)

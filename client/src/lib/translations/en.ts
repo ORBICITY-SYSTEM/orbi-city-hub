@@ -8,8 +8,8 @@ export const en = {
     finance: "Finance",
     marketing: "Marketing",
     reservations: "Reservations",
+    integrations: "Integrations",
     logistics: "Logistics",
-    whatsappBot: "WhatsApp Bot",
   },
   
   // Submenu items
@@ -23,19 +23,23 @@ export const en = {
     
     // Marketing
     marketingDashboard: "Dashboard",
-    otaChannels: "OTA Channels",
+    reviewsReputation: "Reviews & Reputation",
+    otaPerformance: "OTA Performance",
+    communicationsInbox: "Communications Inbox",
     webLeads: "Web Leads",
-    liveChat: "Live Chat",
     
-    // Reservations
-    otaDashboard: "Dashboard",
-    aiResponses: "AI Responses",
-    butlerAI: "Butler AI",
-    email: "Email",
-    reviews: "Reviews",
-    otaCommand: "OTA Command",
+    // Reservations (restructured)
+    reservationsOverview: "Overview",
+    reservationsList: "Reservations List",
+    reservationsCalendar: "Calendar / Timeline",
+    exceptionsIssues: "Exceptions & Issues",
+    aiAssistant: "AI Assistant",
+    
+    // Integrations Hub
+    integrationsHub: "Integrations Hub",
     whatsappBot: "WhatsApp Bot",
     telegramBot: "Telegram Bot",
+    butlerAI: "Butler AI",
     
     // Logistics
     logisticsDashboard: "Dashboard",

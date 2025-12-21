@@ -31,7 +31,13 @@ import {
   Rocket,
   Sparkles,
   Bot,
-  Send
+  Send,
+  Star,
+  List,
+  CalendarDays,
+  AlertTriangle,
+  Settings,
+  Plug
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
@@ -69,9 +75,10 @@ const modules: ModuleItem[] = [
     color: "text-cyan-400",
     subItems: [
       { nameKey: "submenu.marketingDashboard", path: "/marketing", icon: LayoutDashboard },
-      { nameKey: "submenu.otaChannels", path: "/marketing/ota", icon: Globe },
+      { nameKey: "submenu.reviewsReputation", path: "/marketing/reviews", icon: Star },
+      { nameKey: "submenu.otaPerformance", path: "/marketing/ota", icon: Globe },
+      { nameKey: "submenu.communicationsInbox", path: "/marketing/inbox", icon: MessageCircle },
       { nameKey: "submenu.webLeads", path: "/marketing/leads", icon: Users },
-      { nameKey: "submenu.liveChat", path: "/marketing/live-chat", icon: MessageCircle },
     ]
   },
   {
@@ -79,14 +86,22 @@ const modules: ModuleItem[] = [
     icon: Calendar,
     color: "text-cyan-400",
     subItems: [
-      { nameKey: "submenu.otaDashboard", path: "/reservations", icon: LayoutDashboard },
-      { nameKey: "submenu.aiResponses", path: "/reservations/ai-responses", icon: Sparkles },
-      { nameKey: "submenu.butlerAI", path: "/reservations/automations", icon: Bot },
-      { nameKey: "submenu.email", path: "/reservations/email", icon: Mail },
-      { nameKey: "submenu.reviews", path: "/reservations/guests", icon: Users },
-      { nameKey: "submenu.otaCommand", path: "/reservations/ota", icon: Globe },
-      { nameKey: "submenu.whatsappBot", path: "/whatsapp", icon: MessageCircle },
-      { nameKey: "submenu.telegramBot", path: "/reservations/telegram-bot", icon: Send },
+      { nameKey: "submenu.reservationsOverview", path: "/reservations", icon: LayoutDashboard },
+      { nameKey: "submenu.reservationsList", path: "/reservations/list", icon: List },
+      { nameKey: "submenu.reservationsCalendar", path: "/reservations/calendar", icon: CalendarDays },
+      { nameKey: "submenu.exceptionsIssues", path: "/reservations/exceptions", icon: AlertTriangle },
+      { nameKey: "submenu.aiAssistant", path: "/reservations/ai-assistant", icon: Sparkles },
+    ]
+  },
+  {
+    nameKey: "nav.integrations",
+    icon: Plug,
+    color: "text-cyan-400",
+    subItems: [
+      { nameKey: "submenu.integrationsHub", path: "/integrations", icon: LayoutDashboard },
+      { nameKey: "submenu.whatsappBot", path: "/integrations/whatsapp", icon: MessageCircle },
+      { nameKey: "submenu.telegramBot", path: "/integrations/telegram", icon: Send },
+      { nameKey: "submenu.butlerAI", path: "/integrations/butler", icon: Bot },
     ]
   },
   // HIDDEN: Logistics module - uncomment to re-enable
