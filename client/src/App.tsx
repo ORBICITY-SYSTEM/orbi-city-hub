@@ -98,12 +98,13 @@ function RouterContent() {
         <Route path="/finance/expenses" component={FinanceDevelopmentExpenses} />
         <Route path="/finance/powerbi" component={PowerBIFinanceDashboard} />
 
-        {/* Marketing Module (restructured) */}
+        {/* Marketing Module (workflow-based) */}
         <Route path="/marketing" component={MarketingDashboard} />
         <Route path="/marketing/reviews" component={ReviewsDashboard} />
+        <Route path="/marketing/reputation" component={ReviewsDashboard} />
         <Route path="/marketing/ota" component={OTAChannels} />
-        <Route path="/marketing/inbox" component={EmailInbox} />
-        <Route path="/marketing/inbox/:emailId" component={EmailDetail} />
+        <Route path="/marketing/communications" component={EmailInbox} />
+        <Route path="/marketing/communications/:emailId" component={EmailDetail} />
         <Route path="/marketing/leads" component={WebsiteLeads} />
         <Route path="/live-chat" component={LiveChatDashboard} />
 

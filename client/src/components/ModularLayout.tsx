@@ -37,7 +37,12 @@ import {
   CalendarDays,
   AlertTriangle,
   Settings,
-  Plug
+  Plug,
+  Inbox,
+  Archive,
+  LineChart,
+  Target,
+  Zap
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
@@ -57,17 +62,18 @@ interface ModuleItem {
 }
 
 const modules: ModuleItem[] = [
-  // 1. MARKETING (first)
+  // 1. MARKETING (first) - Workflow-based navigation
   {
     nameKey: "nav.marketing",
     icon: Megaphone,
     color: "text-cyan-400",
     subItems: [
       { nameKey: "submenu.marketingDashboard", path: "/marketing", icon: LayoutDashboard },
-      { nameKey: "submenu.reviewsReputation", path: "/marketing/reviews", icon: Star },
+      { nameKey: "submenu.reviewsHub", path: "/marketing/reviews", icon: Star },
+      { nameKey: "submenu.reputationAnalytics", path: "/marketing/reputation", icon: LineChart },
       { nameKey: "submenu.otaPerformance", path: "/marketing/ota", icon: Globe },
-      { nameKey: "submenu.communicationsInbox", path: "/marketing/inbox", icon: MessageCircle },
-      { nameKey: "submenu.webLeads", path: "/marketing/leads", icon: Users },
+      { nameKey: "submenu.guestCommunications", path: "/marketing/communications", icon: MessageCircle },
+      { nameKey: "submenu.leadGeneration", path: "/marketing/leads", icon: Target },
     ]
   },
   // 2. RESERVATIONS (second)

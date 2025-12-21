@@ -23,12 +23,13 @@ export const ka: Translations = {
     otelms: "OTELMS",
     devExpenses: "დევ ხარჯები",
     
-    // Marketing
+    // Marketing (workflow-based)
     marketingDashboard: "მთავარი",
-    reviewsReputation: "მიმოხილვები და რეპუტაცია",
+    reviewsHub: "მიმოხილვები",
+    reputationAnalytics: "რეპუტაციის ანალიტიკა",
     otaPerformance: "OTA შედეგები",
-    communicationsInbox: "კომუნიკაციები",
-    webLeads: "ვებ ლიდები",
+    guestCommunications: "სტუმრებთან კომუნიკაცია",
+    leadGeneration: "ლიდების გენერაცია",
     
     // Reservations (რესტრუქტურიზებული)
     reservationsOverview: "მთავარი",

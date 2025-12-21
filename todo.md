@@ -552,3 +552,13 @@
 - [ ] Multi-channel integration strategy (15 channels)
 
 - [x] Remove AI Assistant from Reservations (already in Reviews as AI Responses tab)
+
+
+## Marketing Module Restructure (Dec 21, 2025)
+- [x] Restructure Marketing sidebar with workflow-based navigation
+- [x] Reviews Hub (Inbox, AI Queue, Archive)
+- [x] Reputation Analytics (Rating Trends, Sentiment, Topics, Competitors)
+- [x] Guest Communications (Email, WhatsApp, Telegram)
+- [x] Lead Generation (Web Leads, Campaigns)
+- [x] Update all translations EN/KA
+- [x] Update routes in App.tsx

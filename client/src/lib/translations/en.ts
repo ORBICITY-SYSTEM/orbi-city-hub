@@ -21,12 +21,13 @@ export const en = {
     otelms: "OTELMS",
     devExpenses: "Dev Expenses",
     
-    // Marketing
+    // Marketing (workflow-based)
     marketingDashboard: "Dashboard",
-    reviewsReputation: "Reviews & Reputation",
+    reviewsHub: "Reviews Hub",
+    reputationAnalytics: "Reputation Analytics",
     otaPerformance: "OTA Performance",
-    communicationsInbox: "Communications Inbox",
-    webLeads: "Web Leads",
+    guestCommunications: "Guest Communications",
+    leadGeneration: "Lead Generation",
     
     // Reservations (restructured)
     reservationsOverview: "Dashboard",
