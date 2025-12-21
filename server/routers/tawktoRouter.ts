@@ -193,4 +193,60 @@ export const tawktoRouter = router({
     
     return unreadChats;
   }),
+
+  // Get tickets (ticket:create events)
+  getTickets: publicProcedure
+    .input(z.object({
+      limit: z.number().min(1).max(100).default(50),
+      offset: z.number().min(0).default(0),
+    }))
+    .query(async ({ input }) => {
+      const db = await getDb();
+      
+      if (!db) {
+        console.warn("[Tawk.to] Database not available");
+        return [];
+      }
+      
+      const tickets = await db
+        .select()
+        .from(tawktoMessages)
+        .where(eq(tawktoMessages.eventType, "ticket:create"))
+        .orderBy(desc(tawktoMessages.createdAt))
+        .limit(input.limit)
+        .offset(input.offset);
+      
+      return tickets;
+    }),
+
+  // Get ticket statistics
+  getTicketStats: publicProcedure.query(async () => {
+    const db = await getDb();
+    
+    if (!db) {
+      return {
+        total: 0,
+        open: 0,
+        closed: 0,
+        todayCount: 0,
+      };
+    }
+    
+    const [stats] = await db
+      .select({
+        total: sql<number>`COUNT(*)`,
+        open: sql<number>`SUM(CASE WHEN status = 'active' THEN 1 ELSE 0 END)`,
+        closed: sql<number>`SUM(CASE WHEN status = 'ended' THEN 1 ELSE 0 END)`,
+        todayCount: sql<number>`SUM(CASE WHEN DATE(createdAt) = CURDATE() THEN 1 ELSE 0 END)`,
+      })
+      .from(tawktoMessages)
+      .where(eq(tawktoMessages.eventType, "ticket:create"));
+    
+    return {
+      total: Number(stats?.total || 0),
+      open: Number(stats?.open || 0),
+      closed: Number(stats?.closed || 0),
+      todayCount: Number(stats?.todayCount || 0),
+    };
+  }),
 });

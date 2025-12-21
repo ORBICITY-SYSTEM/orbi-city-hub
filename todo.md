@@ -562,3 +562,15 @@
 - [x] Lead Generation (Web Leads, Campaigns)
 - [x] Update all translations EN/KA
 - [x] Update routes in App.tsx
+
+
+## Tawk.to Integration into Guest Communications (Dec 21, 2025)
+- [x] Create Guest Communications page with 3 tabs: Live Chat, Tickets, Email
+- [x] Add Live Chat tab showing Tawk.to conversations from database
+- [x] Add Tickets tab showing Tawk.to support tickets
+- [x] Keep Email tab (Gmail integration) as existing
+- [x] Add Live Chat Stats widget to CEO Dashboard (already present)
+- [x] Update routing for /marketing/communications to use new page
+- [x] Test and verify Tawk.to data displays correctly
+- [x] Add getTickets and getTicketStats endpoints to tawktoRouter
+- [x] Write vitest tests for Tawk.to endpoints (8 tests passing)
