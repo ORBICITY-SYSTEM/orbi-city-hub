@@ -466,3 +466,13 @@
 - [ ] Telegram bot: Add trigger for new booking
 - [ ] Telegram bot: Add trigger for checkout completed
 - [ ] Telegram bot: Add trigger for issue created
+
+
+## Module Hide (2025-12-21) - Executive Decision
+- [x] Hide Logistics module from sidebar (keep code intact for future activation)
+
+
+## Module Removal (2025-12-21) - Executive Decision
+- [ ] Remove Logistics module completely from sidebar
+- [ ] Remove Logistics routes from App.tsx
+- [ ] Keep backend routers intact (no backend changes)

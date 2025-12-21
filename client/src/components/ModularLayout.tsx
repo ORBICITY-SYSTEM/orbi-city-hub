@@ -89,16 +89,17 @@ const modules: ModuleItem[] = [
       { nameKey: "submenu.telegramBot", path: "/reservations/telegram-bot", icon: Send },
     ]
   },
-  {
-    nameKey: "nav.logistics",
-    icon: Truck,
-    color: "text-cyan-400",
-    subItems: [
-      { nameKey: "submenu.logisticsDashboard", path: "/logistics", icon: LayoutDashboard },
-      { nameKey: "submenu.housekeeping", path: "/logistics/housekeeping", icon: Package },
-      { nameKey: "submenu.maintenance", path: "/logistics/maintenance", icon: Wrench },
-    ]
-  },
+  // HIDDEN: Logistics module - uncomment to re-enable
+  // {
+  //   nameKey: "nav.logistics",
+  //   icon: Truck,
+  //   color: "text-cyan-400",
+  //   subItems: [
+  //     { nameKey: "submenu.logisticsDashboard", path: "/logistics", icon: LayoutDashboard },
+  //     { nameKey: "submenu.housekeeping", path: "/logistics/housekeeping", icon: Package },
+  //     { nameKey: "submenu.maintenance", path: "/logistics/maintenance", icon: Wrench },
+  //   ]
+  // },
 
 ];
 
@@ -107,7 +108,7 @@ export default function ModularLayout({ children }: { children: React.ReactNode 
   const { t } = useLanguage();
   const [location] = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [expandedModules, setExpandedModules] = useState<string[]>(["nav.finance", "nav.marketing", "nav.reservations", "nav.logistics"]);
+  const [expandedModules, setExpandedModules] = useState<string[]>(["nav.finance", "nav.marketing", "nav.reservations"]);
 
   // Auto-expand module based on current route
   useEffect(() => {
