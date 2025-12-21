@@ -529,3 +529,7 @@
 
 ### Logistics Module:
 - [x] Hidden from sidebar (code preserved for future reactivation)
+
+
+## Module Order Change (Dec 21, 2025)
+- [x] Reorder sidebar modules: Marketing → Reservations → Finance → Integrations

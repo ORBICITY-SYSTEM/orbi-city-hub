@@ -57,18 +57,7 @@ interface ModuleItem {
 }
 
 const modules: ModuleItem[] = [
-  {
-    nameKey: "nav.finance",
-    icon: DollarSign,
-    color: "text-cyan-400",
-    subItems: [
-      { nameKey: "submenu.financeDashboard", path: "/finance", icon: LayoutDashboard },
-      { nameKey: "submenu.analytics", path: "/finance/analytics", icon: TrendingUp },
-      { nameKey: "submenu.reports", path: "/finance/reports", icon: FileText },
-      { nameKey: "submenu.otelms", path: "/finance/otelms", icon: Database },
-      { nameKey: "submenu.devExpenses", path: "/finance/expenses", icon: BarChart3 },
-    ]
-  },
+  // 1. MARKETING (first)
   {
     nameKey: "nav.marketing",
     icon: Megaphone,
@@ -81,6 +70,7 @@ const modules: ModuleItem[] = [
       { nameKey: "submenu.webLeads", path: "/marketing/leads", icon: Users },
     ]
   },
+  // 2. RESERVATIONS (second)
   {
     nameKey: "nav.reservations",
     icon: Calendar,
@@ -93,6 +83,20 @@ const modules: ModuleItem[] = [
       { nameKey: "submenu.aiAssistant", path: "/reservations/ai-assistant", icon: Sparkles },
     ]
   },
+  // 3. FINANCE (third)
+  {
+    nameKey: "nav.finance",
+    icon: DollarSign,
+    color: "text-cyan-400",
+    subItems: [
+      { nameKey: "submenu.financeDashboard", path: "/finance", icon: LayoutDashboard },
+      { nameKey: "submenu.analytics", path: "/finance/analytics", icon: TrendingUp },
+      { nameKey: "submenu.reports", path: "/finance/reports", icon: FileText },
+      { nameKey: "submenu.otelms", path: "/finance/otelms", icon: Database },
+      { nameKey: "submenu.devExpenses", path: "/finance/expenses", icon: BarChart3 },
+    ]
+  },
+  // 4. INTEGRATIONS (fourth)
   {
     nameKey: "nav.integrations",
     icon: Plug,
