@@ -29,14 +29,14 @@ export const en = {
     webLeads: "Web Leads",
     
     // Reservations (restructured)
-    reservationsOverview: "Overview",
+    reservationsOverview: "Dashboard",
     reservationsList: "Reservations List",
     reservationsCalendar: "Calendar / Timeline",
     exceptionsIssues: "Exceptions & Issues",
     aiAssistant: "AI Assistant",
     
     // Integrations Hub
-    integrationsHub: "Integrations Hub",
+    integrationsHub: "Dashboard",
     whatsappBot: "WhatsApp Bot",
     telegramBot: "Telegram Bot",
     butlerAI: "Butler AI",

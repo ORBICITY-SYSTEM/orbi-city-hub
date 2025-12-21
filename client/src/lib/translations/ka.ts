@@ -31,14 +31,14 @@ export const ka: Translations = {
     webLeads: "ვებ ლიდები",
     
     // Reservations (რესტრუქტურიზებული)
-    reservationsOverview: "მიმოხილვა",
+    reservationsOverview: "მთავარი",
     reservationsList: "ჯავშნების სია",
     reservationsCalendar: "კალენდარი / თაიმლაინი",
     exceptionsIssues: "გამონაკლისები და პრობლემები",
     aiAssistant: "AI ასისტენტი",
     
     // Integrations Hub
-    integrationsHub: "ინტეგრაციების ცენტრი",
+    integrationsHub: "მთავარი",
     whatsappBot: "WhatsApp ბოტი",
     telegramBot: "Telegram ბოტი",
     butlerAI: "Butler AI",
