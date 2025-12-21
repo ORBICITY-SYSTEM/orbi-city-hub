@@ -37,7 +37,7 @@ const Finance = () => {
   };
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 min-h-screen">
+    <div className="p-4 sm:p-6 lg:p-8 min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600">

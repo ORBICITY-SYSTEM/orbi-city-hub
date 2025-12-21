@@ -27,12 +27,12 @@ export default function Google() {
   });
 
   return (
-    <div className="glass-wrapper p-8 min-h-screen">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 p-8">
       <div className="mb-8">
-        <h1 className="text-4xl font-bold text-slate-900 mb-2 drop-shadow-sm">
+        <h1 className="text-4xl font-bold text-cyan-400 mb-2">
           Google Workspace
         </h1>
-        <p className="text-slate-700 text-lg">
+        <p className="text-white/70 text-lg">
           Integrated Google tools and analytics for ORBI City
         </p>
       </div>

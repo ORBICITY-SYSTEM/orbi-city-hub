@@ -95,7 +95,7 @@ export default function EmailInbox() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[oklch(0.12_0.08_235)] to-[oklch(0.18_0.08_250)] p-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">

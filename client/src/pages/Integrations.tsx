@@ -156,7 +156,7 @@ export default function Integrations() {
   
   return (
     <DashboardLayout>
-      <div className="space-y-6">
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 space-y-6 p-6 -m-6">
         {/* Header */}
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>

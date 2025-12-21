@@ -29,7 +29,7 @@ const Logistics = () => {
   }, []);
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
       {/* Header with Ocean Wave */}
       <div className="relative rounded-2xl overflow-hidden mx-6 mt-6 mb-8">
         <div className="relative z-10 px-8 pt-8 pb-20">

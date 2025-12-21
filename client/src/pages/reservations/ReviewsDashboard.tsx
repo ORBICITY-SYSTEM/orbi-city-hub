@@ -231,7 +231,7 @@ const ReviewsDashboard = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 space-y-6 p-6">
       {/* Header with Ocean Wave */}
       <div className="relative rounded-2xl overflow-hidden mb-8">
         <div className="relative z-10 px-8 pt-8 pb-20">

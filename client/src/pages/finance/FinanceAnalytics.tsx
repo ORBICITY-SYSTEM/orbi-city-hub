@@ -101,9 +101,9 @@ export default function FinanceAnalytics() {
   }, [summary]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[oklch(0.12_0.10_240)] to-[oklch(0.18_0.10_240)] p-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 p-6">
       {/* Header */}
-      <div className="bg-gradient-to-r from-purple-600 to-purple-800 text-white p-8 rounded-lg mb-6 shadow-xl">
+      <div className="relative overflow-hidden bg-gradient-to-r from-blue-600/20 to-cyan-600/20 border border-white/10 text-white p-8 rounded-lg mb-6 shadow-xl">
         <h1 className="text-4xl font-bold mb-2">📊 Finance Analytics</h1>
         <p className="text-white/90 font-bold">
           ROI Calculator • RevPAR Analysis • Forecasting • Profitability Metrics

@@ -83,11 +83,11 @@ const Reservations = () => {
   const totalRevenue = mockBookings.reduce((sum, b) => sum + b.price, 0);
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 min-h-screen space-y-6">
+    <div className="p-4 sm:p-6 lg:p-8 min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold">Reservations</h1>
-        <p className="text-gray-600">Manage reservations and guests</p>
+        <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-cyan-400">Reservations</h1>
+        <p className="text-white/60">Manage reservations and guests</p>
       </div>
 
       {/* KPI Cards */}

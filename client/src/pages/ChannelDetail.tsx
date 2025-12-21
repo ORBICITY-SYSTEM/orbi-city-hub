@@ -28,7 +28,7 @@ export default function ChannelDetail() {
 
   if (!channel) {
     return (
-      <div className="p-8 min-h-screen">
+      <div className="p-8 min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
         <Card className="bg-white/10 backdrop-blur-md border-white/20 p-12 text-center">
           <AlertCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-white mb-2">Channel Not Found</h2>
@@ -109,7 +109,7 @@ export default function ChannelDetail() {
   };
 
   return (
-    <div className="p-8 min-h-screen">
+    <div className="p-8 min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
       {/* Header */}
       <div className="mb-6">
         <Button

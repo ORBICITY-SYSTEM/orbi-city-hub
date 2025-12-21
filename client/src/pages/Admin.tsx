@@ -18,7 +18,7 @@ const Admin = () => {
   const [activeTab, setActiveTab] = useState("overview");
 
   return (
-    <div className="p-8 min-h-screen space-y-6">
+    <div className="p-8 min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">

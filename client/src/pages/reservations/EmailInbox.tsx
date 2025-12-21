@@ -160,16 +160,16 @@ export default function EmailInbox() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
+            <h1 className="text-3xl font-bold text-cyan-400 flex items-center gap-2">
               <Mail className="w-8 h-8 text-blue-600" />
               Email Inbox
             </h1>
-            <p className="text-gray-600 mt-1">AI-powered email management with smart categorization</p>
+            <p className="text-white/60 mt-1">AI-powered email management with smart categorization</p>
           </div>
           <div className="flex gap-2">
             <Button onClick={() => refetch()} variant="outline" size="sm">
