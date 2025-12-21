@@ -1,0 +1,15 @@
+{
+  "query": "SELECT \n  COUNT(*) as total_reviews,\n  SUM(CASE WHEN hasReply = false OR hasReply IS NULL THEN 1 ELSE 0 END) as pending_reviews,\n  SUM(CASE WHEN hasReply = true THEN 1 ELSE 0 END) as responded_reviews\nFROM guestReviews;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user c2qSkVB4gKtEmor.991468648419 --database 4ExKc24KNHdr4pKbTUzsoU --execute SELECT \n  COUNT(*) as total_reviews,\n  SUM(CASE WHEN hasReply = false OR hasReply IS NULL THEN 1 ELSE 0 END) as pending_reviews,\n  SUM(CASE WHEN hasReply = true THEN 1 ELSE 0 END) as responded_reviews\nFROM guestReviews;",
+  "rows": [
+    {
+      "total_reviews": "273",
+      "pending_reviews": "199",
+      "responded_reviews": "74"
+    }
+  ],
+  "messages": [],
+  "stdout": "total_reviews\tpending_reviews\tresponded_reviews\n273\t199\t74\n",
+  "stderr": "",
+  "execution_time_ms": 53
+}

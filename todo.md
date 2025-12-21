@@ -484,3 +484,8 @@
 3. ✅ No new ideas, features, or logic were introduced (only UI placeholders)
 4. ✅ Logistics module was not touched in any way
 5. ✅ All existing functionality remains available, only relocated
+
+
+## Bug Fixes (2025-12-21)
+- [x] Fix currency symbol from "$" to "₾" on CEO Dashboard KPI cards
+- [x] Verify "199 pending reviews" number accuracy (confirmed: real count from guestReviews table where hasReply=false/NULL)
