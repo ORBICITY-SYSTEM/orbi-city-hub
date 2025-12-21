@@ -31,6 +31,7 @@ const MarketingDashboard = lazy(() => import("./pages/marketing/MarketingDashboa
 const OTAChannels = lazy(() => import("./pages/marketing/OTAChannels"));
 const WebsiteLeads = lazy(() => import("./pages/marketing/WebsiteLeads"));
 const LiveChat = lazy(() => import("./pages/marketing/LiveChat"));
+const LiveChatDashboard = lazy(() => import("./pages/LiveChatDashboard"));
 
 // Reservations Module - Lazy
 const EmailInbox = lazy(() => import("./pages/reservations/EmailInbox"));
@@ -102,6 +103,7 @@ function RouterContent() {
         <Route path="/marketing/ota" component={OTAChannels} />
         <Route path="/marketing/leads" component={WebsiteLeads} />
         <Route path="/marketing/live-chat" component={LiveChat} />
+        <Route path="/live-chat" component={LiveChatDashboard} />
 
         {/* Reservations Module */}
         <Route path="/reservations" component={OTADashboard} />

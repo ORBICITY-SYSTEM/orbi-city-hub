@@ -46,23 +46,36 @@ async function generateAIReviewResponse(params: {
   };
   const greeting = greetings[language] || greetings.en;
   
-  const prompt = `You are the customer service manager for ${BUTLER_KNOWLEDGE.property.name}.
+  // P0 FIX: Clean prompt - plain text only, no automatic compensation
+  // AI may SUGGEST actions, never DECIDE on discounts or compensation
+  const languageInstruction = language === 'ka' ? 'Georgian' : language === 'ru' ? 'Russian' : language === 'tr' ? 'Turkish' : 'English';
+  
+  let ratingGuideline = '';
+  if (rating <= 2) {
+    ratingGuideline = 'Apologize sincerely for their experience. Express genuine concern. Do NOT offer any discounts or compensation - only management can approve that.';
+  } else if (rating <= 4) {
+    ratingGuideline = 'Thank them for their feedback and acknowledge any concerns mentioned.';
+  } else {
+    ratingGuideline = 'Thank them warmly and invite them to visit again.';
+  }
+  
+  const prompt = `You are the customer service manager for Orbi City - Sea View Aparthotel in Batumi.
 Generate a professional response to this ${source} review.
 
 Review Details:
-- Guest: ${reviewerName}
-- Rating: ${rating}/5 stars
-- Review: "${content}"
-- Language: ${language}
+Guest Name: ${reviewerName}
+Rating: ${rating} out of 5 stars
+Review Text: ${content}
+Detected Language: ${language}
 
-Guidelines:
-- Write ONLY in ${language === 'ka' ? 'Georgian' : language === 'ru' ? 'Russian' : language === 'tr' ? 'Turkish' : 'English'} language
-- Start with "${greeting} ${reviewerName}"
-- Tone: ${tone}
-- ${rating <= 2 ? 'Apologize sincerely and offer 20% discount on next stay' : ''}
-- ${rating >= 4 ? 'Thank them warmly and invite them back' : ''}
-- Keep response under 150 words
-- Sign as "Orbi City Team"
+Response Guidelines:
+1. Write ONLY in ${languageInstruction} language
+2. Start with greeting: ${greeting} ${reviewerName}
+3. Tone: ${tone}
+4. ${ratingGuideline}
+5. Keep response under 150 words
+6. Sign as Orbi City Team
+7. IMPORTANT: Do NOT offer any discounts, compensation, or free services. Only management can approve such offers.
 
 Generate the response:`;
 
@@ -104,17 +117,25 @@ Generate the response:`;
   }
 }
 
-// Fallback template response
+// P0 FIX: Fallback template response - NO automatic compensation
+// AI may SUGGEST, manager must APPROVE any discounts
 function getTemplateResponse(guestName: string, rating: number, language: string): string {
   if (rating <= 2) {
+    // P0 FIX: Removed automatic 20% discount - requires manager approval
     if (language === 'ka') {
-      return `მოგესალმებით ${guestName},\n\nგმადლობთ თქვენი გულწრფელი შეფასებისთვის. ღრმად ვწუხვარ რომ თქვენმა მოლოდინი ვერ გაამართლა.\n\nროგორც კომპენსაცია, გთავაზობთ 20% ფასდაკლებას თქვენს შემდეგ ვიზიტზე.\n\nპატივისცემით,\nOrbi City Team`;
+      return `მოგესალმებით ${guestName},\n\nგმადლობთ თქვენი გულწრფელი შეფასებისთვის. ღრმად ვწუხვარ რომ თქვენმა გამოცდილებამ ვერ გაამართლა მოლოდინი.\n\nთქვენი კომენტარები ძალიან მნიშვნელოვანია ჩვენთვის და ვმუშაობთ გაუმჯობესებაზე. ჩვენი მენეჯერი დაგიკავშირდებათ პირადად.\n\nპატივისცემით,\nOrbi City Team`;
     }
-    return `Dear ${guestName},\n\nThank you for your honest feedback. We sincerely apologize that your experience did not meet your expectations.\n\nAs compensation, we offer you a 20% discount on your next stay.\n\nBest regards,\nOrbi City Team`;
+    if (language === 'ru') {
+      return `Уважаемый ${guestName},\n\nБлагодарим вас за честный отзыв. Мы искренне сожалеем, что ваш опыт не оправдал ожиданий.\n\nВаши комментарии очень важны для нас, и мы работаем над улучшением. Наш менеджер свяжется с вами лично.\n\nС уважением,\nOrbi City Team`;
+    }
+    return `Dear ${guestName},\n\nThank you for your honest feedback. We sincerely apologize that your experience did not meet your expectations.\n\nYour comments are very important to us and we are working on improvements. Our manager will contact you personally.\n\nBest regards,\nOrbi City Team`;
   }
   
   if (language === 'ka') {
     return `გმადლობთ ${guestName}!\n\nძალიან გვიხარია რომ მოგეწონათ ჩვენთან ყოფნა! თქვენი თბილი სიტყვები დიდი მოტივაციაა ჩვენი გუნდისთვის.\n\nველოდებით თქვენს მომავალ ვიზიტს!\n\nOrbi City Team`;
+  }
+  if (language === 'ru') {
+    return `Спасибо, ${guestName}!\n\nМы очень рады, что вам понравилось пребывание у нас! Ваши теплые слова - большая мотивация для нашей команды.\n\nЖдем вас снова!\n\nOrbi City Team`;
   }
   return `Dear ${guestName},\n\nThank you so much for your wonderful review! We're delighted that you enjoyed your stay with us.\n\nWe look forward to welcoming you back!\n\nBest regards,\nOrbi City Team`;
 }
@@ -161,10 +182,39 @@ async function startServer() {
   registerOAuthRoutes(app);
   // Outscraper webhook endpoint (raw Express, not tRPC)
   // Supports: Google, Booking.com, Airbnb, TripAdvisor, Expedia
+  // P0 FIX: Strict property whitelist validation added 2025-12-21
   app.post("/api/webhooks/outscraper", async (req, res) => {
     try {
       const data = req.body;
       console.log("[Outscraper Webhook] Received data:", JSON.stringify(data).slice(0, 500));
+      
+      // ============================================
+      // P0 FIX: PROPERTY WHITELIST VALIDATION
+      // Only accept reviews for Orbi City Batumi properties
+      // Reject any foreign property reviews (e.g., Empoli, Italy)
+      // ============================================
+      const ALLOWED_PROPERTIES = {
+        // Booking.com Property ID
+        bookingIds: ["10172179"],
+        // Google Place IDs / Names
+        googleNames: [
+          "orbi city",
+          "orbi city batumi",
+          "orbi city - sea view aparthotel",
+          "orbi city sea view",
+          "orbi city aparthotel"
+        ],
+        // Airbnb Listing IDs
+        airbnbIds: [],
+        // TripAdvisor IDs / Names
+        tripadvisorNames: [
+          "orbi city",
+          "orbi city batumi",
+          "orbi city aparthotel"
+        ],
+        // Location whitelist (must contain one of these)
+        allowedLocations: ["batumi", "georgia", "საქართველო", "ბათუმი"]
+      };
       
       // Detect source platform from task name or data structure
       let source = "google"; // default
@@ -189,20 +239,64 @@ async function startServer() {
       
       // Outscraper sends reviews in different formats
       let reviews: any[] = [];
+      let placeName = "";
+      let placeLocation = "";
       
       if (data.data && Array.isArray(data.data)) {
-        // Format: { data: [{ reviews_data: [...] }] }
+        // Format: { data: [{ reviews_data: [...], name: "...", address: "..." }] }
         for (const place of data.data) {
+          // P0 FIX: Validate property before processing
+          placeName = (place.name || place.title || "").toLowerCase();
+          placeLocation = (place.address || place.location || place.full_address || "").toLowerCase();
+          
+          // Check if this is an allowed property
+          const isAllowedProperty = 
+            ALLOWED_PROPERTIES.googleNames.some(name => placeName.includes(name)) ||
+            ALLOWED_PROPERTIES.allowedLocations.some(loc => placeLocation.includes(loc));
+          
+          if (!isAllowedProperty) {
+            console.warn(`[Outscraper Webhook] REJECTED: Foreign property detected - "${placeName}" at "${placeLocation}". Only Orbi City Batumi reviews are accepted.`);
+            continue; // Skip this place entirely
+          }
+          
           if (place.reviews_data && Array.isArray(place.reviews_data)) {
             reviews = reviews.concat(place.reviews_data);
           }
         }
       } else if (Array.isArray(data)) {
-        // Format: direct array of reviews
-        reviews = data;
+        // Format: direct array of reviews - validate via task name
+        const isAllowedTask = ALLOWED_PROPERTIES.googleNames.some(name => taskName.toLowerCase().includes(name));
+        if (isAllowedTask) {
+          reviews = data;
+        } else {
+          console.warn(`[Outscraper Webhook] REJECTED: Task name "${taskName}" does not match allowed properties.`);
+        }
       } else if (data.reviews_data) {
-        // Format: { reviews_data: [...] }
-        reviews = data.reviews_data;
+        // Format: { reviews_data: [...] } - validate via task name or place info
+        placeName = (data.name || data.title || taskName || "").toLowerCase();
+        placeLocation = (data.address || data.location || "").toLowerCase();
+        
+        const isAllowedProperty = 
+          ALLOWED_PROPERTIES.googleNames.some(name => placeName.includes(name)) ||
+          ALLOWED_PROPERTIES.allowedLocations.some(loc => placeLocation.includes(loc));
+        
+        if (isAllowedProperty) {
+          reviews = data.reviews_data;
+        } else {
+          console.warn(`[Outscraper Webhook] REJECTED: Property "${placeName}" at "${placeLocation}" is not in whitelist.`);
+        }
+      }
+      
+      // P0 FIX: Log rejection if no reviews passed validation
+      if (reviews.length === 0 && (data.data?.length > 0 || data.reviews_data?.length > 0)) {
+        console.warn(`[Outscraper Webhook] All reviews rejected due to property whitelist validation.`);
+        return res.json({ 
+          success: true, 
+          imported: 0, 
+          skipped: 0,
+          rejected: true,
+          reason: "Property not in whitelist. Only Orbi City Batumi reviews are accepted."
+        });
       }
       
       console.log(`[Outscraper Webhook] Processing ${reviews.length} reviews`);

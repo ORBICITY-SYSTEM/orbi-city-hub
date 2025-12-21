@@ -105,3 +105,27 @@ temp/
 *.db
 *.sqlite
 *.sqlite3
+
+# Python (if any scripts are used)
+venv/
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Archive folder (historical experiments)
+/archive/

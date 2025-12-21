@@ -402,3 +402,67 @@
 - [x] Add tRPC routes for Tawk.to data (getAll, getStats, markAsRead, getUnread)
 - [x] Add Live Chat to sidebar navigation (Marketing > Live Chat)
 - [x] Add translations (EN/KA)
+
+
+## Manus + Firebase + N8N Integration Architecture
+- [ ] Set up Firebase SDK in ORBI City Hub frontend
+- [ ] Configure Firebase Firestore for real-time data
+- [ ] Create Firestore collections: tawk_messages, notifications, ai_tasks
+- [ ] Set up Firebase Authentication with Google Workspace
+- [ ] Create N8N workflow for Tawk.to webhook reception
+- [ ] Create N8N workflow for AI response generation (Gemini)
+- [ ] Create N8N workflow for Telegram notifications
+- [ ] Connect N8N to Firebase Firestore (write messages)
+- [ ] Add Firebase real-time listeners to Manus Dashboard
+- [ ] Create Live Chat Messages component with real-time updates
+- [ ] Add notification badges for unread messages
+- [ ] Test end-to-end: Tawk.to → N8N → Firebase → Manus Dashboard
+- [ ] Deploy and verify real-time functionality
+
+## Tawk.to Integration via N8N
+- [ ] Configure Tawk.to webhook in dashboard settings
+- [ ] Set N8N webhook URL as Tawk.to endpoint
+- [ ] Parse incoming chat messages in N8N
+- [ ] Extract visitor info, message content, timestamp
+- [ ] Store messages in Firebase Firestore
+- [ ] Trigger Telegram notification for new chats
+- [ ] Display live chat feed on ORBI Dashboard
+
+## Firebase Firestore Schema
+- [ ] tawk_messages collection: visitor_id, visitor_name, message, timestamp, read, responded
+- [ ] ai_responses collection: review_id, platform, original_text, ai_response, status, approved_at
+- [ ] notifications collection: user_id, type, title, message, read, created_at
+- [ ] activity_log collection: action, module, user_id, timestamp, details
+
+
+## Production-Grade Repository Cleanup (IMMEDIATE)
+- [ ] Remove venv/ from repository (if exists)
+- [ ] Update .gitignore with Python artifacts (venv/, .venv/, __pycache__/, *.pyc)
+- [ ] Archive supabase-butler-schema.sql to /archive/experiments/
+- [ ] Create /archive/experiments/README.md explaining archived files
+- [ ] Create /docs/ARCHITECTURE.md - Single Source of Truth
+- [ ] Update main README.md with clear architecture statement
+
+## GitHub Issues & Releases Process (SHORT-TERM)
+- [ ] Create GitHub labels: bug, feature, ops, security, tech-debt
+- [ ] Create priority labels: priority:P0, priority:P1, priority:P2
+- [ ] Create module labels: module:dashboard, module:reservations, module:cleaning, module:maintenance, module:finance, module:ai
+- [ ] Create Bug Report issue template
+- [ ] Create Feature Request issue template
+- [ ] Create first release tag v0.1.0
+
+
+## P0 CRITICAL FIXES (IMMEDIATE - Executive Decision 2025-12-21)
+- [x] Outscraper webhook: Add strict property/listing whitelist validation
+- [x] Outscraper webhook: Reject reviews not matching Orbi City Batumi property IDs
+- [x] AI review prompt: Remove all LaTex and templating artifacts
+- [x] AI review prompt: Plain text only, deterministic output
+- [x] Automatic compensation: Remove 20% discount from fallback templates
+- [x] Automatic compensation: AI may suggest, never decide - require manager approval
+- [x] Create /docs/ARCHITECTURE.md - Single Source of Truth
+
+## P1 SHORT-TERM ACTIONS
+- [ ] Finance module: Implement nightly OtelMS data sync
+- [ ] Telegram bot: Add trigger for new booking
+- [ ] Telegram bot: Add trigger for checkout completed
+- [ ] Telegram bot: Add trigger for issue created
