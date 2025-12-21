@@ -652,3 +652,15 @@
 - [x] Update all loading states with ocean theme background
 - [x] Verify all pages have consistent ocean blue gradient (slate-900 → blue-900 → slate-900)
 
+
+
+## Tawk.to Webhook Configuration & History Import (Dec 22, 2025)
+- [ ] Research Tawk.to REST API for chat history export
+- [ ] Create API endpoint to fetch historical chats from Tawk.to
+- [ ] Build "Import History" button in Guest Communications page
+- [ ] Create webhook configuration guide/documentation
+- [ ] Add webhook URL display in Guest Communications settings
+- [ ] Test webhook receives real-time chat events
+- [ ] Test history import functionality
+- [ ] Write vitest tests for new endpoints
+
