@@ -543,3 +543,12 @@
 - [x] Add live sync status indicator (last sync timestamp)
 - [ ] Add response time metrics
 - [x] Fix "submenu.reviews" translation bug in tabs
+
+
+## Reviews Phase 2 (Dec 21, 2025)
+- [x] Response Time Metrics - average response time calculation
+- [x] Export Reports - CSV/Excel export for reviews
+- [x] Auto-Sync Schedule documentation for Outscraper (docs/OUTSCRAPER_AUTO_SYNC.md)
+- [ ] Multi-channel integration strategy (15 channels)
+
+- [x] Remove AI Assistant from Reservations (already in Reviews as AI Responses tab)

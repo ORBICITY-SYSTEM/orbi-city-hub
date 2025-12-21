@@ -576,6 +576,73 @@ export const reviewsRouter = router({
   }),
 
   /**
+   * Get response time metrics
+   */
+  getResponseTimeMetrics: publicProcedure.query(async () => {
+    const db = await getDb();
+    if (!db) throw new Error("Database not available");
+
+    // Get all reviews that have replies
+    const repliedReviews = await db
+      .select({
+        reviewDate: guestReviews.reviewDate,
+        replyDate: guestReviews.replyDate,
+      })
+      .from(guestReviews)
+      .where(eq(guestReviews.hasReply, true));
+
+    if (repliedReviews.length === 0) {
+      return {
+        avgResponseTimeHours: 0,
+        avgResponseTimeDays: 0,
+        fastestResponseHours: 0,
+        slowestResponseHours: 0,
+        totalReplied: 0,
+        respondedWithin24h: 0,
+        respondedWithin48h: 0,
+        respondedWithin7d: 0,
+      };
+    }
+
+    let totalHours = 0;
+    let fastestHours = Infinity;
+    let slowestHours = 0;
+    let within24h = 0;
+    let within48h = 0;
+    let within7d = 0;
+
+    for (const review of repliedReviews) {
+      if (!review.reviewDate || !review.replyDate) continue;
+      
+      const reviewTime = new Date(review.reviewDate).getTime();
+      const replyTime = new Date(review.replyDate).getTime();
+      const diffHours = (replyTime - reviewTime) / (1000 * 60 * 60);
+      
+      if (diffHours >= 0) {
+        totalHours += diffHours;
+        if (diffHours < fastestHours) fastestHours = diffHours;
+        if (diffHours > slowestHours) slowestHours = diffHours;
+        if (diffHours <= 24) within24h++;
+        if (diffHours <= 48) within48h++;
+        if (diffHours <= 168) within7d++; // 7 days = 168 hours
+      }
+    }
+
+    const avgHours = repliedReviews.length > 0 ? totalHours / repliedReviews.length : 0;
+
+    return {
+      avgResponseTimeHours: Math.round(avgHours * 10) / 10,
+      avgResponseTimeDays: Math.round((avgHours / 24) * 10) / 10,
+      fastestResponseHours: fastestHours === Infinity ? 0 : Math.round(fastestHours * 10) / 10,
+      slowestResponseHours: Math.round(slowestHours * 10) / 10,
+      totalReplied: repliedReviews.length,
+      respondedWithin24h: within24h,
+      respondedWithin48h: within48h,
+      respondedWithin7d: within7d,
+    };
+  }),
+
+  /**
    * Get last sync timestamp
    */
   getLastSyncTime: publicProcedure.query(async () => {
@@ -592,6 +659,74 @@ export const reviewsRouter = router({
       lastSync: result[0]?.createdAt || null,
     };
   }),
+
+  /**
+   * Export reviews data for PDF/Excel
+   */
+  exportReviews: publicProcedure
+    .input(z.object({
+      format: z.enum(["json", "csv"]),
+      source: z.enum(["all", "google", "booking", "airbnb", "tripadvisor"]).optional(),
+      dateFrom: z.string().optional(),
+      dateTo: z.string().optional(),
+    }))
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+
+      const conditions = [];
+      
+      if (input.source && input.source !== "all") {
+        conditions.push(eq(guestReviews.source, input.source));
+      }
+      
+      if (input.dateFrom) {
+        conditions.push(gte(guestReviews.reviewDate, new Date(input.dateFrom)));
+      }
+      
+      if (input.dateTo) {
+        conditions.push(lte(guestReviews.reviewDate, new Date(input.dateTo)));
+      }
+
+      const reviews = await db
+        .select({
+          id: guestReviews.id,
+          source: guestReviews.source,
+          reviewerName: guestReviews.reviewerName,
+          rating: guestReviews.rating,
+          content: guestReviews.content,
+          sentiment: guestReviews.sentiment,
+          reviewDate: guestReviews.reviewDate,
+          hasReply: guestReviews.hasReply,
+          replyContent: guestReviews.replyContent,
+          replyDate: guestReviews.replyDate,
+        })
+        .from(guestReviews)
+        .where(conditions.length > 0 ? and(...conditions) : undefined)
+        .orderBy(desc(guestReviews.reviewDate));
+
+      if (input.format === "csv") {
+        // Generate CSV string
+        const headers = ["ID", "Source", "Reviewer", "Rating", "Content", "Sentiment", "Date", "Has Reply", "Reply Content", "Reply Date"];
+        const rows = reviews.map(r => [
+          r.id,
+          r.source,
+          r.reviewerName || "",
+          r.rating,
+          `"${(r.content || "").replace(/"/g, '""')}"`,
+          r.sentiment,
+          r.reviewDate ? format(new Date(r.reviewDate), 'yyyy-MM-dd') : "",
+          r.hasReply ? "Yes" : "No",
+          `"${(r.replyContent || "").replace(/"/g, '""')}"`,
+          r.replyDate ? format(new Date(r.replyDate), 'yyyy-MM-dd') : "",
+        ]);
+        
+        const csv = [headers.join(","), ...rows.map(r => r.join(","))].join("\n");
+        return { format: "csv", data: csv, count: reviews.length };
+      }
+
+      return { format: "json", data: reviews, count: reviews.length };
+    }),
 
   /**
    * Get rating trend over time (monthly)

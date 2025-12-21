@@ -280,6 +280,17 @@ export const en = {
     reviewsFromTripadvisor: "from TripAdvisor",
     ratingTrend: "Rating Trend",
     reviewVolume: "Review Volume",
+    responseTimeMetrics: "Response Time Metrics",
+    avgResponseTime: "Avg Response Time",
+    within24h: "Within 24h",
+    within48h: "Within 48h",
+    fastestResponse: "Fastest Response",
+    totalReplied: "Total Replied",
+    avgResponseDays: "Avg Response",
+    days: "days",
+    exportReviews: "Export Reviews",
+    exportPDF: "Export PDF",
+    exportExcel: "Export Excel",
   },
   
   // AI Response Queue

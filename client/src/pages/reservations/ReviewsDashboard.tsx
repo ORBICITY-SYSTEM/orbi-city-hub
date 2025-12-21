@@ -28,6 +28,9 @@ import {
   PieChart,
   Users,
   Calendar,
+  Download,
+  FileSpreadsheet,
+  FileText,
   ThumbsUp,
   ThumbsDown,
   Minus,
@@ -121,6 +124,9 @@ const ReviewsDashboard = () => {
 
   // Rating trend
   const { data: ratingTrend } = trpc.reviews.getRatingTrend.useQuery();
+
+  // Response time metrics
+  const { data: responseTimeMetrics } = trpc.reviews.getResponseTimeMetrics.useQuery();
   const [showWebhookInfo, setShowWebhookInfo] = useState(false);
 
   const syncDemoMutation = trpc.reviews.syncDemoReviews.useMutation({
@@ -164,6 +170,38 @@ const ReviewsDashboard = () => {
     setSelectedReview(review);
     setReplyText(review.replyContent || "");
     setReplyDialogOpen(true);
+  };
+
+  // Export reviews
+  const handleExport = async (format: 'csv' | 'pdf') => {
+    try {
+      const response = await fetch(`/api/trpc/reviews.exportReviews?input=${encodeURIComponent(JSON.stringify({ format: 'csv', source: 'all' }))}`);
+      const result = await response.json();
+      
+      if (result.result?.data?.data) {
+        const csvData = result.result.data.data;
+        const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `reviews_export_${new Date().toISOString().split('T')[0]}.csv`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        
+        toast({
+          title: t('toast.success'),
+          description: `${result.result.data.count} ${t('reviews.exportReviews')}`
+        });
+      }
+    } catch (error) {
+      toast({
+        title: t('reviews.error'),
+        description: 'Export failed',
+        variant: 'destructive'
+      });
+    }
   };
 
   // Render star rating
@@ -221,6 +259,26 @@ const ReviewsDashboard = () => {
           <Button onClick={() => refetch()} variant="outline" disabled={isLoading}>
             <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? "animate-spin" : ""}`} />
             {t('common.refresh')}
+          </Button>
+          
+          {/* Export Buttons */}
+          <Button 
+            onClick={() => handleExport('csv')} 
+            variant="outline" 
+            size="sm"
+            className="bg-emerald-500/10 border-emerald-500/30 hover:bg-emerald-500/20"
+          >
+            <FileSpreadsheet className="h-4 w-4 mr-2" />
+            Excel
+          </Button>
+          <Button 
+            onClick={() => handleExport('pdf')} 
+            variant="outline" 
+            size="sm"
+            className="bg-red-500/10 border-red-500/30 hover:bg-red-500/20"
+          >
+            <FileText className="h-4 w-4 mr-2" />
+            PDF
           </Button>
             </div>
           </div>
@@ -819,6 +877,67 @@ const ReviewsDashboard = () => {
                         <p className="text-sm text-muted-foreground">{t("reviews.pending")}</p>
                       </div>
                     </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Response Time Metrics */}
+            <Card className="lg:col-span-2">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Clock className="h-5 w-5" />
+                  {t("reviews.responseTimeMetrics")}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {/* Average Response Time */}
+                  <div className="text-center p-4 bg-blue-500/10 rounded-lg">
+                    <Clock className="h-8 w-8 mx-auto text-blue-500 mb-2" />
+                    <p className="text-2xl font-bold text-blue-600">
+                      {responseTimeMetrics?.avgResponseTimeHours || 0}h
+                    </p>
+                    <p className="text-sm text-muted-foreground">{t("reviews.avgResponseTime")}</p>
+                  </div>
+                  
+                  {/* Within 24h */}
+                  <div className="text-center p-4 bg-emerald-500/10 rounded-lg">
+                    <CheckCircle2 className="h-8 w-8 mx-auto text-emerald-500 mb-2" />
+                    <p className="text-2xl font-bold text-emerald-600">
+                      {responseTimeMetrics?.respondedWithin24h || 0}
+                    </p>
+                    <p className="text-sm text-muted-foreground">{t("reviews.within24h")}</p>
+                  </div>
+                  
+                  {/* Within 48h */}
+                  <div className="text-center p-4 bg-yellow-500/10 rounded-lg">
+                    <Clock className="h-8 w-8 mx-auto text-yellow-500 mb-2" />
+                    <p className="text-2xl font-bold text-yellow-600">
+                      {responseTimeMetrics?.respondedWithin48h || 0}
+                    </p>
+                    <p className="text-sm text-muted-foreground">{t("reviews.within48h")}</p>
+                  </div>
+                  
+                  {/* Fastest Response */}
+                  <div className="text-center p-4 bg-purple-500/10 rounded-lg">
+                    <TrendingUp className="h-8 w-8 mx-auto text-purple-500 mb-2" />
+                    <p className="text-2xl font-bold text-purple-600">
+                      {responseTimeMetrics?.fastestResponseHours || 0}h
+                    </p>
+                    <p className="text-sm text-muted-foreground">{t("reviews.fastestResponse")}</p>
+                  </div>
+                </div>
+                
+                {/* Response Time Summary */}
+                <div className="mt-4 pt-4 border-t border-white/10">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">{t("reviews.totalReplied")}:</span>
+                    <span className="font-medium">{responseTimeMetrics?.totalReplied || 0}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm mt-2">
+                    <span className="text-muted-foreground">{t("reviews.avgResponseDays")}:</span>
+                    <span className="font-medium">{responseTimeMetrics?.avgResponseTimeDays || 0} {t("reviews.days")}</span>
                   </div>
                 </div>
               </CardContent>

@@ -282,6 +282,17 @@ export const ka: Translations = {
     reviewsFromTripadvisor: "TripAdvisor-დან",
     ratingTrend: "რეიტინგის ტრენდი",
     reviewVolume: "მიმოხილვების რაოდენობა",
+    responseTimeMetrics: "პასუხის დროის მეტრიკა",
+    avgResponseTime: "საშუალო პასუხის დრო",
+    within24h: "24 საათში",
+    within48h: "48 საათში",
+    fastestResponse: "ყველაზე სწრაფი",
+    totalReplied: "სულ პასუხი",
+    avgResponseDays: "საშუალო პასუხი",
+    days: "დღე",
+    exportReviews: "მიმოხილვების ექსპორტი",
+    exportPDF: "PDF ექსპორტი",
+    exportExcel: "Excel ექსპორტი",
   },
   
   // AI Response Queue

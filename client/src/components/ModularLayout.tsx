@@ -80,7 +80,6 @@ const modules: ModuleItem[] = [
       { nameKey: "submenu.reservationsList", path: "/reservations/list", icon: List },
       { nameKey: "submenu.reservationsCalendar", path: "/reservations/calendar", icon: CalendarDays },
       { nameKey: "submenu.exceptionsIssues", path: "/reservations/exceptions", icon: AlertTriangle },
-      { nameKey: "submenu.aiAssistant", path: "/reservations/ai-assistant", icon: Sparkles },
     ]
   },
   // 3. FINANCE (third)
