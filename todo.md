@@ -533,3 +533,13 @@
 
 ## Module Order Change (Dec 21, 2025)
 - [x] Reorder sidebar modules: Marketing → Reservations → Finance → Integrations
+
+
+## Reviews Command Center Upgrade (Dec 21, 2025)
+- [x] Add date range filter (from-to date picker)
+- [x] Add platform breakdown cards (Google, Booking, Airbnb, TripAdvisor counts)
+- [x] Add rating trend chart (rating over time)
+- [x] Add review volume chart (reviews per month)
+- [x] Add live sync status indicator (last sync timestamp)
+- [ ] Add response time metrics
+- [x] Fix "submenu.reviews" translation bug in tabs

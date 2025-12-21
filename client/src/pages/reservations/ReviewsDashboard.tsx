@@ -112,6 +112,15 @@ const ReviewsDashboard = () => {
 
   // Outscraper webhook status
   const { data: outscraperStatus } = trpc.reviews.getOutscraperStatus.useQuery();
+
+  // Platform breakdown
+  const { data: platformBreakdown } = trpc.reviews.getPlatformBreakdown.useQuery();
+
+  // Last sync time
+  const { data: lastSyncData } = trpc.reviews.getLastSyncTime.useQuery();
+
+  // Rating trend
+  const { data: ratingTrend } = trpc.reviews.getRatingTrend.useQuery();
   const [showWebhookInfo, setShowWebhookInfo] = useState(false);
 
   const syncDemoMutation = trpc.reviews.syncDemoReviews.useMutation({
@@ -309,6 +318,54 @@ const ReviewsDashboard = () => {
         </Card>
       </div>
 
+      {/* Platform Breakdown */}
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-lg flex items-center gap-2">
+            <PieChart className="h-5 w-5" />
+            {t("reviews.platformBreakdown")}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {platformBreakdown?.map((platform) => {
+              const config = platformConfig[platform.source] || { color: "text-gray-600", bgColor: "bg-gray-500/10", icon: "?" };
+              return (
+                <div key={platform.source} className={`p-4 rounded-lg ${config.bgColor} border border-white/10`}>
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className={`text-xl font-bold ${config.color}`}>{config.icon}</span>
+                    <span className="font-medium capitalize">{platform.source}</span>
+                  </div>
+                  <p className="text-2xl font-bold">{platform.count}</p>
+                  <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                    <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                    {platform.avgRating}
+                  </div>
+                </div>
+              );
+            })}
+            {(!platformBreakdown || platformBreakdown.length === 0) && (
+              <div className="col-span-4 text-center text-muted-foreground py-4">
+                {t("reviews.noReviews")}
+              </div>
+            )}
+          </div>
+          {/* Last Sync Info */}
+          <div className="mt-4 pt-4 border-t border-white/10 flex items-center justify-between text-sm text-muted-foreground">
+            <div className="flex items-center gap-2">
+              <Clock className="h-4 w-4" />
+              <span>{t("reviews.lastSync")}:</span>
+              <span className="font-medium">
+                {lastSyncData?.lastSync 
+                  ? format(new Date(lastSyncData.lastSync), 'dd MMM yyyy, HH:mm')
+                  : t("reviews.neverSynced")
+                }
+              </span>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Filters */}
       <Card>
         <CardContent className="p-4">
@@ -368,6 +425,26 @@ const ReviewsDashboard = () => {
               </SelectContent>
             </Select>
 
+            {/* Date Range Filters */}
+            <div className="flex items-center gap-2">
+              <Calendar className="h-4 w-4 text-muted-foreground" />
+              <Input
+                type="date"
+                value={filters.dateFrom}
+                onChange={(e) => setFilters(f => ({ ...f, dateFrom: e.target.value }))}
+                className="w-[140px]"
+                placeholder={t("reviews.dateFrom")}
+              />
+              <span className="text-muted-foreground">-</span>
+              <Input
+                type="date"
+                value={filters.dateTo}
+                onChange={(e) => setFilters(f => ({ ...f, dateTo: e.target.value }))}
+                className="w-[140px]"
+                placeholder={t("reviews.dateTo")}
+              />
+            </div>
+
             <div className="flex-1">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -392,7 +469,7 @@ const ReviewsDashboard = () => {
           </TabsTrigger>
           <TabsTrigger value="reviews" className="flex items-center gap-2">
             <MessageSquare className="h-4 w-4" />
-            {t("submenu.reviews")}
+            {t("reviews.allReviews")}
           </TabsTrigger>
           <TabsTrigger value="analytics" className="flex items-center gap-2">
             <BarChart3 className="h-4 w-4" />
@@ -635,6 +712,56 @@ const ReviewsDashboard = () => {
                     <p className="text-sm text-muted-foreground">{t("reviews.negative")}</p>
                   </div>
                 </div>
+              </CardContent>
+            </Card>
+
+            {/* Rating Trend Chart */}
+            <Card className="lg:col-span-2">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5" />
+                  {t("reviews.ratingTrend")}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {ratingTrend && ratingTrend.length > 0 ? (
+                  <div className="space-y-4">
+                    {/* Simple bar chart */}
+                    <div className="flex items-end gap-2 h-40">
+                      {ratingTrend.map((item: any) => {
+                        const maxCount = Math.max(...ratingTrend.map((r: any) => r.reviewCount));
+                        const height = maxCount > 0 ? (item.reviewCount / maxCount) * 100 : 0;
+                        return (
+                          <div key={item.month} className="flex-1 flex flex-col items-center gap-1">
+                            <div className="text-xs text-muted-foreground">{item.avgRating}</div>
+                            <div 
+                              className="w-full bg-gradient-to-t from-cyan-500 to-blue-500 rounded-t transition-all"
+                              style={{ height: `${height}%`, minHeight: '4px' }}
+                            />
+                            <div className="text-xs text-muted-foreground">
+                              {item.month.split('-')[1]}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                    {/* Legend */}
+                    <div className="flex items-center justify-center gap-6 text-sm text-muted-foreground">
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 bg-gradient-to-r from-cyan-500 to-blue-500 rounded" />
+                        <span>{t("reviews.reviewVolume")}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                        <span>{t("reviews.avgRating")}</span>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="h-40 flex items-center justify-center text-muted-foreground">
+                    {t("reviews.noReviews")}
+                  </div>
+                )}
               </CardContent>
             </Card>
 

@@ -268,6 +268,18 @@ export const en = {
     error: "Error",
     webhookConfig: "Outscraper Webhook Configuration",
     webhookCopyHint: "Copy this URL and paste it in Outscraper's Webhook settings",
+    allReviews: "All Reviews",
+    dateFrom: "From",
+    dateTo: "To",
+    platformBreakdown: "Platform Breakdown",
+    lastSync: "Last Sync",
+    neverSynced: "Never synced",
+    reviewsFromGoogle: "from Google",
+    reviewsFromBooking: "from Booking",
+    reviewsFromAirbnb: "from Airbnb",
+    reviewsFromTripadvisor: "from TripAdvisor",
+    ratingTrend: "Rating Trend",
+    reviewVolume: "Review Volume",
   },
   
   // AI Response Queue

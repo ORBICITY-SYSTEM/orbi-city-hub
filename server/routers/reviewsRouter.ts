@@ -3,6 +3,7 @@ import { z } from "zod";
 import { getDb } from "../db";
 import { guestReviews, notifications } from "../../drizzle/schema";
 import { eq, desc, sql, and, gte, lte } from "drizzle-orm";
+import { format } from "date-fns";
 
 /**
  * Helper functions for review processing
@@ -550,4 +551,90 @@ export const reviewsRouter = router({
 
     return { success: true, imported, skipped, total: demoReviews.length };
   }),
+
+  /**
+   * Get platform breakdown statistics
+   */
+  getPlatformBreakdown: publicProcedure.query(async () => {
+    const db = await getDb();
+    if (!db) throw new Error("Database not available");
+
+    const breakdown = await db
+      .select({
+        source: guestReviews.source,
+        count: sql<number>`COUNT(*)`,
+        avgRating: sql<number>`AVG(${guestReviews.rating})`,
+      })
+      .from(guestReviews)
+      .groupBy(guestReviews.source);
+
+    return breakdown.map(item => ({
+      source: item.source,
+      count: Number(item.count) || 0,
+      avgRating: item.avgRating ? parseFloat(Number(item.avgRating).toFixed(1)) : 0,
+    }));
+  }),
+
+  /**
+   * Get last sync timestamp
+   */
+  getLastSyncTime: publicProcedure.query(async () => {
+    const db = await getDb();
+    if (!db) throw new Error("Database not available");
+
+    const result = await db
+      .select({ createdAt: guestReviews.createdAt })
+      .from(guestReviews)
+      .orderBy(desc(guestReviews.createdAt))
+      .limit(1);
+
+    return {
+      lastSync: result[0]?.createdAt || null,
+    };
+  }),
+
+  /**
+   * Get rating trend over time (monthly)
+   */
+  getRatingTrend: publicProcedure
+    .input(z.object({
+      months: z.number().min(1).max(24).default(12),
+    }).optional())
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+
+      const monthsBack = input?.months || 12;
+      const startDate = new Date();
+      startDate.setMonth(startDate.getMonth() - monthsBack);
+
+      const reviews = await db
+        .select({
+          rating: guestReviews.rating,
+          reviewDate: guestReviews.reviewDate,
+        })
+        .from(guestReviews)
+        .where(gte(guestReviews.reviewDate, startDate));
+
+      // Group by month
+      const monthlyData: Record<string, { total: number; sum: number; count: number }> = {};
+
+      for (const review of reviews) {
+        if (!review.reviewDate) continue;
+        const monthKey = format(new Date(review.reviewDate), 'yyyy-MM');
+        if (!monthlyData[monthKey]) {
+          monthlyData[monthKey] = { total: 0, sum: 0, count: 0 };
+        }
+        monthlyData[monthKey].count++;
+        monthlyData[monthKey].sum += review.rating || 0;
+      }
+
+      return Object.entries(monthlyData)
+        .map(([month, data]) => ({
+          month,
+          avgRating: data.count > 0 ? parseFloat((data.sum / data.count).toFixed(1)) : 0,
+          reviewCount: data.count,
+        }))
+        .sort((a, b) => a.month.localeCompare(b.month));
+    }),
 });

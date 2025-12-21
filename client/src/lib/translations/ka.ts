@@ -270,6 +270,18 @@ export const ka: Translations = {
     error: "შეცდომა",
     webhookConfig: "Outscraper Webhook კონფიგურაცია",
     webhookCopyHint: "დააკოპირეთ ეს URL და ჩასვით Outscraper-ის Webhook პარამეტრებში",
+    allReviews: "ყველა მიმოხილვა",
+    dateFrom: "დან",
+    dateTo: "მდე",
+    platformBreakdown: "პლატფორმების მიხედვით",
+    lastSync: "ბოლო სინქრონიზაცია",
+    neverSynced: "არასდროს სინქრონიზებული",
+    reviewsFromGoogle: "Google-დან",
+    reviewsFromBooking: "Booking-დან",
+    reviewsFromAirbnb: "Airbnb-დან",
+    reviewsFromTripadvisor: "TripAdvisor-დან",
+    ratingTrend: "რეიტინგის ტრენდი",
+    reviewVolume: "მიმოხილვების რაოდენობა",
   },
   
   // AI Response Queue
