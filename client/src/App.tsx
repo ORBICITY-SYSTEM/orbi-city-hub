@@ -48,12 +48,6 @@ const EmailManagement = lazy(() => import("./pages/EmailManagement"));
 
 // Integrations Module - Lazy
 const Integrations = lazy(() => import("./pages/Integrations"));
-const IntegrationsHub = lazy(() => import("./pages/IntegrationsHub"));
-
-// Marketing Module - Additional Pages
-const CommunicationsInbox = lazy(() => import("./pages/marketing/CommunicationsInbox"));
-const SocialMediaPerformance = lazy(() => import("./pages/marketing/SocialMediaPerformance"));
-const PaidAds = lazy(() => import("./pages/marketing/PaidAds"));
 
 // Settings Module - Lazy
 const Settings = lazy(() => import("./pages/Settings"));
@@ -127,12 +121,6 @@ function RouterContent() {
 
         {/* Integrations Module */}
         <Route path="/integrations" component={Integrations} />
-        <Route path="/integrations-hub" component={IntegrationsHub} />
-
-        {/* Marketing Module - Additional Pages */}
-        <Route path="/marketing/inbox" component={CommunicationsInbox} />
-        <Route path="/marketing/social" component={SocialMediaPerformance} />
-        <Route path="/marketing/ads" component={PaidAds} />
 
         {/* Settings Module */}
         <Route path="/settings" component={Settings} />

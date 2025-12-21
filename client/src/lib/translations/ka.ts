@@ -12,7 +12,6 @@ export const ka: Translations = {
     reservations: "რეზერვაციები",
     logistics: "ლოჯისტიკა",
     whatsappBot: "WhatsApp ბოტი",
-    integrationsHub: "ინტეგრაციების ჰაბი",
   },
   
   // Submenu items
@@ -26,12 +25,9 @@ export const ka: Translations = {
     
     // Marketing
     marketingDashboard: "მთავარი",
-    inbox: "კომუნიკაციების ინბოქსი",
     otaChannels: "OTA არხები",
     webLeads: "ვებ ლიდები",
     liveChat: "ლაივ ჩატი",
-    socialMedia: "სოციალური მედია",
-    paidAds: "ფასიანი რეკლამა",
     
     // Reservations
     otaDashboard: "მთავარი",

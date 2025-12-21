@@ -10,7 +10,6 @@ export const en = {
     reservations: "Reservations",
     logistics: "Logistics",
     whatsappBot: "WhatsApp Bot",
-    integrationsHub: "Integrations Hub",
   },
   
   // Submenu items
@@ -24,12 +23,9 @@ export const en = {
     
     // Marketing
     marketingDashboard: "Dashboard",
-    inbox: "Communications Inbox",
     otaChannels: "OTA Channels",
     webLeads: "Web Leads",
     liveChat: "Live Chat",
-    socialMedia: "Social Media",
-    paidAds: "Paid Ads",
     
     // Reservations
     otaDashboard: "Dashboard",

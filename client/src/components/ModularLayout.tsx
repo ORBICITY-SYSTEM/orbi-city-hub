@@ -31,11 +31,7 @@ import {
   Rocket,
   Sparkles,
   Bot,
-  Send,
-  Plug,
-  Inbox,
-  Instagram,
-  DollarSign as Ads
+  Send
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
@@ -73,11 +69,9 @@ const modules: ModuleItem[] = [
     color: "text-cyan-400",
     subItems: [
       { nameKey: "submenu.marketingDashboard", path: "/marketing", icon: LayoutDashboard },
-      { nameKey: "submenu.inbox", path: "/marketing/inbox", icon: Inbox },
       { nameKey: "submenu.otaChannels", path: "/marketing/ota", icon: Globe },
       { nameKey: "submenu.webLeads", path: "/marketing/leads", icon: Users },
       { nameKey: "submenu.liveChat", path: "/marketing/live-chat", icon: MessageCircle },
-      { nameKey: "submenu.socialMedia", path: "/marketing/social", icon: Instagram },
     ]
   },
   {
@@ -187,19 +181,6 @@ export default function ModularLayout({ children }: { children: React.ReactNode 
             )}>
               <LayoutDashboard className="w-5 h-5" />
               <span className="font-medium">{t("nav.home")}</span>
-            </div>
-          </Link>
-
-          {/* Integrations Hub */}
-          <Link href="/integrations-hub">
-            <div className={cn(
-              "flex items-center gap-3 px-4 py-3 rounded-lg transition-all cursor-pointer",
-              location === "/integrations-hub" 
-                ? "bg-cyan-500/20 text-cyan-400" 
-                : "text-white/70 hover:bg-slate-800/50 hover:text-white"
-            )}>
-              <Plug className="w-5 h-5" />
-              <span className="font-medium">{t("nav.integrationsHub")}</span>
             </div>
           </Link>
 
