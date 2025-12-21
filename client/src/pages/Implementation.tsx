@@ -108,7 +108,7 @@ export default function Implementation() {
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-secondary">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
         <Card className="max-w-md w-full shadow-elegant">
           <CardHeader>
             <CardTitle>შესვლა საჭიროა</CardTitle>
@@ -127,7 +127,7 @@ export default function Implementation() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-secondary py-12">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 py-12">
       <div className="container max-w-7xl">
         <div className="text-center mb-12 animate-fade-in">
           <h1 className="text-4xl md:text-5xl font-bold mb-4 text-gradient">

@@ -122,7 +122,7 @@ export default function Testing() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-secondary py-12">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 py-12">
       <div className="container max-w-6xl">
         <div className="text-center mb-12 animate-fade-in">
           <h1 className="text-4xl md:text-5xl font-bold mb-4 text-gradient">

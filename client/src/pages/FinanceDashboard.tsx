@@ -108,7 +108,7 @@ export default function FinanceDashboard() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
         <div className="text-lg text-white font-bold">Loading real financial data...</div>
       </div>
     );

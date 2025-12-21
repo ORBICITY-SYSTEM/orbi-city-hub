@@ -159,12 +159,12 @@ const OTAAgents = () => {
   const [selectedAgent, setSelectedAgent] = useState<MiniAgent | null>(null);
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 p-6 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-4xl font-bold text-black">OTA CHANNELS AGENT</h1>
-          <p className="text-gray-600 mt-2">Virtual Employees Managing Your Distribution Channels</p>
+          <h1 className="text-4xl font-bold text-cyan-400">OTA CHANNELS AGENT</h1>
+          <p className="text-white/70 mt-2">Virtual Employees Managing Your Distribution Channels</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline">
@@ -185,41 +185,41 @@ const OTAAgents = () => {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-black">Total Agents</CardTitle>
+            <CardTitle className="text-sm font-medium text-cyan-300">Total Agents</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-black">4</div>
-            <p className="text-xs text-gray-600 mt-1">2 active, 2 idle</p>
+            <div className="text-3xl font-bold text-white">4</div>
+            <p className="text-xs text-white/60 mt-1">2 active, 2 idle</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-black">Tasks Completed Today</CardTitle>
+            <CardTitle className="text-sm font-medium text-cyan-300">Tasks Completed Today</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-black">726</div>
+            <div className="text-3xl font-bold text-white">726</div>
             <p className="text-xs text-green-600 mt-1">+12% from yesterday</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-black">Knowledge Loaded</CardTitle>
+            <CardTitle className="text-sm font-medium text-cyan-300">Knowledge Loaded</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-black">78.7 KB</div>
-            <p className="text-xs text-gray-600 mt-1">2 channels analyzed</p>
+            <div className="text-3xl font-bold text-white">78.7 KB</div>
+            <p className="text-xs text-white/60 mt-1">2 channels analyzed</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-black">Avg Performance</CardTitle>
+            <CardTitle className="text-sm font-medium text-cyan-300">Avg Performance</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-black">8.4</div>
-            <p className="text-xs text-gray-600 mt-1">Review score</p>
+            <div className="text-3xl font-bold text-white">8.4</div>
+            <p className="text-xs text-white/60 mt-1">Review score</p>
           </CardContent>
         </Card>
       </div>
@@ -239,12 +239,12 @@ const OTAAgents = () => {
                   {agent.status}
                 </Badge>
               </div>
-              <CardTitle className="text-lg mt-2 text-black">{agent.name}</CardTitle>
-              <CardDescription className="text-black">{agent.channel}</CardDescription>
+              <CardTitle className="text-lg mt-2 text-white">{agent.name}</CardTitle>
+              <CardDescription className="text-white/70">{agent.channel}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-black">Priority</span>
+                <span className="text-sm text-white/70">Priority</span>
                 <Badge className={getPriorityColor(agent.priority)}>
                   {agent.priority}
                 </Badge>
@@ -252,15 +252,15 @@ const OTAAgents = () => {
 
               <div className="space-y-1">
                 <div className="flex justify-between text-sm">
-                  <span className="text-black">Knowledge Base</span>
-                  <span className="text-black">{agent.knowledgeBase.loaded ? "✅" : "❌"}</span>
+                  <span className="text-white/70">Knowledge Base</span>
+                  <span className="text-white">{agent.knowledgeBase.loaded ? "✅" : "❌"}</span>
                 </div>
                 {agent.knowledgeBase.loaded && (
                   <Progress value={100} className="h-2" />
                 )}
               </div>
 
-              <div className="text-xs text-gray-600">
+              <div className="text-xs text-white/60">
                 <div>Last activity: {agent.lastActivity}</div>
                 <div>Tasks completed: {agent.tasksCompleted}</div>
               </div>
@@ -269,7 +269,7 @@ const OTAAgents = () => {
                 <div className="pt-2 border-t">
                   <div className="flex items-center gap-2 text-sm">
                     <Star className="h-4 w-4 text-yellow-500" />
-                    <span className="text-black">{agent.performance.reviewScore}/10</span>
+                    <span className="text-white">{agent.performance.reviewScore}/10</span>
                   </div>
                 </div>
               )}
@@ -282,8 +282,8 @@ const OTAAgents = () => {
       {selectedAgent && (
         <Card>
           <CardHeader>
-            <CardTitle className="text-black">{selectedAgent.name} - Detailed View</CardTitle>
-            <CardDescription className="text-black">
+            <CardTitle className="text-white">{selectedAgent.name} - Detailed View</CardTitle>
+            <CardDescription className="text-white/70">
               Managing {selectedAgent.channel} channel
             </CardDescription>
           </CardHeader>
@@ -299,41 +299,41 @@ const OTAAgents = () => {
               <TabsContent value="overview" className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <h4 className="font-semibold text-black mb-2">Agent Status</h4>
+                    <h4 className="font-semibold text-cyan-300 mb-2">Agent Status</h4>
                     <div className="space-y-2">
                       <div className="flex justify-between">
-                        <span className="text-black">Status:</span>
+                        <span className="text-white/70">Status:</span>
                         <Badge className={getStatusColor(selectedAgent.status)}>
                           {selectedAgent.status}
                         </Badge>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-black">Priority:</span>
+                        <span className="text-white/70">Priority:</span>
                         <Badge className={getPriorityColor(selectedAgent.priority)}>
                           {selectedAgent.priority}
                         </Badge>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-black">Last Activity:</span>
-                        <span className="text-black">{selectedAgent.lastActivity}</span>
+                        <span className="text-white/70">Last Activity:</span>
+                        <span className="text-white">{selectedAgent.lastActivity}</span>
                       </div>
                     </div>
                   </div>
 
                   <div>
-                    <h4 className="font-semibold text-black mb-2">Performance Metrics</h4>
+                    <h4 className="font-semibold text-cyan-300 mb-2">Performance Metrics</h4>
                     <div className="space-y-2">
                       <div className="flex justify-between">
-                        <span className="text-black">Review Score:</span>
-                        <span className="text-black">{selectedAgent.performance.reviewScore}/10</span>
+                        <span className="text-white/70">Review Score:</span>
+                        <span className="text-white">{selectedAgent.performance.reviewScore}/10</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-black">Occupancy:</span>
-                        <span className="text-black">{selectedAgent.performance.occupancyRate}%</span>
+                        <span className="text-white/70">Occupancy:</span>
+                        <span className="text-white">{selectedAgent.performance.occupancyRate}%</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-black">Avg Daily Rate:</span>
-                        <span className="text-black">${selectedAgent.performance.averageDailyRate}</span>
+                        <span className="text-white/70">Avg Daily Rate:</span>
+                        <span className="text-white">${selectedAgent.performance.averageDailyRate}</span>
                       </div>
                     </div>
                   </div>
@@ -344,21 +344,21 @@ const OTAAgents = () => {
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
                     <CheckCircle2 className={`h-5 w-5 ${selectedAgent.knowledgeBase.loaded ? "text-green-600" : "text-gray-400"}`} />
-                    <span className="text-black">Knowledge Base Loaded: {selectedAgent.knowledgeBase.loaded ? "Yes" : "No"}</span>
+                    <span className="text-white">Knowledge Base Loaded: {selectedAgent.knowledgeBase.loaded ? "Yes" : "No"}</span>
                   </div>
                   {selectedAgent.knowledgeBase.loaded && (
                     <>
                       <div className="flex items-center gap-2">
                         <CheckCircle2 className="h-5 w-5 text-green-600" />
-                        <span className="text-black">Size: {(selectedAgent.knowledgeBase.size / 1024).toFixed(2)} KB</span>
+                        <span className="text-white">Size: {(selectedAgent.knowledgeBase.size / 1024).toFixed(2)} KB</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <CheckCircle2 className={`h-5 w-5 ${selectedAgent.knowledgeBase.hasCompetitorData ? "text-green-600" : "text-gray-400"}`} />
-                        <span className="text-black">Competitor Data: {selectedAgent.knowledgeBase.hasCompetitorData ? "Available" : "Not Available"}</span>
+                        <span className="text-white">Competitor Data: {selectedAgent.knowledgeBase.hasCompetitorData ? "Available" : "Not Available"}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <CheckCircle2 className={`h-5 w-5 ${selectedAgent.knowledgeBase.hasPricingData ? "text-green-600" : "text-gray-400"}`} />
-                        <span className="text-black">Pricing Data: {selectedAgent.knowledgeBase.hasPricingData ? "Available" : "Not Available"}</span>
+                        <span className="text-white">Pricing Data: {selectedAgent.knowledgeBase.hasPricingData ? "Available" : "Not Available"}</span>
                       </div>
                     </>
                   )}
@@ -366,8 +366,8 @@ const OTAAgents = () => {
               </TabsContent>
 
               <TabsContent value="tasks" className="space-y-4">
-                <div className="text-black">
-                  <h4 className="font-semibold mb-2">Completed Tasks: {selectedAgent.tasksCompleted}</h4>
+                <div className="text-white">
+                  <h4 className="font-semibold text-cyan-300 mb-2">Completed Tasks: {selectedAgent.tasksCompleted}</h4>
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
                       <Clock className="h-4 w-4 text-blue-600" />
@@ -386,8 +386,8 @@ const OTAAgents = () => {
               </TabsContent>
 
               <TabsContent value="performance" className="space-y-4">
-                <div className="text-black">
-                  <h4 className="font-semibold mb-2">Channel Performance</h4>
+                <div className="text-white">
+                  <h4 className="font-semibold text-cyan-300 mb-2">Channel Performance</h4>
                   {selectedAgent.performance.reviewScore > 0 ? (
                     <div className="space-y-3">
                       <div>
@@ -412,7 +412,7 @@ const OTAAgents = () => {
                       </div>
                     </div>
                   ) : (
-                    <div className="text-gray-600">
+                    <div className="text-white/60">
                       Performance data not yet available for this channel.
                     </div>
                   )}

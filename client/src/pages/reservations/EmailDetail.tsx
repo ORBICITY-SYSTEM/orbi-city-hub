@@ -55,8 +55,8 @@ export default function EmailDetail() {
 
   if (!emailId) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-gray-600">Email not found</p>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
+        <p className="text-white/70">Email not found</p>
       </div>
     );
   }
@@ -99,19 +99,19 @@ export default function EmailDetail() {
 
   if (emailLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
+        <Loader2 className="w-8 h-8 animate-spin text-cyan-400" />
       </div>
     );
   }
 
   if (!email) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50">
-        <Card className="p-8 text-center">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
+        <Card className="p-8 text-center bg-white/10 border-white/10">
           <AlertCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Email Not Found</h2>
-          <p className="text-gray-600 mb-4">This email may have been deleted or moved.</p>
+          <h2 className="text-xl font-semibold text-white mb-2">Email Not Found</h2>
+          <p className="text-white/70 mb-4">This email may have been deleted or moved.</p>
           <Button onClick={() => setLocation("/email-inbox")}>
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Inbox

@@ -121,7 +121,7 @@ export default function UserManagementPage() {
 
   if (!hasPermission("canManageUsers")) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-[#0a1628]">
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
         <div className="text-center p-8 bg-[#1a2942] rounded-xl border border-red-500/30">
           <div className="text-6xl mb-4">🔒</div>
           <h2 className="text-xl font-bold text-white mb-2">წვდომა შეზღუდულია</h2>

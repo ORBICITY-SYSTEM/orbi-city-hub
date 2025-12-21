@@ -44,10 +44,10 @@ export default function OTELMSAnalytics() {
 
   if (isLoading) {
     return (
-      <div className="p-8 min-h-screen flex items-center justify-center">
+      <div className="p-8 min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1B5E40] mx-auto mb-4"></div>
-          <p className="text-slate-600">Loading OTELMS data...</p>
+          <p className="text-white/70">Loading OTELMS data...</p>
         </div>
       </div>
     );
@@ -55,11 +55,11 @@ export default function OTELMSAnalytics() {
 
   if (!latestReport) {
     return (
-      <div className="p-8 min-h-screen">
+      <div className="p-8 min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
         <div className="glass-card p-8 text-center">
           <Building2 className="w-16 h-16 text-slate-400 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-slate-900 mb-2">No OTELMS Data Available</h2>
-          <p className="text-slate-600">
+          <h2 className="text-2xl font-bold text-white mb-2">No OTELMS Data Available</h2>
+          <p className="text-white/70">
             Daily reports from OTELMS will appear here once the email integration is active.
           </p>
         </div>
@@ -108,13 +108,13 @@ export default function OTELMSAnalytics() {
   ];
 
   return (
-    <div className="p-8 min-h-screen">
+    <div className="p-8 min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-4xl font-bold text-slate-900 mb-2 drop-shadow-sm">
+        <h1 className="text-4xl font-bold text-cyan-400 mb-2">
           OTELMS Analytics
         </h1>
-        <p className="text-slate-700 text-lg">
+        <p className="text-white/70 text-lg">
           Real-time data from OTELMS Hotel Management System
         </p>
       </div>
