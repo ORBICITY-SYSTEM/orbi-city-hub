@@ -40,7 +40,8 @@ export const SHEETS_CONFIG = {
   },
   
   // Google Apps Script Web App URL (for write operations)
-  APPSCRIPT_WEB_APP_URL: import.meta.env.VITE_APPSCRIPT_WEB_APP_URL || '',
+  // LIVE URL: OrbiHub_Brain deployed Dec 22, 2025
+  APPSCRIPT_WEB_APP_URL: import.meta.env.VITE_APPSCRIPT_WEB_APP_URL || 'https://script.google.com/macros/s/AKfycbyhtSuushijLz-VnTTxjJOTBfyge544D0Mwv-FIVIL9rxQtVZ7g97sALlZ4oDRsn4H-/exec',
   
   // Cache duration in milliseconds
   CACHE_DURATION: 5 * 60 * 1000, // 5 minutes
