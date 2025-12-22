@@ -1,0 +1,127 @@
+{
+  "query": "SHOW TABLES;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user c2qSkVB4gKtEmor.991468648419 --database 4ExKc24KNHdr4pKbTUzsoU --execute SHOW TABLES;",
+  "rows": [
+    {
+      "Tables_in_4ExKc24KNHdr4pKbTUzsoU": "__drizzle_migrations"
+    },
+    {
+      "Tables_in_4ExKc24KNHdr4pKbTUzsoU": "activityLogs"
+    },
+    {
+      "Tables_in_4ExKc24KNHdr4pKbTUzsoU": "adminUsers"
+    },
+    {
+      "Tables_in_4ExKc24KNHdr4pKbTUzsoU": "aiConversations"
+    },
+    {
+      "Tables_in_4ExKc24KNHdr4pKbTUzsoU": "aiTaskAnalytics"
+    },
+    {
+      "Tables_in_4ExKc24KNHdr4pKbTUzsoU": "butler_tasks"
+    },
+    {
+      "Tables_in_4ExKc24KNHdr4pKbTUzsoU": "chatMessages"
+    },
+    {
+      "Tables_in_4ExKc24KNHdr4pKbTUzsoU": "emailCategories"
+    },
+    {
+      "Tables_in_4ExKc24KNHdr4pKbTUzsoU": "emailSummaries"
+    },
+    {
+      "Tables_in_4ExKc24KNHdr4pKbTUzsoU": "emails"
+    },
+    {
+      "Tables_in_4ExKc24KNHdr4pKbTUzsoU": "errorLogs"
+    },
+    {
+      "Tables_in_4ExKc24KNHdr4pKbTUzsoU": "files"
+    },
+    {
+      "Tables_in_4ExKc24KNHdr4pKbTUzsoU": "financialData"
+    },
+    {
+      "Tables_in_4ExKc24KNHdr4pKbTUzsoU": "googleBusinessTokens"
+    },
+    {
+      "Tables_in_4ExKc24KNHdr4pKbTUzsoU": "guestReviews"
+    },
+    {
+      "Tables_in_4ExKc24KNHdr4pKbTUzsoU": "guest_reviews"
+    },
+    {
+      "Tables_in_4ExKc24KNHdr4pKbTUzsoU": "guests"
+    },
+    {
+      "Tables_in_4ExKc24KNHdr4pKbTUzsoU": "housekeepingSchedules"
+    },
+    {
+      "Tables_in_4ExKc24KNHdr4pKbTUzsoU": "housekeepingTasks"
+    },
+    {
+      "Tables_in_4ExKc24KNHdr4pKbTUzsoU": "integrations"
+    },
+    {
+      "Tables_in_4ExKc24KNHdr4pKbTUzsoU": "inventoryItems"
+    },
+    {
+      "Tables_in_4ExKc24KNHdr4pKbTUzsoU": "logisticsActivityLog"
+    },
+    {
+      "Tables_in_4ExKc24KNHdr4pKbTUzsoU": "maintenanceSchedules"
+    },
+    {
+      "Tables_in_4ExKc24KNHdr4pKbTUzsoU": "modules"
+    },
+    {
+      "Tables_in_4ExKc24KNHdr4pKbTUzsoU": "notifications"
+    },
+    {
+      "Tables_in_4ExKc24KNHdr4pKbTUzsoU": "ota_bookings"
+    },
+    {
+      "Tables_in_4ExKc24KNHdr4pKbTUzsoU": "ota_monthly_stats"
+    },
+    {
+      "Tables_in_4ExKc24KNHdr4pKbTUzsoU": "otelmsDailyReports"
+    },
+    {
+      "Tables_in_4ExKc24KNHdr4pKbTUzsoU": "reservations"
+    },
+    {
+      "Tables_in_4ExKc24KNHdr4pKbTUzsoU": "reviewNotifications"
+    },
+    {
+      "Tables_in_4ExKc24KNHdr4pKbTUzsoU": "roomInventoryItems"
+    },
+    {
+      "Tables_in_4ExKc24KNHdr4pKbTUzsoU": "rooms"
+    },
+    {
+      "Tables_in_4ExKc24KNHdr4pKbTUzsoU": "standardInventoryItems"
+    },
+    {
+      "Tables_in_4ExKc24KNHdr4pKbTUzsoU": "systemConfig"
+    },
+    {
+      "Tables_in_4ExKc24KNHdr4pKbTUzsoU": "systemSettings"
+    },
+    {
+      "Tables_in_4ExKc24KNHdr4pKbTUzsoU": "tawktoMessages"
+    },
+    {
+      "Tables_in_4ExKc24KNHdr4pKbTUzsoU": "unsubscribeSuggestions"
+    },
+    {
+      "Tables_in_4ExKc24KNHdr4pKbTUzsoU": "users"
+    },
+    {
+      "Tables_in_4ExKc24KNHdr4pKbTUzsoU": "whitelabelSettings"
+    }
+  ],
+  "messages": [],
+  "stdout": "Tables_in_4ExKc24KNHdr4pKbTUzsoU\n__drizzle_migrations\nactivityLogs\nadminUsers\naiConversations\naiTaskAnalytics\nbutler_tasks\nchatMessages\nemailCategories\nemailSummaries\nemails\nerrorLogs\nfiles\nfinancialData\ngoogleBusinessTokens\nguestReviews\nguest_reviews\nguests\nhousekeepingSchedules\nhousekeepingTasks\nintegrations\ninventoryItems\nlogisticsActivityLog\nmaintenanceSchedules\nmodules\nnotifications\nota_bookings\nota_monthly_stats\notelmsDailyReports\nreservations\nreviewNotifications\nroomInventoryItems\nrooms\nstandardInventoryItems\nsystemConfig\nsystemSettings\ntawktoMessages\nunsubscribeSuggestions\nusers\nwhitelabelSettings\n",
+  "stderr": "",
+  "execution_time_ms": 118
+}

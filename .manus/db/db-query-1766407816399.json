@@ -1,0 +1,45 @@
+{
+  "query": "SELECT month, year, totalRevenue, occupancyRate, studios FROM financialData ORDER BY year DESC, monthNumber DESC LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user c2qSkVB4gKtEmor.991468648419 --database 4ExKc24KNHdr4pKbTUzsoU --execute SELECT month, year, totalRevenue, occupancyRate, studios FROM financialData ORDER BY year DESC, monthNumber DESC LIMIT 5;",
+  "rows": [
+    {
+      "month": "Nov 2025",
+      "year": "2025",
+      "totalRevenue": "52665.00",
+      "occupancyRate": "77.00",
+      "studios": "75"
+    },
+    {
+      "month": "Oct 2025",
+      "year": "2025",
+      "totalRevenue": "61222.00",
+      "occupancyRate": "68.00",
+      "studios": "56"
+    },
+    {
+      "month": "Sep 2025",
+      "year": "2025",
+      "totalRevenue": "114074.00",
+      "occupancyRate": "80.50",
+      "studios": "55"
+    },
+    {
+      "month": "Aug 2025",
+      "year": "2025",
+      "totalRevenue": "218594.00",
+      "occupancyRate": "90.50",
+      "studios": "54"
+    },
+    {
+      "month": "Jul 2025",
+      "year": "2025",
+      "totalRevenue": "175512.00",
+      "occupancyRate": "88.00",
+      "studios": "53"
+    }
+  ],
+  "messages": [],
+  "stdout": "month\tyear\ttotalRevenue\toccupancyRate\tstudios\nNov 2025\t2025\t52665.00\t77.00\t75\nOct 2025\t2025\t61222.00\t68.00\t56\nSep 2025\t2025\t114074.00\t80.50\t55\nAug 2025\t2025\t218594.00\t90.50\t54\nJul 2025\t2025\t175512.00\t88.00\t53\n",
+  "stderr": "",
+  "execution_time_ms": 54
+}

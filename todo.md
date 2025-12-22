@@ -689,3 +689,28 @@
 - [x] Enable Logistics menu in ModularLayout
 - [x] Add nav.logistics to default expanded modules
 - [x] Test Logistics dashboard loads correctly
+
+
+## Investor Video Demo Mode (Dec 22, 2025)
+
+### Step 1: Logistics Demo Data
+- [ ] Create demo-logistics-seeder with 60 apartments (101-160)
+- [ ] Add 3 staff members (Nino-Maid, Giorgi-Tech, Manager)
+- [ ] Inject 15 active tasks (5 cleaning, 3 AC maintenance, 7 inspection)
+- [ ] High-contrast status badges (Red/Green/Amber)
+
+### Step 2: Dashboard Visualization
+- [ ] Hard-code 25% growth revenue chart
+- [ ] Set occupancy widget to 85%
+- [ ] Channel split pie chart (Booking 45%, Expedia 20%, Airbnb 15%, Direct 20%)
+
+### Step 3: AI Reviews Wow Factor
+- [ ] Disable actual Gemini API call for demo
+- [ ] Hard-code instant AI response for negative reviews
+- [ ] Add "AI Generating..." animation (1.5 seconds)
+
+### Step 4: UI Cleanup for Camera
+- [ ] Hide Excel upload buttons
+- [ ] Hide ExpediaEmailParser settings
+- [ ] Reorder sidebar: Dashboard → Logistics → Reservations → Guest Experience
+- [ ] Add "System Online | OTELMS Connected" banner

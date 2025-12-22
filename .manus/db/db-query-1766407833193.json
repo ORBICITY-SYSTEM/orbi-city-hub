@@ -1,0 +1,26 @@
+{
+  "query": "SELECT source, COUNT(*) as count FROM guestReviews GROUP BY source;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user c2qSkVB4gKtEmor.991468648419 --database 4ExKc24KNHdr4pKbTUzsoU --execute SELECT source, COUNT(*) as count FROM guestReviews GROUP BY source;",
+  "rows": [
+    {
+      "source": "booking",
+      "count": "155"
+    },
+    {
+      "source": "airbnb",
+      "count": "17"
+    },
+    {
+      "source": "tripadvisor",
+      "count": "3"
+    },
+    {
+      "source": "google",
+      "count": "100"
+    }
+  ],
+  "messages": [],
+  "stdout": "source\tcount\nbooking\t155\nairbnb\t17\ntripadvisor\t3\ngoogle\t100\n",
+  "stderr": "",
+  "execution_time_ms": 51
+}
