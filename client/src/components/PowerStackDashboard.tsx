@@ -34,19 +34,26 @@ import {
   useTriggerSync 
 } from '@/hooks/useGoogleSheets';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useDemoMode } from '@/hooks/useDemoMode';
 
 // ============================================================================
 // POWERSTACK BADGE COMPONENT
 // ============================================================================
 
 function PowerStackBadge() {
+  const { isDemo, badge } = useDemoMode();
+  
   return (
     <Badge 
       variant="outline" 
-      className="bg-gradient-to-r from-green-500/20 to-emerald-500/20 border-green-500/50 text-green-400 text-xs"
+      className={`text-xs ${
+        isDemo 
+          ? 'bg-gradient-to-r from-amber-500/20 to-orange-500/20 border-amber-500/50 text-amber-400'
+          : 'bg-gradient-to-r from-green-500/20 to-emerald-500/20 border-green-500/50 text-green-400'
+      }`}
     >
       <Cloud className="w-3 h-3 mr-1" />
-      PowerStack
+      {isDemo ? 'Demo Mode' : 'PowerStack'}
     </Badge>
   );
 }
@@ -265,6 +272,7 @@ function HousekeepingGrid() {
 
 export function PowerStackDashboard() {
   const { language } = useLanguage();
+  const { isDemo, dataSource } = useDemoMode();
   const { data: kpis, isLoading: kpisLoading, refetch: refetchKPIs } = useDashboardKPIs();
   const { data: financials, isLoading: financialsLoading } = useFinancialMetrics();
   const { mutate: triggerSync, isLoading: syncing } = useTriggerSync();
@@ -320,8 +328,15 @@ export function PowerStackDashboard() {
       <div className="flex items-center gap-2 text-xs text-white/40">
         <Database className="w-4 h-4" />
         <span>{language === 'ka' ? 'მონაცემთა წყარო:' : 'Data Source:'}</span>
-        <span className="text-green-400 font-medium">Google Sheets</span>
-        <CheckCircle2 className="w-3 h-3 text-green-400" />
+        <span className={`font-medium ${isDemo ? 'text-amber-400' : 'text-green-400'}`}>
+          {isDemo ? 'Demo Data (High-Fidelity)' : dataSource}
+        </span>
+        <CheckCircle2 className={`w-3 h-3 ${isDemo ? 'text-amber-400' : 'text-green-400'}`} />
+        {isDemo && (
+          <Badge variant="outline" className="ml-2 text-[10px] border-amber-500/30 text-amber-400 py-0">
+            VITE_USE_DEMO_DATA=true
+          </Badge>
+        )}
       </div>
 
       {/* KPI Cards */}

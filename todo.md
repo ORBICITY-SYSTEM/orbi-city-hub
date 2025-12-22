@@ -776,3 +776,12 @@
 - [ ] Create Google Sheets template structure
 - [ ] Document AppScript deployment steps
 - [ ] Create Vercel deployment guide
+
+
+### PowerStack Simulation Mode (Dec 22, 2025)
+- [x] Update PowerStack_Main_Engine.js with Simulation Mode
+- [x] Add doGet(e) with action parameter handling
+- [x] Add getDashboardStats simulation (~45,000 GEL, ~82%, ~48 guests)
+- [x] Add getHousekeeping simulation (60 units, random statuses)
+- [x] Update GoogleSheetsService.ts with High-Fidelity Mock Data
+- [x] Ensure no white screens during demo
