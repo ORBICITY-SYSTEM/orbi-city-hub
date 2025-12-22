@@ -35,6 +35,7 @@ import {
 } from '@/hooks/useGoogleSheets';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useDemoMode } from '@/hooks/useDemoMode';
+import { RevenueHistoryChart } from '@/components/RevenueHistoryChart';
 
 // ============================================================================
 // POWERSTACK BADGE COMPONENT
@@ -437,6 +438,9 @@ export function PowerStackDashboard() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Revenue History Chart */}
+      <RevenueHistoryChart />
 
       {/* Two Column Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

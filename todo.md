@@ -785,3 +785,11 @@
 - [x] Add getHousekeeping simulation (60 units, random statuses)
 - [x] Update GoogleSheetsService.ts with High-Fidelity Mock Data
 - [x] Ensure no white screens during demo
+
+
+### Revenue History Chart (Dec 22, 2025)
+- [x] Create RevenueHistoryChart component
+- [x] Add monthly revenue/expenses/profit line chart
+- [x] Add occupancy trend overlay
+- [x] Integrate with GoogleSheetsService
+- [x] Add to PowerStackDashboard
