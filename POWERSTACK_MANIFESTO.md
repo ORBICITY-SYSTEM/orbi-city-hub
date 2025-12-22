@@ -27,6 +27,26 @@ This document is the constitution of the PowerStack HotelOS project. Every line 
 
 ---
 
+## 🏛️ UPDATED STRATEGY: The "PowerStack" 2.0 (With Marketing Automation)
+
+**CONTEXT:** We have finalized the core philosophy. Now we are expanding the scope to include "Vital Operations" (Telegram) and "Automated Marketing" (Socials).
+
+### 1. THE NERVOUS SYSTEM (Telegram)
+
+*   **Telegram is Mandatory:** We do not use email for internal ops. All alerts (Clean/Dirty, New Booking, Financial Report) go to specific Telegram Topics via AppScript Bots.
+*   **Bot Logic:** The bot must be "Status Aware". It doesn't just send text; it provides inline buttons (e.g., "Mark Clean", "Approve Discount").
+
+### 2. THE MARKETING ENGINE (The "Unreachable" Channels)
+
+*   **Strategy:** We use **Make.com** as the bridge for Facebook, Instagram, and WhatsApp.
+*   **The "Content Factory" Logic:**
+    *   **Source:** Positive Reviews (from Outscraper/Sheet) or Low Occupancy Alerts (from Sheet).
+    *   **Processor:** Gemini (AppScript) writes the caption/story text.
+    *   **Distributor:** Make.com pushes to FB/Insta.
+*   **Goal:** "Always-on" social presence driven by data triggers, not manual posting.
+
+---
+
 This manifesto is the single source of truth for our development strategy. Any deviation requires explicit approval from the project lead.
 
 **Signed,**
