@@ -57,6 +57,9 @@ const Settings = lazy(() => import("./pages/Settings"));
 const LogisticsDashboard = lazy(() => import("./pages/logistics/LogisticsDashboard"));
 const Housekeeping = lazy(() => import("./pages/logistics/Housekeeping"));
 
+// Operations Module - PowerStack
+const HousekeepingGrid = lazy(() => import("./pages/operations/HousekeepingGrid"));
+
 // WhatsApp Bot Module - Lazy
 const WhatsAppImplementation = lazy(() => import("./pages/Implementation"));
 const WhatsAppCodeExamples = lazy(() => import("./pages/CodeExamples"));
@@ -131,6 +134,9 @@ function RouterContent() {
         {/* Logistics Module */}
         <Route path="/logistics" component={LogisticsDashboard} />
         <Route path="/logistics/housekeeping" component={Housekeeping} />
+
+        {/* Operations Module - PowerStack */}
+        <Route path="/operations/housekeeping" component={HousekeepingGrid} />
 
         {/* AI Agent Module */}
         <Route path="/ai-agent" component={MirrorEffectAgent} />
