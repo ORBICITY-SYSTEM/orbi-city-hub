@@ -1,0 +1,66 @@
+{
+  "query": "SELECT 'users' as table_name, COUNT(*) as row_count FROM users\nUNION ALL SELECT 'guestReviews', COUNT(*) FROM guestReviews\nUNION ALL SELECT 'financialData', COUNT(*) FROM financialData\nUNION ALL SELECT 'notifications', COUNT(*) FROM notifications\nUNION ALL SELECT 'activityLogs', COUNT(*) FROM activityLogs\nUNION ALL SELECT 'reservations', COUNT(*) FROM reservations\nUNION ALL SELECT 'emails', COUNT(*) FROM emails\nUNION ALL SELECT 'chatMessages', COUNT(*) FROM chatMessages\nUNION ALL SELECT 'guests', COUNT(*) FROM guests\nUNION ALL SELECT 'rooms', COUNT(*) FROM rooms\nUNION ALL SELECT 'housekeepingTasks', COUNT(*) FROM housekeepingTasks\nUNION ALL SELECT 'integrations', COUNT(*) FROM integrations\nUNION ALL SELECT 'systemSettings', COUNT(*) FROM systemSettings\nUNION ALL SELECT 'whitelabelSettings', COUNT(*) FROM whitelabelSettings",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user c2qSkVB4gKtEmor.991468648419 --database 4ExKc24KNHdr4pKbTUzsoU --execute SELECT 'users' as table_name, COUNT(*) as row_count FROM users\nUNION ALL SELECT 'guestReviews', COUNT(*) FROM guestReviews\nUNION ALL SELECT 'financialData', COUNT(*) FROM financialData\nUNION ALL SELECT 'notifications', COUNT(*) FROM notifications\nUNION ALL SELECT 'activityLogs', COUNT(*) FROM activityLogs\nUNION ALL SELECT 'reservations', COUNT(*) FROM reservations\nUNION ALL SELECT 'emails', COUNT(*) FROM emails\nUNION ALL SELECT 'chatMessages', COUNT(*) FROM chatMessages\nUNION ALL SELECT 'guests', COUNT(*) FROM guests\nUNION ALL SELECT 'rooms', COUNT(*) FROM rooms\nUNION ALL SELECT 'housekeepingTasks', COUNT(*) FROM housekeepingTasks\nUNION ALL SELECT 'integrations', COUNT(*) FROM integrations\nUNION ALL SELECT 'systemSettings', COUNT(*) FROM systemSettings\nUNION ALL SELECT 'whitelabelSettings', COUNT(*) FROM whitelabelSettings",
+  "rows": [
+    {
+      "table_name": "users",
+      "row_count": "420"
+    },
+    {
+      "table_name": "guestReviews",
+      "row_count": "275"
+    },
+    {
+      "table_name": "activityLogs",
+      "row_count": "0"
+    },
+    {
+      "table_name": "notifications",
+      "row_count": "0"
+    },
+    {
+      "table_name": "financialData",
+      "row_count": "0"
+    },
+    {
+      "table_name": "emails",
+      "row_count": "0"
+    },
+    {
+      "table_name": "reservations",
+      "row_count": "0"
+    },
+    {
+      "table_name": "guests",
+      "row_count": "0"
+    },
+    {
+      "table_name": "chatMessages",
+      "row_count": "0"
+    },
+    {
+      "table_name": "rooms",
+      "row_count": "56"
+    },
+    {
+      "table_name": "systemSettings",
+      "row_count": "0"
+    },
+    {
+      "table_name": "housekeepingTasks",
+      "row_count": "0"
+    },
+    {
+      "table_name": "integrations",
+      "row_count": "0"
+    },
+    {
+      "table_name": "whitelabelSettings",
+      "row_count": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "table_name\trow_count\nusers\t420\nguestReviews\t275\nactivityLogs\t0\nnotifications\t0\nfinancialData\t0\nemails\t0\nreservations\t0\nguests\t0\nchatMessages\t0\nrooms\t56\nsystemSettings\t0\nhousekeepingTasks\t0\nintegrations\t0\nwhitelabelSettings\t0\n",
+  "stderr": "",
+  "execution_time_ms": 73
+}

@@ -2,7 +2,7 @@
  * Live Chat Dashboard
  * 
  * Real-time Tawk.to messages display via Firebase
- * Architecture: Tawk.to → N8N → Firebase → Manus Dashboard
+ * Architecture: Tawk.to → N8N/AppScript → Firebase → ORBI Hub Dashboard
  */
 
 import { useState, useEffect } from 'react';

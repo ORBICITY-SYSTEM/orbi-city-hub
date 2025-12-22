@@ -1,7 +1,7 @@
 /**
  * Firebase Configuration for ORBI City Hub
  * 
- * Architecture: Manus + Firebase + N8N
+ * Architecture: Google Workspace + Firebase + Gemini AI
  * - Firebase Firestore: Real-time database for chat messages, notifications
  * - Firebase Auth: Google Workspace authentication
  * - N8N: Webhook processing and AI workflows
