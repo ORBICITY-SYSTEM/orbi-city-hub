@@ -4,13 +4,13 @@ import { Badge } from "@/components/ui/badge";
 import { Package, Pencil, Warehouse, Calendar, Wrench } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { useNavigate } from "react-router-dom";
+import { useLocation } from "wouter";
 import { useModuleCustomization } from "@/hooks/useModuleCustomization";
 import { ModuleEditDialog } from "./ModuleEditDialog";
 
 export const OrbiLogistics = () => {
   const { t } = useLanguage();
-  const navigate = useNavigate();
+  const [, setLocation] = useLocation();
   const [editOpen, setEditOpen] = useState(false);
   
   const defaultTitle = t("ოთახები და დასუფთავება", "Rooms & Housekeeping");
@@ -24,7 +24,7 @@ export const OrbiLogistics = () => {
   
   return (
     <>
-      <Card className="border-primary/20 cursor-pointer" onClick={() => navigate("/logistics")}>
+      <Card className="border-primary/20 cursor-pointer" onClick={() => setLocation("/logistics")}>
         <CardHeader>
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-ai text-2xl">
@@ -62,7 +62,7 @@ export const OrbiLogistics = () => {
               variant="outline" 
               size="sm" 
               className="flex-1"
-              onClick={() => navigate("/logistics")}
+              onClick={() => setLocation("/logistics")}
             >
               <Warehouse className="h-4 w-4 mr-2" />
               {t("ინვენტარი", "Inventory")}
@@ -71,7 +71,7 @@ export const OrbiLogistics = () => {
               variant="outline" 
               size="sm" 
               className="flex-1"
-              onClick={() => navigate("/housekeeping")}
+              onClick={() => setLocation("/logistics/housekeeping")}
             >
               <Calendar className="h-4 w-4 mr-2" />
               {t("დასუფთავება", "Cleaning")}
@@ -80,7 +80,7 @@ export const OrbiLogistics = () => {
               variant="outline" 
               size="sm" 
               className="flex-1"
-              onClick={() => navigate("/logistics")}
+              onClick={() => setLocation("/logistics/maintenance")}
             >
               <Wrench className="h-4 w-4 mr-2" />
               {t("მომსახურება", "Maintenance")}
