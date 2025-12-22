@@ -714,3 +714,65 @@
 - [ ] Hide ExpediaEmailParser settings
 - [ ] Reorder sidebar: Dashboard → Logistics → Reservations → Guest Experience
 - [ ] Add "System Online | OTELMS Connected" banner
+
+
+## TRUE Performance Analytics - Inception Date Logic (Dec 22, 2025)
+- [ ] Browse OTELMS calendar and extract real reservation data
+- [ ] Parse reviews-data.json for sentiment analysis
+- [ ] Calculate Inception Date for each of 60 apartments
+- [ ] Create live-analytics-engine.ts with Real Occupancy logic
+- [ ] Update CEO Dashboard with TRUE metrics
+- [ ] Generate Unit Efficiency Table (ROI by apartment)
+- [ ] Revenue Graph with accurate monthly growth
+- [ ] Merge OTELMS data with reviews sentiment scores
+
+
+## Inception Date Logic Implementation (Dec 22, 2025)
+- [ ] Extract all reservations from OTELMS (CSV export)
+- [ ] Extract RevPAR and ADR reports from OTELMS
+- [ ] Calculate Inception Date for each of 60 apartments (first booking date)
+- [ ] Compute real occupancy: Days Occupied / Days Since Inception
+- [ ] Create Unit Performance Table (60 apartments sorted by ROI)
+- [ ] Update CEO Dashboard with real Inception Date-based metrics
+- [ ] Update Finance Dashboard with accurate occupancy data
+- [ ] Save checkpoint with Inception Date logic
+
+
+## 🚀 POWERSTACK REFACTORING (Dec 22, 2025)
+
+### Phase 1: Architecture Cleanup (Kill the Server)
+- [ ] Remove server/ directory dependencies
+- [ ] Remove drizzle, mysql, trpc from package.json
+- [ ] Clean up server-related imports
+- [ ] Convert to static frontend
+
+### Phase 2: Google Sheets Service
+- [ ] Create GoogleSheetsService.ts adapter
+- [ ] Define data models for Sheets structure
+- [ ] Implement CSV/JSON fetch from published Sheets
+- [ ] Create Master_DB Sheet structure
+
+### Phase 3: AppScript Backend
+- [ ] Create PowerStack_Main_Engine.js
+- [ ] Implement syncOtelMS() function
+- [ ] Implement generateAIResponse() for Gemini Ultra
+- [ ] Create Web App deployment config
+- [ ] Deploy AppScript as Web App
+
+### Phase 4: Dashboard Updates
+- [ ] Update Revenue charts to read from Sheets
+- [ ] Update Occupancy charts to read from Sheets
+- [ ] Update Unit Performance table (60 apartments)
+- [ ] Implement Housekeeping grid with AppScript POST
+- [ ] Add Inception Date logic for real occupancy
+
+### Phase 5: Vercel Deployment
+- [ ] Configure vite.config.ts for Vercel
+- [ ] Remove server-side build scripts
+- [ ] Test static build
+- [ ] Deploy to Vercel
+
+### Phase 6: Documentation
+- [ ] Create Google Sheets template structure
+- [ ] Document AppScript deployment steps
+- [ ] Create Vercel deployment guide
