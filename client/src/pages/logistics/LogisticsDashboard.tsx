@@ -1,4 +1,3 @@
-import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Package, ArrowLeft, BarChart3, ClipboardList, Wrench, History } from "lucide-react";
@@ -9,24 +8,16 @@ import { StudioInventoryList } from "@/components/StudioInventoryList";
 import { HousekeepingModule } from "@/components/HousekeepingModule";
 import { MaintenanceModule } from "@/components/MaintenanceModule";
 import { LogisticsActivityLog } from "@/components/LogisticsActivityLog";
-import { supabase } from "@/integrations/supabase/client";
-import { useEffect, useState, Suspense } from "react";
+import { Suspense } from "react";
 import { Loader2 } from "lucide-react";
 import { useLogisticsRealtimeNotifications } from "@/hooks/useLogisticsRealtimeNotifications";
 
 const Logistics = () => {
-  const navigate = useLocation();
-  const { t, language } = useLanguage();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [, setLocation] = useLocation();
+  const { t } = useLanguage();
 
   // Enable real-time notifications
   useLogisticsRealtimeNotifications();
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setIsAuthenticated(!!session);
-    });
-  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
@@ -34,22 +25,16 @@ const Logistics = () => {
       <div className="relative rounded-2xl overflow-hidden mx-6 mt-6 mb-8">
         <div className="relative z-10 px-8 pt-8 pb-20">
           <div className="flex items-center gap-4">
-            {isAuthenticated && (
-              <Button variant="ghost" size="sm" onClick={() => setLocation("/")} className="text-cyan-300 hover:text-white hover:bg-white/10">
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                {t('nav.home')}
-              </Button>
-            )}
             <div className="flex items-center gap-3">
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-500 to-cyan-600 shadow-lg">
                 <Package className="h-6 w-6 text-white" />
               </div>
               <div>
                 <h1 className="text-3xl md:text-4xl font-bold text-cyan-400 tracking-tight">
-                  {t('logistics.title')}
+                  {t("ლოჯისტიკის ცენტრი", "Logistics Command Center")}
                 </h1>
                 <p className="text-lg text-white/90 mt-1 font-medium">
-                  {t('logistics.subtitle')}
+                  {t("სტუდიოების ინვენტარის მართვა და ანალიტიკა", "Studio inventory management and analytics")}
                 </p>
               </div>
             </div>
@@ -69,24 +54,24 @@ const Logistics = () => {
 
       <main className="container mx-auto px-6 py-8">
         <Tabs defaultValue="dashboard" className="w-full">
-          <TabsList className="grid w-full grid-cols-5 mb-8">
-            <TabsTrigger value="dashboard" className="flex items-center gap-2">
+          <TabsList className="grid w-full grid-cols-5 mb-8 bg-slate-800/50">
+            <TabsTrigger value="dashboard" className="flex items-center gap-2 data-[state=active]:bg-cyan-600 data-[state=active]:text-white">
               <BarChart3 className="h-4 w-4" />
-              {t('common.overview')}
+              {t("მიმოხილვა", "Overview")}
             </TabsTrigger>
-            <TabsTrigger value="inventory" className="flex items-center gap-2">
+            <TabsTrigger value="inventory" className="flex items-center gap-2 data-[state=active]:bg-cyan-600 data-[state=active]:text-white">
               <Package className="h-4 w-4" />
-              {t('submenu.inventory')}
+              {t("ინვენტარი", "Inventory")}
             </TabsTrigger>
-            <TabsTrigger value="housekeeping" className="flex items-center gap-2">
+            <TabsTrigger value="housekeeping" className="flex items-center gap-2 data-[state=active]:bg-cyan-600 data-[state=active]:text-white">
               <ClipboardList className="h-4 w-4" />
               {t("დასუფთავება", "Housekeeping")}
             </TabsTrigger>
-            <TabsTrigger value="maintenance" className="flex items-center gap-2">
+            <TabsTrigger value="maintenance" className="flex items-center gap-2 data-[state=active]:bg-cyan-600 data-[state=active]:text-white">
               <Wrench className="h-4 w-4" />
               {t("ტექნიკური", "Maintenance")}
             </TabsTrigger>
-            <TabsTrigger value="activity" className="flex items-center gap-2">
+            <TabsTrigger value="activity" className="flex items-center gap-2 data-[state=active]:bg-cyan-600 data-[state=active]:text-white">
               <History className="h-4 w-4" />
               {t("აქტივობა", "Activity")}
             </TabsTrigger>
@@ -95,7 +80,7 @@ const Logistics = () => {
           <TabsContent value="dashboard">
             <Suspense fallback={
               <div className="flex items-center justify-center p-12">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                <Loader2 className="h-8 w-8 animate-spin text-cyan-400" />
               </div>
             }>
               <InventoryDashboardStats />
@@ -105,7 +90,7 @@ const Logistics = () => {
           <TabsContent value="inventory">
             <Suspense fallback={
               <div className="flex items-center justify-center p-12">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                <Loader2 className="h-8 w-8 animate-spin text-cyan-400" />
               </div>
             }>
               <StudioInventoryList />
@@ -115,7 +100,7 @@ const Logistics = () => {
           <TabsContent value="housekeeping">
             <Suspense fallback={
               <div className="flex items-center justify-center p-12">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                <Loader2 className="h-8 w-8 animate-spin text-cyan-400" />
               </div>
             }>
               <HousekeepingModule />
@@ -125,7 +110,7 @@ const Logistics = () => {
           <TabsContent value="maintenance">
             <Suspense fallback={
               <div className="flex items-center justify-center p-12">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                <Loader2 className="h-8 w-8 animate-spin text-cyan-400" />
               </div>
             }>
               <MaintenanceModule />
@@ -135,7 +120,7 @@ const Logistics = () => {
           <TabsContent value="activity">
             <Suspense fallback={
               <div className="flex items-center justify-center p-12">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                <Loader2 className="h-8 w-8 animate-spin text-cyan-400" />
               </div>
             }>
               <LogisticsActivityLog />

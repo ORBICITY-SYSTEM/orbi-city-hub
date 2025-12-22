@@ -1,3 +1,5 @@
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -5,24 +7,36 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { format } from "date-fns";
 import { History, User, Clock, Package, ClipboardList, Wrench } from "lucide-react";
 import { Loader2 } from "lucide-react";
-import { trpc } from "@/lib/trpc";
 
 interface ActivityLog {
-  id: number;
-  userId: number;
-  userEmail: string;
+  id: string;
+  user_id: string;
+  user_email: string;
   action: string;
-  entityType: string;
-  entityId: string;
-  entityName: string;
+  entity_type: string;
+  entity_id: string;
+  entity_name: string;
   changes: any;
-  createdAt: Date;
+  created_at: string;
 }
 
 export function LogisticsActivityLog() {
   const { t } = useLanguage();
 
-  const { data: logs, isLoading } = trpc.logistics.activityLog.list.useQuery({ limit: 100 });
+  const { data: logs, isLoading } = useQuery({
+    queryKey: ["logistics-activity-log"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("logistics_activity_log")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(100);
+
+      if (error) throw error;
+      return data as ActivityLog[];
+    },
+    refetchInterval: 30000, // Refresh every 30 seconds
+  });
 
   const getActionBadge = (action: string) => {
     const actionMap = {
@@ -86,23 +100,23 @@ export function LogisticsActivityLog() {
               <Card key={log.id} className="p-4 border-l-4 border-l-primary/50">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-start gap-3 flex-1">
-                    <div className="mt-1">{getEntityIcon(log.entityType)}</div>
+                    <div className="mt-1">{getEntityIcon(log.entity_type)}</div>
                     <div className="flex-1 space-y-1">
                       <div className="flex items-center gap-2 flex-wrap">
                         {getActionBadge(log.action)}
-                        <span className="font-medium">{getEntityLabel(log.entityType)}</span>
-                        {log.entityName && (
+                        <span className="font-medium">{getEntityLabel(log.entity_type)}</span>
+                        {log.entity_name && (
                           <span className="text-sm text-muted-foreground">
-                            • {log.entityName}
+                            • {log.entity_name}
                           </span>
                         )}
                       </div>
                       
                       <div className="flex items-center gap-2 text-sm text-muted-foreground">
                         <User className="h-3 w-3" />
-                        <span>{log.userEmail || t("უცნობი", "Unknown")}</span>
+                        <span>{log.user_email || t("უცნობი", "Unknown")}</span>
                         <Clock className="h-3 w-3 ml-2" />
-                        <span>{format(new Date(log.createdAt), "PPp")}</span>
+                        <span>{format(new Date(log.created_at), "PPp")}</span>
                       </div>
 
                       {log.changes && Object.keys(log.changes).length > 0 && (

@@ -113,17 +113,17 @@ const modules: ModuleItem[] = [
       { nameKey: "submenu.butlerAI", path: "/integrations/butler", icon: Bot },
     ]
   },
-  // HIDDEN: Logistics module - uncomment to re-enable
-  // {
-  //   nameKey: "nav.logistics",
-  //   icon: Truck,
-  //   color: "text-cyan-400",
-  //   subItems: [
-  //     { nameKey: "submenu.logisticsDashboard", path: "/logistics", icon: LayoutDashboard },
-  //     { nameKey: "submenu.housekeeping", path: "/logistics/housekeeping", icon: Package },
-  //     { nameKey: "submenu.maintenance", path: "/logistics/maintenance", icon: Wrench },
-  //   ]
-  // },
+  // 5. LOGISTICS (fifth)
+  {
+    nameKey: "nav.logistics",
+    icon: Truck,
+    color: "text-cyan-400",
+    subItems: [
+      { nameKey: "submenu.logisticsDashboard", path: "/logistics", icon: LayoutDashboard },
+      { nameKey: "submenu.housekeeping", path: "/logistics/housekeeping", icon: Package },
+      { nameKey: "submenu.maintenance", path: "/logistics/maintenance", icon: Wrench },
+    ]
+  },
 
 ];
 
@@ -132,7 +132,7 @@ export default function ModularLayout({ children }: { children: React.ReactNode 
   const { t } = useLanguage();
   const [location] = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [expandedModules, setExpandedModules] = useState<string[]>(["nav.finance", "nav.marketing", "nav.reservations"]);
+  const [expandedModules, setExpandedModules] = useState<string[]>(["nav.finance", "nav.marketing", "nav.reservations", "nav.logistics"]);
 
   // Auto-expand module based on current route
   useEffect(() => {

@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 export const useLogisticsRealtimeNotifications = () => {
@@ -45,11 +45,13 @@ export const useLogisticsRealtimeNotifications = () => {
               maintenance_schedule: t("ტექნიკური გრაფიკი", "maintenance schedule")
             }[newLog.entity_type] || newLog.entity_type;
 
-            toast({
-              title: t("ახალი ცვლილება", "New Change"),
-              description: `${newLog.user_email || t("მომხმარებელმა", "User")} ${actionText} ${entityText}${newLog.entity_name ? `: ${newLog.entity_name}` : ""}`,
-              duration: 5000,
-            });
+            toast.info(
+              `${newLog.user_email || t("მომხმარებელმა", "User")} ${actionText} ${entityText}${newLog.entity_name ? `: ${newLog.entity_name}` : ""}`,
+              {
+                description: t("ახალი ცვლილება", "New Change"),
+                duration: 5000,
+              }
+            );
           }
         )
         .subscribe();

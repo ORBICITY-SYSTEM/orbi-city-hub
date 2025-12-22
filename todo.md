@@ -675,3 +675,17 @@
 - [x] Sync all changes to GitHub
 - [x] Create GeminiAIChat component (replacing ManusAIChat)
 - [x] Create GeminiDialog component (replacing ManusDialog)
+
+
+## Logistics Module Migration from orbi-ai-nexus (Dec 22, 2025)
+- [x] Clone orbi-ai-nexus repository
+- [x] Copy HousekeepingModule component
+- [x] Copy MaintenanceModule component
+- [x] Copy useLogisticsActivity hook
+- [x] Copy useLogisticsRealtimeNotifications hook
+- [x] Install @supabase/supabase-js package
+- [x] Configure Supabase client with Lovable credentials
+- [x] Fix toast imports to use sonner
+- [x] Enable Logistics menu in ModularLayout
+- [x] Add nav.logistics to default expanded modules
+- [x] Test Logistics dashboard loads correctly

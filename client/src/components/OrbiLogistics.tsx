@@ -4,13 +4,13 @@ import { Badge } from "@/components/ui/badge";
 import { Package, Pencil, Warehouse, Calendar, Wrench } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { useLocation } from "wouter";
+import { useNavigate } from "react-router-dom";
 import { useModuleCustomization } from "@/hooks/useModuleCustomization";
 import { ModuleEditDialog } from "./ModuleEditDialog";
 
 export const OrbiLogistics = () => {
   const { t } = useLanguage();
-  const navigate = useLocation();
+  const navigate = useNavigate();
   const [editOpen, setEditOpen] = useState(false);
   
   const defaultTitle = t("ოთახები და დასუფთავება", "Rooms & Housekeeping");
