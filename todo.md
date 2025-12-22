@@ -741,30 +741,30 @@
 ## 🚀 POWERSTACK REFACTORING (Dec 22, 2025)
 
 ### Phase 1: Architecture Cleanup (Kill the Server)
-- [ ] Remove server/ directory dependencies
+- [x] Remove server/ directory dependencies (archived to __ARCHIVE_BEFORE_MIGRATION/)
 - [ ] Remove drizzle, mysql, trpc from package.json
 - [ ] Clean up server-related imports
 - [ ] Convert to static frontend
 
 ### Phase 2: Google Sheets Service
-- [ ] Create GoogleSheetsService.ts adapter
-- [ ] Define data models for Sheets structure
-- [ ] Implement CSV/JSON fetch from published Sheets
-- [ ] Create Master_DB Sheet structure
+- [x] Create GoogleSheetsService.ts adapter
+- [x] Define data models for Sheets structure
+- [x] Implement CSV/JSON fetch from published Sheets
+- [x] Create Master_DB Sheet structure (documented)
 
 ### Phase 3: AppScript Backend
-- [ ] Create PowerStack_Main_Engine.js
-- [ ] Implement syncOtelMS() function
-- [ ] Implement generateAIResponse() for Gemini Ultra
-- [ ] Create Web App deployment config
+- [x] Create PowerStack_Main_Engine.js
+- [x] Implement syncOtelMS() function
+- [x] Implement generateAIResponse() for Gemini Ultra
+- [x] Create Web App deployment config
 - [ ] Deploy AppScript as Web App
 
 ### Phase 4: Dashboard Updates
-- [ ] Update Revenue charts to read from Sheets
-- [ ] Update Occupancy charts to read from Sheets
-- [ ] Update Unit Performance table (60 apartments)
-- [ ] Implement Housekeeping grid with AppScript POST
-- [ ] Add Inception Date logic for real occupancy
+- [x] Update Revenue charts to read from Sheets (PowerStackDashboard)
+- [x] Update Occupancy charts to read from Sheets (PowerStackDashboard)
+- [x] Update Unit Performance table (60 apartments)
+- [x] Implement Housekeeping grid with AppScript POST
+- [x] Add Inception Date logic for real occupancy
 
 ### Phase 5: Vercel Deployment
 - [ ] Configure vite.config.ts for Vercel

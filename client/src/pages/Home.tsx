@@ -20,6 +20,7 @@ import {
   MessageCircle
 } from "lucide-react";
 import { MainAIAgent } from "@/components/MainAIAgent";
+import { PowerStackDashboard } from "@/components/PowerStackDashboard";
 import { IntegrationsShowcase } from "@/components/IntegrationsShowcase";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useState } from "react";
@@ -306,6 +307,11 @@ export default function Home() {
             </div>
           </Link>
         </div>
+      </div>
+
+      {/* PowerStack Dashboard - Google Sheets Integration */}
+      <div className="px-6">
+        <PowerStackDashboard />
       </div>
 
       {/* Module Summary Cards */}
