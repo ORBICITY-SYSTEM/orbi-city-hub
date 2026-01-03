@@ -736,3 +736,312 @@ export const tawktoMessages = mysqlTable("tawktoMessages", {
 
 export type TawktoMessage = typeof tawktoMessages.$inferSelect;
 export type InsertTawktoMessage = typeof tawktoMessages.$inferInsert;
+
+
+// ============================================================================
+// POWERHUB INFRASTRUCTURE TABLES
+// Event-driven architecture for Apps Script ↔ Hub communication
+// ============================================================================
+
+/**
+ * Integration Outbox - Reliable event delivery to external systems
+ * Implements the Outbox Pattern for guaranteed delivery with retry logic
+ */
+export const integrationEvents = mysqlTable("integrationEvents", {
+  id: varchar("id", { length: 36 }).primaryKey(), // CUID
+  
+  // Event metadata
+  eventType: varchar("eventType", { length: 64 }).notNull(), // e.g., "Booking.Upserted"
+  destination: varchar("destination", { length: 64 }).notNull(), // e.g., "APPS_SCRIPT_SHEETS", "TELEGRAM"
+  
+  // Payload
+  payload: json("payload").notNull(),
+  
+  // Processing status
+  status: mysqlEnum("status", ["PENDING", "PROCESSING", "COMPLETED", "FAILED", "DEAD_LETTER"]).default("PENDING").notNull(),
+  retryCount: int("retryCount").default(0).notNull(),
+  maxRetries: int("maxRetries").default(5).notNull(),
+  nextRetryAt: timestamp("nextRetryAt").defaultNow().notNull(),
+  
+  // Error tracking
+  lastError: text("lastError"),
+  errorHistory: json("errorHistory").$type<Array<{timestamp: string, error: string}>>(),
+  
+  // Timing
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  processedAt: timestamp("processedAt"),
+  completedAt: timestamp("completedAt"),
+});
+
+export type IntegrationEvent = typeof integrationEvents.$inferSelect;
+export type InsertIntegrationEvent = typeof integrationEvents.$inferInsert;
+
+/**
+ * Used Nonces - Replay attack prevention
+ * Stores nonces from Apps Script requests to prevent replay attacks
+ */
+export const usedNonces = mysqlTable("usedNonces", {
+  nonce: varchar("nonce", { length: 64 }).primaryKey(),
+  source: varchar("source", { length: 64 }).notNull(), // e.g., "APPS_SCRIPT_GMAIL"
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  expiresAt: timestamp("expiresAt").notNull(), // TTL for cleanup
+});
+
+export type UsedNonce = typeof usedNonces.$inferSelect;
+export type InsertUsedNonce = typeof usedNonces.$inferInsert;
+
+/**
+ * Processed Events - Idempotency tracking
+ * Ensures each event is processed exactly once
+ */
+export const processedEvents = mysqlTable("processedEvents", {
+  eventId: varchar("eventId", { length: 64 }).primaryKey(),
+  eventType: varchar("eventType", { length: 64 }).notNull(),
+  source: varchar("source", { length: 64 }).notNull(),
+  entityType: varchar("entityType", { length: 64 }), // e.g., "Booking", "RoomStatus"
+  entityId: varchar("entityId", { length: 64 }),
+  processedAt: timestamp("processedAt").defaultNow().notNull(),
+  result: mysqlEnum("result", ["SUCCESS", "IGNORED", "FAILED"]).default("SUCCESS").notNull(),
+  metadata: json("metadata"),
+});
+
+export type ProcessedEvent = typeof processedEvents.$inferSelect;
+export type InsertProcessedEvent = typeof processedEvents.$inferInsert;
+
+// ============================================================================
+// POWERHUB CORE ENTITY TABLES
+// Main business entities with version tracking for conflict detection
+// ============================================================================
+
+/**
+ * Bookings - Central reservation management
+ * Source of truth for all bookings from any channel
+ */
+export const bookings = mysqlTable("bookings", {
+  id: varchar("id", { length: 36 }).primaryKey(), // b_xxx
+  
+  // External reference (for OTA bookings)
+  channel: mysqlEnum("channel", ["DIRECT", "WEBSITE", "BOOKING", "AIRBNB", "EXPEDIA", "AGODA", "MANUAL", "OTHER"]).default("DIRECT").notNull(),
+  externalReservationId: varchar("externalReservationId", { length: 128 }),
+  
+  // Status
+  status: mysqlEnum("status", ["NEW", "CONFIRMED", "MODIFIED", "CANCELLED", "CHECKED_IN", "CHECKED_OUT", "NO_SHOW"]).default("NEW").notNull(),
+  
+  // Dates
+  checkIn: timestamp("checkIn").notNull(),
+  checkOut: timestamp("checkOut").notNull(),
+  nights: int("nights").notNull(),
+  
+  // Unit/Room
+  unitId: varchar("unitId", { length: 36 }),
+  unitCode: varchar("unitCode", { length: 32 }),
+  
+  // Guest info
+  guestId: varchar("guestId", { length: 36 }),
+  guestName: varchar("guestName", { length: 255 }),
+  guestEmail: varchar("guestEmail", { length: 320 }),
+  guestPhone: varchar("guestPhone", { length: 50 }),
+  guestCountry: varchar("guestCountry", { length: 64 }),
+  guestLanguage: varchar("guestLanguage", { length: 16 }),
+  
+  // Occupancy
+  adults: int("adults").default(1).notNull(),
+  children: int("children").default(0).notNull(),
+  
+  // Pricing
+  totalAmount: decimal("totalAmount", { precision: 10, scale: 2 }),
+  currency: varchar("currency", { length: 3 }).default("USD"),
+  
+  // Notes
+  notes: text("notes"),
+  internalNotes: text("internalNotes"),
+  
+  // Raw data (for debugging/audit)
+  rawEmailId: varchar("rawEmailId", { length: 255 }),
+  rawData: json("rawData"),
+  parseConfidence: decimal("parseConfidence", { precision: 3, scale: 2 }),
+  
+  // Version tracking (for conflict detection)
+  version: int("version").default(1).notNull(),
+  lastUpdatedSource: varchar("lastUpdatedSource", { length: 64 }), // HUB_UI, APPS_SCRIPT, WEBSITE
+  
+  // Timestamps
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Booking = typeof bookings.$inferSelect;
+export type InsertBooking = typeof bookings.$inferInsert;
+
+/**
+ * Units/Rooms - Property inventory
+ */
+export const units = mysqlTable("units", {
+  id: varchar("id", { length: 36 }).primaryKey(), // u_xxx
+  code: varchar("code", { length: 32 }).notNull().unique(), // e.g., "4501"
+  name: varchar("name", { length: 128 }),
+  type: mysqlEnum("type", ["STUDIO", "1BR", "2BR", "3BR", "PENTHOUSE", "OTHER"]).default("STUDIO").notNull(),
+  floor: int("floor"),
+  building: varchar("building", { length: 64 }),
+  
+  // Status
+  status: mysqlEnum("status", ["AVAILABLE", "OCCUPIED", "MAINTENANCE", "OUT_OF_SERVICE"]).default("AVAILABLE").notNull(),
+  cleaningStatus: mysqlEnum("cleaningStatus", ["CLEAN", "DIRTY", "CLEANING", "INSPECTED"]).default("CLEAN").notNull(),
+  
+  // Owner info
+  ownerId: varchar("ownerId", { length: 36 }),
+  ownerName: varchar("ownerName", { length: 255 }),
+  
+  // Version tracking
+  version: int("version").default(1).notNull(),
+  lastUpdatedSource: varchar("lastUpdatedSource", { length: 64 }),
+  
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Unit = typeof units.$inferSelect;
+export type InsertUnit = typeof units.$inferInsert;
+
+/**
+ * Tasks - Operational task management
+ */
+export const tasks = mysqlTable("tasks", {
+  id: varchar("id", { length: 36 }).primaryKey(), // t_xxx
+  
+  type: mysqlEnum("type", ["CLEANING", "MAINTENANCE", "GUEST_REQUEST", "ADMIN", "SALES", "FINANCE", "OTHER"]).notNull(),
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  
+  priority: mysqlEnum("priority", ["LOW", "MEDIUM", "HIGH", "URGENT"]).default("MEDIUM").notNull(),
+  status: mysqlEnum("status", ["OPEN", "IN_PROGRESS", "DONE", "CANCELLED"]).default("OPEN").notNull(),
+  
+  // Assignments
+  assignedTo: varchar("assignedTo", { length: 36 }),
+  assignedToName: varchar("assignedToName", { length: 255 }),
+  
+  // Links
+  bookingId: varchar("bookingId", { length: 36 }),
+  unitId: varchar("unitId", { length: 36 }),
+  guestId: varchar("guestId", { length: 36 }),
+  
+  // Timing
+  dueAt: timestamp("dueAt"),
+  completedAt: timestamp("completedAt"),
+  
+  // Source tracking
+  sourceRef: json("sourceRef"), // { sheetRowId, telegramMsgId, etc. }
+  tags: json("tags").$type<string[]>(),
+  
+  // Version tracking
+  version: int("version").default(1).notNull(),
+  lastUpdatedSource: varchar("lastUpdatedSource", { length: 64 }),
+  
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Task = typeof tasks.$inferSelect;
+export type InsertTask = typeof tasks.$inferInsert;
+
+/**
+ * Messages - Unified communication log
+ */
+export const messages = mysqlTable("messages", {
+  id: varchar("id", { length: 36 }).primaryKey(), // m_xxx
+  
+  channel: mysqlEnum("channel", ["EMAIL", "TELEGRAM", "WHATSAPP", "SMS", "PHONE_NOTE", "WEBSITE_CHAT", "OTHER"]).notNull(),
+  direction: mysqlEnum("direction", ["INBOUND", "OUTBOUND"]).notNull(),
+  
+  threadId: varchar("threadId", { length: 255 }),
+  
+  fromAddress: varchar("fromAddress", { length: 320 }),
+  toAddress: varchar("toAddress", { length: 320 }),
+  
+  subject: varchar("subject", { length: 500 }),
+  bodySnippet: text("bodySnippet"),
+  bodyRef: json("bodyRef"), // { driveFileId, etc. }
+  attachments: json("attachments").$type<Array<{name: string, url: string, size?: number}>>(),
+  
+  // Links
+  bookingId: varchar("bookingId", { length: 36 }),
+  guestId: varchar("guestId", { length: 36 }),
+  unitId: varchar("unitId", { length: 36 }),
+  
+  // Raw reference
+  rawRef: json("rawRef"), // { gmailMessageId, telegramUpdateId, etc. }
+  
+  sentAt: timestamp("sentAt").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type Message = typeof messages.$inferSelect;
+export type InsertMessage = typeof messages.$inferInsert;
+
+/**
+ * Payments - Financial transaction tracking
+ */
+export const payments = mysqlTable("payments", {
+  id: varchar("id", { length: 36 }).primaryKey(), // p_xxx
+  
+  bookingId: varchar("bookingId", { length: 36 }),
+  
+  direction: mysqlEnum("direction", ["IN", "OUT"]).notNull(),
+  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  currency: varchar("currency", { length: 3 }).default("USD").notNull(),
+  
+  method: mysqlEnum("method", ["CASH", "CARD", "BANK", "ONLINE", "OTA_PAYOUT", "OTHER"]).notNull(),
+  status: mysqlEnum("status", ["PENDING", "CONFIRMED", "FAILED", "REFUNDED"]).default("PENDING").notNull(),
+  
+  providerRef: varchar("providerRef", { length: 255 }), // Bank transaction ID, etc.
+  note: text("note"),
+  
+  paidAt: timestamp("paidAt"),
+  
+  // Version tracking
+  version: int("version").default(1).notNull(),
+  lastUpdatedSource: varchar("lastUpdatedSource", { length: 64 }),
+  
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Payment = typeof payments.$inferSelect;
+export type InsertPayment = typeof payments.$inferInsert;
+
+/**
+ * Leads - Marketing lead capture
+ */
+export const leads = mysqlTable("leads", {
+  id: varchar("id", { length: 36 }).primaryKey(), // l_xxx
+  
+  source: mysqlEnum("source", ["WEBSITE", "FORM", "CALL", "INSTAGRAM", "WHATSAPP", "TELEGRAM", "EMAIL", "OTHER"]).notNull(),
+  
+  // Contact info
+  name: varchar("name", { length: 255 }),
+  phone: varchar("phone", { length: 50 }),
+  email: varchar("email", { length: 320 }),
+  
+  // Intent
+  intent: mysqlEnum("intent", ["BOOKING_QUESTION", "PRICE_REQUEST", "AVAILABILITY", "PARTNERSHIP", "OTHER"]).default("OTHER").notNull(),
+  message: text("message"),
+  
+  // UTM tracking
+  utmSource: varchar("utmSource", { length: 128 }),
+  utmMedium: varchar("utmMedium", { length: 128 }),
+  utmCampaign: varchar("utmCampaign", { length: 128 }),
+  utmContent: varchar("utmContent", { length: 128 }),
+  utmTerm: varchar("utmTerm", { length: 128 }),
+  
+  // Status
+  status: mysqlEnum("status", ["NEW", "CONTACTED", "QUALIFIED", "CONVERTED", "LOST"]).default("NEW").notNull(),
+  
+  // Conversion
+  convertedBookingId: varchar("convertedBookingId", { length: 36 }),
+  
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Lead = typeof leads.$inferSelect;
+export type InsertLead = typeof leads.$inferInsert;
