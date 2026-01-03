@@ -259,6 +259,30 @@ export const logisticsRouter = router({
         
         return { success: true };
       }),
+    
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input, ctx }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+        
+        // Get schedule before delete for logging
+        const [schedule] = await db.select().from(housekeepingSchedules).where(eq(housekeepingSchedules.id, input.id)).limit(1);
+        
+        await db.delete(housekeepingSchedules).where(eq(housekeepingSchedules.id, input.id));
+        
+        // Log activity
+        await logActivity({
+          userId: ctx.user.id,
+          userEmail: ctx.user.email || "",
+          action: "delete",
+          entityType: "housekeeping_schedule",
+          entityId: input.id,
+          entityName: schedule ? `Housekeeping ${schedule.scheduledDate}` : `Schedule #${input.id}`,
+        });
+        
+        return { success: true };
+      }),
   }),
 
   // ============================================================================
@@ -358,6 +382,118 @@ export const logisticsRouter = router({
         
         return { success: true };
       }),
+    
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input, ctx }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+        
+        // Get schedule before delete for logging
+        const [schedule] = await db.select().from(maintenanceSchedules).where(eq(maintenanceSchedules.id, input.id)).limit(1);
+        
+        await db.delete(maintenanceSchedules).where(eq(maintenanceSchedules.id, input.id));
+        
+        // Log activity
+        await logActivity({
+          userId: ctx.user.id,
+          userEmail: ctx.user.email || "",
+          action: "delete",
+          entityType: "maintenance_schedule",
+          entityId: input.id,
+          entityName: schedule ? `Maintenance ${schedule.roomNumber}: ${schedule.problem}` : `Schedule #${input.id}`,
+        });
+        
+        return { success: true };
+      }),
+  }),
+
+  // ============================================================================
+  // DASHBOARD STATS
+  // ============================================================================
+  
+  dashboard: router({
+    stats: protectedProcedure.query(async () => {
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+      
+      // Get all rooms
+      const allRooms = await db.select().from(rooms);
+      
+      // Get housekeeping schedules
+      const housekeeping = await db.select().from(housekeepingSchedules);
+      const pendingHousekeeping = housekeeping.filter(h => h.status === "pending").length;
+      const completedHousekeeping = housekeeping.filter(h => h.status === "completed").length;
+      
+      // Get maintenance schedules
+      const maintenance = await db.select().from(maintenanceSchedules);
+      const pendingMaintenance = maintenance.filter(m => m.status === "pending" || m.status === "in_progress").length;
+      const completedMaintenance = maintenance.filter(m => m.status === "completed").length;
+      
+      // Get inventory items with issues
+      const inventoryItems = await db.select().from(roomInventoryItems);
+      const standardItems = await db.select().from(standardInventoryItems);
+      
+      // Calculate missing items
+      const missingItems: Array<{
+        category: string;
+        itemName: string;
+        standardQuantity: number;
+        totalMissing: number;
+        roomsWithIssues: Array<{ roomNumber: string; actualQuantity: number; missingCount: number }>;
+      }> = [];
+      
+      for (const stdItem of standardItems) {
+        const roomsWithIssue: Array<{ roomNumber: string; actualQuantity: number; missingCount: number }> = [];
+        let totalMissing = 0;
+        
+        for (const room of allRooms) {
+          const roomItem = inventoryItems.find(
+            i => i.roomId === room.id && i.standardItemId === stdItem.id
+          );
+          const actualQty = roomItem?.actualQuantity ?? 0;
+          const missing = stdItem.standardQuantity - actualQty;
+          
+          if (missing > 0) {
+            totalMissing += missing;
+            roomsWithIssue.push({
+              roomNumber: room.roomNumber,
+              actualQuantity: actualQty,
+              missingCount: missing,
+            });
+          }
+        }
+        
+        if (totalMissing > 0) {
+          missingItems.push({
+            category: stdItem.category,
+            itemName: stdItem.itemName,
+            standardQuantity: stdItem.standardQuantity,
+            totalMissing,
+            roomsWithIssues: roomsWithIssue,
+          });
+        }
+      }
+      
+      return {
+        totalRooms: allRooms.length,
+        housekeeping: {
+          pending: pendingHousekeeping,
+          completed: completedHousekeeping,
+          total: housekeeping.length,
+        },
+        maintenance: {
+          pending: pendingMaintenance,
+          completed: completedMaintenance,
+          total: maintenance.length,
+        },
+        inventory: {
+          totalMissingItems: missingItems.reduce((sum, item) => sum + item.totalMissing, 0),
+          itemsWithIssues: missingItems.length,
+          missingItems: missingItems.slice(0, 10), // Top 10 missing items
+        },
+      };
+    }),
   }),
 
   // ============================================================================
