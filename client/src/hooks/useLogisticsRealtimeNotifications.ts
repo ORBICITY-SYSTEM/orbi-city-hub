@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { trpc } from "@/utils/trpc";
+import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
 
