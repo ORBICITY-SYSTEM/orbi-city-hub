@@ -1,12 +1,43 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { AlertTriangle, Package, CheckCircle, Home, Wrench, Sparkles } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { AlertTriangle, Package, CheckCircle, Home, Wrench, Sparkles, Database } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Loader2 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
+import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
 
 export function InventoryDashboardStats() {
   const { t } = useLanguage();
+  const { toast } = useToast();
+  const [isSeeding, setIsSeeding] = useState(false);
+  const utils = trpc.useUtils();
+  
+  const seedMutation = trpc.logistics.seedData.useMutation({
+    onSuccess: (data) => {
+      setIsSeeding(false);
+      utils.logistics.dashboard.stats.invalidate();
+      utils.logistics.rooms.list.invalidate();
+      toast({
+        title: "✅ Seed წარმატებით დასრულდა!",
+        description: `${data.roomsInserted} ოთახი, ${data.itemsInserted} ინვენტარი`,
+      });
+    },
+    onError: (error) => {
+      setIsSeeding(false);
+      toast({
+        title: "❌ შეცდომა",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+  
+  const handleSeed = () => {
+    setIsSeeding(true);
+    seedMutation.mutate();
+  };
   
   const { data: stats, isLoading } = trpc.logistics.dashboard.stats.useQuery(undefined, {
     refetchInterval: 30000, // Refresh every 30 seconds
@@ -20,10 +51,33 @@ export function InventoryDashboardStats() {
     );
   }
 
-  if (!stats) {
+  if (!stats || stats.totalRooms === 0) {
     return (
-      <div className="text-center text-muted-foreground py-8">
-        {t("მონაცემები არ მოიძებნა", "No data found")}
+      <div className="text-center py-12 space-y-4">
+        <div className="text-muted-foreground">
+          {t("მონაცემები არ მოიძებნა", "No data found")}
+        </div>
+        <Button
+          onClick={handleSeed}
+          disabled={isSeeding}
+          className="bg-gradient-to-r from-green-600 to-cyan-600 hover:from-green-700 hover:to-cyan-700"
+          size="lg"
+        >
+          {isSeeding ? (
+            <>
+              <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+              {t("მიმდინარეობს...", "Seeding...")}
+            </>
+          ) : (
+            <>
+              <Database className="h-5 w-5 mr-2" />
+              {t("🌱 შეიტანე 56 ოთახი და ინვენტარი", "🌱 Seed 56 Rooms & Inventory")}
+            </>
+          )}
+        </Button>
+        <p className="text-sm text-muted-foreground">
+          {t("A, C, D1, D2 კორპუსების ოთახები და სტანდარტული ინვენტარი", "Rooms from A, C, D1, D2 buildings and standard inventory")}
+        </p>
       </div>
     );
   }
