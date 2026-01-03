@@ -49,6 +49,7 @@ import { telegramRouter } from "./routers/telegramRouter";
 import { tawktoRouter } from "./routers/tawktoRouter";
 import { ingestRouter } from "./routers/ingestRouter";
 import { outboxRouter } from "./routers/outboxRouter";
+import { seedLogisticsRouter } from "./routers/seedLogistics";
 
 export const appRouter = router({
   realFinance: realFinanceRouter,
@@ -93,6 +94,7 @@ export const appRouter = router({
   tawkto: tawktoRouter,
   ingest: ingestRouter,
   outbox: outboxRouter,
+  seedLogistics: seedLogisticsRouter,
   system: systemRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
