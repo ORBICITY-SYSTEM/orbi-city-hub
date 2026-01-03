@@ -780,6 +780,97 @@ export const logisticsRouter = router({
   }),
   
   // ============================================================================
+  // SEED DATA - Quick seed for rooms and inventory
+  // ============================================================================
+  
+  seedData: protectedProcedure.mutation(async () => {
+    const db = await getDb();
+    if (!db) throw new Error("Database not available");
+    
+    const ROOMS = [
+      {roomNumber: "A 1033", building: "A"}, {roomNumber: "A 1258", building: "A"},
+      {roomNumber: "A 1301", building: "A"}, {roomNumber: "A 1806", building: "A"},
+      {roomNumber: "A 1821", building: "A"}, {roomNumber: "A 1833", building: "A"},
+      {roomNumber: "A 2035", building: "A"}, {roomNumber: "A 2441", building: "A"},
+      {roomNumber: "A 3035", building: "A"}, {roomNumber: "A 3041", building: "A"},
+      {roomNumber: "A 4022", building: "A"}, {roomNumber: "A 4023", building: "A"},
+      {roomNumber: "A 4024", building: "A"}, {roomNumber: "A 4025", building: "A"},
+      {roomNumber: "A 4026", building: "A"}, {roomNumber: "A 4027", building: "A"},
+      {roomNumber: "A 4029", building: "A"}, {roomNumber: "A 4035", building: "A"},
+      {roomNumber: "C 1256", building: "C"}, {roomNumber: "C 2107", building: "C"},
+      {roomNumber: "C 2520", building: "C"}, {roomNumber: "C 2522", building: "C"},
+      {roomNumber: "C 2524", building: "C"}, {roomNumber: "C 2529", building: "C"},
+      {roomNumber: "C 2547", building: "C"}, {roomNumber: "C 2558", building: "C"},
+      {roomNumber: "C 2609", building: "C"}, {roomNumber: "C 2637", building: "C"},
+      {roomNumber: "C 2641", building: "C"}, {roomNumber: "C 2847", building: "C"},
+      {roomNumber: "C 2861", building: "C"}, {roomNumber: "C 2921", building: "C"},
+      {roomNumber: "C 2923", building: "C"}, {roomNumber: "C 2936", building: "C"},
+      {roomNumber: "C 2947", building: "C"}, {roomNumber: "C 2961", building: "C"},
+      {roomNumber: "C 3421", building: "C"}, {roomNumber: "C 3423", building: "C"},
+      {roomNumber: "C 3425", building: "C"}, {roomNumber: "C 3428", building: "C"},
+      {roomNumber: "C 3431", building: "C"}, {roomNumber: "C 3437", building: "C"},
+      {roomNumber: "C 3439", building: "C"}, {roomNumber: "C 3441", building: "C"},
+      {roomNumber: "C 3611", building: "C"}, {roomNumber: "C 3834", building: "C"},
+      {roomNumber: "C 3928", building: "C"}, {roomNumber: "C 3937", building: "C"},
+      {roomNumber: "C 4011", building: "C"}, {roomNumber: "C 4638", building: "C"},
+      {roomNumber: "C 4704", building: "C"}, {roomNumber: "C 4706", building: "C"},
+      {roomNumber: "D1 3414", building: "D1"}, {roomNumber: "D1 3416", building: "D1"},
+      {roomNumber: "D1 3418", building: "D1"}, {roomNumber: "D2 3727", building: "D2"}
+    ];
+    
+    const ITEMS = [
+      {category: "აბაზანის აქსესუარები", itemName: "აბაზანის სარკე", defaultQuantity: 1},
+      {category: "აბაზანის აქსესუარები", itemName: "ნაგვის ურნა", defaultQuantity: 1},
+      {category: "აბაზანის აქსესუარები", itemName: "ნიჟარა შემრევით", defaultQuantity: 1},
+      {category: "აბაზანის აქსესუარები", itemName: "საშხაპე დუშითა და შემრევით", defaultQuantity: 1},
+      {category: "აბაზანის აქსესუარები", itemName: "ტუალეტის ქაღალდის საკიდი", defaultQuantity: 1},
+      {category: "აბაზანის აქსესუარები", itemName: "უნიტაზი", defaultQuantity: 1},
+      {category: "აბაზანის აქსესუარები", itemName: "უნიტაზის ჯაგრისი", defaultQuantity: 1},
+      {category: "აბაზანის აქსესუარები", itemName: "ფენი", defaultQuantity: 1},
+      {category: "აბაზანის აქსესუარები", itemName: "წყლის გამაცხელებელი", defaultQuantity: 1},
+      {category: "ავეჯი და ტექსტილი", itemName: "აივნის მაგიდა", defaultQuantity: 1},
+      {category: "ავეჯი და ტექსტილი", itemName: "აივნის სკამი", defaultQuantity: 4},
+      {category: "ავეჯი და ტექსტილი", itemName: "ბალიში", defaultQuantity: 3},
+      {category: "ავეჯი და ტექსტილი", itemName: "ბალიშის ჩიხოლი", defaultQuantity: 3},
+      {category: "ავეჯი და ტექსტილი", itemName: "დივანი გასაშლელი", defaultQuantity: 1},
+      {category: "ავეჯი და ტექსტილი", itemName: "ზეწარი", defaultQuantity: 2},
+      {category: "ავეჯი და ტექსტილი", itemName: "ხის კალათა", defaultQuantity: 1}
+    ];
+    
+    let roomsInserted = 0, itemsInserted = 0;
+    
+    // Insert rooms
+    for (const r of ROOMS) {
+      try {
+        const floor = parseInt(r.roomNumber.match(/\d+/)?.[0]?.slice(0, -2) || "1");
+        await db.insert(rooms).values({
+          roomNumber: r.roomNumber,
+          building: r.building,
+          floor,
+          roomType: "studio",
+          status: "available"
+        }).onDuplicateKeyUpdate({ set: { building: r.building } });
+        roomsInserted++;
+      } catch (e) {}
+    }
+    
+    // Insert standard items
+    for (const item of ITEMS) {
+      try {
+        await db.insert(standardInventoryItems).values({
+          itemName: item.itemName,
+          category: item.category,
+          defaultQuantity: item.defaultQuantity,
+          isRequired: true
+        }).onDuplicateKeyUpdate({ set: { category: item.category } });
+        itemsInserted++;
+      } catch (e) {}
+    }
+    
+    return { success: true, roomsInserted, itemsInserted };
+  }),
+  
+  // ============================================================================
   // RECENT CHANGES (for realtime notifications polling)
   // ============================================================================
   

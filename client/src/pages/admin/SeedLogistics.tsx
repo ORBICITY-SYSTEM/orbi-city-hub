@@ -14,14 +14,14 @@ export default function SeedLogistics() {
   const statusQuery = trpc.seedLogistics.status.useQuery();
 
   // Seed all mutation
-  const seedAllMutation = trpc.seedLogistics.seedAll.useMutation({
+  const seedAllMutation = trpc.logistics.seedData.useMutation({
     onSuccess: (data) => {
       setResult(data);
       setIsSeeding(false);
       statusQuery.refetch();
       toast({
         title: "✅ Seed წარმატებით დასრულდა!",
-        description: `${data.summary.totalRooms} ოთახი, ${data.summary.totalItems} ინვენტარი`,
+        description: `${data.roomsInserted} ოთახი, ${data.itemsInserted} ინვენტარი`,
       });
     },
     onError: (error) => {
@@ -140,24 +140,18 @@ export default function SeedLogistics() {
                   <CheckCircle className="h-5 w-5" />
                   <span className="font-semibold">წარმატებით დასრულდა!</span>
                 </div>
-                <div className="grid grid-cols-3 gap-4 text-sm">
+                <div className="grid grid-cols-2 gap-4 text-sm">
                   <div className="text-center">
                     <div className="text-2xl font-bold text-white">
-                      {result.results.rooms.inserted}
+                      {result.roomsInserted}
                     </div>
-                    <div className="text-white/60">ახალი ოთახი</div>
+                    <div className="text-white/60">ოთახი</div>
                   </div>
                   <div className="text-center">
                     <div className="text-2xl font-bold text-white">
-                      {result.results.standardItems.inserted}
+                      {result.itemsInserted}
                     </div>
-                    <div className="text-white/60">ახალი ინვენტარი</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-white">
-                      {result.results.roomInventory.created}
-                    </div>
-                    <div className="text-white/60">ოთახ-ინვენტარი</div>
+                    <div className="text-white/60">ინვენტარი</div>
                   </div>
                 </div>
               </div>
