@@ -1,0 +1,366 @@
+{
+  "export_date": "2025-12-22",
+  "module": "Logistics",
+  "project": "Orbi City Aparthotel",
+  
+  "rooms": [
+    {"room_number": "A 1033", "building": "A"},
+    {"room_number": "A 1258", "building": "A"},
+    {"room_number": "A 1301", "building": "A"},
+    {"room_number": "A 1806", "building": "A"},
+    {"room_number": "A 1821", "building": "A"},
+    {"room_number": "A 1833", "building": "A"},
+    {"room_number": "A 2035", "building": "A"},
+    {"room_number": "A 2441", "building": "A"},
+    {"room_number": "A 3035", "building": "A"},
+    {"room_number": "A 3041", "building": "A"},
+    {"room_number": "A 4022", "building": "A"},
+    {"room_number": "A 4023", "building": "A"},
+    {"room_number": "A 4024", "building": "A"},
+    {"room_number": "A 4025", "building": "A"},
+    {"room_number": "A 4026", "building": "A"},
+    {"room_number": "A 4027", "building": "A"},
+    {"room_number": "A 4029", "building": "A"},
+    {"room_number": "A 4035", "building": "A"},
+    {"room_number": "C 1256", "building": "C"},
+    {"room_number": "C 2107", "building": "C"},
+    {"room_number": "C 2520", "building": "C"},
+    {"room_number": "C 2522", "building": "C"},
+    {"room_number": "C 2524", "building": "C"},
+    {"room_number": "C 2529", "building": "C"},
+    {"room_number": "C 2547", "building": "C"},
+    {"room_number": "C 2558", "building": "C"},
+    {"room_number": "C 2609", "building": "C"},
+    {"room_number": "C 2637", "building": "C"},
+    {"room_number": "C 2641", "building": "C"},
+    {"room_number": "C 2847", "building": "C"},
+    {"room_number": "C 2861", "building": "C"},
+    {"room_number": "C 2921", "building": "C"},
+    {"room_number": "C 2923", "building": "C"},
+    {"room_number": "C 2936", "building": "C"},
+    {"room_number": "C 2947", "building": "C"},
+    {"room_number": "C 2961", "building": "C"},
+    {"room_number": "C 3421", "building": "C"},
+    {"room_number": "C 3423", "building": "C"},
+    {"room_number": "C 3425", "building": "C"},
+    {"room_number": "C 3428", "building": "C"},
+    {"room_number": "C 3431", "building": "C"},
+    {"room_number": "C 3437", "building": "C"},
+    {"room_number": "C 3439", "building": "C"},
+    {"room_number": "C 3441", "building": "C"},
+    {"room_number": "C 3611", "building": "C"},
+    {"room_number": "C 3834", "building": "C"},
+    {"room_number": "C 3928", "building": "C"},
+    {"room_number": "C 3937", "building": "C"},
+    {"room_number": "C 4011", "building": "C"},
+    {"room_number": "C 4638", "building": "C"},
+    {"room_number": "C 4704", "building": "C"},
+    {"room_number": "C 4706", "building": "C"},
+    {"room_number": "D1 3414", "building": "D1"},
+    {"room_number": "D1 3416", "building": "D1"},
+    {"room_number": "D1 3418", "building": "D1"},
+    {"room_number": "D2 3727", "building": "D2"}
+  ],
+  
+  "standard_inventory_items": [
+    {"category": "აბაზანის აქსესუარები", "item_name": "აბაზანის სარკე", "standard_quantity": 1},
+    {"category": "აბაზანის აქსესუარები", "item_name": "ნაგვის ურნა", "standard_quantity": 1},
+    {"category": "აბაზანის აქსესუარები", "item_name": "ნიჟარა შემრევით", "standard_quantity": 1},
+    {"category": "აბაზანის აქსესუარები", "item_name": "საშხაპე დუშითა და შემრევით", "standard_quantity": 1},
+    {"category": "აბაზანის აქსესუარები", "item_name": "საშხაპის აქსესუარი", "standard_quantity": 1},
+    {"category": "აბაზანის აქსესუარები", "item_name": "ტუალეტის ქაღალდის საკიდი", "standard_quantity": 1},
+    {"category": "აბაზანის აქსესუარები", "item_name": "უნიტაზი", "standard_quantity": 1},
+    {"category": "აბაზანის აქსესუარები", "item_name": "უნიტაზის ჯაგრისი", "standard_quantity": 1},
+    {"category": "აბაზანის აქსესუარები", "item_name": "ფენი", "standard_quantity": 1},
+    {"category": "აბაზანის აქსესუარები", "item_name": "წყლის გამაცხელებელი", "standard_quantity": 1},
+    {"category": "აბაზანის აქსესუარები", "item_name": "ხის კალათა", "standard_quantity": 1},
+    {"category": "ავეჯი და ტექსტილი", "item_name": "აივნის მაგიდა", "standard_quantity": 1},
+    {"category": "ავეჯი და ტექსტილი", "item_name": "აივნის სკამი", "standard_quantity": 4},
+    {"category": "ავეჯი და ტექსტილი", "item_name": "ბალიში (საწოლისთვის და დივნისთვის)", "standard_quantity": 3},
+    {"category": "ავეჯი და ტექსტილი", "item_name": "ბალიშის ჩიხოლი (საწოლისთვის და დივნისთვის)", "standard_quantity": 3},
+    {"category": "ავეჯი და ტექსტილი", "item_name": "დივანი გასაშლელი", "standard_quantity": 1},
+    {"category": "ავეჯი და ტექსტილი", "item_name": "ზეწარი (საწოლისთვის და დივნისთვის)", "standard_quantity": 2},
+    {"category": "ავეჯი და ტექსტილი", "item_name": "კარადა სარკით", "standard_quantity": 1}
+  ],
+  
+  "housekeeping_schedules": [
+    {
+      "scheduled_date": "2025-12-20",
+      "rooms": ["A 4023", "A 4025", "A 4022", "A 4024", "C 2921", "C 2923"],
+      "total_rooms": 6,
+      "notes": "ნანა",
+      "status": "pending"
+    },
+    {
+      "scheduled_date": "2025-12-19",
+      "rooms": ["C 4706", "C 4704", "C 2529", "C 3611", "C 3937", "D2 3727"],
+      "total_rooms": 6,
+      "notes": "ნანა",
+      "status": "completed",
+      "completed_at": "2025-12-20T17:41:32.639Z"
+    },
+    {
+      "scheduled_date": "2025-12-18",
+      "rooms": ["A 1301", "A 4029", "A 4022", "A 4024"],
+      "total_rooms": 4,
+      "notes": "ნანა",
+      "status": "completed",
+      "completed_at": "2025-12-20T17:41:24.99Z"
+    },
+    {
+      "scheduled_date": "2025-12-17",
+      "rooms": ["A 4029", "C 2861", "C 4706", "C 3937"],
+      "total_rooms": 4,
+      "notes": "ნანა",
+      "status": "completed",
+      "completed_at": "2025-12-17T15:39:46.358Z"
+    },
+    {
+      "scheduled_date": "2025-12-16",
+      "rooms": ["C 3437", "A 4027", "C 2947", "C 2609"],
+      "total_rooms": 4,
+      "notes": "ნანა",
+      "status": "completed",
+      "completed_at": "2025-12-16T15:08:40.291Z"
+    },
+    {
+      "scheduled_date": "2025-12-15",
+      "rooms": ["C 4706", "A 4026"],
+      "total_rooms": 2,
+      "notes": "ნანა",
+      "status": "completed",
+      "completed_at": "2025-12-16T07:40:00.479Z"
+    },
+    {
+      "scheduled_date": "2025-12-14",
+      "rooms": ["A 4029", "A 4027", "C 2921", "C 2947", "C 3611", "D2 3727"],
+      "total_rooms": 6,
+      "notes": "ნანა",
+      "status": "completed",
+      "completed_at": "2025-12-16T15:08:38.891Z"
+    },
+    {
+      "scheduled_date": "2025-12-13",
+      "rooms": ["A 4026", "A 1806", "A 1301", "A 4035"],
+      "total_rooms": 4,
+      "notes": "ნანა",
+      "status": "completed",
+      "completed_at": "2025-12-13T14:33:24.11Z"
+    },
+    {
+      "scheduled_date": "2025-12-12",
+      "rooms": ["A 1301", "A 4029", "C 3425", "C 3611", "C 4704", "C 4706", "C 1256"],
+      "total_rooms": 7,
+      "notes": "ნანა",
+      "status": "completed",
+      "completed_at": "2025-12-12T14:01:59.376Z"
+    },
+    {
+      "scheduled_date": "2025-12-09",
+      "rooms": ["A 4027", "A 4026", "A 3041", "A 2035"],
+      "total_rooms": 4,
+      "notes": "ნანა",
+      "status": "completed",
+      "completed_at": "2025-12-11T06:09:55.13Z"
+    },
+    {
+      "scheduled_date": "2025-12-08",
+      "rooms": ["A 4035", "A 4023", "A 4025", "A 4026", "A 4029", "A 3035", "A 2441"],
+      "total_rooms": 7,
+      "notes": "ნანა",
+      "status": "completed",
+      "completed_at": "2025-12-09T15:51:31.769Z"
+    },
+    {
+      "scheduled_date": "2025-12-07",
+      "rooms": ["C 3611", "C 4706", "A 2035", "A 3035"],
+      "total_rooms": 4,
+      "notes": "ნანა",
+      "status": "completed",
+      "completed_at": "2025-12-09T15:50:40.708Z"
+    },
+    {
+      "scheduled_date": "2025-12-05",
+      "rooms": ["A 1301", "A 2035", "A 4026", "C 4704"],
+      "total_rooms": 4,
+      "notes": "ნანა",
+      "status": "completed",
+      "completed_at": "2025-12-09T15:49:45.284Z"
+    },
+    {
+      "scheduled_date": "2025-12-04",
+      "rooms": ["A 4022", "A 4023", "A 4024", "A 4025", "A 4026"],
+      "total_rooms": 5,
+      "notes": "ნანა",
+      "status": "completed",
+      "completed_at": "2025-12-04T10:48:29.234Z"
+    }
+  ],
+  
+  "maintenance_schedules": [
+    {
+      "scheduled_date": "2025-12-16",
+      "room_number": "C 3611",
+      "problem": "საბარათე დაზიანდა",
+      "problem_en": "Card reader damaged",
+      "notes": "საბარათე",
+      "cost": 45,
+      "status": "completed"
+    },
+    {
+      "scheduled_date": "2025-12-13",
+      "room_number": "C 2947",
+      "problem": "გატყდა დუშის ყურმილლ]ი",
+      "problem_en": "Shower hose broken",
+      "notes": "შევიძინეთ ყურმილი",
+      "cost": 8,
+      "status": "completed"
+    },
+    {
+      "scheduled_date": "2025-12-12",
+      "room_number": "C 1256",
+      "problem": "C837 საბარათე",
+      "problem_en": "C837 Card reader",
+      "notes": "C837 საბარათე",
+      "cost": 45,
+      "status": "completed"
+    },
+    {
+      "scheduled_date": "2025-12-10",
+      "room_number": "C 1256",
+      "problem": "ც839 შუქი არ ინთებოდა",
+      "problem_en": "C839 Light not working",
+      "notes": "C839 შევიძინეთ საბარათე (1256 არასწორადაა მონიშნული)",
+      "cost": 45,
+      "status": "completed"
+    },
+    {
+      "scheduled_date": "2025-12-04",
+      "room_number": "A 1301",
+      "problem": "დაჯდა კარის ელემენტი",
+      "problem_en": "Door element issue",
+      "notes": "გამოვცვალეთ კარის ელემენტი",
+      "cost": 20,
+      "status": "completed"
+    },
+    {
+      "scheduled_date": "2025-12-03",
+      "room_number": "A 1033",
+      "problem": "აივნის კარი არ იკეტება",
+      "problem_en": "Balcony door won't close",
+      "notes": "შეიძინეს კარის სახელურის მექანიზმი",
+      "cost": 100,
+      "status": "completed"
+    },
+    {
+      "scheduled_date": "2025-11-29",
+      "room_number": "C 4704",
+      "problem": "დაიკარგა ბარათი",
+      "problem_en": "Card lost",
+      "notes": "შევიძინეთ",
+      "cost": 20,
+      "status": "completed"
+    },
+    {
+      "scheduled_date": "2025-11-22",
+      "room_number": "A 3035",
+      "problem": "უნიტაზში ჩადიოდა წყალი",
+      "problem_en": "Toilet water leak",
+      "notes": "აბრატნი კლაპანი",
+      "cost": 10,
+      "status": "completed"
+    },
+    {
+      "scheduled_date": "2025-11-21",
+      "room_number": "A 3035",
+      "problem": "წყალი ჩადის უნიტაზში, ვაკეთებთ და მაინც ფუჭდება",
+      "problem_en": "Toilet leak, keeps breaking",
+      "notes": "შეგვაძენინეს რეგულატორი",
+      "cost": 80,
+      "status": "completed"
+    },
+    {
+      "scheduled_date": "2025-11-20",
+      "room_number": "A 2035",
+      "problem": "ტვ პულტსს ელემენტი არ ჰქონდა",
+      "problem_en": "TV remote missing battery",
+      "notes": "შევიძინეთ ელემენტი",
+      "cost": 2,
+      "status": "completed"
+    },
+    {
+      "scheduled_date": "2025-11-19",
+      "room_number": "A 3035",
+      "problem": "დუშის შლანგიი გაფუჭდა",
+      "problem_en": "Shower hose damaged",
+      "notes": "შევიძინეთ დუშის შლანგი",
+      "cost": 8,
+      "status": "completed"
+    }
+  ],
+  
+  "activity_log_sample": [
+    {
+      "action": "create",
+      "entity_type": "housekeeping_schedule",
+      "entity_name": "6 rooms - 2025-12-20",
+      "user_email": "orbi.apartments1@gmail.com",
+      "created_at": "2025-12-20T17:41:57.137Z",
+      "changes": {
+        "rooms": ["A 4023", "A 4025", "A 4022", "A 4024", "C 2921", "C 2923"],
+        "notes": "ნანა"
+      }
+    },
+    {
+      "action": "update",
+      "entity_type": "housekeeping_schedule",
+      "entity_name": "6 rooms",
+      "user_email": "orbi.apartments1@gmail.com",
+      "created_at": "2025-12-20T17:41:33.072Z",
+      "changes": {
+        "status": "completed",
+        "previous_status": "pending"
+      }
+    },
+    {
+      "action": "create",
+      "entity_type": "maintenance_schedule",
+      "entity_name": "Room C 3611 - საბარათე დაზიანდა",
+      "user_email": "orbi.apartments1@gmail.com",
+      "created_at": "2025-12-16T15:12:44.535Z",
+      "changes": {
+        "problem": "საბარათე დაზიანდა",
+        "status": "completed",
+        "cost": 45
+      }
+    }
+  ],
+  
+  "statistics": {
+    "total_rooms": 56,
+    "buildings": {
+      "A": 18,
+      "C": 34,
+      "D1": 3,
+      "D2": 1
+    },
+    "housekeeping": {
+      "total_schedules": 14,
+      "completed": 13,
+      "pending": 1,
+      "primary_cleaner": "ნანა"
+    },
+    "maintenance": {
+      "total_issues": 11,
+      "completed": 11,
+      "pending": 0,
+      "total_cost_gel": 383,
+      "common_issues": [
+        "Card reader problems",
+        "Door mechanisms",
+        "Plumbing (toilet, shower)",
+        "Electrical (lights)"
+      ]
+    }
+  }
+}

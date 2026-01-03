@@ -274,6 +274,7 @@ export type InsertLogisticsActivityLog = typeof logisticsActivityLog.$inferInser
 export const rooms = mysqlTable("rooms", {
   id: int("id").autoincrement().primaryKey(),
   roomNumber: varchar("roomNumber", { length: 16 }).notNull().unique(),
+  building: varchar("building", { length: 8 }),
   roomType: varchar("roomType", { length: 64 }),
   floor: int("floor"),
   status: mysqlEnum("status", ["available", "occupied", "cleaning", "maintenance", "blocked"]).default("available").notNull(),
@@ -486,6 +487,7 @@ export type InsertRoomInventoryItem = typeof roomInventoryItems.$inferInsert;
  */
 export const housekeepingSchedules = mysqlTable("housekeepingSchedules", {
   id: int("id").autoincrement().primaryKey(),
+  batchId: varchar("batchId", { length: 64 }),
   roomId: int("roomId").notNull(),
   scheduledDate: timestamp("scheduledDate").notNull(),
   scheduledTime: varchar("scheduledTime", { length: 16 }),
@@ -509,6 +511,8 @@ export const maintenanceSchedules = mysqlTable("maintenanceSchedules", {
   id: int("id").autoincrement().primaryKey(),
   roomId: int("roomId"),
   equipmentName: varchar("equipmentName", { length: 255 }),
+  description: text("description"),
+  descriptionEn: text("descriptionEn"),
   maintenanceType: varchar("maintenanceType", { length: 64 }).notNull(),
   scheduledDate: timestamp("scheduledDate").notNull(),
   assignedTo: int("assignedTo"),

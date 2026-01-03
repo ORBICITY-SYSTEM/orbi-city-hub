@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { eq, and, desc } from "drizzle-orm";
+import { eq, and, desc, sql, inArray } from "drizzle-orm";
 import { protectedProcedure, router } from "./_core/trpc";
 import { getDb } from "./db";
 import { logActivity } from "./logisticsActivity";
@@ -11,7 +11,9 @@ import {
   housekeepingSchedules,
   maintenanceSchedules,
   logisticsActivityLog,
+  activityLogs,
 } from "../drizzle/schema";
+import { randomUUID } from "crypto";
 
 export const logisticsRouter = router({
   // ============================================================================
@@ -23,7 +25,7 @@ export const logisticsRouter = router({
       const db = await getDb();
       if (!db) throw new Error("Database not available");
       
-      return await db.select().from(rooms).orderBy(rooms.roomNumber);
+      return await db.select().from(rooms).orderBy(rooms.building, rooms.roomNumber);
     }),
     
     getById: protectedProcedure
@@ -34,6 +36,40 @@ export const logisticsRouter = router({
         
         const [room] = await db.select().from(rooms).where(eq(rooms.id, input.id)).limit(1);
         return room;
+      }),
+    
+    getByNumber: protectedProcedure
+      .input(z.object({ roomNumber: z.string() }))
+      .query(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+        
+        const [room] = await db.select().from(rooms).where(eq(rooms.roomNumber, input.roomNumber)).limit(1);
+        return room;
+      }),
+      
+    updateStatus: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        status: z.enum(["available", "occupied", "cleaning", "maintenance", "blocked"])
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+        
+        await db.update(rooms).set({ status: input.status }).where(eq(rooms.id, input.id));
+        
+        await logActivity({
+          userId: ctx.user.id,
+          userEmail: ctx.user.email || "",
+          action: "update",
+          entityType: "room",
+          entityId: input.id,
+          entityName: `Room #${input.id}`,
+          changes: { status: input.status },
+        });
+        
+        return { success: true };
       }),
   }),
 
@@ -95,9 +131,9 @@ export const logisticsRouter = router({
       .input(
         z.object({
           roomId: z.number(),
-          standardItemId: z.number(),
-          actualQuantity: z.number(),
-          condition: z.enum(["good", "fair", "poor", "missing"]).optional(),
+          itemId: z.number(),
+          quantity: z.number(),
+          status: z.enum(["ok", "low", "missing", "damaged"]).optional(),
           notes: z.string().optional(),
         })
       )
@@ -105,14 +141,14 @@ export const logisticsRouter = router({
         const db = await getDb();
         if (!db) throw new Error("Database not available");
         
-        // Check if item exists
+        // Check if exists
         const [existing] = await db
           .select()
           .from(roomInventoryItems)
           .where(
             and(
               eq(roomInventoryItems.roomId, input.roomId),
-              eq(roomInventoryItems.standardItemId, input.standardItemId)
+              eq(roomInventoryItems.itemId, input.itemId)
             )
           )
           .limit(1);
@@ -122,56 +158,79 @@ export const logisticsRouter = router({
           await db
             .update(roomInventoryItems)
             .set({
-              actualQuantity: input.actualQuantity,
-              condition: input.condition,
+              quantity: input.quantity,
+              status: input.status || "ok",
               notes: input.notes,
               lastChecked: new Date(),
             })
             .where(eq(roomInventoryItems.id, existing.id));
           
-          // Log activity
           await logActivity({
             userId: ctx.user.id,
             userEmail: ctx.user.email || "",
             action: "update",
             entityType: "inventory_item",
             entityId: existing.id,
-            entityName: `Room ${input.roomId} - Item ${input.standardItemId}`,
-            changes: { actualQuantity: input.actualQuantity, condition: input.condition },
+            entityName: `Room ${input.roomId} - Item ${input.itemId}`,
+            changes: { quantity: input.quantity, status: input.status },
           });
           
           return { success: true, id: existing.id };
         } else {
           // Insert
-          const [result] = await db
-            .insert(roomInventoryItems)
-            .values({
-              roomId: input.roomId,
-              standardItemId: input.standardItemId,
-              actualQuantity: input.actualQuantity,
-              condition: input.condition || "good",
-              notes: input.notes,
-              lastChecked: new Date(),
-            });
+          const [result] = await db.insert(roomInventoryItems).values({
+            roomId: input.roomId,
+            itemId: input.itemId,
+            quantity: input.quantity,
+            status: input.status || "ok",
+            notes: input.notes,
+            lastChecked: new Date(),
+          });
           
-          // Log activity
           await logActivity({
             userId: ctx.user.id,
             userEmail: ctx.user.email || "",
             action: "create",
             entityType: "inventory_item",
             entityId: result.insertId,
-            entityName: `Room ${input.roomId} - Item ${input.standardItemId}`,
-            changes: { actualQuantity: input.actualQuantity, condition: input.condition },
+            entityName: `Room ${input.roomId} - Item ${input.itemId}`,
+            changes: { quantity: input.quantity, status: input.status },
           });
           
           return { success: true, id: result.insertId };
         }
       }),
+      
+    updateQuantity: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        quantity: z.number(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+        
+        await db.update(roomInventoryItems).set({
+          quantity: input.quantity,
+          lastChecked: new Date(),
+        }).where(eq(roomInventoryItems.id, input.id));
+        
+        await logActivity({
+          userId: ctx.user.id,
+          userEmail: ctx.user.email || "",
+          action: "update",
+          entityType: "inventory_item",
+          entityId: input.id,
+          entityName: `Inventory Item #${input.id}`,
+          changes: { quantity: input.quantity },
+        });
+        
+        return { success: true };
+      }),
   }),
 
   // ============================================================================
-  // HOUSEKEEPING SCHEDULES
+  // HOUSEKEEPING SCHEDULES (with batch support for multi-room)
   // ============================================================================
   
   housekeeping: router({
@@ -179,19 +238,138 @@ export const logisticsRouter = router({
       const db = await getDb();
       if (!db) throw new Error("Database not available");
       
-      return await db
-        .select()
+      // Get all schedules with room info
+      const schedules = await db
+        .select({
+          id: housekeepingSchedules.id,
+          batchId: housekeepingSchedules.batchId,
+          roomId: housekeepingSchedules.roomId,
+          roomNumber: rooms.roomNumber,
+          building: rooms.building,
+          scheduledDate: housekeepingSchedules.scheduledDate,
+          scheduledTime: housekeepingSchedules.scheduledTime,
+          taskType: housekeepingSchedules.taskType,
+          assignedTo: housekeepingSchedules.assignedTo,
+          status: housekeepingSchedules.status,
+          priority: housekeepingSchedules.priority,
+          notes: housekeepingSchedules.notes,
+          completedAt: housekeepingSchedules.completedAt,
+          createdAt: housekeepingSchedules.createdAt,
+        })
         .from(housekeepingSchedules)
+        .leftJoin(rooms, eq(housekeepingSchedules.roomId, rooms.id))
         .orderBy(desc(housekeepingSchedules.scheduledDate));
+      
+      return schedules;
     }),
     
+    // List grouped by batch (for multi-room view)
+    listByBatch: protectedProcedure.query(async () => {
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+      
+      const schedules = await db
+        .select({
+          id: housekeepingSchedules.id,
+          batchId: housekeepingSchedules.batchId,
+          roomId: housekeepingSchedules.roomId,
+          roomNumber: rooms.roomNumber,
+          building: rooms.building,
+          scheduledDate: housekeepingSchedules.scheduledDate,
+          taskType: housekeepingSchedules.taskType,
+          status: housekeepingSchedules.status,
+          priority: housekeepingSchedules.priority,
+          notes: housekeepingSchedules.notes,
+          completedAt: housekeepingSchedules.completedAt,
+        })
+        .from(housekeepingSchedules)
+        .leftJoin(rooms, eq(housekeepingSchedules.roomId, rooms.id))
+        .orderBy(desc(housekeepingSchedules.scheduledDate), housekeepingSchedules.batchId);
+      
+      // Group by batchId
+      const batches = new Map<string, typeof schedules>();
+      for (const schedule of schedules) {
+        const key = schedule.batchId || `single_${schedule.id}`;
+        if (!batches.has(key)) {
+          batches.set(key, []);
+        }
+        batches.get(key)!.push(schedule);
+      }
+      
+      return Array.from(batches.entries()).map(([batchId, items]) => ({
+        batchId,
+        scheduledDate: items[0].scheduledDate,
+        taskType: items[0].taskType,
+        status: items[0].status,
+        priority: items[0].priority,
+        notes: items[0].notes,
+        rooms: items.map(i => ({
+          id: i.id,
+          roomId: i.roomId,
+          roomNumber: i.roomNumber,
+          building: i.building,
+          status: i.status,
+          completedAt: i.completedAt,
+        })),
+        totalRooms: items.length,
+        completedRooms: items.filter(i => i.status === "completed").length,
+      }));
+    }),
+    
+    // Create batch (multi-room schedule)
+    createBatch: protectedProcedure
+      .input(
+        z.object({
+          roomIds: z.array(z.number()),
+          scheduledDate: z.string(),
+          scheduledTime: z.string().optional(),
+          taskType: z.string().default("cleaning"),
+          priority: z.enum(["low", "normal", "high", "urgent"]).optional(),
+          notes: z.string().optional(),
+        })
+      )
+      .mutation(async ({ input, ctx }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+        
+        const batchId = `batch_${Date.now()}_${randomUUID().slice(0, 8)}`;
+        
+        // Insert one record per room
+        for (const roomId of input.roomIds) {
+          await db.insert(housekeepingSchedules).values({
+            batchId,
+            roomId,
+            scheduledDate: new Date(input.scheduledDate),
+            scheduledTime: input.scheduledTime,
+            taskType: input.taskType,
+            priority: input.priority || "normal",
+            notes: input.notes,
+            status: "scheduled",
+          });
+        }
+        
+        await logActivity({
+          userId: ctx.user.id,
+          userEmail: ctx.user.email || "",
+          action: "create",
+          entityType: "housekeeping_batch",
+          entityId: 0,
+          entityName: `Housekeeping Batch ${input.scheduledDate} (${input.roomIds.length} rooms)`,
+          changes: { batchId, roomCount: input.roomIds.length, scheduledDate: input.scheduledDate },
+        });
+        
+        return { success: true, batchId };
+      }),
+    
+    // Create single room schedule
     create: protectedProcedure
       .input(
         z.object({
+          roomId: z.number(),
           scheduledDate: z.string(),
-          rooms: z.array(z.string()),
-          totalRooms: z.number(),
-          status: z.enum(["pending", "in_progress", "completed", "cancelled"]).optional(),
+          scheduledTime: z.string().optional(),
+          taskType: z.string().default("cleaning"),
+          priority: z.enum(["low", "normal", "high", "urgent"]).optional(),
           notes: z.string().optional(),
         })
       )
@@ -200,23 +378,23 @@ export const logisticsRouter = router({
         if (!db) throw new Error("Database not available");
         
         const [result] = await db.insert(housekeepingSchedules).values({
-          userId: ctx.user.id,
-          scheduledDate: input.scheduledDate,
-          rooms: input.rooms,
-          totalRooms: input.totalRooms,
-          status: input.status || "pending",
+          roomId: input.roomId,
+          scheduledDate: new Date(input.scheduledDate),
+          scheduledTime: input.scheduledTime,
+          taskType: input.taskType,
+          priority: input.priority || "normal",
           notes: input.notes,
+          status: "scheduled",
         });
         
-        // Log activity
         await logActivity({
           userId: ctx.user.id,
           userEmail: ctx.user.email || "",
           action: "create",
           entityType: "housekeeping_schedule",
           entityId: result.insertId,
-          entityName: `Housekeeping ${input.scheduledDate} (${input.totalRooms} rooms)`,
-          changes: { scheduledDate: input.scheduledDate, totalRooms: input.totalRooms },
+          entityName: `Housekeeping for Room ${input.roomId}`,
+          changes: { scheduledDate: input.scheduledDate, taskType: input.taskType },
         });
         
         return { success: true, id: result.insertId };
@@ -226,27 +404,28 @@ export const logisticsRouter = router({
       .input(
         z.object({
           id: z.number(),
-          status: z.enum(["pending", "in_progress", "completed", "cancelled"]).optional(),
+          status: z.enum(["scheduled", "in_progress", "completed", "cancelled", "skipped"]).optional(),
+          priority: z.enum(["low", "normal", "high", "urgent"]).optional(),
           notes: z.string().optional(),
-          additionalNotes: z.string().optional(),
-          completedAt: z.date().optional(),
+          assignedTo: z.number().optional(),
         })
       )
       .mutation(async ({ input, ctx }) => {
         const db = await getDb();
         if (!db) throw new Error("Database not available");
         
+        const updateData: any = {};
+        if (input.status) updateData.status = input.status;
+        if (input.priority) updateData.priority = input.priority;
+        if (input.notes !== undefined) updateData.notes = input.notes;
+        if (input.assignedTo !== undefined) updateData.assignedTo = input.assignedTo;
+        if (input.status === "completed") updateData.completedAt = new Date();
+        
         await db
           .update(housekeepingSchedules)
-          .set({
-            status: input.status,
-            notes: input.notes,
-            additionalNotes: input.additionalNotes,
-            completedAt: input.completedAt,
-          })
+          .set(updateData)
           .where(eq(housekeepingSchedules.id, input.id));
         
-        // Log activity
         await logActivity({
           userId: ctx.user.id,
           userEmail: ctx.user.email || "",
@@ -254,7 +433,32 @@ export const logisticsRouter = router({
           entityType: "housekeeping_schedule",
           entityId: input.id,
           entityName: `Housekeeping Schedule #${input.id}`,
-          changes: { status: input.status, completedAt: input.completedAt },
+          changes: updateData,
+        });
+        
+        return { success: true };
+      }),
+    
+    // Complete entire batch
+    completeBatch: protectedProcedure
+      .input(z.object({ batchId: z.string() }))
+      .mutation(async ({ input, ctx }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+        
+        await db
+          .update(housekeepingSchedules)
+          .set({ status: "completed", completedAt: new Date() })
+          .where(eq(housekeepingSchedules.batchId, input.batchId));
+        
+        await logActivity({
+          userId: ctx.user.id,
+          userEmail: ctx.user.email || "",
+          action: "complete",
+          entityType: "housekeeping_batch",
+          entityId: 0,
+          entityName: `Batch ${input.batchId}`,
+          changes: { status: "completed" },
         });
         
         return { success: true };
@@ -266,19 +470,17 @@ export const logisticsRouter = router({
         const db = await getDb();
         if (!db) throw new Error("Database not available");
         
-        // Get schedule before delete for logging
         const [schedule] = await db.select().from(housekeepingSchedules).where(eq(housekeepingSchedules.id, input.id)).limit(1);
         
         await db.delete(housekeepingSchedules).where(eq(housekeepingSchedules.id, input.id));
         
-        // Log activity
         await logActivity({
           userId: ctx.user.id,
           userEmail: ctx.user.email || "",
           action: "delete",
           entityType: "housekeeping_schedule",
           entityId: input.id,
-          entityName: schedule ? `Housekeeping ${schedule.scheduledDate}` : `Schedule #${input.id}`,
+          entityName: schedule ? `Housekeeping for Room ${schedule.roomId}` : `Schedule #${input.id}`,
         });
         
         return { success: true };
@@ -294,22 +496,47 @@ export const logisticsRouter = router({
       const db = await getDb();
       if (!db) throw new Error("Database not available");
       
-      return await db
-        .select()
+      const schedules = await db
+        .select({
+          id: maintenanceSchedules.id,
+          roomId: maintenanceSchedules.roomId,
+          roomNumber: rooms.roomNumber,
+          building: rooms.building,
+          equipmentName: maintenanceSchedules.equipmentName,
+          description: maintenanceSchedules.description,
+          descriptionEn: maintenanceSchedules.descriptionEn,
+          maintenanceType: maintenanceSchedules.maintenanceType,
+          scheduledDate: maintenanceSchedules.scheduledDate,
+          assignedTo: maintenanceSchedules.assignedTo,
+          status: maintenanceSchedules.status,
+          priority: maintenanceSchedules.priority,
+          estimatedDuration: maintenanceSchedules.estimatedDuration,
+          actualDuration: maintenanceSchedules.actualDuration,
+          cost: maintenanceSchedules.cost,
+          notes: maintenanceSchedules.notes,
+          completedAt: maintenanceSchedules.completedAt,
+          createdAt: maintenanceSchedules.createdAt,
+        })
         .from(maintenanceSchedules)
+        .leftJoin(rooms, eq(maintenanceSchedules.roomId, rooms.id))
         .orderBy(desc(maintenanceSchedules.scheduledDate));
+      
+      return schedules;
     }),
     
     create: protectedProcedure
       .input(
         z.object({
-          roomNumber: z.string(),
+          roomId: z.number(),
+          equipmentName: z.string().optional(),
+          description: z.string(),
+          descriptionEn: z.string().optional(),
+          maintenanceType: z.string().default("repair"),
           scheduledDate: z.string(),
-          problem: z.string(),
+          priority: z.enum(["low", "normal", "high", "urgent"]).optional(),
+          estimatedDuration: z.number().optional(),
+          cost: z.number().optional(),
           notes: z.string().optional(),
-          status: z.enum(["pending", "in_progress", "completed", "cancelled"]).optional(),
-          estimatedCost: z.number().optional(),
-          priority: z.enum(["low", "medium", "high", "urgent"]).optional(),
         })
       )
       .mutation(async ({ input, ctx }) => {
@@ -317,25 +544,27 @@ export const logisticsRouter = router({
         if (!db) throw new Error("Database not available");
         
         const [result] = await db.insert(maintenanceSchedules).values({
-          userId: ctx.user.id,
-          roomNumber: input.roomNumber,
-          scheduledDate: input.scheduledDate,
-          problem: input.problem,
+          roomId: input.roomId,
+          equipmentName: input.equipmentName,
+          description: input.description,
+          descriptionEn: input.descriptionEn,
+          maintenanceType: input.maintenanceType,
+          scheduledDate: new Date(input.scheduledDate),
+          priority: input.priority || "normal",
+          estimatedDuration: input.estimatedDuration,
+          cost: input.cost,
           notes: input.notes,
-          status: input.status || "pending",
-          estimatedCost: input.estimatedCost,
-          priority: input.priority || "medium",
+          status: "scheduled",
         });
         
-        // Log activity
         await logActivity({
           userId: ctx.user.id,
           userEmail: ctx.user.email || "",
           action: "create",
           entityType: "maintenance_schedule",
           entityId: result.insertId,
-          entityName: `Maintenance ${input.roomNumber}: ${input.problem}`,
-          changes: { roomNumber: input.roomNumber, problem: input.problem, estimatedCost: input.estimatedCost },
+          entityName: `Maintenance for Room ${input.roomId}: ${input.description}`,
+          changes: { description: input.description, cost: input.cost },
         });
         
         return { success: true, id: result.insertId };
@@ -345,31 +574,32 @@ export const logisticsRouter = router({
       .input(
         z.object({
           id: z.number(),
-          status: z.enum(["pending", "in_progress", "completed", "cancelled"]).optional(),
+          status: z.enum(["scheduled", "in_progress", "completed", "cancelled", "postponed"]).optional(),
+          priority: z.enum(["low", "normal", "high", "urgent"]).optional(),
+          actualDuration: z.number().optional(),
+          cost: z.number().optional(),
           notes: z.string().optional(),
-          estimatedCost: z.number().optional(),
-          actualCost: z.number().optional(),
-          assignedTo: z.string().optional(),
-          completedAt: z.date().optional(),
+          assignedTo: z.number().optional(),
         })
       )
       .mutation(async ({ input, ctx }) => {
         const db = await getDb();
         if (!db) throw new Error("Database not available");
         
+        const updateData: any = {};
+        if (input.status) updateData.status = input.status;
+        if (input.priority) updateData.priority = input.priority;
+        if (input.actualDuration !== undefined) updateData.actualDuration = input.actualDuration;
+        if (input.cost !== undefined) updateData.cost = input.cost;
+        if (input.notes !== undefined) updateData.notes = input.notes;
+        if (input.assignedTo !== undefined) updateData.assignedTo = input.assignedTo;
+        if (input.status === "completed") updateData.completedAt = new Date();
+        
         await db
           .update(maintenanceSchedules)
-          .set({
-            status: input.status,
-            notes: input.notes,
-            estimatedCost: input.estimatedCost,
-            actualCost: input.actualCost,
-            assignedTo: input.assignedTo,
-            completedAt: input.completedAt,
-          })
+          .set(updateData)
           .where(eq(maintenanceSchedules.id, input.id));
         
-        // Log activity
         await logActivity({
           userId: ctx.user.id,
           userEmail: ctx.user.email || "",
@@ -377,7 +607,7 @@ export const logisticsRouter = router({
           entityType: "maintenance_schedule",
           entityId: input.id,
           entityName: `Maintenance Schedule #${input.id}`,
-          changes: { status: input.status, actualCost: input.actualCost, completedAt: input.completedAt },
+          changes: updateData,
         });
         
         return { success: true };
@@ -389,19 +619,17 @@ export const logisticsRouter = router({
         const db = await getDb();
         if (!db) throw new Error("Database not available");
         
-        // Get schedule before delete for logging
         const [schedule] = await db.select().from(maintenanceSchedules).where(eq(maintenanceSchedules.id, input.id)).limit(1);
         
         await db.delete(maintenanceSchedules).where(eq(maintenanceSchedules.id, input.id));
         
-        // Log activity
         await logActivity({
           userId: ctx.user.id,
           userEmail: ctx.user.email || "",
           action: "delete",
           entityType: "maintenance_schedule",
           entityId: input.id,
-          entityName: schedule ? `Maintenance ${schedule.roomNumber}: ${schedule.problem}` : `Schedule #${input.id}`,
+          entityName: schedule ? `Maintenance: ${schedule.description}` : `Schedule #${input.id}`,
         });
         
         return { success: true };
@@ -409,118 +637,172 @@ export const logisticsRouter = router({
   }),
 
   // ============================================================================
-  // DASHBOARD STATS
-  // ============================================================================
-  
-  dashboard: router({
-    stats: protectedProcedure.query(async () => {
-      const db = await getDb();
-      if (!db) throw new Error("Database not available");
-      
-      // Get all rooms
-      const allRooms = await db.select().from(rooms);
-      
-      // Get housekeeping schedules
-      const housekeeping = await db.select().from(housekeepingSchedules);
-      const pendingHousekeeping = housekeeping.filter(h => h.status === "pending").length;
-      const completedHousekeeping = housekeeping.filter(h => h.status === "completed").length;
-      
-      // Get maintenance schedules
-      const maintenance = await db.select().from(maintenanceSchedules);
-      const pendingMaintenance = maintenance.filter(m => m.status === "pending" || m.status === "in_progress").length;
-      const completedMaintenance = maintenance.filter(m => m.status === "completed").length;
-      
-      // Get inventory items with issues
-      const inventoryItems = await db.select().from(roomInventoryItems);
-      const standardItems = await db.select().from(standardInventoryItems);
-      
-      // Calculate missing items
-      const missingItems: Array<{
-        category: string;
-        itemName: string;
-        standardQuantity: number;
-        totalMissing: number;
-        roomsWithIssues: Array<{ roomNumber: string; actualQuantity: number; missingCount: number }>;
-      }> = [];
-      
-      for (const stdItem of standardItems) {
-        const roomsWithIssue: Array<{ roomNumber: string; actualQuantity: number; missingCount: number }> = [];
-        let totalMissing = 0;
-        
-        for (const room of allRooms) {
-          const roomItem = inventoryItems.find(
-            i => i.roomId === room.id && i.standardItemId === stdItem.id
-          );
-          const actualQty = roomItem?.actualQuantity ?? 0;
-          const missing = stdItem.standardQuantity - actualQty;
-          
-          if (missing > 0) {
-            totalMissing += missing;
-            roomsWithIssue.push({
-              roomNumber: room.roomNumber,
-              actualQuantity: actualQty,
-              missingCount: missing,
-            });
-          }
-        }
-        
-        if (totalMissing > 0) {
-          missingItems.push({
-            category: stdItem.category,
-            itemName: stdItem.itemName,
-            standardQuantity: stdItem.standardQuantity,
-            totalMissing,
-            roomsWithIssues: roomsWithIssue,
-          });
-        }
-      }
-      
-      return {
-        totalRooms: allRooms.length,
-        housekeeping: {
-          pending: pendingHousekeeping,
-          completed: completedHousekeeping,
-          total: housekeeping.length,
-        },
-        maintenance: {
-          pending: pendingMaintenance,
-          completed: completedMaintenance,
-          total: maintenance.length,
-        },
-        inventory: {
-          totalMissingItems: missingItems.reduce((sum, item) => sum + item.totalMissing, 0),
-          itemsWithIssues: missingItems.length,
-          missingItems: missingItems.slice(0, 10), // Top 10 missing items
-        },
-      };
-    }),
-  }),
-
-  // ============================================================================
   // ACTIVITY LOG
   // ============================================================================
   
-  activityLog: router({
+  activity: router({
     list: protectedProcedure
-      .input(
-        z.object({
-          limit: z.number().optional(),
-        })
-      )
+      .input(z.object({
+        module: z.string().optional(),
+        limit: z.number().optional().default(50),
+      }))
       .query(async ({ input }) => {
         const db = await getDb();
         if (!db) throw new Error("Database not available");
         
-        const query = db
+        let query = db
           .select()
-          .from(logisticsActivityLog)
-          .orderBy(desc(logisticsActivityLog.createdAt));
+          .from(activityLogs)
+          .orderBy(desc(activityLogs.createdAt))
+          .limit(input.limit);
         
-        if (input.limit) {
-          return await query.limit(input.limit);
+        if (input.module) {
+          query = db
+            .select()
+            .from(activityLogs)
+            .where(eq(activityLogs.module, input.module))
+            .orderBy(desc(activityLogs.createdAt))
+            .limit(input.limit);
         }
         
         return await query;
       }),
+    
+    append: protectedProcedure
+      .input(z.object({
+        actionType: z.string(),
+        targetEntity: z.string().optional(),
+        targetId: z.string().optional(),
+        oldValue: z.any().optional(),
+        newValue: z.any().optional(),
+        module: z.string().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+        
+        const [result] = await db.insert(activityLogs).values({
+          userId: ctx.user.id,
+          actionType: input.actionType,
+          targetEntity: input.targetEntity,
+          targetId: input.targetId,
+          oldValue: input.oldValue,
+          newValue: input.newValue,
+          module: input.module || "logistics",
+        });
+        
+        return { success: true, id: result.insertId };
+      }),
   }),
+
+  // ============================================================================
+  // DASHBOARD STATS
+  // ============================================================================
+  
+  dashboardStats: protectedProcedure.query(async () => {
+    const db = await getDb();
+    if (!db) throw new Error("Database not available");
+    
+    // Get room counts by status
+    const roomStats = await db
+      .select({
+        status: rooms.status,
+        count: sql<number>`count(*)`,
+      })
+      .from(rooms)
+      .groupBy(rooms.status);
+    
+    // Get today's housekeeping
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    
+    const todayHousekeeping = await db
+      .select({
+        status: housekeepingSchedules.status,
+        count: sql<number>`count(*)`,
+      })
+      .from(housekeepingSchedules)
+      .where(
+        and(
+          sql`${housekeepingSchedules.scheduledDate} >= ${today}`,
+          sql`${housekeepingSchedules.scheduledDate} < ${tomorrow}`
+        )
+      )
+      .groupBy(housekeepingSchedules.status);
+    
+    // Get pending maintenance
+    const pendingMaintenance = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(maintenanceSchedules)
+      .where(inArray(maintenanceSchedules.status, ["scheduled", "in_progress"]));
+    
+    // Get inventory alerts (low/missing items)
+    const inventoryAlerts = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(roomInventoryItems)
+      .where(inArray(roomInventoryItems.status, ["low", "missing", "damaged"]));
+    
+    // Total maintenance cost this month
+    const firstOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    const maintenanceCost = await db
+      .select({ total: sql<number>`COALESCE(SUM(cost), 0)` })
+      .from(maintenanceSchedules)
+      .where(
+        and(
+          eq(maintenanceSchedules.status, "completed"),
+          sql`${maintenanceSchedules.completedAt} >= ${firstOfMonth}`
+        )
+      );
+    
+    return {
+      rooms: {
+        total: roomStats.reduce((sum, r) => sum + r.count, 0),
+        available: roomStats.find(r => r.status === "available")?.count || 0,
+        occupied: roomStats.find(r => r.status === "occupied")?.count || 0,
+        cleaning: roomStats.find(r => r.status === "cleaning")?.count || 0,
+        maintenance: roomStats.find(r => r.status === "maintenance")?.count || 0,
+      },
+      housekeeping: {
+        todayTotal: todayHousekeeping.reduce((sum, h) => sum + h.count, 0),
+        todayCompleted: todayHousekeeping.find(h => h.status === "completed")?.count || 0,
+        todayPending: todayHousekeeping.filter(h => h.status !== "completed" && h.status !== "cancelled").reduce((sum, h) => sum + h.count, 0),
+      },
+      maintenance: {
+        pending: pendingMaintenance[0]?.count || 0,
+        monthCost: maintenanceCost[0]?.total || 0,
+      },
+      inventory: {
+        alerts: inventoryAlerts[0]?.count || 0,
+      },
+    };
+  }),
+  
+  // ============================================================================
+  // RECENT CHANGES (for realtime notifications polling)
+  // ============================================================================
+  
+  recentChanges: protectedProcedure
+    .input(z.object({ since: z.string().optional() }))
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+      
+      const sinceDate = input.since ? new Date(input.since) : new Date(Date.now() - 60000); // Last minute
+      
+      const changes = await db
+        .select()
+        .from(activityLogs)
+        .where(
+          and(
+            eq(activityLogs.module, "logistics"),
+            sql`${activityLogs.createdAt} > ${sinceDate}`
+          )
+        )
+        .orderBy(desc(activityLogs.createdAt))
+        .limit(20);
+      
+      return changes;
+    }),
 });

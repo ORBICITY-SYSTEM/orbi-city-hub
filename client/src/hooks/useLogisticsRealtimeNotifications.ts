@@ -1,66 +1,73 @@
-import { useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { useEffect, useRef } from "react";
+import { trpc } from "@/utils/trpc";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
 
+/**
+ * Logistics Realtime Notifications Hook
+ * 
+ * Migrated from Supabase realtime to tRPC polling.
+ * In future, can be upgraded to SSE/WebSocket for true realtime.
+ * 
+ * Polls every 30 seconds for new activity log entries.
+ */
 export const useLogisticsRealtimeNotifications = () => {
   const { t } = useLanguage();
+  const lastCheckedRef = useRef<Date>(new Date());
+  const shownIdsRef = useRef<Set<number>>(new Set());
+
+  // Poll for new activity logs
+  const { data: activityLogs } = trpc.logistics.activity.list.useQuery(
+    { limit: 10 },
+    {
+      refetchInterval: 30000, // Poll every 30 seconds
+      refetchIntervalInBackground: false,
+    }
+  );
 
   useEffect(() => {
-    const getCurrentUserId = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      return user?.id;
-    };
+    if (!activityLogs || activityLogs.length === 0) return;
 
-    const setupRealtimeSubscription = async () => {
-      const currentUserId = await getCurrentUserId();
+    // Filter for new entries we haven't shown yet
+    const newLogs = activityLogs.filter((log: any) => {
+      const logDate = new Date(log.createdAt);
+      const isNew = logDate > lastCheckedRef.current;
+      const notShown = !shownIdsRef.current.has(log.id);
+      return isNew && notShown;
+    });
 
-      const channel = supabase
-        .channel('logistics-changes')
-        .on(
-          'postgres_changes',
-          {
-            event: 'INSERT',
-            schema: 'public',
-            table: 'logistics_activity_log'
-          },
-          (payload) => {
-            const newLog = payload.new as any;
-            
-            // Don't show notifications for current user's own changes
-            if (newLog.user_id === currentUserId) {
-              return;
-            }
+    // Show toast for each new log
+    newLogs.forEach((log: any) => {
+      shownIdsRef.current.add(log.id);
 
-            const actionText = {
-              create: t("შექმნა", "created"),
-              update: t("განაახლა", "updated"),
-              delete: t("წაშალა", "deleted")
-            }[newLog.action] || newLog.action;
+      const actionText = {
+        create: t("შექმნა", "created"),
+        update: t("განაახლა", "updated"),
+        delete: t("წაშალა", "deleted"),
+        status_change: t("სტატუსი შეცვალა", "changed status"),
+        assign: t("მიანიჭა", "assigned"),
+        complete: t("დაასრულა", "completed"),
+      }[log.action] || log.action;
 
-            const entityText = {
-              room: t("ოთახი", "room"),
-              inventory_item: t("ინვენტარის ელემენტი", "inventory item"),
-              housekeeping_schedule: t("დასუფთავების გრაფიკი", "housekeeping schedule"),
-              maintenance_schedule: t("ტექნიკური გრაფიკი", "maintenance schedule")
-            }[newLog.entity_type] || newLog.entity_type;
+      const entityText = {
+        room: t("ოთახი", "room"),
+        inventory_item: t("ინვენტარის ელემენტი", "inventory item"),
+        housekeeping_task: t("დასუფთავების ამოცანა", "housekeeping task"),
+        maintenance_request: t("ტექნიკური მოთხოვნა", "maintenance request"),
+      }[log.entityType] || log.entityType;
 
-            toast.info(
-              `${newLog.user_email || t("მომხმარებელმა", "User")} ${actionText} ${entityText}${newLog.entity_name ? `: ${newLog.entity_name}` : ""}`,
-              {
-                description: t("ახალი ცვლილება", "New Change"),
-                duration: 5000,
-              }
-            );
-          }
-        )
-        .subscribe();
+      toast.info(
+        `${log.userName || t("მომხმარებელმა", "User")} ${actionText} ${entityText}${log.entityName ? `: ${log.entityName}` : ""}`,
+        {
+          description: t("ახალი ცვლილება", "New Change"),
+          duration: 5000,
+        }
+      );
+    });
 
-      return () => {
-        supabase.removeChannel(channel);
-      };
-    };
-
-    setupRealtimeSubscription();
-  }, [t]);
+    // Update last checked time
+    if (newLogs.length > 0) {
+      lastCheckedRef.current = new Date();
+    }
+  }, [activityLogs, t]);
 };
