@@ -50,6 +50,7 @@ import { tawktoRouter } from "./routers/tawktoRouter";
 import { ingestRouter } from "./routers/ingestRouter";
 import { outboxRouter } from "./routers/outboxRouter";
 import { seedLogisticsRouter } from "./routers/seedLogistics";
+import { appscriptBridgeRouter } from "./routers/appscriptBridge";
 
 export const appRouter = router({
   realFinance: realFinanceRouter,
@@ -95,6 +96,7 @@ export const appRouter = router({
   ingest: ingestRouter,
   outbox: outboxRouter,
   seedLogistics: seedLogisticsRouter,
+  appscriptBridge: appscriptBridgeRouter,
   system: systemRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
