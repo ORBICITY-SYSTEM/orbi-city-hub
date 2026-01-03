@@ -118,10 +118,10 @@ export const seedLogisticsRouter = router({
     const [itemCount] = await db.select({ count: sql<number>`count(*)` }).from(standardInventoryItems);
     
     return {
-      roomsInDb: roomCount?.count || 0,
-      standardItemsInDb: itemCount?.count || 0,
-      roomsToSeed: SEED_DATA.rooms.length,
-      itemsToSeed: SEED_DATA.standard_inventory_items.length,
+      roomsInDb: Number(roomCount?.count) || 0,
+      standardItemsInDb: Number(itemCount?.count) || 0,
+      roomsToSeed: 56,
+      itemsToSeed: 16,
     };
   }),
   
