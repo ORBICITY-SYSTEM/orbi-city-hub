@@ -72,6 +72,9 @@ const WhatsAppQuickStart = lazy(() => import("./pages/QuickStart"));
 // AI Agent Module - Lazy
 const MirrorEffectAgent = lazy(() => import("./pages/ai/MirrorEffectAgent"));
 
+// Admin Pages - Lazy
+const SeedLogistics = lazy(() => import("./pages/admin/SeedLogistics"));
+
 // System Pages - Lazy
 const ActivityLogPage = lazy(() => import("./pages/system/ActivityLogPage"));
 const AnalyticsDashboardPage = lazy(() => import("./pages/system/AnalyticsDashboardPage"));
@@ -140,6 +143,9 @@ function RouterContent() {
 
         {/* AI Agent Module */}
         <Route path="/ai-agent" component={MirrorEffectAgent} />
+
+        {/* Admin Pages */}
+        <Route path="/admin/seed-logistics" component={SeedLogistics} />
 
         {/* System Pages */}
         <Route path="/system/activity-log" component={ActivityLogPage} />
