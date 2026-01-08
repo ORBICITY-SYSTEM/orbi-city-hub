@@ -7,26 +7,42 @@ export const ka: Translations = {
   // Navigation
   nav: {
     home: "მთავარი",
+    mainDashboard: "სამართავი ცენტრი",
     finance: "ფინანსები",
     marketing: "მარკეტინგი",
     reservations: "რეზერვაციები",
     integrations: "ინტეგრაციები",
     logistics: "ლოჯისტიკა",
-    knowledgeBase: "ცოდნის ბაზა",
+    settings: "პარამეტრები",
+  },
+  
+  // Navigation Groups
+  navGroup: {
+    modules: "Modules",
+    system: "System",
   },
   
   // Submenu items
   submenu: {
     // Finance
-    financeDashboard: "მთავარი",
+    financeDashboard: "Dashboard",
+    aiFinanceDirector: "AI Manager",
+    revenue: "Revenue",
     analytics: "ანალიტიკა",
-    reports: "თვიური ანგარიშები",
+    reports: "Reports",
     otelms: "OTELMS",
-    devExpenses: "დევ ხარჯები",
+    devExpenses: "Expenses",
     
     // Marketing (workflow-based)
     marketingDashboard: "მთავარი",
-    aiMarketingDirector: "AI Marketing Director",
+    aiMarketingDirector: "AI Manager",
+    instagram: "Instagram",
+    facebook: "Facebook",
+    tiktok: "TikTok",
+    website: "Website",
+    youtube: "YouTube",
+    googleAds: "Google Ads",
+    otaChannels: "OTA Channels",
     reviewsHub: "მიმოხილვები",
     reputationAnalytics: "რეპუტაციის ანალიტიკა",
     otaPerformance: "OTA შედეგები",
@@ -34,11 +50,20 @@ export const ka: Translations = {
     leadGeneration: "ლიდების გენერაცია",
     
     // Reservations (რესტრუქტურიზებული)
+    reservationsDashboard: "Dashboard",
+    aiReservationsDirector: "AI Manager",
     reservationsOverview: "მთავარი",
-    reservationsList: "ჯავშნების სია",
-    reservationsCalendar: "კალენდარი / თაიმლაინი",
+    reservationsList: "Bookings",
+    reservationsCalendar: "Calendar",
+    guests: "Guests",
+    messages: "Messages",
     exceptionsIssues: "გამონაკლისები და პრობლემები",
     aiAssistant: "AI ასისტენტი",
+    
+    // Channel Manager
+    channelManagerCalendar: "Calendar View",
+    channelManagerStatus: "Status Dashboard",
+    channelManagerReports: "Reporting List",
     
     // Integrations Hub
     integrationsHub: "მთავარი",
@@ -47,10 +72,11 @@ export const ka: Translations = {
     butlerAI: "Butler AI",
     
     // Logistics
-    logisticsDashboard: "მთავარი",
-    inventory: "ინვენტარი",
-    housekeeping: "დალაგება",
-    maintenance: "მოვლა",
+    logisticsDashboard: "Dashboard",
+    aiLogisticsDirector: "AI Manager",
+    inventory: "Inventory",
+    housekeeping: "Housekeeping",
+    maintenance: "Maintenance",
     
     // Knowledge Base
     knowledgeBase: "ცოდნის ბაზა",

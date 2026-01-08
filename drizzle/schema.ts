@@ -762,3 +762,78 @@ export const marketingTasks = mysqlTable("marketingTasks", {
 
 export type MarketingTask = typeof marketingTasks.$inferSelect;
 export type InsertMarketingTask = typeof marketingTasks.$inferInsert;
+
+/**
+ * Reservations Tasks table for AI Reservations Director
+ */
+export const reservationsTasks = mysqlTable("reservationsTasks", {
+  id: int("id").autoincrement().primaryKey(),
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  category: mysqlEnum("category", ["bookings", "guests", "calendar", "ota", "reviews", "messages", "general"]).default("general").notNull(),
+  status: mysqlEnum("status", ["pending", "in_progress", "completed", "cancelled"]).default("pending").notNull(),
+  priority: mysqlEnum("priority", ["low", "medium", "high", "urgent"]).default("medium").notNull(),
+  assignedTo: varchar("assignedTo", { length: 64 }), // 'ai_agent' or human name
+  agentName: varchar("agentName", { length: 64 }), // which AI agent if assigned to AI
+  dueDate: timestamp("dueDate"),
+  completedAt: timestamp("completedAt"),
+  createdBy: varchar("createdBy", { length: 64 }).default("human").notNull(),
+  aiNotes: text("aiNotes"),
+  humanNotes: text("humanNotes"),
+  parentTaskId: int("parentTaskId"), // Self-referencing for sub-tasks
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ReservationsTask = typeof reservationsTasks.$inferSelect;
+export type InsertReservationsTask = typeof reservationsTasks.$inferInsert;
+
+/**
+ * Finance Tasks table for AI Finance Director
+ */
+export const financeTasks = mysqlTable("financeTasks", {
+  id: int("id").autoincrement().primaryKey(),
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  category: mysqlEnum("category", ["revenue", "expenses", "reports", "analytics", "otelms", "general"]).default("general").notNull(),
+  status: mysqlEnum("status", ["pending", "in_progress", "completed", "cancelled"]).default("pending").notNull(),
+  priority: mysqlEnum("priority", ["low", "medium", "high", "urgent"]).default("medium").notNull(),
+  assignedTo: varchar("assignedTo", { length: 64 }), // 'ai_agent' or human name
+  agentName: varchar("agentName", { length: 64 }), // which AI agent if assigned to AI
+  dueDate: timestamp("dueDate"),
+  completedAt: timestamp("completedAt"),
+  createdBy: varchar("createdBy", { length: 64 }).default("human").notNull(),
+  aiNotes: text("aiNotes"),
+  humanNotes: text("humanNotes"),
+  parentTaskId: int("parentTaskId"), // Self-referencing for sub-tasks
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type FinanceTask = typeof financeTasks.$inferSelect;
+export type InsertFinanceTask = typeof financeTasks.$inferInsert;
+
+/**
+ * Logistics Tasks table for AI Logistics Director
+ */
+export const logisticsTasks = mysqlTable("logisticsTasks", {
+  id: int("id").autoincrement().primaryKey(),
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  category: mysqlEnum("category", ["housekeeping", "inventory", "maintenance", "scheduling", "general"]).default("general").notNull(),
+  status: mysqlEnum("status", ["pending", "in_progress", "completed", "cancelled"]).default("pending").notNull(),
+  priority: mysqlEnum("priority", ["low", "medium", "high", "urgent"]).default("medium").notNull(),
+  assignedTo: varchar("assignedTo", { length: 64 }), // 'ai_agent' or human name
+  agentName: varchar("agentName", { length: 64 }), // which AI agent if assigned to AI
+  dueDate: timestamp("dueDate"),
+  completedAt: timestamp("completedAt"),
+  createdBy: varchar("createdBy", { length: 64 }).default("human").notNull(),
+  aiNotes: text("aiNotes"),
+  humanNotes: text("humanNotes"),
+  parentTaskId: int("parentTaskId"), // Self-referencing for sub-tasks
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type LogisticsTask = typeof logisticsTasks.$inferSelect;
+export type InsertLogisticsTask = typeof logisticsTasks.$inferInsert;

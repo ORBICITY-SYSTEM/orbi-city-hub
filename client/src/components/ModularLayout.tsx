@@ -42,99 +42,103 @@ import {
   Archive,
   LineChart,
   Target,
-  Zap
+  Zap,
+  Building2,
+  Brain,
+  Instagram,
+  Facebook,
+  Youtube,
+  Hotel,
+  PieChart,
+  Receipt
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
 
-interface SubMenuItem {
+interface NavItem {
   nameKey: string;
   path: string;
   icon: React.ComponentType<{ className?: string }>;
+  children?: { nameKey: string; path: string; icon?: React.ComponentType<{ className?: string }> }[];
 }
 
-interface ModuleItem {
-  nameKey: string;
-  icon: React.ComponentType<{ className?: string }>;
-  color: string;
-  subItems: SubMenuItem[];
-}
-
-const modules: ModuleItem[] = [
-  // 1. MARKETING (first) - Workflow-based navigation
+// Main modules (orb-city-harmony style)
+const mainModules: NavItem[] = [
+  {
+    nameKey: "nav.mainDashboard",
+    path: "/",
+    icon: LayoutDashboard,
+  },
   {
     nameKey: "nav.marketing",
+    path: "/marketing",
     icon: Megaphone,
-    color: "text-cyan-400",
-    subItems: [
-      { nameKey: "submenu.marketingDashboard", path: "/marketing", icon: LayoutDashboard },
-      { nameKey: "submenu.aiMarketingDirector", path: "/marketing/ai-director", icon: Bot },
-      { nameKey: "submenu.reviewsHub", path: "/marketing/reviews", icon: Star },
-      { nameKey: "submenu.reputationAnalytics", path: "/marketing/reputation", icon: LineChart },
-      { nameKey: "submenu.otaPerformance", path: "/marketing/ota", icon: Globe },
-      { nameKey: "submenu.guestCommunications", path: "/marketing/communications", icon: MessageCircle },
-      { nameKey: "submenu.leadGeneration", path: "/marketing/leads", icon: Target },
-    ]
+    children: [
+      { nameKey: "submenu.aiMarketingDirector", path: "/marketing/ai-director", icon: Brain },
+      { nameKey: "submenu.instagram", path: "/marketing/instagram", icon: Instagram },
+      { nameKey: "submenu.facebook", path: "/marketing/facebook", icon: Facebook },
+      { nameKey: "submenu.tiktok", path: "/marketing/tiktok", icon: Sparkles },
+      { nameKey: "submenu.website", path: "/marketing/website", icon: Globe },
+      { nameKey: "submenu.youtube", path: "/marketing/youtube", icon: Youtube },
+      { nameKey: "submenu.googleAds", path: "/marketing/google", icon: TrendingUp },
+      { nameKey: "submenu.otaChannels", path: "/marketing/ota", icon: Hotel },
+      { nameKey: "submenu.leadGeneration", path: "/marketing/leads", icon: Users },
+    ],
   },
-  // 2. RESERVATIONS (second)
   {
     nameKey: "nav.reservations",
+    path: "/reservations",
     icon: Calendar,
-    color: "text-cyan-400",
-    subItems: [
-      { nameKey: "submenu.reservationsOverview", path: "/reservations", icon: LayoutDashboard },
-      { nameKey: "submenu.reservationsList", path: "/reservations/list", icon: List },
+    children: [
+      { nameKey: "submenu.reservationsDashboard", path: "/reservations", icon: PieChart },
+      { nameKey: "submenu.aiReservationsDirector", path: "/reservations/ai-director", icon: Bot },
+      { nameKey: "submenu.reservationsList", path: "/reservations/list", icon: Calendar },
       { nameKey: "submenu.reservationsCalendar", path: "/reservations/calendar", icon: CalendarDays },
-      { nameKey: "submenu.exceptionsIssues", path: "/reservations/exceptions", icon: AlertTriangle },
-    ]
+      { nameKey: "submenu.otaChannels", path: "/reservations/ota-channels", icon: Hotel },
+      { nameKey: "submenu.guests", path: "/reservations/guests", icon: Users },
+      { nameKey: "submenu.reviewsHub", path: "/reservations/reviews", icon: Star },
+      { nameKey: "submenu.messages", path: "/reservations/messages", icon: MessageCircle },
+    ],
   },
-  // 3. FINANCE (third)
   {
     nameKey: "nav.finance",
+    path: "/finance",
     icon: DollarSign,
-    color: "text-cyan-400",
-    subItems: [
-      { nameKey: "submenu.financeDashboard", path: "/finance", icon: LayoutDashboard },
-      { nameKey: "submenu.analytics", path: "/finance/analytics", icon: TrendingUp },
+    children: [
+      { nameKey: "submenu.financeDashboard", path: "/finance", icon: PieChart },
+      { nameKey: "submenu.aiFinanceDirector", path: "/finance/ai-director", icon: Bot },
+      { nameKey: "submenu.revenue", path: "/finance/revenue", icon: TrendingUp },
+      { nameKey: "submenu.devExpenses", path: "/finance/expenses", icon: Receipt },
       { nameKey: "submenu.reports", path: "/finance/reports", icon: FileText },
-      { nameKey: "submenu.otelms", path: "/finance/otelms", icon: Database },
-      { nameKey: "submenu.devExpenses", path: "/finance/expenses", icon: BarChart3 },
-    ]
+    ],
   },
-  // 4. INTEGRATIONS (fourth)
-  {
-    nameKey: "nav.integrations",
-    icon: Plug,
-    color: "text-cyan-400",
-    subItems: [
-      { nameKey: "submenu.integrationsHub", path: "/integrations", icon: LayoutDashboard },
-      { nameKey: "submenu.whatsappBot", path: "/integrations/whatsapp", icon: MessageCircle },
-      { nameKey: "submenu.telegramBot", path: "/integrations/telegram", icon: Send },
-      { nameKey: "submenu.butlerAI", path: "/integrations/butler", icon: Bot },
-    ]
-  },
-  // 5. LOGISTICS (fifth)
   {
     nameKey: "nav.logistics",
+    path: "/logistics",
     icon: Truck,
-    color: "text-cyan-400",
-    subItems: [
-      { nameKey: "submenu.logisticsDashboard", path: "/logistics", icon: LayoutDashboard },
-      { nameKey: "submenu.housekeeping", path: "/logistics/housekeeping", icon: Package },
+    children: [
+      { nameKey: "submenu.logisticsDashboard", path: "/logistics", icon: PieChart },
+      { nameKey: "submenu.aiLogisticsDirector", path: "/logistics/ai-director", icon: Bot },
+      { nameKey: "submenu.housekeeping", path: "/logistics/housekeeping", icon: Sparkles },
+      { nameKey: "submenu.inventory", path: "/logistics/inventory", icon: Package },
       { nameKey: "submenu.maintenance", path: "/logistics/maintenance", icon: Wrench },
-    ]
+    ],
   },
-  // 6. KNOWLEDGE BASE (sixth)
-  {
-    nameKey: "nav.knowledgeBase",
-    icon: BookOpen,
-    color: "text-cyan-400",
-    subItems: [
-      { nameKey: "submenu.knowledgeBase", path: "/knowledge-base", icon: BookOpen },
-    ]
-  },
+];
 
+// System modules (bottom)
+const systemModules: NavItem[] = [
+  {
+    nameKey: "nav.integrations",
+    path: "/integrations",
+    icon: Plug,
+  },
+  {
+    nameKey: "nav.settings",
+    path: "/settings",
+    icon: Settings,
+  },
 ];
 
 export default function ModularLayout({ children }: { children: React.ReactNode }) {
@@ -142,16 +146,18 @@ export default function ModularLayout({ children }: { children: React.ReactNode 
   const { t } = useLanguage();
   const [location] = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [expandedModules, setExpandedModules] = useState<string[]>(["nav.finance", "nav.marketing", "nav.reservations", "nav.logistics"]);
+  const [expandedItems, setExpandedItems] = useState<string[]>([]);
 
-  // Auto-expand module based on current route
+  // Auto-expand item based on current route
   useEffect(() => {
-    const currentModule = modules.find(m => 
-      m.subItems.some(item => location.startsWith(item.path))
-    );
-    if (currentModule && !expandedModules.includes(currentModule.nameKey)) {
-      setExpandedModules(prev => [...prev, currentModule.nameKey]);
-    }
+    [...mainModules, ...systemModules].forEach(item => {
+      if (item.children) {
+        const hasActiveChild = item.children.some(child => location.startsWith(child.path));
+        if (hasActiveChild && !expandedItems.includes(item.path)) {
+          setExpandedItems(prev => [...prev, item.path]);
+        }
+      }
+    });
   }, [location]);
 
   // Close sidebar on route change (mobile)
@@ -159,11 +165,78 @@ export default function ModularLayout({ children }: { children: React.ReactNode 
     setSidebarOpen(false);
   }, [location]);
 
-  const toggleModule = (moduleNameKey: string) => {
-    setExpandedModules(prev => 
-      prev.includes(moduleNameKey) 
-        ? prev.filter(name => name !== moduleNameKey)
-        : [...prev, moduleNameKey]
+  const toggleItem = (itemPath: string) => {
+    setExpandedItems(prev => 
+      prev.includes(itemPath) 
+        ? prev.filter(path => path !== itemPath)
+        : [...prev, itemPath]
+    );
+  };
+
+  const isItemActive = (item: NavItem): boolean => {
+    if (item.path === "/") return location === "/";
+    if (item.children) {
+      return item.children.some(child => location.startsWith(child.path));
+    }
+    return location.startsWith(item.path);
+  };
+
+  const renderMenuItem = (item: NavItem) => {
+    const isActive = isItemActive(item);
+    const isExpanded = expandedItems.includes(item.path);
+
+    return (
+      <div key={item.path}>
+        {item.children ? (
+          <>
+            <button
+              onClick={() => toggleItem(item.path)}
+              className={cn(
+                "w-full flex items-center justify-between px-4 py-3 rounded-lg transition-all",
+                isActive
+                  ? "bg-cyan-500/10 text-cyan-400"
+                  : "text-white/70 hover:bg-slate-800/50 hover:text-white"
+              )}
+            >
+              <div className="flex items-center gap-3">
+                <item.icon className="w-5 h-5" />
+                <span className="font-medium">{t(item.nameKey)}</span>
+              </div>
+              <ChevronDown className={cn("w-4 h-4 transition-transform", isExpanded && "rotate-180")} />
+            </button>
+            
+            {isExpanded && (
+              <div className="ml-4 mt-1 space-y-1 border-l border-cyan-500/20 pl-4">
+                {item.children.map((child) => (
+                  <Link key={child.path} href={child.path}>
+                    <div className={cn(
+                      "flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all cursor-pointer",
+                      location === child.path || location.startsWith(child.path + "/")
+                        ? "bg-cyan-500/20 text-cyan-400"
+                        : "text-white/60 hover:bg-slate-800/50 hover:text-white"
+                    )}>
+                      {child.icon && <child.icon className="w-3.5 h-3.5" />}
+                      <span>{t(child.nameKey)}</span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </>
+        ) : (
+          <Link href={item.path}>
+            <div className={cn(
+              "flex items-center gap-3 px-4 py-3 rounded-lg transition-all cursor-pointer",
+              isActive
+                ? "bg-cyan-500/20 text-cyan-400"
+                : "text-white/70 hover:bg-slate-800/50 hover:text-white"
+            )}>
+              <item.icon className="w-5 h-5" />
+              <span className="font-medium">{t(item.nameKey)}</span>
+            </div>
+          </Link>
+        )}
+      </div>
     );
   };
 
@@ -199,69 +272,48 @@ export default function ModularLayout({ children }: { children: React.ReactNode 
         {/* Logo */}
         <div className="hidden lg:flex items-center gap-3 px-6 py-4 border-b border-cyan-500/20">
           <Link href="/" className="flex items-center gap-3">
-            <img src={APP_LOGO} alt={APP_TITLE} className="w-10 h-10" />
-            <span className="font-bold text-xl text-white">{APP_TITLE}</span>
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600">
+              <Building2 className="h-5 w-5 text-white" />
+            </div>
+            <div className="flex flex-col">
+              <span className="font-bold text-base text-white">ORBI City</span>
+              <span className="text-xs text-muted-foreground">Hub</span>
+            </div>
           </Link>
         </div>
 
         {/* Navigation */}
         <nav className="px-4 py-6 space-y-2 overflow-y-auto h-[calc(100vh-80px)] lg:h-[calc(100vh-72px)] mt-16 lg:mt-0">
-          {/* Home */}
-          <Link href="/">
-            <div className={cn(
-              "flex items-center gap-3 px-4 py-3 rounded-lg transition-all cursor-pointer",
-              location === "/" 
-                ? "bg-cyan-500/20 text-cyan-400" 
-                : "text-white/70 hover:bg-slate-800/50 hover:text-white"
-            )}>
-              <LayoutDashboard className="w-5 h-5" />
-              <span className="font-medium">{t("nav.home")}</span>
+          {/* Main Modules */}
+          <div className="mb-6">
+            <div className="px-3 py-2 mb-2">
+              <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                {t("navGroup.modules") || "Modules"}
+              </h3>
             </div>
-          </Link>
+            <div className="space-y-1">
+              {mainModules.map(renderMenuItem)}
+            </div>
+          </div>
 
-          {/* Modules */}
-          {modules.map((module) => (
-            <div key={module.nameKey}>
-              <button
-                onClick={() => toggleModule(module.nameKey)}
-                className={cn(
-                  "w-full flex items-center justify-between px-4 py-3 rounded-lg transition-all",
-                  module.subItems.some(item => location.startsWith(item.path))
-                    ? "bg-cyan-500/10 text-cyan-400"
-                    : "text-white/70 hover:bg-slate-800/50 hover:text-white"
-                )}
-              >
-                <div className="flex items-center gap-3">
-                  <module.icon className={cn("w-5 h-5", module.color)} />
-                  <span className="font-medium">{t(module.nameKey)}</span>
-                </div>
-                {expandedModules.includes(module.nameKey) ? (
-                  <ChevronDown className="w-4 h-4" />
-                ) : (
-                  <ChevronRight className="w-4 h-4" />
-                )}
-              </button>
-              
-              {expandedModules.includes(module.nameKey) && (
-                <div className="ml-4 mt-1 space-y-1 border-l border-cyan-500/20 pl-4">
-                  {module.subItems.map((item) => (
-                    <Link key={item.path} href={item.path}>
-                      <div className={cn(
-                        "flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all cursor-pointer",
-                        location === item.path
-                          ? "bg-cyan-500/20 text-cyan-400"
-                          : "text-white/60 hover:bg-slate-800/50 hover:text-white"
-                      )}>
-                        <item.icon className="w-4 h-4" />
-                        <span>{t(item.nameKey)}</span>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-              )}
+          {/* System Modules */}
+          <div className="mt-auto pt-6 border-t border-cyan-500/20">
+            <div className="px-3 py-2 mb-2">
+              <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                {t("navGroup.system") || "System"}
+              </h3>
             </div>
-          ))}
+            <div className="space-y-1">
+              {systemModules.map(renderMenuItem)}
+            </div>
+          </div>
         </nav>
+
+        {/* Footer - System Online */}
+        <div className="hidden lg:flex items-center gap-2 px-6 py-4 border-t border-cyan-500/20 text-xs text-muted-foreground">
+          <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+          <span>System Online</span>
+        </div>
       </aside>
 
       {/* Mobile Overlay */}

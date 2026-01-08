@@ -48,6 +48,9 @@ import { ceoDashboardRouter } from "./ceoDashboardRouter";
 import { telegramRouter } from "./routers/telegramRouter";
 import { tawktoRouter } from "./routers/tawktoRouter";
 import { marketingRouter } from "./routers/marketingRouter";
+import { reservationsRouter as reservationsAIDirectorRouter } from "./routers/reservationsRouter";
+import { financeRouter as financeAIDirectorRouter } from "./routers/financeRouter";
+import { logisticsRouter as logisticsAIDirectorRouter } from "./routers/logisticsRouter";
 
 export const appRouter = router({
   realFinance: realFinanceRouter,
@@ -91,6 +94,9 @@ export const appRouter = router({
   telegram: telegramRouter,
   tawkto: tawktoRouter,
   marketing: marketingRouter,
+  reservationsAIDirector: reservationsAIDirectorRouter,
+  financeAIDirector: financeAIDirectorRouter,
+  logisticsAIDirector: logisticsAIDirectorRouter,
   system: systemRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),

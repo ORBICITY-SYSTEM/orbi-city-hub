@@ -35,6 +35,11 @@ const LiveChat = lazy(() => import("./pages/marketing/LiveChat"));
 const GuestCommunications = lazy(() => import("./pages/marketing/GuestCommunications"));
 const LiveChatDashboard = lazy(() => import("./pages/LiveChatDashboard"));
 
+// AI Directors - Lazy
+const AIReservationsDirector = lazy(() => import("./pages/reservations/AIReservationsDirector"));
+const AIFinanceDirector = lazy(() => import("./pages/finance/AIFinanceDirector"));
+const AILogisticsDirector = lazy(() => import("./pages/logistics/AILogisticsDirector"));
+
 // Reservations Module - Lazy
 const EmailInbox = lazy(() => import("./pages/reservations/EmailInbox"));
 const EmailDetail = lazy(() => import("./pages/reservations/EmailDetail"));
@@ -83,6 +88,16 @@ const AnalyticsDashboardPage = lazy(() => import("./pages/system/AnalyticsDashbo
 const WhiteLabelSettingsPage = lazy(() => import("./pages/system/WhiteLabelSettingsPage"));
 const UserManagementPage = lazy(() => import("./pages/system/UserManagementPage"));
 
+// New Pages for Grouped Navigation - Lazy
+const LivePulse = lazy(() => import("./pages/LivePulse"));
+const ChannelManager = lazy(() => import("./pages/ChannelManager"));
+const ChannelManagerCalendar = lazy(() => import("./pages/channel-manager/ChannelManagerCalendar"));
+const ChannelManagerStatus = lazy(() => import("./pages/channel-manager/ChannelManagerStatus"));
+const ChannelManagerReports = lazy(() => import("./pages/channel-manager/ChannelManagerReports"));
+const MarketRadar = lazy(() => import("./pages/MarketRadar"));
+const OwnersHub = lazy(() => import("./pages/OwnersHub"));
+const RoomInventory = lazy(() => import("./pages/RoomInventory"));
+
 function Router() {
   return (
     <Suspense fallback={<PageLoadingSkeleton />}>
@@ -98,16 +113,23 @@ function RouterContent() {
         {/* Home */}
         <Route path={"/"} component={Home} />
         <Route path={"/real-finance"} component={RealFinanceDashboard} />
+        
+        {/* COMMAND CENTER */}
+        <Route path="/live" component={LivePulse} />
 
-        {/* Finance Module */}
+        {/* FINANCIAL TOWER - Finance Module */}
         <Route path="/finance" component={FinanceDashboard} />
         <Route path="/finance/analytics" component={FinanceAnalytics} />
         <Route path="/finance/reports" component={FinanceMonthlyReports} />
         <Route path="/finance/otelms" component={FinanceOTELMS} />
         <Route path="/finance/expenses" component={FinanceDevelopmentExpenses} />
         <Route path="/finance/powerbi" component={PowerBIFinanceDashboard} />
+        <Route path="/finance/ai-director" component={AIFinanceDirector} />
+        
+        {/* FINANCIAL TOWER - Owners Hub */}
+        <Route path="/owners" component={OwnersHub} />
 
-        {/* Marketing Module (workflow-based) */}
+        {/* GROWTH ENGINE - Marketing Module (workflow-based) */}
         <Route path="/marketing" component={MarketingDashboard} />
         <Route path="/marketing/ai-director" component={AIMarketingDirector} />
         <Route path="/marketing/reviews" component={ReviewsDashboard} />
@@ -117,13 +139,26 @@ function RouterContent() {
         <Route path="/marketing/communications/:emailId" component={EmailDetail} />
         <Route path="/marketing/leads" component={WebsiteLeads} />
         <Route path="/live-chat" component={LiveChatDashboard} />
+        
+        {/* GROWTH ENGINE - Market Radar */}
+        <Route path="/radar" component={MarketRadar} />
 
-        {/* Reservations Module (restructured - 5 items only) */}
+        {/* OPERATIONS HUB - Channel Manager */}
+        <Route path="/channel-manager" component={ChannelManager} />
+        <Route path="/channel-manager/calendar" component={ChannelManagerCalendar} />
+        <Route path="/channel-manager/status" component={ChannelManagerStatus} />
+        <Route path="/channel-manager/reports" component={ChannelManagerReports} />
+        
+        {/* OPERATIONS HUB - Reservations Module (restructured - 5 items only) */}
         <Route path="/reservations" component={OTADashboard} />
         <Route path="/reservations/list" component={OTADashboard} />
         <Route path="/reservations/calendar" component={ReservationsCalendar} />
         <Route path="/reservations/exceptions" component={OTADashboard} />
         <Route path="/reservations/ai-assistant" component={AIResponseQueue} />
+        <Route path="/reservations/ai-director" component={AIReservationsDirector} />
+        
+        {/* OPERATIONS HUB - Room Inventory */}
+        <Route path="/rooms" component={RoomInventory} />
 
         {/* Integrations Hub (new module) */}
         <Route path="/integrations" component={Integrations} />
@@ -134,12 +169,19 @@ function RouterContent() {
         {/* Email Management Module */}
         <Route path="/email-management" component={EmailManagement} />
 
-        {/* Settings Module */}
+        {/* SYSTEM - Team Access */}
+        <Route path="/team" component={UserManagementPage} />
+        
+        {/* SYSTEM - Audit Log */}
+        <Route path="/audit" component={ActivityLogPage} />
+        
+        {/* SYSTEM - Settings */}
         <Route path="/settings" component={Settings} />
 
         {/* Logistics Module */}
         <Route path="/logistics" component={LogisticsDashboard} />
         <Route path="/logistics/housekeeping" component={Housekeeping} />
+        <Route path="/logistics/ai-director" component={AILogisticsDirector} />
 
         {/* Operations Module - PowerStack */}
         <Route path="/operations/housekeeping" component={HousekeepingGrid} />

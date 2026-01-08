@@ -29,9 +29,20 @@ import {
   ExternalLink,
   Zap,
   Settings,
-  ArrowRight
+  ArrowRight,
+  Code,
+  Database,
+  BookOpen,
+  Github,
+  Cloud,
+  Terminal,
+  FileSpreadsheet,
+  Brain,
+  Server,
+  Webhook
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const PLAN_COLORS: Record<PlanTier, string> = {
   starter: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
@@ -246,8 +257,421 @@ export default function Integrations() {
           </TabsContent>
         </Tabs>
         
+        {/* Development Tools Section */}
+        <div className="mt-8">
+          <div className="mb-4">
+            <h2 className="text-2xl font-bold flex items-center gap-2">
+              <Code className="h-6 w-6" />
+              Development Tools & Infrastructure
+            </h2>
+            <p className="text-muted-foreground mt-1">
+              Core tools and services used to build and power ORBI Ultimate V2
+            </p>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {/* Rows.com */}
+            <Card className="hover:shadow-lg transition-shadow border-cyan-500/20">
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <div className="h-12 w-12 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center">
+                    <FileSpreadsheet className="h-6 w-6 text-white" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-lg">Rows.com</CardTitle>
+                    <Badge className="bg-green-500/20 text-green-400 border-green-500/30 mt-1">Active</Badge>
+                  </div>
+                </div>
+                <CardDescription className="mt-2">
+                  Real-time data engine for Channel Manager sync. Python script pushes OTELMS data to Rows.com spreadsheets.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-sm">
+                    <CheckCircle2 className="h-4 w-4 text-green-500" />
+                    <span>Calendar sync (OTELMS → Rows.com)</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <CheckCircle2 className="h-4 w-4 text-green-500" />
+                    <span>Status dashboard sync</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <CheckCircle2 className="h-4 w-4 text-green-500" />
+                    <span>Reporting list sync</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <CheckCircle2 className="h-4 w-4 text-green-500" />
+                    <span>Embedded in Reservations Calendar</span>
+                  </div>
+                </div>
+                <div className="mt-4 pt-4 border-t">
+                  <Button variant="outline" size="sm" className="w-full" asChild>
+                    <a href="/reservations/calendar" target="_blank" rel="noopener noreferrer">
+                      <ExternalLink className="h-4 w-4 mr-2" />
+                      View Calendar
+                    </a>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Obsidian */}
+            <Card className="hover:shadow-lg transition-shadow border-purple-500/20">
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <div className="h-12 w-12 rounded-lg bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center">
+                    <BookOpen className="h-6 w-6 text-white" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-lg">Obsidian</CardTitle>
+                    <Badge className="bg-green-500/20 text-green-400 border-green-500/30 mt-1">Active</Badge>
+                  </div>
+                </div>
+                <CardDescription className="mt-2">
+                  Central Knowledge Base for all hotel operations. Staff instructions, procedures, and training materials.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-sm">
+                    <CheckCircle2 className="h-4 w-4 text-green-500" />
+                    <span>Staff operations manual</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <CheckCircle2 className="h-4 w-4 text-green-500" />
+                    <span>Check-in/check-out procedures</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <CheckCircle2 className="h-4 w-4 text-green-500" />
+                    <span>Housekeeping checklists</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <CheckCircle2 className="h-4 w-4 text-green-500" />
+                    <span>Training materials</span>
+                  </div>
+                </div>
+                <div className="mt-4 pt-4 border-t">
+                  <Button variant="outline" size="sm" className="w-full" asChild>
+                    <a href="/knowledge-base" target="_blank" rel="noopener noreferrer">
+                      <ExternalLink className="h-4 w-4 mr-2" />
+                      Open Knowledge Base
+                    </a>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Python API (OTELMS Scraper) */}
+            <Card className="hover:shadow-lg transition-shadow border-orange-500/20">
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <div className="h-12 w-12 rounded-lg bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center">
+                    <Server className="h-6 w-6 text-white" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-lg">Python API</CardTitle>
+                    <Badge className="bg-green-500/20 text-green-400 border-green-500/30 mt-1">Active</Badge>
+                  </div>
+                </div>
+                <CardDescription className="mt-2">
+                  Selenium-based scraper for OTELMS Channel Manager. Runs 24/7 on Cloud Run, syncs data to Rows.com.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-sm">
+                    <CheckCircle2 className="h-4 w-4 text-green-500" />
+                    <span>Selenium web scraping</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <CheckCircle2 className="h-4 w-4 text-green-500" />
+                    <span>Rows.com API integration</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <CheckCircle2 className="h-4 w-4 text-green-500" />
+                    <span>GCS backup system</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <CheckCircle2 className="h-4 w-4 text-green-500" />
+                    <span>Cloud Run deployment</span>
+                  </div>
+                </div>
+                <div className="mt-4 pt-4 border-t">
+                  <Button variant="outline" size="sm" className="w-full" asChild>
+                    <a href={import.meta.env.VITE_OTELMS_API_URL || "https://otelms-api.run.app"} target="_blank" rel="noopener noreferrer">
+                      <ExternalLink className="h-4 w-4 mr-2" />
+                      API Endpoint
+                    </a>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* GitHub */}
+            <Card className="hover:shadow-lg transition-shadow border-gray-500/20">
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <div className="h-12 w-12 rounded-lg bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center">
+                    <Github className="h-6 w-6 text-white" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-lg">GitHub</CardTitle>
+                    <Badge className="bg-green-500/20 text-green-400 border-green-500/30 mt-1">Active</Badge>
+                  </div>
+                </div>
+                <CardDescription className="mt-2">
+                  Version control and repository management. Source code, issues, and deployment workflows.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-sm">
+                    <CheckCircle2 className="h-4 w-4 text-green-500" />
+                    <span>Code repository</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <CheckCircle2 className="h-4 w-4 text-green-500" />
+                    <span>CI/CD workflows</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <CheckCircle2 className="h-4 w-4 text-green-500" />
+                    <span>Issue tracking</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <CheckCircle2 className="h-4 w-4 text-green-500" />
+                    <span>Vercel auto-deploy</span>
+                  </div>
+                </div>
+                <div className="mt-4 pt-4 border-t">
+                  <Button variant="outline" size="sm" className="w-full" asChild>
+                    <a href="https://github.com/ORBICITY-SYSTEM/orbi-city-hub" target="_blank" rel="noopener noreferrer">
+                      <ExternalLink className="h-4 w-4 mr-2" />
+                      View Repository
+                    </a>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Vercel */}
+            <Card className="hover:shadow-lg transition-shadow border-black/20 dark:border-white/20">
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <div className="h-12 w-12 rounded-lg bg-gradient-to-br from-black to-gray-800 dark:from-white dark:to-gray-200 flex items-center justify-center">
+                    <Cloud className="h-6 w-6 text-white dark:text-black" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-lg">Vercel</CardTitle>
+                    <Badge className="bg-green-500/20 text-green-400 border-green-500/30 mt-1">Active</Badge>
+                  </div>
+                </div>
+                <CardDescription className="mt-2">
+                  Frontend hosting and deployment. Automatic deployments from GitHub, edge network, and analytics.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-sm">
+                    <CheckCircle2 className="h-4 w-4 text-green-500" />
+                    <span>Automatic deployments</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <CheckCircle2 className="h-4 w-4 text-green-500" />
+                    <span>Edge network (global CDN)</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <CheckCircle2 className="h-4 w-4 text-green-500" />
+                    <span>Environment variables</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <CheckCircle2 className="h-4 w-4 text-green-500" />
+                    <span>Production & preview URLs</span>
+                  </div>
+                </div>
+                <div className="mt-4 pt-4 border-t">
+                  <Button variant="outline" size="sm" className="w-full" asChild>
+                    <a href="https://vercel.com" target="_blank" rel="noopener noreferrer">
+                      <ExternalLink className="h-4 w-4 mr-2" />
+                      Vercel Dashboard
+                    </a>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Google Cloud Run */}
+            <Card className="hover:shadow-lg transition-shadow border-blue-500/20">
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <div className="h-12 w-12 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center">
+                    <Server className="h-6 w-6 text-white" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-lg">Google Cloud Run</CardTitle>
+                    <Badge className="bg-green-500/20 text-green-400 border-green-500/30 mt-1">Active</Badge>
+                  </div>
+                </div>
+                <CardDescription className="mt-2">
+                  Serverless container hosting for Python API. Runs OTELMS scraper 24/7 with auto-scaling.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-sm">
+                    <CheckCircle2 className="h-4 w-4 text-green-500" />
+                    <span>Serverless containers</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <CheckCircle2 className="h-4 w-4 text-green-500" />
+                    <span>Auto-scaling</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <CheckCircle2 className="h-4 w-4 text-green-500" />
+                    <span>24/7 uptime</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <CheckCircle2 className="h-4 w-4 text-green-500" />
+                    <span>GCS integration</span>
+                  </div>
+                </div>
+                <div className="mt-4 pt-4 border-t">
+                  <Button variant="outline" size="sm" className="w-full" asChild>
+                    <a href="https://console.cloud.google.com/run" target="_blank" rel="noopener noreferrer">
+                      <ExternalLink className="h-4 w-4 mr-2" />
+                      Cloud Console
+                    </a>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Gemini AI */}
+            <Card className="hover:shadow-lg transition-shadow border-purple-500/20">
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <div className="h-12 w-12 rounded-lg bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center">
+                    <Brain className="h-6 w-6 text-white" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-lg">Gemini 2.5 Pro</CardTitle>
+                    <Badge className="bg-green-500/20 text-green-400 border-green-500/30 mt-1">Active</Badge>
+                  </div>
+                </div>
+                <CardDescription className="mt-2">
+                  AI engine powering all AI Directors. Handles task management, analysis, and agent coordination.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-sm">
+                    <CheckCircle2 className="h-4 w-4 text-green-500" />
+                    <span>AI Marketing Director</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <CheckCircle2 className="h-4 w-4 text-green-500" />
+                    <span>AI Reservations Director</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <CheckCircle2 className="h-4 w-4 text-green-500" />
+                    <span>AI Finance Director</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <CheckCircle2 className="h-4 w-4 text-green-500" />
+                    <span>AI Logistics Director</span>
+                  </div>
+                </div>
+                <div className="mt-4 pt-4 border-t">
+                  <Button variant="outline" size="sm" className="w-full" asChild>
+                    <a href="/marketing/ai-director" target="_blank" rel="noopener noreferrer">
+                      <ExternalLink className="h-4 w-4 mr-2" />
+                      View AI Directors
+                    </a>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* MySQL/TiDB Database */}
+            <Card className="hover:shadow-lg transition-shadow border-emerald-500/20">
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <div className="h-12 w-12 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
+                    <Database className="h-6 w-6 text-white" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-lg">MySQL/TiDB</CardTitle>
+                    <Badge className="bg-green-500/20 text-green-400 border-green-500/30 mt-1">Active</Badge>
+                  </div>
+                </div>
+                <CardDescription className="mt-2">
+                  Primary database with Drizzle ORM. Stores all application data, tasks, and user information.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-sm">
+                    <CheckCircle2 className="h-4 w-4 text-green-500" />
+                    <span>Drizzle ORM</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <CheckCircle2 className="h-4 w-4 text-green-500" />
+                    <span>Type-safe queries</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <CheckCircle2 className="h-4 w-4 text-green-500" />
+                    <span>Migration system</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <CheckCircle2 className="h-4 w-4 text-green-500" />
+                    <span>tRPC integration</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* tRPC */}
+            <Card className="hover:shadow-lg transition-shadow border-blue-500/20">
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <div className="h-12 w-12 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
+                    <Webhook className="h-6 w-6 text-white" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-lg">tRPC</CardTitle>
+                    <Badge className="bg-green-500/20 text-green-400 border-green-500/30 mt-1">Active</Badge>
+                  </div>
+                </div>
+                <CardDescription className="mt-2">
+                  End-to-end typesafe APIs. TypeScript-first API layer connecting frontend and backend.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-sm">
+                    <CheckCircle2 className="h-4 w-4 text-green-500" />
+                    <span>Type-safe APIs</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <CheckCircle2 className="h-4 w-4 text-green-500" />
+                    <span>Auto-completion</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <CheckCircle2 className="h-4 w-4 text-green-500" />
+                    <span>React Query integration</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <CheckCircle2 className="h-4 w-4 text-green-500" />
+                    <span>Protected procedures</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
         {/* Upgrade CTA */}
-        <Card className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950 dark:to-purple-950 border-none">
+        <Card className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950 dark:to-purple-950 border-none mt-8">
           <CardContent className="flex items-center justify-between py-6">
             <div>
               <h3 className="text-lg font-semibold">Unlock More Integrations</h3>

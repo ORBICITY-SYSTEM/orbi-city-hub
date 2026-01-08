@@ -5,26 +5,42 @@ export const en = {
   // Navigation
   nav: {
     home: "Home",
+    mainDashboard: "Main Dashboard",
     finance: "Finance",
     marketing: "Marketing",
     reservations: "Reservations",
     integrations: "Integrations",
     logistics: "Logistics",
-    knowledgeBase: "Knowledge Base",
+    settings: "Settings",
+  },
+  
+  // Navigation Groups
+  navGroup: {
+    modules: "Modules",
+    system: "System",
   },
   
   // Submenu items
   submenu: {
     // Finance
     financeDashboard: "Dashboard",
+    aiFinanceDirector: "AI Manager",
+    revenue: "Revenue",
     analytics: "Analytics",
-    reports: "Monthly Reports",
+    reports: "Reports",
     otelms: "OTELMS",
-    devExpenses: "Dev Expenses",
+    devExpenses: "Expenses",
     
     // Marketing (workflow-based)
     marketingDashboard: "Dashboard",
-    aiMarketingDirector: "AI Marketing Director",
+    aiMarketingDirector: "AI Manager",
+    instagram: "Instagram",
+    facebook: "Facebook",
+    tiktok: "TikTok",
+    website: "Website",
+    youtube: "YouTube",
+    googleAds: "Google Ads",
+    otaChannels: "OTA Channels",
     reviewsHub: "Reviews Hub",
     reputationAnalytics: "Reputation Analytics",
     otaPerformance: "OTA Performance",
@@ -32,11 +48,20 @@ export const en = {
     leadGeneration: "Lead Generation",
     
     // Reservations (restructured)
-    reservationsOverview: "Dashboard",
-    reservationsList: "Reservations List",
-    reservationsCalendar: "Calendar / Timeline",
+    reservationsDashboard: "Dashboard",
+    aiReservationsDirector: "AI Manager",
+    reservationsOverview: "Overview",
+    reservationsList: "Bookings",
+    reservationsCalendar: "Calendar",
+    guests: "Guests",
+    messages: "Messages",
     exceptionsIssues: "Exceptions & Issues",
     aiAssistant: "AI Assistant",
+    
+    // Channel Manager
+    channelManagerCalendar: "Calendar View",
+    channelManagerStatus: "Status Dashboard",
+    channelManagerReports: "Reporting List",
     
     // Integrations Hub
     integrationsHub: "Dashboard",
@@ -46,6 +71,7 @@ export const en = {
     
     // Logistics
     logisticsDashboard: "Dashboard",
+    aiLogisticsDirector: "AI Manager",
     inventory: "Inventory",
     housekeeping: "Housekeeping",
     maintenance: "Maintenance",

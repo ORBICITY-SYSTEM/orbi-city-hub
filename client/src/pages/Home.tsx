@@ -17,15 +17,20 @@ import {
   ArrowDownRight,
   Loader2,
   Puzzle,
-  MessageCircle
+  MessageCircle,
+  Brain,
+  Sparkles
 } from "lucide-react";
 import { MainAIAgent } from "@/components/MainAIAgent";
 import { PowerStackDashboard } from "@/components/PowerStackDashboard";
 import { IntegrationsShowcase } from "@/components/IntegrationsShowcase";
+import AIDirectorsShowcase from "@/components/AIDirectorsShowcase";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { trpc } from "@/lib/trpc";
+import { Sparkles } from "lucide-react";
 
 export default function Home() {
   const { t, language } = useLanguage();
@@ -307,6 +312,29 @@ export default function Home() {
             </div>
           </Link>
         </div>
+      </div>
+
+      {/* 5D AI Directors Showcase */}
+      <div className="px-6 pb-8">
+        <div className="mb-6">
+          <h2 className="text-2xl md:text-3xl font-bold text-white mb-2 flex items-center gap-3">
+            <Brain className="w-8 h-8 text-cyan-400" />
+            <span>
+              {language === 'ka' ? "🤖 AI დირექტორების პანელი" : "🤖 AI Directors Panel"}
+            </span>
+            <Badge variant="outline" className="ml-2 bg-cyan-500/20 text-cyan-400 border-cyan-500/30">
+              <Sparkles className="w-3 h-3 mr-1" />
+              {language === 'ka' ? "5D ინტერაქტივი" : "5D Interactive"}
+            </Badge>
+          </h2>
+          <p className="text-white/60 text-sm">
+            {language === 'ka' 
+              ? "დააკლიკეთ AI დირექტორზე მის სამუშაო დეშბორდზე გადასვლისთვის" 
+              : "Click on any AI Director to access their dedicated dashboard"
+            }
+          </p>
+        </div>
+        <AIDirectorsShowcase />
       </div>
 
       {/* PowerStack Dashboard - Google Sheets Integration */}
