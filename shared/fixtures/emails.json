@@ -1,0 +1,85 @@
+{
+  "emails": [
+    {
+      "id": "email_demo_1",
+      "from": "booking@booking.com",
+      "subject": "New Booking Confirmation #12345678",
+      "body": "Dear ORBI City, You have a new booking from John Smith. Check-in: Dec 15, Check-out: Dec 20. Total: €350.",
+      "category": "booking",
+      "sentiment": "positive",
+      "priority": "high",
+      "language": "en",
+      "receivedAt": "2024-12-10T10:30:00Z",
+      "isRead": true,
+      "isProcessed": true
+    },
+    {
+      "id": "email_demo_2",
+      "from": "guest@example.com",
+      "subject": "Question about parking",
+      "body": "Hello, I have a reservation for next week. Is there parking available at the hotel? How much does it cost?",
+      "category": "question",
+      "sentiment": "neutral",
+      "priority": "normal",
+      "language": "en",
+      "receivedAt": "2024-12-11T14:20:00Z",
+      "isRead": true,
+      "isProcessed": false
+    },
+    {
+      "id": "email_demo_3",
+      "from": "airbnb@airbnb.com",
+      "subject": "Payment Received for Reservation",
+      "body": "Payment of $180 has been received for reservation HMXK7890. Guest: Maria Garcia.",
+      "category": "payment",
+      "sentiment": "positive",
+      "priority": "normal",
+      "language": "en",
+      "receivedAt": "2024-12-11T16:45:00Z",
+      "isRead": false,
+      "isProcessed": false
+    },
+    {
+      "id": "email_demo_4",
+      "from": "გიორგი@example.ge",
+      "subject": "დაჯავშნის მოთხოვნა",
+      "body": "გამარჯობა, მინდა დავჯავშნო ოთახი 17-19 დეკემბერს. რა ფასია ზღვის ხედით?",
+      "category": "booking",
+      "sentiment": "positive",
+      "priority": "high",
+      "language": "ka",
+      "receivedAt": "2024-12-12T09:15:00Z",
+      "isRead": false,
+      "isProcessed": false
+    },
+    {
+      "id": "email_demo_5",
+      "from": "complaint@example.com",
+      "subject": "Issue with room cleanliness",
+      "body": "I am very disappointed with the cleanliness of my room. The bathroom was not properly cleaned and there were stains on the carpet.",
+      "category": "complaint",
+      "sentiment": "negative",
+      "priority": "urgent",
+      "language": "en",
+      "receivedAt": "2024-12-13T08:00:00Z",
+      "isRead": false,
+      "isProcessed": false
+    }
+  ],
+  "stats": {
+    "totalEmails": 5,
+    "unreadEmails": 3,
+    "unprocessedEmails": 4,
+    "byCategory": {
+      "booking": 2,
+      "question": 1,
+      "payment": 1,
+      "complaint": 1
+    },
+    "bySentiment": {
+      "positive": 3,
+      "neutral": 1,
+      "negative": 1
+    }
+  }
+}

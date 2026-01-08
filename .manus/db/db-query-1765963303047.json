@@ -1,0 +1,150 @@
+{
+  "query": "SELECT channel, month, bookings, revenue, nights FROM ota_monthly_stats ORDER BY revenue DESC LIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user c2qSkVB4gKtEmor.991468648419 --database 4ExKc24KNHdr4pKbTUzsoU --execute SELECT channel, month, bookings, revenue, nights FROM ota_monthly_stats ORDER BY revenue DESC LIMIT 20;",
+  "rows": [
+    {
+      "channel": "Expedia",
+      "month": "2025-07",
+      "bookings": "147",
+      "revenue": "61947.64",
+      "nights": "441"
+    },
+    {
+      "channel": "Booking.com",
+      "month": "2025-07",
+      "bookings": "96",
+      "revenue": "37287.28",
+      "nights": "288"
+    },
+    {
+      "channel": "Agoda",
+      "month": "2025-11",
+      "bookings": "48",
+      "revenue": "31828.00",
+      "nights": "144"
+    },
+    {
+      "channel": "Agoda",
+      "month": "2025-09",
+      "bookings": "133",
+      "revenue": "26600.75",
+      "nights": "399"
+    },
+    {
+      "channel": "Ostrovok",
+      "month": "2025-07",
+      "bookings": "43",
+      "revenue": "23383.65",
+      "nights": "129"
+    },
+    {
+      "channel": "Booking.com",
+      "month": "2025-06",
+      "bookings": "58",
+      "revenue": "22305.29",
+      "nights": "168"
+    },
+    {
+      "channel": "Expedia",
+      "month": "2025-06",
+      "bookings": "56",
+      "revenue": "22305.29",
+      "nights": "168"
+    },
+    {
+      "channel": "Booking.com",
+      "month": "2025-08",
+      "bookings": "51",
+      "revenue": "21631.45",
+      "nights": "153"
+    },
+    {
+      "channel": "Booking.com",
+      "month": "2025-10",
+      "bookings": "82",
+      "revenue": "21361.81",
+      "nights": "246"
+    },
+    {
+      "channel": "Expedia",
+      "month": "2025-08",
+      "bookings": "32",
+      "revenue": "19859.73",
+      "nights": "96"
+    },
+    {
+      "channel": "Booking.com",
+      "month": "2025-09",
+      "bookings": "87",
+      "revenue": "19063.68",
+      "nights": "261"
+    },
+    {
+      "channel": "Booking.com",
+      "month": "2025-11",
+      "bookings": "63",
+      "revenue": "16108.16",
+      "nights": "189"
+    },
+    {
+      "channel": "Ostrovok",
+      "month": "2025-08",
+      "bookings": "22",
+      "revenue": "13083.53",
+      "nights": "66"
+    },
+    {
+      "channel": "Expedia",
+      "month": "2025-11",
+      "bookings": "41",
+      "revenue": "12270.21",
+      "nights": "123"
+    },
+    {
+      "channel": "Agoda",
+      "month": "2025-08",
+      "bookings": "29",
+      "revenue": "11204.00",
+      "nights": "87"
+    },
+    {
+      "channel": "Agoda",
+      "month": "2025-07",
+      "bookings": "23",
+      "revenue": "10902.00",
+      "nights": "69"
+    },
+    {
+      "channel": "Agoda",
+      "month": "2025-10",
+      "bookings": "45",
+      "revenue": "9297.10",
+      "nights": "135"
+    },
+    {
+      "channel": "Ostrovok",
+      "month": "2025-11",
+      "bookings": "7",
+      "revenue": "7461.45",
+      "nights": "21"
+    },
+    {
+      "channel": "Expedia",
+      "month": "2025-10",
+      "bookings": "50",
+      "revenue": "7245.03",
+      "nights": "150"
+    },
+    {
+      "channel": "Expedia",
+      "month": "2025-09",
+      "bookings": "32",
+      "revenue": "7034.88",
+      "nights": "96"
+    }
+  ],
+  "messages": [],
+  "stdout": "channel\tmonth\tbookings\trevenue\tnights\nExpedia\t2025-07\t147\t61947.64\t441\nBooking.com\t2025-07\t96\t37287.28\t288\nAgoda\t2025-11\t48\t31828.00\t144\nAgoda\t2025-09\t133\t26600.75\t399\nOstrovok\t2025-07\t43\t23383.65\t129\nBooking.com\t2025-06\t58\t22305.29\t168\nExpedia\t2025-06\t56\t22305.29\t168\nBooking.com\t2025-08\t51\t21631.45\t153\nBooking.com\t2025-10\t82\t21361.81\t246\nExpedia\t2025-08\t32\t19859.73\t96\nBooking.com\t2025-09\t87\t19063.68\t261\nBooking.com\t2025-11\t63\t16108.16\t189\nOstrovok\t2025-08\t22\t13083.53\t66\nExpedia\t2025-11\t41\t12270.21\t123\nAgoda\t2025-08\t29\t11204.00\t87\nAgoda\t2025-07\t23\t10902.00\t69\nAgoda\t2025-10\t45\t9297.10\t135\nOstrovok\t2025-11\t7\t7461.45\t21\nExpedia\t2025-10\t50\t7245.03\t150\nExpedia\t2025-09\t32\t7034.88\t96\n",
+  "stderr": "",
+  "execution_time_ms": 58
+}

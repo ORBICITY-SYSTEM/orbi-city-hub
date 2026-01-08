@@ -1,0 +1,18 @@
+{
+  "query": "SELECT \n  (SELECT COUNT(*) FROM users) as users_count,\n  (SELECT COUNT(*) FROM guestReviews) as reviews_count,\n  (SELECT COUNT(*) FROM financialData) as financial_records,\n  (SELECT COUNT(*) FROM notifications) as notifications_count,\n  (SELECT COUNT(*) FROM activityLogs) as activity_logs_count,\n  (SELECT COUNT(*) FROM aiConversations) as ai_conversations_count",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user c2qSkVB4gKtEmor.991468648419 --database 4ExKc24KNHdr4pKbTUzsoU --execute SELECT \n  (SELECT COUNT(*) FROM users) as users_count,\n  (SELECT COUNT(*) FROM guestReviews) as reviews_count,\n  (SELECT COUNT(*) FROM financialData) as financial_records,\n  (SELECT COUNT(*) FROM notifications) as notifications_count,\n  (SELECT COUNT(*) FROM activityLogs) as activity_logs_count,\n  (SELECT COUNT(*) FROM aiConversations) as ai_conversations_count",
+  "rows": [
+    {
+      "users_count": "420",
+      "reviews_count": "275",
+      "financial_records": "0",
+      "notifications_count": "0",
+      "activity_logs_count": "0",
+      "ai_conversations_count": "3"
+    }
+  ],
+  "messages": [],
+  "stdout": "users_count\treviews_count\tfinancial_records\tnotifications_count\tactivity_logs_count\tai_conversations_count\n420\t275\t0\t0\t0\t3\n",
+  "stderr": "",
+  "execution_time_ms": 909
+}

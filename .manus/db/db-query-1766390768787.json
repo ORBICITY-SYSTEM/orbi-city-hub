@@ -1,0 +1,30 @@
+{
+  "query": "SELECT source, COUNT(*) as count, ROUND(AVG(rating), 2) as avg_rating \nFROM guestReviews \nGROUP BY source \nORDER BY count DESC",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user c2qSkVB4gKtEmor.991468648419 --database 4ExKc24KNHdr4pKbTUzsoU --execute SELECT source, COUNT(*) as count, ROUND(AVG(rating), 2) as avg_rating \nFROM guestReviews \nGROUP BY source \nORDER BY count DESC",
+  "rows": [
+    {
+      "source": "booking",
+      "count": "155",
+      "avg_rating": "4.35"
+    },
+    {
+      "source": "google",
+      "count": "100",
+      "avg_rating": "3.01"
+    },
+    {
+      "source": "airbnb",
+      "count": "17",
+      "avg_rating": "4.65"
+    },
+    {
+      "source": "tripadvisor",
+      "count": "3",
+      "avg_rating": "5.00"
+    }
+  ],
+  "messages": [],
+  "stdout": "source\tcount\tavg_rating\nbooking\t155\t4.35\ngoogle\t100\t3.01\nairbnb\t17\t4.65\ntripadvisor\t3\t5.00\n",
+  "stderr": "",
+  "execution_time_ms": 203
+}

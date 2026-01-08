@@ -1,0 +1,58 @@
+{
+  "query": "SELECT channel, SUM(bookings) as total_bookings, SUM(revenue) as total_revenue, SUM(nights) as total_nights FROM ota_monthly_stats GROUP BY channel ORDER BY total_revenue DESC;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user c2qSkVB4gKtEmor.991468648419 --database 4ExKc24KNHdr4pKbTUzsoU --execute SELECT channel, SUM(bookings) as total_bookings, SUM(revenue) as total_revenue, SUM(nights) as total_nights FROM ota_monthly_stats GROUP BY channel ORDER BY total_revenue DESC;",
+  "rows": [
+    {
+      "channel": "Booking.com",
+      "total_bookings": "480",
+      "total_revenue": "148056.43",
+      "total_nights": "1591"
+    },
+    {
+      "channel": "Expedia",
+      "total_bookings": "421",
+      "total_revenue": "146466.81",
+      "total_nights": "1260"
+    },
+    {
+      "channel": "Agoda",
+      "total_bookings": "292",
+      "total_revenue": "94051.85",
+      "total_nights": "1226"
+    },
+    {
+      "channel": "Ostrovok",
+      "total_bookings": "102",
+      "total_revenue": "52986.86",
+      "total_nights": "398"
+    },
+    {
+      "channel": "Airbnb",
+      "total_bookings": "97",
+      "total_revenue": "12915.00",
+      "total_nights": "157"
+    },
+    {
+      "channel": "Sutochno",
+      "total_bookings": "17",
+      "total_revenue": "6535.85",
+      "total_nights": "55"
+    },
+    {
+      "channel": "Tvil.ru",
+      "total_bookings": "2",
+      "total_revenue": "1755.00",
+      "total_nights": "8"
+    },
+    {
+      "channel": "Hostelworld",
+      "total_bookings": "2",
+      "total_revenue": "410.00",
+      "total_nights": "4"
+    }
+  ],
+  "messages": [],
+  "stdout": "channel\ttotal_bookings\ttotal_revenue\ttotal_nights\nBooking.com\t480\t148056.43\t1591\nExpedia\t421\t146466.81\t1260\nAgoda\t292\t94051.85\t1226\nOstrovok\t102\t52986.86\t398\nAirbnb\t97\t12915.00\t157\nSutochno\t17\t6535.85\t55\nTvil.ru\t2\t1755.00\t8\nHostelworld\t2\t410.00\t4\n",
+  "stderr": "",
+  "execution_time_ms": 163
+}

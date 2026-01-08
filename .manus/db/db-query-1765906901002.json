@@ -1,0 +1,88 @@
+{
+  "query": "SELECT month, totalRevenue, totalProfit, studios FROM financialData ORDER BY year DESC, monthNumber DESC;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user c2qSkVB4gKtEmor.991468648419 --database 4ExKc24KNHdr4pKbTUzsoU --execute SELECT month, totalRevenue, totalProfit, studios FROM financialData ORDER BY year DESC, monthNumber DESC;",
+  "rows": [
+    {
+      "month": "Nov 2025",
+      "totalRevenue": "52665.00",
+      "totalProfit": "36105.00",
+      "studios": "75"
+    },
+    {
+      "month": "Oct 2025",
+      "totalRevenue": "61222.00",
+      "totalProfit": "47125.00",
+      "studios": "56"
+    },
+    {
+      "month": "Sep 2025",
+      "totalRevenue": "114074.00",
+      "totalProfit": "79154.00",
+      "studios": "55"
+    },
+    {
+      "month": "Aug 2025",
+      "totalRevenue": "218594.00",
+      "totalProfit": "187434.00",
+      "studios": "54"
+    },
+    {
+      "month": "Jul 2025",
+      "totalRevenue": "175512.00",
+      "totalProfit": "148956.00",
+      "studios": "53"
+    },
+    {
+      "month": "Jun 2025",
+      "totalRevenue": "99443.00",
+      "totalProfit": "72470.00",
+      "studios": "53"
+    },
+    {
+      "month": "May 2025",
+      "totalRevenue": "69350.00",
+      "totalProfit": "51971.00",
+      "studios": "47"
+    },
+    {
+      "month": "Apr 2025",
+      "totalRevenue": "55122.00",
+      "totalProfit": "40568.00",
+      "studios": "45"
+    },
+    {
+      "month": "Mar 2025",
+      "totalRevenue": "39055.00",
+      "totalProfit": "30498.00",
+      "studios": "43"
+    },
+    {
+      "month": "Feb 2025",
+      "totalRevenue": "33200.00",
+      "totalProfit": "24538.00",
+      "studios": "37"
+    },
+    {
+      "month": "Jan 2025",
+      "totalRevenue": "29429.00",
+      "totalProfit": "22066.00",
+      "studios": "34"
+    },
+    {
+      "month": "Dec 2024",
+      "totalRevenue": "26775.00",
+      "totalProfit": "20817.00",
+      "studios": "34"
+    },
+    {
+      "month": "Nov 2024",
+      "totalRevenue": "25102.00",
+      "totalProfit": "17030.00",
+      "studios": "34"
+    }
+  ],
+  "messages": [],
+  "stdout": "month\ttotalRevenue\ttotalProfit\tstudios\nNov 2025\t52665.00\t36105.00\t75\nOct 2025\t61222.00\t47125.00\t56\nSep 2025\t114074.00\t79154.00\t55\nAug 2025\t218594.00\t187434.00\t54\nJul 2025\t175512.00\t148956.00\t53\nJun 2025\t99443.00\t72470.00\t53\nMay 2025\t69350.00\t51971.00\t47\nApr 2025\t55122.00\t40568.00\t45\nMar 2025\t39055.00\t30498.00\t43\nFeb 2025\t33200.00\t24538.00\t37\nJan 2025\t29429.00\t22066.00\t34\nDec 2024\t26775.00\t20817.00\t34\nNov 2024\t25102.00\t17030.00\t34\n",
+  "stderr": "",
+  "execution_time_ms": 54
+}

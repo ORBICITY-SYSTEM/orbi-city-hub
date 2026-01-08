@@ -1,0 +1,9 @@
+{
+  "query": "INSERT INTO ota_channels (name, total_bookings, total_revenue, total_nights, cancelled_bookings, avg_revenue, is_active) VALUES\n('Booking.com', 480, 148056.43, 1591, 0, 308.45, TRUE),\n('Airbnb', 97, 12915.00, 157, 0, 133.14, TRUE),\n('Expedia', 421, 146466.81, 1260, 0, 347.90, TRUE),\n('Agoda', 292, 94051.85, 1226, 0, 322.10, TRUE),\n('Hostelworld', 2, 410.00, 4, 0, 205.00, TRUE),\n('Ostrovok', 102, 52986.86, 398, 0, 519.48, TRUE),\n('Sutochno', 17, 6535.85, 55, 0, 384.46, TRUE),\n('Tvil.ru', 2, 1755.00, 8, 0, 877.50, TRUE);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user c2qSkVB4gKtEmor.991468648419 --database 4ExKc24KNHdr4pKbTUzsoU --execute INSERT INTO ota_channels (name, total_bookings, total_revenue, total_nights, cancelled_bookings, avg_revenue, is_active) VALUES\n('Booking.com', 480, 148056.43, 1591, 0, 308.45, TRUE),\n('Airbnb', 97, 12915.00, 157, 0, 133.14, TRUE),\n('Expedia', 421, 146466.81, 1260, 0, 347.90, TRUE),\n('Agoda', 292, 94051.85, 1226, 0, 322.10, TRUE),\n('Hostelworld', 2, 410.00, 4, 0, 205.00, TRUE),\n('Ostrovok', 102, 52986.86, 398, 0, 519.48, TRUE),\n('Sutochno', 17, 6535.85, 55, 0, 384.46, TRUE),\n('Tvil.ru', 2, 1755.00, 8, 0, 877.50, TRUE);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 71
+}

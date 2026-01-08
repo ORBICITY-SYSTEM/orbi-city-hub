@@ -1,0 +1,55 @@
+{
+  "query": "SELECT id, source, reviewerName, rating, content, sentiment, reviewDate FROM guestReviews LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user c2qSkVB4gKtEmor.991468648419 --database 4ExKc24KNHdr4pKbTUzsoU --execute SELECT id, source, reviewerName, rating, content, sentiment, reviewDate FROM guestReviews LIMIT 5;",
+  "rows": [
+    {
+      "id": "60001",
+      "source": "google",
+      "reviewerName": "კობა წიკლაური",
+      "rating": "5",
+      "content": "",
+      "sentiment": "positive",
+      "reviewDate": "2025-12-13 07:30:16"
+    },
+    {
+      "id": "60002",
+      "source": "google",
+      "reviewerName": "Berkay Cihan",
+      "rating": "5",
+      "content": "Gayet ucuz ve temiz ama direkt oraya gidince oda yok diyorlar anlayamadım dişarıda kiralıyorlar tavsiye ederim",
+      "sentiment": "positive",
+      "reviewDate": "2025-12-12 13:26:12"
+    },
+    {
+      "id": "60003",
+      "source": "google",
+      "reviewerName": "Sulxan",
+      "rating": "5",
+      "content": "",
+      "sentiment": "positive",
+      "reviewDate": "2025-12-11 12:14:08"
+    },
+    {
+      "id": "60004",
+      "source": "google",
+      "reviewerName": "mancho khodeli",
+      "rating": "5",
+      "content": "მე ძალიან მომწონს ლოკაცია",
+      "sentiment": "positive",
+      "reviewDate": "2025-12-07 13:23:16"
+    },
+    {
+      "id": "60005",
+      "source": "google",
+      "reviewerName": "Bektas Akay",
+      "rating": "5",
+      "content": "3 günlük konaklama deneyimi yaşadık, gayet memnun kaldık.  Tavsiye ediyorum.",
+      "sentiment": "positive",
+      "reviewDate": "2025-12-07 08:56:23"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tsource\treviewerName\trating\tcontent\tsentiment\treviewDate\n60001\tgoogle\tკობა წიკლაური\t5\t\tpositive\t2025-12-13 07:30:16\n60002\tgoogle\tBerkay Cihan\t5\tGayet ucuz ve temiz ama direkt oraya gidince oda yok diyorlar anlayamadım dişarıda kiralıyorlar tavsiye ederim\tpositive\t2025-12-12 13:26:12\n60003\tgoogle\tSulxan\t5\t\tpositive\t2025-12-11 12:14:08\n60004\tgoogle\tmancho khodeli\t5\tმე ძალიან მომწონს ლოკაცია\tpositive\t2025-12-07 13:23:16\n60005\tgoogle\tBektas Akay\t5\t3 günlük konaklama deneyimi yaşadık, gayet memnun kaldık.  Tavsiye ediyorum.\tpositive\t2025-12-07 08:56:23\n",
+  "stderr": "",
+  "execution_time_ms": 53
+}

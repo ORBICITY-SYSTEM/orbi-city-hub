@@ -1,0 +1,15 @@
+{
+  "query": "SELECT COUNT(*) as total, AVG(rating) as avg_rating, SUM(CASE WHEN hasReply = 1 THEN 1 ELSE 0 END) as with_reply FROM guestReviews;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user c2qSkVB4gKtEmor.991468648419 --database 4ExKc24KNHdr4pKbTUzsoU --execute SELECT COUNT(*) as total, AVG(rating) as avg_rating, SUM(CASE WHEN hasReply = 1 THEN 1 ELSE 0 END) as with_reply FROM guestReviews;",
+  "rows": [
+    {
+      "total": "40",
+      "avg_rating": "4.5500",
+      "with_reply": "26"
+    }
+  ],
+  "messages": [],
+  "stdout": "total\tavg_rating\twith_reply\n40\t4.5500\t26\n",
+  "stderr": "",
+  "execution_time_ms": 56
+}

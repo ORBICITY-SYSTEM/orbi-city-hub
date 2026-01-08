@@ -1,0 +1,50 @@
+{
+  "query": "SELECT channel, SUM(revenue) as total_revenue, SUM(bookings) as total_bookings FROM ota_monthly_stats GROUP BY channel ORDER BY total_revenue DESC;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user c2qSkVB4gKtEmor.991468648419 --database 4ExKc24KNHdr4pKbTUzsoU --execute SELECT channel, SUM(revenue) as total_revenue, SUM(bookings) as total_bookings FROM ota_monthly_stats GROUP BY channel ORDER BY total_revenue DESC;",
+  "rows": [
+    {
+      "channel": "Booking.com",
+      "total_revenue": "148055.79",
+      "total_bookings": "480"
+    },
+    {
+      "channel": "Expedia",
+      "total_revenue": "146466.81",
+      "total_bookings": "421"
+    },
+    {
+      "channel": "Agoda",
+      "total_revenue": "94051.85",
+      "total_bookings": "292"
+    },
+    {
+      "channel": "Ostrovok",
+      "total_revenue": "52986.86",
+      "total_bookings": "102"
+    },
+    {
+      "channel": "Airbnb",
+      "total_revenue": "12915.00",
+      "total_bookings": "97"
+    },
+    {
+      "channel": "Sutochno",
+      "total_revenue": "6535.85",
+      "total_bookings": "17"
+    },
+    {
+      "channel": "Tvil.ru",
+      "total_revenue": "1755.00",
+      "total_bookings": "2"
+    },
+    {
+      "channel": "Hostelworld",
+      "total_revenue": "410.00",
+      "total_bookings": "2"
+    }
+  ],
+  "messages": [],
+  "stdout": "channel\ttotal_revenue\ttotal_bookings\nBooking.com\t148055.79\t480\nExpedia\t146466.81\t421\nAgoda\t94051.85\t292\nOstrovok\t52986.86\t102\nAirbnb\t12915.00\t97\nSutochno\t6535.85\t17\nTvil.ru\t1755.00\t2\nHostelworld\t410.00\t2\n",
+  "stderr": "",
+  "execution_time_ms": 54
+}

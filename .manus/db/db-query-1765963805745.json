@@ -1,0 +1,9 @@
+{
+  "query": "INSERT INTO ota_monthly_stats (channel, month, bookings, revenue, nights) VALUES \n('Booking.com', '2024-12', 3, 461.0, 6),\n('Booking.com', '2025-04', 63, 9262.81, 177),\n('Booking.com', '2025-05', 31, 11159.41, 163),\n('Booking.com', '2025-06', 87, 27908.58, 305),\n('Booking.com', '2025-07', 67, 27173.5, 232),\n('Booking.com', '2025-08', 78, 30546.5, 285),\n('Booking.com', '2025-09', 122, 23498.0, 376),\n('Booking.com', '2025-10', 14, 4986.0, 42),\n('Booking.com', '2025-11', 3, 1570.0, 9),\n('Booking.com', '2025-12', 3, 801.0, 9),\n('Booking.com', '2026-01', 2, 231.0, 6),\n('Booking.com', '2026-06', 3, 1580.0, 9),\n('Booking.com', '2026-07', 3, 6262.0, 21),\n('Booking.com', '2026-08', 1, 2616.0, 14);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user c2qSkVB4gKtEmor.991468648419 --database 4ExKc24KNHdr4pKbTUzsoU --execute INSERT INTO ota_monthly_stats (channel, month, bookings, revenue, nights) VALUES \n('Booking.com', '2024-12', 3, 461.0, 6),\n('Booking.com', '2025-04', 63, 9262.81, 177),\n('Booking.com', '2025-05', 31, 11159.41, 163),\n('Booking.com', '2025-06', 87, 27908.58, 305),\n('Booking.com', '2025-07', 67, 27173.5, 232),\n('Booking.com', '2025-08', 78, 30546.5, 285),\n('Booking.com', '2025-09', 122, 23498.0, 376),\n('Booking.com', '2025-10', 14, 4986.0, 42),\n('Booking.com', '2025-11', 3, 1570.0, 9),\n('Booking.com', '2025-12', 3, 801.0, 9),\n('Booking.com', '2026-01', 2, 231.0, 6),\n('Booking.com', '2026-06', 3, 1580.0, 9),\n('Booking.com', '2026-07', 3, 6262.0, 21),\n('Booking.com', '2026-08', 1, 2616.0, 14);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 56
+}
