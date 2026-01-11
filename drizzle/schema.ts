@@ -837,3 +837,93 @@ export const logisticsTasks = mysqlTable("logisticsTasks", {
 
 export type LogisticsTask = typeof logisticsTasks.$inferSelect;
 export type InsertLogisticsTask = typeof logisticsTasks.$inferInsert;
+
+/**
+ * Instagram Daily Metrics table for analytics
+ */
+export const instagramDailyMetrics = mysqlTable("instagram_daily_metrics", {
+  id: int("id").autoincrement().primaryKey(),
+  date: varchar("date", { length: 10 }).notNull(),
+  reach: int("reach"),
+  accounts_engaged: int("accounts_engaged"),
+  likes: int("likes"),
+  comments: int("comments"),
+  shares: int("shares"),
+  follows: int("follows"),
+  profile_links_taps: int("profile_links_taps"),
+  views: int("views"),
+  total_interactions: int("total_interactions"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type InstagramDailyMetric = typeof instagramDailyMetrics.$inferSelect;
+export type InsertInstagramDailyMetric = typeof instagramDailyMetrics.$inferInsert;
+
+/**
+ * Instagram Posts table
+ */
+export const instagramPosts = mysqlTable("instagram_posts", {
+  id: int("id").autoincrement().primaryKey(),
+  post_url: text("post_url"),
+  post_date: varchar("post_date", { length: 10 }),
+  created_time: timestamp("created_time"),
+  caption: text("caption"),
+  likes: int("likes"),
+  reach: int("reach"),
+  comments: int("comments"),
+  saved: int("saved"),
+  follows: int("follows"),
+  media_type: varchar("media_type", { length: 50 }),
+  watch_time_ms: bigint("watch_time_ms", { mode: "number" }),
+  theme: varchar("theme", { length: 100 }),
+  media_url: text("media_url"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type InstagramPost = typeof instagramPosts.$inferSelect;
+export type InsertInstagramPost = typeof instagramPosts.$inferInsert;
+
+/**
+ * Instagram Summary table
+ */
+export const instagramSummary = mysqlTable("instagram_summary", {
+  id: int("id").autoincrement().primaryKey(),
+  synced_at: timestamp("synced_at").defaultNow().notNull(),
+  time_frame: varchar("time_frame", { length: 50 }),
+  posts_count: int("posts_count"),
+  total_reach: int("total_reach"),
+  total_likes: int("total_likes"),
+  total_comments: int("total_comments"),
+  total_saved: int("total_saved"),
+  total_follows: int("total_follows"),
+  avg_reach_per_post: decimal("avg_reach_per_post", { precision: 10, scale: 2 }),
+  engagement_rate: decimal("engagement_rate", { precision: 5, scale: 2 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type InstagramSummary = typeof instagramSummary.$inferSelect;
+export type InsertInstagramSummary = typeof instagramSummary.$inferInsert;
+
+/**
+ * Instagram Weekly Stats table
+ */
+export const instagramWeeklyStats = mysqlTable("instagram_weekly_stats", {
+  id: int("id").autoincrement().primaryKey(),
+  week_starting: varchar("week_starting", { length: 10 }).notNull(),
+  posts_count: int("posts_count"),
+  reach: int("reach"),
+  likes: int("likes"),
+  comments: int("comments"),
+  saved: int("saved"),
+  follows: int("follows"),
+  avg_reach_per_post: decimal("avg_reach_per_post", { precision: 10, scale: 2 }),
+  engagement_rate: decimal("engagement_rate", { precision: 5, scale: 2 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type InstagramWeeklyStat = typeof instagramWeeklyStats.$inferSelect;
+export type InsertInstagramWeeklyStat = typeof instagramWeeklyStats.$inferInsert;

@@ -14,6 +14,9 @@ build/
 .env.test.local
 .env.production.local
 
+# Environment variable documentation with sensitive data
+VERCEL_ENV_COMPLETE_LIST.md
+
 # IDE and editor files
 .vscode/
 .idea/
@@ -130,3 +133,9 @@ coverage.xml
 # Archive folder (historical experiments)
 /archive/
 .vercel
+
+# GitHub config (contains sensitive tokens)
+.github-config.ps1
+
+# Node.js portable installation
+nodejs/

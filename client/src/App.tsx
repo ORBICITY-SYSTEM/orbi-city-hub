@@ -29,11 +29,13 @@ const PowerBIFinanceDashboard = lazy(() => import("./pages/finance/PowerBIFinanc
 // Marketing Module - Lazy
 const MarketingDashboard = lazy(() => import("./pages/marketing/MarketingDashboard"));
 const AIMarketingDirector = lazy(() => import("./pages/marketing/AIMarketingDirector"));
+const InstagramAnalytics = lazy(() => import("./pages/marketing/InstagramAnalytics"));
 const OTAChannels = lazy(() => import("./pages/marketing/OTAChannels"));
 const WebsiteLeads = lazy(() => import("./pages/marketing/WebsiteLeads"));
 const LiveChat = lazy(() => import("./pages/marketing/LiveChat"));
 const GuestCommunications = lazy(() => import("./pages/marketing/GuestCommunications"));
 const LiveChatDashboard = lazy(() => import("./pages/LiveChatDashboard"));
+const ComingSoon = lazy(() => import("./pages/ComingSoon"));
 
 // AI Directors - Lazy
 const AIReservationsDirector = lazy(() => import("./pages/reservations/AIReservationsDirector"));
@@ -132,6 +134,12 @@ function RouterContent() {
         {/* GROWTH ENGINE - Marketing Module (workflow-based) */}
         <Route path="/marketing" component={MarketingDashboard} />
         <Route path="/marketing/ai-director" component={AIMarketingDirector} />
+        <Route path="/marketing/instagram" component={InstagramAnalytics} />
+        <Route path="/marketing/facebook" component={ComingSoon} />
+        <Route path="/marketing/tiktok" component={ComingSoon} />
+        <Route path="/marketing/website" component={ComingSoon} />
+        <Route path="/marketing/youtube" component={ComingSoon} />
+        <Route path="/marketing/google" component={ComingSoon} />
         <Route path="/marketing/reviews" component={ReviewsDashboard} />
         <Route path="/marketing/reputation" component={ReviewsDashboard} />
         <Route path="/marketing/ota" component={OTAChannels} />

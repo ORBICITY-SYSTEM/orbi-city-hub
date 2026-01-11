@@ -201,7 +201,8 @@ class SDKServer {
     cookieValue: string | undefined | null
   ): Promise<{ openId: string; appId: string; name: string } | null> {
     if (!cookieValue) {
-      console.warn("[Auth] Missing session cookie");
+      // Suppress excessive auth warnings in development mode
+      // They're expected when OAuth is not configured
       return null;
     }
 

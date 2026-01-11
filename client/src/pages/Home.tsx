@@ -30,7 +30,6 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { trpc } from "@/lib/trpc";
-import { Sparkles } from "lucide-react";
 
 export default function Home() {
   const { t, language } = useLanguage();

@@ -226,11 +226,31 @@ export default function AIDirectorsShowcase() {
   const [marqueeTasks, setMarqueeTasks] = useState<Array<{id: string, task: string, color: string}>>([]);
   const marqueeRef = useRef<HTMLDivElement>(null);
 
-  // Fetch real-time task data for each director
-  const { data: marketingTasks } = trpc.marketing.getTaskStats.useQuery(undefined, { refetchInterval: 30000 });
-  const { data: reservationsTasks } = trpc.reservationsAIDirector.getTaskStats.useQuery(undefined, { refetchInterval: 30000 });
-  const { data: financeTasks } = trpc.financeAIDirector.getTaskStats.useQuery(undefined, { refetchInterval: 30000 });
-  const { data: logisticsTasks } = trpc.logisticsAIDirector.getTaskStats.useQuery(undefined, { refetchInterval: 30000 });
+  // Fetch real-time task data for each director (with error handling to prevent crashes)
+  const { data: marketingTasks } = trpc.marketing.getTaskStats.useQuery(undefined, { 
+    refetchInterval: 30000,
+    retry: false,
+    refetchOnWindowFocus: false
+  });
+  
+  // Fetch other directors' stats - routers exist, but handle errors gracefully
+  const { data: reservationsTasks } = trpc.reservationsAIDirector.getTaskStats.useQuery(undefined, { 
+    refetchInterval: 30000,
+    retry: false,
+    refetchOnWindowFocus: false
+  });
+  
+  const { data: financeTasks } = trpc.financeAIDirector.getTaskStats.useQuery(undefined, { 
+    refetchInterval: 30000,
+    retry: false,
+    refetchOnWindowFocus: false
+  });
+  
+  const { data: logisticsTasks } = trpc.logisticsAIDirector.getTaskStats.useQuery(undefined, { 
+    refetchInterval: 30000,
+    retry: false,
+    refetchOnWindowFocus: false
+  });
 
   // Rotate tasks for marquee effect
   useEffect(() => {

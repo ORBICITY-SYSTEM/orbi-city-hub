@@ -1,0 +1,5 @@
+cd "C:\Users\tamuna.makharad_Medi\Desktop\ARCHITECTURE ORBI CITY\MTAVARI\github\program\orbi-city-hub-main\orbi-city-hub-main"
+
+pnpm install
+
+pnpm dev
