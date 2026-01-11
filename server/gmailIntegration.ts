@@ -8,8 +8,8 @@ import { promisify } from "util";
 import { categorizeEmail } from "./emailCategorization";
 import { summarizeEmail } from "./emailSummarization";
 import { getDb } from "./db";
-import { emailCategories, emailSummaries } from "../drizzle/schema";
-import { eq } from "drizzle-orm";
+import { emails, emailSummaries } from "../drizzle/schema";
+import { eq, desc } from "drizzle-orm";
 
 const execAsync = promisify(exec);
 
@@ -150,8 +150,8 @@ export async function fetchAndCategorizeEmails(
         // Check if already categorized
         const existing = await db
           .select()
-          .from(emailCategories)
-          .where(eq(emailCategories.emailId, message.id))
+          .from(emails)
+          .where(eq(emails.id, message.id))
           .limit(1);
 
         if (existing.length > 0) {
@@ -167,16 +167,18 @@ export async function fetchAndCategorizeEmails(
           date: new Date(message.date),
         });
 
-        // Save categorization
-        await db.insert(emailCategories).values({
-          emailId: message.id,
-          emailSubject: message.subject,
-          emailFrom: message.from,
+        // Save email with categorization
+        await db.insert(emails).values({
+          id: message.id,
+          threadId: message.threadId,
+          subject: message.subject,
+          sender: message.from,
+          recipient: message.to,
           emailDate: new Date(message.date),
-          category: categoryResult.category,
-          confidence: categoryResult.confidence,
-          aiReasoning: categoryResult.reasoning,
-          userId: null, // Auto-categorized, no user
+          body: message.body,
+          snippet: message.snippet,
+          category: categoryResult.category as any,
+          reasoning: categoryResult.reasoning,
         });
 
         stats.categorized++;
@@ -194,12 +196,9 @@ export async function fetchAndCategorizeEmails(
           // Save summary
           await db.insert(emailSummaries).values({
             emailId: message.id,
-            shortSummary: summaryResult.shortSummary,
-            keyPoints: summaryResult.keyPoints,
-            actionItems: summaryResult.actionItems,
-            sentiment: summaryResult.sentiment,
-            wordCount: summaryResult.wordCount,
-            userId: null,
+            summary: summaryResult.shortSummary,
+            keyPoints: summaryResult.keyPoints || [],
+            actionItems: summaryResult.actionItems || [],
           });
 
           stats.summarized++;
@@ -251,8 +250,8 @@ export async function getGmailSyncStatus(): Promise<{
 
   // Get total categorized emails
   const categorizedCount = await db
-    .select({ count: emailCategories.id })
-    .from(emailCategories);
+    .select({ count: emails.id })
+    .from(emails);
 
   // Get total summarized emails
   const summarizedCount = await db
@@ -261,9 +260,9 @@ export async function getGmailSyncStatus(): Promise<{
 
   // Get last sync time (most recent email date)
   const lastEmail = await db
-    .select({ date: emailCategories.emailDate })
-    .from(emailCategories)
-    .orderBy(emailCategories.emailDate)
+    .select({ date: emails.emailDate })
+    .from(emails)
+    .orderBy(desc(emails.emailDate))
     .limit(1);
 
   return {
