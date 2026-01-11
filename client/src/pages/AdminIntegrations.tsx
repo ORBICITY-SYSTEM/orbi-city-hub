@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Loader2, Mail, BarChart3, Star, CheckCircle2, XCircle, Upload } from "lucide-react";
+import { Loader2, Mail, BarChart3, Star, CheckCircle2, XCircle, Upload, Zap } from "lucide-react";
 
 export default function AdminIntegrations() {
   // OTELMS Email Sync State
@@ -22,6 +22,9 @@ export default function AdminIntegrations() {
   const [gbpLocationId, setGbpLocationId] = useState("");
   const [gbpLoading, setGbpLoading] = useState(false);
 
+  // Axiom AI State
+  const [axiomLoading, setAxiomLoading] = useState(false);
+
   // Get integration status
   const { data: integrationStatus, refetch: refetchStatus } = trpc.integrations.getStatus.useQuery();
 
@@ -36,6 +39,9 @@ export default function AdminIntegrations() {
   // Workload Identity Federation test mutations
   const testGA4ConnectionMutation = trpc.googleAnalytics.testConnection.useMutation();
   const testGBPConnectionMutation = trpc.googleBusiness.testConnection.useMutation();
+  
+  // Axiom AI test mutation
+  const testAxiomMutation = trpc.axiom.testConnection.useMutation();
   
   // Gmail OTELMS sync handler
   const [gmailSyncLoading, setGmailSyncLoading] = useState(false);
@@ -238,6 +244,24 @@ export default function AdminIntegrations() {
       console.error(error);
     } finally {
       setGbpLoading(false);
+    }
+  };
+
+  // Axiom AI Test Handler
+  const handleAxiomTest = async () => {
+    setAxiomLoading(true);
+    try {
+      const result = await testAxiomMutation.mutateAsync();
+      if (result.success) {
+        toast.success(result.message || "Axiom AI connection successful!");
+      } else {
+        toast.error(result.error || result.message || "Axiom AI connection failed");
+      }
+    } catch (error: any) {
+      toast.error(error.message || "Failed to test Axiom AI connection");
+      console.error(error);
+    } finally {
+      setAxiomLoading(false);
     }
   };
 
@@ -477,6 +501,54 @@ export default function AdminIntegrations() {
                   className="w-full border-yellow-500/50 text-yellow-400 hover:bg-yellow-500/10"
                 >
                   Test Workload Identity
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Axiom AI Automation */}
+          <Card className="bg-white/10 backdrop-blur-md border-white/20">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-purple-500/20 rounded-lg">
+                    <Zap className="w-6 h-6 text-purple-400" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-white">Axiom AI</CardTitle>
+                    <CardDescription className="text-slate-300">Automation Platform</CardDescription>
+                  </div>
+                </div>
+                <CheckCircle2 className="w-5 h-5 text-green-400" />
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <p className="text-sm text-slate-300">
+                  Trigger Axiom AI bots and automation workflows via API. Configure your API token in environment variables.
+                </p>
+                <p className="text-xs text-slate-400 mt-2">
+                  Token configured: <span className="text-green-400">✓</span> AXIOM_API_TOKEN
+                </p>
+              </div>
+              <div className="space-y-2">
+                <Button
+                  onClick={handleAxiomTest}
+                  disabled={axiomLoading}
+                  variant="outline"
+                  className="w-full border-purple-500/50 text-purple-400 hover:bg-purple-500/10"
+                >
+                  {axiomLoading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Testing...
+                    </>
+                  ) : (
+                    <>
+                      <Zap className="w-4 h-4 mr-2" />
+                      Test Connection
+                    </>
+                  )}
                 </Button>
               </div>
             </CardContent>

@@ -52,6 +52,7 @@ import { reservationsRouter as reservationsAIDirectorRouter } from "./routers/re
 import { financeRouter as financeAIDirectorRouter } from "./routers/financeRouter";
 import { logisticsRouter as logisticsAIDirectorRouter } from "./routers/logisticsRouter";
 import { instagramRouter } from "./routers/instagramRouter";
+import { axiomRouter } from "./routers/axiomRouter";
 
 export const appRouter = router({
   realFinance: realFinanceRouter,
@@ -99,6 +100,7 @@ export const appRouter = router({
   financeAIDirector: financeAIDirectorRouter,
   logisticsAIDirector: logisticsAIDirectorRouter,
   instagram: instagramRouter,
+  axiom: axiomRouter,
   system: systemRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
