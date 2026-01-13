@@ -16,7 +16,7 @@ export const googleRouter = router({
       })
     )
     .query(async ({ input }) => {
-      const locationId = input.locationId || process.env.GOOGLE_BUSINESS_LOCATION_ID || "default";
+      const locationId = String(input.locationId || process.env.GOOGLE_BUSINESS_LOCATION_ID || "default");
       return await fetchGoogleBusinessReviews(locationId, input.pageSize, input.pageToken);
     }),
 

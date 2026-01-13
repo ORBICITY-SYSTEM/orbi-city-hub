@@ -43,10 +43,12 @@ export const integrationsRouter = router({
 
     const allIntegrations = await db.select().from(integrations);
 
+    // TODO: integrations schema doesn't have service column
+    // Should use slug or type instead
     return {
-      otelms: allIntegrations.some((i) => i.service === "otelms" && i.status === "connected"),
-      googleAnalytics: allIntegrations.some((i) => i.service === "google_analytics" && i.status === "connected"),
-      googleBusiness: allIntegrations.some((i) => i.service === "google_business" && i.status === "connected"),
+      otelms: allIntegrations.some((i) => i.slug === "otelms" && i.status === "active"),
+      googleAnalytics: allIntegrations.some((i) => i.slug === "google-analytics" && i.status === "active"),
+      googleBusiness: allIntegrations.some((i) => i.slug === "google-business" && i.status === "active"),
     };
   }),
 
@@ -73,7 +75,7 @@ export const integrationsRouter = router({
       const existing = await db
         .select()
         .from(integrations)
-        .where(eq(integrations.service, "otelms"))
+        .where(eq(integrations.slug, "otelms"))
         .limit(1);
 
       if (existing.length > 0) {
@@ -81,16 +83,18 @@ export const integrationsRouter = router({
         await db
           .update(integrations)
           .set({
-            credentials: encryptedCredentials,
+            config: encryptedCredentials as any,
             status: "pending",
             updatedAt: new Date(),
           })
-          .where(eq(integrations.service, "otelms"));
+          .where(eq(integrations.slug, "otelms"));
       } else {
         // Insert new
         await db.insert(integrations).values({
-          service: "otelms",
-          credentials: encryptedCredentials,
+          name: "OTELMS",
+          slug: "otelms",
+          type: "email",
+          config: encryptedCredentials as any,
           status: "pending",
         });
       }
@@ -106,7 +110,7 @@ export const integrationsRouter = router({
     const integration = await db
       .select()
       .from(integrations)
-      .where(eq(integrations.service, "otelms"))
+      .where(eq(integrations.slug, "otelms"))
       .limit(1);
 
     if (integration.length === 0) {
@@ -114,7 +118,8 @@ export const integrationsRouter = router({
     }
 
     try {
-      const credentials = JSON.parse(decrypt(integration[0]!.credentials));
+      const config = integration[0]!.config as any;
+      const credentials = JSON.parse(decrypt(config || "{}"));
       
       // TODO: Implement actual Yahoo IMAP connection test
       // For now, just validate credentials exist
@@ -122,11 +127,11 @@ export const integrationsRouter = router({
         await db
           .update(integrations)
           .set({
-            status: "connected",
+            status: "active",
             lastSync: new Date(),
             updatedAt: new Date(),
           })
-          .where(eq(integrations.service, "otelms"));
+          .where(eq(integrations.slug, "otelms"));
 
         return { success: true, message: "Connection successful" };
       }
@@ -160,22 +165,24 @@ export const integrationsRouter = router({
       const existing = await db
         .select()
         .from(integrations)
-        .where(eq(integrations.service, "google_analytics"))
+        .where(eq(integrations.slug, "google-analytics"))
         .limit(1);
 
       if (existing.length > 0) {
         await db
           .update(integrations)
           .set({
-            credentials: encryptedCredentials,
+            config: encryptedCredentials as any,
             status: "pending",
             updatedAt: new Date(),
           })
-          .where(eq(integrations.service, "google_analytics"));
+          .where(eq(integrations.slug, "google-analytics"));
       } else {
         await db.insert(integrations).values({
-          service: "google_analytics",
-          credentials: encryptedCredentials,
+          name: "Google Analytics",
+          slug: "google-analytics",
+          type: "analytics",
+          config: encryptedCredentials as any,
           status: "pending",
         });
       }
@@ -191,26 +198,27 @@ export const integrationsRouter = router({
     const integration = await db
       .select()
       .from(integrations)
-      .where(eq(integrations.service, "google_analytics"))
-      .limit(1);
+      .where(eq(integrations.slug, "google-analytics"))
+        .limit(1);
 
     if (integration.length === 0) {
       return { success: false, message: "No credentials found" };
     }
 
     try {
-      const credentials = JSON.parse(decrypt(integration[0]!.credentials));
+      const config = integration[0]!.config as any;
+      const credentials = JSON.parse(decrypt(config || "{}"));
       
       // TODO: Implement actual Google Analytics API test
       if (credentials.serviceAccount && credentials.propertyId) {
         await db
           .update(integrations)
           .set({
-            status: "connected",
+            status: "active",
             lastSync: new Date(),
             updatedAt: new Date(),
           })
-          .where(eq(integrations.service, "google_analytics"));
+          .where(eq(integrations.slug, "google-analytics"));
 
         return { success: true, message: "Connection successful" };
       }
@@ -244,22 +252,24 @@ export const integrationsRouter = router({
       const existing = await db
         .select()
         .from(integrations)
-        .where(eq(integrations.service, "google_business"))
+        .where(eq(integrations.slug, "google-business"))
         .limit(1);
 
       if (existing.length > 0) {
         await db
           .update(integrations)
           .set({
-            credentials: encryptedCredentials,
+            config: encryptedCredentials as any,
             status: "pending",
             updatedAt: new Date(),
           })
-          .where(eq(integrations.service, "google_business"));
+          .where(eq(integrations.slug, "google-business"));
       } else {
         await db.insert(integrations).values({
-          service: "google_business",
-          credentials: encryptedCredentials,
+          name: "Google Business Profile",
+          slug: "google-business",
+          type: "business",
+          config: encryptedCredentials as any,
           status: "pending",
         });
       }
@@ -275,26 +285,27 @@ export const integrationsRouter = router({
     const integration = await db
       .select()
       .from(integrations)
-      .where(eq(integrations.service, "google_business"))
-      .limit(1);
+      .where(eq(integrations.slug, "google-business"))
+        .limit(1);
 
     if (integration.length === 0) {
       return { success: false, message: "No credentials found" };
     }
 
     try {
-      const credentials = JSON.parse(decrypt(integration[0]!.credentials));
+      const config = integration[0]!.config as any;
+      const credentials = JSON.parse(decrypt(config || "{}"));
       
       // TODO: Implement actual Google Business Profile API test
       if (credentials.locationId && credentials.accessToken) {
         await db
           .update(integrations)
           .set({
-            status: "connected",
+            status: "active",
             lastSync: new Date(),
             updatedAt: new Date(),
           })
-          .where(eq(integrations.service, "google_business"));
+          .where(eq(integrations.slug, "google-business"));
 
         return { success: true, message: "Connection successful" };
       }

@@ -107,8 +107,9 @@ export const fileManagerRouter = router({
           fileUrl: file.fileUrl,
           fileSize: file.fileSize,
           mimeType: file.mimeType,
-          module: file.module,
-          description: file.description,
+          // TODO: files schema doesn't have module and description columns
+          module: null,
+          description: null,
           uploadedAt: file.uploadedAt,
         }));
       } catch (error) {

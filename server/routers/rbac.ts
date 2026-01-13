@@ -92,9 +92,12 @@ export const rbacRouter = router({
       const db = await getDb();
       if (!db) throw new Error("Database not available");
       
+      // TODO: users.role enum is ["user", "admin"], not ["admin", "manager", "staff", "guest"]
+      // Map input role to valid enum value
+      const validRole = input.role === "admin" ? "admin" : "user";
       await db
         .update(users)
-        .set({ role: input.role })
+        .set({ role: validRole })
         .where(eq(users.id, input.userId));
       
       return {

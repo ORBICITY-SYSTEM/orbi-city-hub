@@ -76,12 +76,13 @@ export const googleAnalyticsRouter = router({
         },
       });
 
-      const rows = response.data.rows || [];
-      const totalActiveUsers = rows.reduce((sum, row) => {
+      const data = (response as any).data || {};
+      const rows = data.rows || [];
+      const totalActiveUsers = rows.reduce((sum: number, row: any) => {
         return sum + parseInt(row.metricValues?.[0]?.value || '0', 10);
       }, 0);
 
-      const totalPageViews = rows.reduce((sum, row) => {
+      const totalPageViews = rows.reduce((sum: number, row: any) => {
         return sum + parseInt(row.metricValues?.[1]?.value || '0', 10);
       }, 0);
 
@@ -149,16 +150,17 @@ export const googleAnalyticsRouter = router({
           },
         });
 
-        const rows = response.data.rows || [];
-        const sources = rows.map(row => ({
-          source: row.dimensionValues?.[0]?.value || 'Unknown',
-          medium: row.dimensionValues?.[1]?.value || 'Unknown',
-          sessions: parseInt(row.metricValues?.[0]?.value || '0', 10),
-          users: parseInt(row.metricValues?.[1]?.value || '0', 10),
-        }));
+      const data = (response as any).data || {};
+      const rows = data.rows || [];
+      const sources = rows.map((row: any) => ({
+        source: row.dimensionValues?.[0]?.value || 'Unknown',
+        medium: row.dimensionValues?.[1]?.value || 'Unknown',
+        sessions: parseInt(row.metricValues?.[0]?.value || '0', 10),
+        users: parseInt(row.metricValues?.[1]?.value || '0', 10),
+      }));
 
-        const totalSessions = sources.reduce((sum, s) => sum + s.sessions, 0);
-        const totalUsers = sources.reduce((sum, s) => sum + s.users, 0);
+      const totalSessions = sources.reduce((sum: number, s: any) => sum + s.sessions, 0);
+      const totalUsers = sources.reduce((sum: number, s: any) => sum + s.users, 0);
 
         return {
           sources,

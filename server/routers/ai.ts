@@ -106,10 +106,12 @@ export const aiRouter = router({
       
       // If user referenced a file by name, add it to context
       if (referencedFile) {
-        let fileContext = `[Referenced file: ${referencedFile.fileName}]\n[File URL: ${referencedFile.fileUrl}]\n[File type: ${referencedFile.mimeType}]\n[File size: ${(referencedFile.fileSize / 1024).toFixed(1)} KB]\n[Uploaded: ${new Date(referencedFile.uploadedAt).toLocaleString('ka-GE')}]`;
+        const fileSize = referencedFile.fileSize ? (referencedFile.fileSize / 1024).toFixed(1) : '0';
+        const mimeType = referencedFile.mimeType || 'unknown';
+        let fileContext = `[Referenced file: ${referencedFile.fileName}]\n[File URL: ${referencedFile.fileUrl}]\n[File type: ${mimeType}]\n[File size: ${fileSize} KB]\n[Uploaded: ${new Date(referencedFile.uploadedAt).toLocaleString('ka-GE')}]`;
         
         // If it's an Excel file, parse it automatically
-        if (referencedFile.mimeType.includes('spreadsheet') || referencedFile.mimeType.includes('excel')) {
+        if (mimeType.includes('spreadsheet') || mimeType.includes('excel')) {
           try {
             const excelData = await parseExcelFromUrl(referencedFile.fileUrl, referencedFile.fileName);
             const formattedData = formatExcelForAI(excelData, 30); // Show first 30 rows
@@ -140,16 +142,14 @@ export const aiRouter = router({
       const db = await getDb();
       if (db) {
         try {
+          // TODO: aiConversations schema has messages (json) column, not individual fields
           await db.insert(aiConversations).values({
             userId: ctx.user.id,
             module,
-            userMessage,
-            aiResponse,
-            fileUrl: fileUrl ?? undefined,
-            fileName: fileName ?? undefined,
-            fileType: fileType ?? undefined,
-            responseTime: responseTime,
-            tokensUsed: response.usage?.total_tokens ?? undefined,
+            messages: [
+              { role: "user", content: userMessage, timestamp: Date.now() },
+              { role: "assistant", content: aiResponse, timestamp: Date.now() },
+            ] as any,
           });
         } catch (error) {
           console.error("[AI] Failed to save conversation:", error);

@@ -69,14 +69,11 @@ export const adminRouter = router({
       // Create JWT token
       const token = createAdminToken(adminUser.id, adminUser.username);
 
-      // Set cookie
-      ctx.res.cookie(ADMIN_SESSION_COOKIE, token, {
-        httpOnly: true,
-        secure: ctx.req.protocol === "https",
-        sameSite: ctx.req.protocol === "https" ? "none" : "lax",
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-        path: "/",
-      });
+      // Set cookie (Vercel serverless functions - use setHeader instead)
+      if (typeof ctx.res.setHeader === 'function') {
+        const cookieOptions = `HttpOnly; Secure; SameSite=None; Max-Age=${7 * 24 * 60 * 60}; Path=/`;
+        ctx.res.setHeader('Set-Cookie', `${ADMIN_SESSION_COOKIE}=${token}; ${cookieOptions}`);
+      }
 
       return {
         success: true,
@@ -90,7 +87,12 @@ export const adminRouter = router({
 
   // Get current admin user
   me: publicProcedure.query(async ({ ctx }) => {
-    const token = ctx.req.cookies[ADMIN_SESSION_COOKIE];
+    // Vercel serverless functions - get cookie from headers
+    const cookieHeader = (ctx.req as any).headers?.cookie || '';
+    const cookies = Object.fromEntries(
+      cookieHeader.split(';').map(c => c.trim().split('='))
+    );
+    const token = cookies[ADMIN_SESSION_COOKIE];
     
     if (!token) {
       return null;
@@ -112,19 +114,18 @@ export const adminRouter = router({
       id: adminUser.id,
       username: adminUser.username,
       role: adminUser.role,
-      permissions: adminUser.permissions,
+      // TODO: permissions doesn't exist in adminUsers schema
+      permissions: null,
       lastLogin: adminUser.lastLogin,
     };
   }),
 
   // Admin logout
   logout: publicProcedure.mutation(({ ctx }) => {
-    ctx.res.clearCookie(ADMIN_SESSION_COOKIE, {
-      httpOnly: true,
-      secure: ctx.req.protocol === "https",
-      sameSite: ctx.req.protocol === "https" ? "none" : "lax",
-      path: "/",
-    });
+    // Vercel serverless functions - clear cookie using setHeader
+    if (typeof ctx.res.setHeader === 'function') {
+      ctx.res.setHeader('Set-Cookie', `${ADMIN_SESSION_COOKIE}=; HttpOnly; Secure; SameSite=None; Max-Age=0; Path=/`);
+    }
 
     return { success: true };
   }),
@@ -152,15 +153,11 @@ export const adminRouter = router({
       const passwordHash = await bcrypt.hash(input.password, 10);
 
       // Create admin user
+      // TODO: permissions doesn't exist in adminUsers schema
       const adminUser = await adminDb.createAdminUser({
         username: input.username,
         passwordHash,
         role: "super_admin",
-        permissions: {
-          modules: { add: true, edit: true, delete: true },
-          users: { manage: true },
-          settings: { edit: true },
-        },
       });
 
       if (!adminUser) {
