@@ -121,7 +121,7 @@ export const excelImportRouter = router({
               checkIn: checkInDate,
               checkOut: checkOutDate,
               roomNumber: roomNumber ? String(roomNumber) : undefined,
-              price: priceInt,
+              totalPrice: priceInt,
               currency: "GEL",
               channel: channelMapped,
               bookingId: String(bookingId),

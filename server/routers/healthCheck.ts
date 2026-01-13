@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { publicProcedure, router } from "../_core/trpc";
 import { getDb } from "../db";
+import { sql } from "drizzle-orm";
 
 /**
  * Health check router for system monitoring
@@ -36,7 +37,7 @@ export const healthCheckRouter = router({
     try {
       const start = Date.now();
       if (db) {
-        await db.execute({ sql: "SELECT 1", params: [] });
+        await db.execute(sql`SELECT 1`);
         dbLatency = Date.now() - start;
         dbStatus = "connected";
       }
@@ -98,10 +99,7 @@ export const healthCheckRouter = router({
       if (!db) return [];
 
       const limit = input?.limit || 20;
-      const result = await db.execute({
-        sql: `SELECT * FROM errorLogs ORDER BY createdAt DESC LIMIT ${limit}`,
-        params: [],
-      });
+      const result = await db.execute(sql`SELECT * FROM errorLogs ORDER BY createdAt DESC LIMIT ${limit}`);
 
       // Drizzle execute returns [rows[], FieldPacket[]] for SELECT queries
       const rows = Array.isArray(result[0]) ? result[0] : [];

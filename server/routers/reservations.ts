@@ -90,7 +90,7 @@ export const reservationsRouter = router({
         price: z.number().optional(),
         currency: z.string().optional(),
         channel: z.enum(["Booking.com", "Airbnb", "Expedia", "Agoda", "Direct", "Other"]).optional(),
-        status: z.enum(["confirmed", "pending", "cancelled", "checked-in", "checked-out"]).optional(),
+        status: z.enum(["pending", "confirmed", "checked_in", "checked_out", "cancelled"]).optional(),
         guestEmail: z.string().email().optional(),
         guestPhone: z.string().optional(),
         numberOfGuests: z.number().optional(),
