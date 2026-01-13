@@ -86,18 +86,32 @@ export default async function handler(req: any, res: any) {
       createContext: async () => createContext({ req: expressReq, res: expressRes } as CreateExpressContextOptions),
     });
 
-    // Call middleware function - it returns a Promise
+    // Call middleware function - createExpressMiddleware returns an Express middleware
+    // Express middleware signature: (req, res, next) => void
     return new Promise<void>((resolve, reject) => {
       const next = (err?: any) => {
         if (err) {
+          console.error("[Vercel tRPC Handler] Middleware error:", err);
           reject(err);
+        } else if (!responseSent) {
+          // If middleware didn't send a response, resolve
+          resolve();
         } else {
+          // Response was sent, resolve
           resolve();
         }
       };
       
-      // Call middleware with req, res, next
-      (middleware as any)(expressReq, expressRes, next);
+      try {
+        // Call middleware with req, res, next
+        const result = (middleware as any)(expressReq, expressRes, next);
+        // If middleware returns a Promise, wait for it
+        if (result && typeof result.then === 'function') {
+          result.catch(reject);
+        }
+      } catch (err) {
+        reject(err);
+      }
     });
   } catch (error) {
     console.error("[Vercel tRPC Handler] Error:", error);

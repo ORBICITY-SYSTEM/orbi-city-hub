@@ -1,0 +1,2 @@
+# Ignore TypeScript files from Vercel's automatic type checking
+# Vercel will still build them via esbuild, but won't run tsc
