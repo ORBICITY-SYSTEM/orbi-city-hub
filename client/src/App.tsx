@@ -30,6 +30,7 @@ const PowerBIFinanceDashboard = lazy(() => import("./pages/finance/PowerBIFinanc
 const MarketingDashboard = lazy(() => import("./pages/marketing/MarketingDashboard"));
 const AIMarketingDirector = lazy(() => import("./pages/marketing/AIMarketingDirector"));
 const InstagramAnalytics = lazy(() => import("./pages/marketing/InstagramAnalytics"));
+const InstagramAnalyticsTest = lazy(() => import("./pages/marketing/InstagramAnalyticsTest"));
 const OTAChannels = lazy(() => import("./pages/marketing/OTAChannels"));
 const WebsiteLeads = lazy(() => import("./pages/marketing/WebsiteLeads"));
 const LiveChat = lazy(() => import("./pages/marketing/LiveChat"));
@@ -135,6 +136,7 @@ function RouterContent() {
         <Route path="/marketing" component={MarketingDashboard} />
         <Route path="/marketing/ai-director" component={AIMarketingDirector} />
         <Route path="/marketing/instagram" component={InstagramAnalytics} />
+        <Route path="/marketing/instagram/test" component={InstagramAnalyticsTest} />
         <Route path="/marketing/facebook" component={ComingSoon} />
         <Route path="/marketing/tiktok" component={ComingSoon} />
         <Route path="/marketing/website" component={ComingSoon} />
