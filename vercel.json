@@ -5,14 +5,14 @@
   "installCommand": "pnpm install",
   "framework": "vite",
   "ignoreCommand": "git diff --quiet HEAD^ HEAD .",
-  "routes": [
+  "rewrites": [
     {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
+      "source": "/api/:path*",
+      "destination": "/api/:path*"
     },
     {
-      "src": "/(.*)",
-      "dest": "/index.html"
+      "source": "/((?!api).*)",
+      "destination": "/index.html"
     }
   ],
   "headers": [
