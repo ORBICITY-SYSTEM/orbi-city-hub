@@ -1,4 +1,4 @@
-import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
+import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import type { CreateExpressContextOptions } from "@trpc/server/adapters/express";
 import { appRouter } from "../../server/routers";
 import { createContext } from "../../server/_core/context";
@@ -9,7 +9,7 @@ export const config = {
   maxDuration: 30,
 };
 
-// Vercel serverless function handler - using fetchRequestHandler (correct for Vercel)
+// Vercel serverless function handler - using createExpressMiddleware with proper error handling
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     // Handle CORS preflight
@@ -20,49 +20,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(200).end();
     }
 
-    // Convert Vercel request to Fetch API Request
-    const protocol = (req.headers?.['x-forwarded-proto'] as string)?.split(',')[0]?.trim() || 
-                     (process.env.VERCEL === "1" ? "https" : "http");
-    const host = req.headers?.host || process.env.VERCEL_URL || 'localhost:3000';
-    const url = `${protocol}://${host}${req.url || '/api/trpc'}`;
-    
-    // Create Fetch API Request from Vercel request (using global Request if available, otherwise create manually)
-    let fetchReq: Request;
-    if (typeof Request !== 'undefined') {
-      // Use global Request if available (Node.js 18+)
-      fetchReq = new Request(url, {
-        method: req.method || 'GET',
-        headers: new Headers(req.headers as Record<string, string>),
-        body: req.method !== 'GET' && req.method !== 'HEAD' 
-          ? (typeof req.body === 'string' ? req.body : JSON.stringify(req.body || {}))
-          : undefined,
-      });
-    } else {
-      // Manual Request creation for older Node.js versions
-      const headers = new (globalThis as any).Headers?.(req.headers as Record<string, string>) || req.headers as Record<string, string>;
-      const body = req.method !== 'GET' && req.method !== 'HEAD' 
-        ? (typeof req.body === 'string' ? req.body : JSON.stringify(req.body || {}))
-        : undefined;
-      
-      fetchReq = {
-        url,
-        method: req.method || 'GET',
-        headers: headers instanceof Headers ? headers : new (globalThis as any).Headers?.(headers) || headers,
-        body: body,
-        // Add other required Request properties
-        signal: null,
-        redirect: 'follow',
-        cache: 'default',
-        credentials: 'include',
-        integrity: '',
-        keepalive: false,
-        mode: 'cors',
-        referrer: '',
-        referrerPolicy: '',
-      } as any as Request;
+    // Parse body for POST requests (Vercel auto-parses JSON, but ensure it's available)
+    let body = req.body;
+    if (req.method === 'POST' && !body && typeof req.body === 'string') {
+      try {
+        body = JSON.parse(req.body);
+      } catch (e) {
+        // Body might already be parsed or empty
+        body = req.body;
+      }
     }
 
-    // Convert Vercel response to Express-like for createContext
+    // Convert Vercel request/response to Express-like format
+    const protocol = (req.headers?.['x-forwarded-proto'] as string)?.split(',')[0]?.trim() || 
+                     (process.env.VERCEL === "1" ? "https" : "http");
+    
     const expressReq = {
       ...req,
       headers: req.headers || {},
@@ -70,64 +42,137 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       url: req.url || '/',
       originalUrl: req.url || '/',
       query: req.query || {},
-      body: req.body,
+      body: body || req.body,
       protocol: protocol,
     } as any;
 
+    let responseSent = false;
+
     const expressRes = {
       setHeader: (key: string, value: string | string[]) => {
-        res.setHeader(key, value);
+        if (!responseSent) {
+          res.setHeader(key, value);
+        }
       },
       getHeader: (key: string) => res.getHeader(key),
       removeHeader: (key: string) => {
-        res.removeHeader(key);
+        if (!responseSent) {
+          res.removeHeader(key);
+        }
       },
       status: (code: number) => {
-        res.status(code);
+        if (!responseSent) {
+          res.status(code);
+        }
         return expressRes;
       },
       json: (data: any) => {
-        res.json(data);
+        if (!responseSent) {
+          responseSent = true;
+          res.json(data);
+        }
       },
       send: (data: any) => {
-        res.send(data);
+        if (!responseSent) {
+          responseSent = true;
+          res.send(data);
+        }
       },
       end: () => {
-        res.end();
+        if (!responseSent) {
+          responseSent = true;
+          res.end();
+        }
       },
       clearCookie: (name: string, options?: any) => {
         // Vercel serverless functions: clear cookie by setting it with maxAge=0
-        const cookieOptions = options || {};
-        const cookieValue = `${name}=; Path=${cookieOptions.path || '/'}; Max-Age=0; HttpOnly=${cookieOptions.httpOnly !== false}; SameSite=${cookieOptions.sameSite || 'None'}; Secure=${cookieOptions.secure !== false}`;
-        res.setHeader('Set-Cookie', cookieValue);
+        if (!responseSent) {
+          const cookieOptions = options || {};
+          const cookieValue = `${name}=; Path=${cookieOptions.path || '/'}; Max-Age=0; HttpOnly=${cookieOptions.httpOnly !== false}; SameSite=${cookieOptions.sameSite || 'None'}; Secure=${cookieOptions.secure !== false}`;
+          res.setHeader('Set-Cookie', cookieValue);
+        }
       },
     } as any;
 
-    // Use fetchRequestHandler (correct for Vercel serverless functions)
-    const response = await fetchRequestHandler({
-      endpoint: '/api/trpc',
-      req: fetchReq,
+    // Use Express middleware adapter
+    const middleware = createExpressMiddleware({
       router: appRouter,
-      createContext: async () => createContext({ req: expressReq, res: expressRes } as CreateExpressContextOptions),
+      createContext: async () => {
+        try {
+          return await createContext({ req: expressReq, res: expressRes } as CreateExpressContextOptions);
+        } catch (error) {
+          console.error("[Vercel tRPC Handler] Context creation error:", error);
+          // Return minimal context on error
+          return {
+            req: expressReq,
+            res: expressRes,
+            user: null,
+          };
+        }
+      },
     });
 
-    // Convert Fetch API Response to Vercel response
-    const responseData = await response.text();
-    const responseHeaders: Record<string, string> = {};
-    response.headers.forEach((value, key) => {
-      responseHeaders[key] = value;
+    // Call middleware function - createExpressMiddleware returns an Express middleware
+    return new Promise<void>((resolve, reject) => {
+      const next = (err?: any) => {
+        if (err) {
+          console.error("[Vercel tRPC Handler] Middleware error:", err);
+          if (!responseSent) {
+            res.status(500).json({ 
+              error: "Internal server error",
+              message: err instanceof Error ? err.message : String(err)
+            });
+            responseSent = true;
+          }
+          reject(err);
+        } else if (!responseSent) {
+          // If middleware didn't send a response, send 404
+          res.status(404).json({ error: "Not found" });
+          responseSent = true;
+          resolve();
+        } else {
+          // Response was sent, resolve
+          resolve();
+        }
+      };
+      
+      try {
+        // Call middleware with req, res, next
+        const result = (middleware as any)(expressReq, expressRes, next);
+        // If middleware returns a Promise, wait for it
+        if (result && typeof result.then === 'function') {
+          result.then(() => {
+            if (!responseSent) {
+              res.status(404).json({ error: "Not found" });
+              responseSent = true;
+            }
+            resolve();
+          }).catch((err: any) => {
+            console.error("[Vercel tRPC Handler] Promise rejection:", err);
+            if (!responseSent) {
+              res.status(500).json({ 
+                error: "Internal server error",
+                message: err instanceof Error ? err.message : String(err)
+              });
+              responseSent = true;
+            }
+            reject(err);
+          });
+        }
+      } catch (err) {
+        console.error("[Vercel tRPC Handler] Synchronous error:", err);
+        if (!responseSent) {
+          res.status(500).json({ 
+            error: "Internal server error",
+            message: err instanceof Error ? err.message : String(err)
+          });
+          responseSent = true;
+        }
+        reject(err);
+      }
     });
-
-    // Set headers
-    Object.entries(responseHeaders).forEach(([key, value]) => {
-      res.setHeader(key, value);
-    });
-
-    // Set status and send response
-    res.status(response.status);
-    res.send(responseData);
   } catch (error) {
-    console.error("[Vercel tRPC Handler] Error:", error);
+    console.error("[Vercel tRPC Handler] Top-level error:", error);
     if (!res.headersSent) {
       res.status(500).json({ 
         error: "Internal server error",
