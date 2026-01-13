@@ -207,30 +207,30 @@ export const reviewsRouter = router({
       const db = await getDb();
       if (!db) throw new Error("Database not available");
 
-      const filters = input || {};
+      const filters = input || {} as typeof input;
       const conditions: any[] = [];
 
-      if (filters.source && filters.source !== "all") {
+      if (filters?.source && filters.source !== "all") {
         conditions.push(eq(guestReviews.source, filters.source as any));
       }
-      if (filters.sentiment && filters.sentiment !== "all") {
+      if (filters?.sentiment && filters.sentiment !== "all") {
         conditions.push(eq(guestReviews.sentiment, filters.sentiment as any));
       }
-      if (filters.rating && filters.rating !== "all") {
-        conditions.push(eq(guestReviews.rating, parseInt(filters.rating)));
+      if (filters?.rating && filters.rating !== "all") {
+        conditions.push(eq(guestReviews.rating, parseInt(String(filters.rating))));
       }
-      if (filters.hasReply === "yes") {
+      if (filters?.hasReply === "yes") {
         conditions.push(eq(guestReviews.hasReply, true));
-      } else if (filters.hasReply === "no") {
+      } else if (filters?.hasReply === "no") {
         conditions.push(eq(guestReviews.hasReply, false));
       }
-      if (filters.dateFrom) {
+      if (filters?.dateFrom) {
         conditions.push(gte(guestReviews.reviewDate, new Date(filters.dateFrom)));
       }
-      if (filters.dateTo) {
+      if (filters?.dateTo) {
         conditions.push(lte(guestReviews.reviewDate, new Date(filters.dateTo)));
       }
-      if (filters.search) {
+      if (filters?.search) {
         conditions.push(
           sql`(${guestReviews.content} LIKE ${`%${filters.search}%`} OR ${guestReviews.reviewerName} LIKE ${`%${filters.search}%`})`
         );
@@ -243,8 +243,8 @@ export const reviewsRouter = router({
         .from(guestReviews)
         .where(whereClause)
         .orderBy(desc(guestReviews.reviewDate))
-        .limit(filters.limit || 50)
-        .offset(filters.offset || 0);
+        .limit(filters?.limit || 50)
+        .offset(filters?.offset || 0);
 
       const countResult = await db
         .select({ count: sql<number>`COUNT(*)` })
@@ -254,7 +254,7 @@ export const reviewsRouter = router({
       return {
         reviews,
         total: countResult[0]?.count || 0,
-        hasMore: (filters.offset || 0) + reviews.length < (countResult[0]?.count || 0),
+        hasMore: (filters?.offset || 0) + reviews.length < (countResult[0]?.count || 0),
       };
     }),
 
@@ -271,16 +271,16 @@ export const reviewsRouter = router({
       const db = await getDb();
       if (!db) throw new Error("Database not available");
 
-      const filters = input || {};
+      const filters = input || {} as typeof input;
       const conditions: any[] = [];
 
-      if (filters.source && filters.source !== "all") {
+      if (filters?.source && filters.source !== "all") {
         conditions.push(eq(guestReviews.source, filters.source as any));
       }
-      if (filters.dateFrom) {
+      if (filters?.dateFrom) {
         conditions.push(gte(guestReviews.reviewDate, new Date(filters.dateFrom)));
       }
-      if (filters.dateTo) {
+      if (filters?.dateTo) {
         conditions.push(lte(guestReviews.reviewDate, new Date(filters.dateTo)));
       }
 
@@ -456,10 +456,10 @@ export const reviewsRouter = router({
       const db = await getDb();
       if (!db) throw new Error("Database not available");
 
-      const filters = input || {};
+      const filters = input || {} as typeof input;
       const conditions: any[] = [];
-
-      if (filters.source && filters.source !== "all") {
+      
+      if (filters?.source && filters.source !== "all") {
         conditions.push(eq(guestReviews.source, filters.source as any));
       }
 
@@ -649,14 +649,16 @@ export const reviewsRouter = router({
     const db = await getDb();
     if (!db) throw new Error("Database not available");
 
+    // TODO: guestReviews schema doesn't have createdAt column
+    // Should use reviewDate or importedAt instead
     const result = await db
-      .select({ createdAt: guestReviews.createdAt })
+      .select({ reviewDate: guestReviews.reviewDate })
       .from(guestReviews)
-      .orderBy(desc(guestReviews.createdAt))
+      .orderBy(desc(guestReviews.reviewDate))
       .limit(1);
 
     return {
-      lastSync: result[0]?.createdAt || null,
+      lastSync: result[0]?.reviewDate || null,
     };
   }),
 
