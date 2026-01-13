@@ -26,14 +26,41 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const host = req.headers?.host || process.env.VERCEL_URL || 'localhost:3000';
     const url = `${protocol}://${host}${req.url || '/api/trpc'}`;
     
-    // Create Fetch API Request from Vercel request
-    const fetchReq = new Request(url, {
-      method: req.method || 'GET',
-      headers: new Headers(req.headers as Record<string, string>),
-      body: req.method !== 'GET' && req.method !== 'HEAD' 
+    // Create Fetch API Request from Vercel request (using global Request if available, otherwise create manually)
+    let fetchReq: Request;
+    if (typeof Request !== 'undefined') {
+      // Use global Request if available (Node.js 18+)
+      fetchReq = new Request(url, {
+        method: req.method || 'GET',
+        headers: new Headers(req.headers as Record<string, string>),
+        body: req.method !== 'GET' && req.method !== 'HEAD' 
+          ? (typeof req.body === 'string' ? req.body : JSON.stringify(req.body || {}))
+          : undefined,
+      });
+    } else {
+      // Manual Request creation for older Node.js versions
+      const headers = new (globalThis as any).Headers?.(req.headers as Record<string, string>) || req.headers as Record<string, string>;
+      const body = req.method !== 'GET' && req.method !== 'HEAD' 
         ? (typeof req.body === 'string' ? req.body : JSON.stringify(req.body || {}))
-        : undefined,
-    });
+        : undefined;
+      
+      fetchReq = {
+        url,
+        method: req.method || 'GET',
+        headers: headers instanceof Headers ? headers : new (globalThis as any).Headers?.(headers) || headers,
+        body: body,
+        // Add other required Request properties
+        signal: null,
+        redirect: 'follow',
+        cache: 'default',
+        credentials: 'include',
+        integrity: '',
+        keepalive: false,
+        mode: 'cors',
+        referrer: '',
+        referrerPolicy: '',
+      } as any as Request;
+    }
 
     // Convert Vercel response to Express-like for createContext
     const expressReq = {
