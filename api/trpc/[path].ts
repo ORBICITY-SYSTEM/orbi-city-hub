@@ -1,4 +1,5 @@
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
+import type { CreateExpressContextOptions } from "@trpc/server/adapters/express";
 import { appRouter } from "../../server/routers";
 import { createContext } from "../../server/_core/context";
 
@@ -73,15 +74,19 @@ export default async function handler(req: any, res: any) {
           res.end();
         }
       },
+      clearCookie: (name: string, options?: any) => {
+        // Vercel serverless functions don't support clearCookie directly
+        // This is a no-op for now
+      },
     } as any;
 
-    // Use Express middleware adapter
+    // Use Express middleware adapter with type assertion
     const middleware = createExpressMiddleware({
       router: appRouter,
-      createContext: async () => createContext({ req: expressReq, res: expressRes }),
+      createContext: async () => createContext({ req: expressReq, res: expressRes } as CreateExpressContextOptions),
     });
 
-    await middleware(expressReq, expressRes);
+    await middleware(expressReq as any, expressRes as any);
   } catch (error) {
     console.error("[Vercel tRPC Handler] Error:", error);
     if (!res.headersSent) {
