@@ -112,7 +112,7 @@ export const marketingRouter = router({
         throw new Error("Database not available");
       }
 
-      const insertedTask = await db
+      const insertResult = await db
         .insert(marketingTasks)
         .values({
           title: input.title,
@@ -130,7 +130,7 @@ export const marketingRouter = router({
       const [created] = await db
         .select()
         .from(marketingTasks)
-        .where(eq(marketingTasks.id, insertedTask.id))
+        .where(eq(marketingTasks.id, insertResult.id))
         .limit(1);
       
       return created || null;
