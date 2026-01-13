@@ -19,6 +19,17 @@ export default async function handler(req: any, res: any) {
       return res.status(200).end();
     }
 
+    // Parse body for POST requests (Vercel auto-parses JSON, but ensure it's available)
+    let body = req.body;
+    if (req.method === 'POST' && !body && typeof req.body === 'string') {
+      try {
+        body = JSON.parse(req.body);
+      } catch (e) {
+        // Body might already be parsed or empty
+        body = req.body;
+      }
+    }
+
     // Convert Vercel request/response to Express-like format
     // Vercel passes the path in req.url - need to construct full URL
     const url = req.url || '/';
@@ -33,7 +44,7 @@ export default async function handler(req: any, res: any) {
       url: url,
       originalUrl: url,
       query: req.query || {},
-      body: req.body,
+      body: body || req.body,
     } as any;
 
     let responseSent = false;
