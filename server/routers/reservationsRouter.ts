@@ -157,11 +157,17 @@ export const reservationsRouter = router({
         updates.completedAt = new Date();
       }
 
-      const [updated] = await db
+      await db
         .update(reservationsTasks)
         .set(updates)
+        .where(eq(reservationsTasks.id, input.id));
+
+      // Fetch updated task
+      const [updated] = await db
+        .select()
+        .from(reservationsTasks)
         .where(eq(reservationsTasks.id, input.id))
-        .returning();
+        .limit(1);
 
       return updated || null;
     }),
@@ -212,11 +218,17 @@ export const reservationsRouter = router({
         updateData.completedAt = new Date();
       }
 
-      const [updated] = await db
+      await db
         .update(reservationsTasks)
         .set(updateData)
+        .where(eq(reservationsTasks.id, id));
+
+      // Fetch updated task
+      const [updated] = await db
+        .select()
+        .from(reservationsTasks)
         .where(eq(reservationsTasks.id, id))
-        .returning();
+        .limit(1);
 
       return updated || null;
     }),

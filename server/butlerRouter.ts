@@ -59,8 +59,7 @@ Generate the response:`;
       messages: [
         { role: 'system', content: 'You are a professional hotel customer service manager.' },
         { role: 'user', content: prompt }
-      ],
-      temperature: 0.9 // Higher for more variety
+      ]
     });
     
     return response.choices[0]?.message?.content || getDefaultResponse(reviewerName, rating, language);

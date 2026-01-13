@@ -146,11 +146,17 @@ export const financeRouter = router({
         updates.completedAt = new Date();
       }
 
-      const [updated] = await db
+      await db
         .update(financeTasks)
         .set(updates)
+        .where(eq(financeTasks.id, input.id));
+
+      // Fetch updated task
+      const [updated] = await db
+        .select()
+        .from(financeTasks)
         .where(eq(financeTasks.id, input.id))
-        .returning();
+        .limit(1);
 
       return updated || null;
     }),
@@ -197,11 +203,17 @@ export const financeRouter = router({
         updateData.completedAt = new Date();
       }
 
-      const [updated] = await db
+      await db
         .update(financeTasks)
         .set(updateData)
+        .where(eq(financeTasks.id, id));
+
+      // Fetch updated task
+      const [updated] = await db
+        .select()
+        .from(financeTasks)
         .where(eq(financeTasks.id, id))
-        .returning();
+        .limit(1);
 
       return updated || null;
     }),
