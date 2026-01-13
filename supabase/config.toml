@@ -1,0 +1,7 @@
+project_id = "eifaludttgnpoesjewlv"
+
+[functions.instagram-test-connection]
+verify_jwt = false
+
+[functions.instagram-sync-cron]
+verify_jwt = false
