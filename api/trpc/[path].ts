@@ -86,7 +86,19 @@ export default async function handler(req: any, res: any) {
       createContext: async () => createContext({ req: expressReq, res: expressRes } as CreateExpressContextOptions),
     });
 
-    await middleware(expressReq as any, expressRes as any);
+    // Call middleware function - it returns a Promise
+    return new Promise<void>((resolve, reject) => {
+      const next = (err?: any) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      };
+      
+      // Call middleware with req, res, next
+      (middleware as any)(expressReq, expressRes, next);
+    });
   } catch (error) {
     console.error("[Vercel tRPC Handler] Error:", error);
     if (!res.headersSent) {
