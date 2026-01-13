@@ -11,6 +11,8 @@ export const config = {
 
 // Vercel serverless function handler - using createExpressMiddleware with proper error handling
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  console.log("[Vercel tRPC Handler] Request received:", req.method, req.url);
+  
   try {
     // Handle CORS preflight
     if (req.method === 'OPTIONS') {
@@ -19,6 +21,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
       return res.status(200).end();
     }
+    
+    console.log("[Vercel tRPC Handler] Processing request...");
 
     // Parse body for POST requests (Vercel auto-parses JSON, but ensure it's available)
     let body = req.body;
@@ -94,14 +98,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       },
     } as any;
 
+    console.log("[Vercel tRPC Handler] Creating middleware...");
+    
     // Use Express middleware adapter
     const middleware = createExpressMiddleware({
       router: appRouter,
       createContext: async () => {
         try {
-          return await createContext({ req: expressReq, res: expressRes } as CreateExpressContextOptions);
+          console.log("[Vercel tRPC Handler] Creating context...");
+          const ctx = await createContext({ req: expressReq, res: expressRes } as CreateExpressContextOptions);
+          console.log("[Vercel tRPC Handler] Context created successfully");
+          return ctx;
         } catch (error) {
           console.error("[Vercel tRPC Handler] Context creation error:", error);
+          console.error("[Vercel tRPC Handler] Error stack:", error instanceof Error ? error.stack : 'No stack');
           // Return minimal context on error
           return {
             req: expressReq,
@@ -111,6 +121,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         }
       },
     });
+    
+    console.log("[Vercel tRPC Handler] Middleware created, calling it...");
 
     // Call middleware function - createExpressMiddleware returns an Express middleware
     return new Promise<void>((resolve, reject) => {
