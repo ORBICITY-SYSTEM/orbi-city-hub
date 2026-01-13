@@ -148,15 +148,16 @@ export const gmailOtelmsRouter = router({
             if (parsed) {
               // Save to database
               await db.insert(otelmsDailyReports).values({
-                date: parsed.date,
-                totalRevenue: parsed.totalRevenue,
-                totalBookings: parsed.totalBookings || 0,
-                source: parsed.source,
-                channel: parsed.channel || null,
-                notes: parsed.notes || null,
-                rawEmailContent: parsed.rawText,
-                emailId: message.id!,
-                syncedAt: new Date(),
+                reportDate: parsed.date,
+                revenue: parsed.totalRevenue || 0,
+                bookingsCount: parsed.totalBookings || 0,
+                rawData: {
+                  source: parsed.source,
+                  channel: parsed.channel || null,
+                  notes: parsed.notes || null,
+                  rawEmailContent: parsed.rawText,
+                  emailId: message.id!,
+                } as any,
               });
 
               // Mark as read
@@ -214,7 +215,7 @@ export const gmailOtelmsRouter = router({
         const reports = await db
           .select()
           .from(otelmsDailyReports)
-          .orderBy(otelmsDailyReports.date)
+          .orderBy(desc(otelmsDailyReports.reportDate))
           .limit(limit);
 
         return {
