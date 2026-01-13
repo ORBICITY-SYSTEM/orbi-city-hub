@@ -187,13 +187,13 @@ export function useInstagramAnalytics(): UseInstagramAnalyticsReturn {
     }
   }, []);
 
-  // Trigger sync from Rows.com
-  const syncFromRows = useCallback(async (): Promise<boolean> => {
-    try {
-      const { data, error: invokeError } = await supabase.functions.invoke(
-        'instagram-sync-cron',
-        { body: { action: 'sync' } }
-      );
+    // Trigger sync from Rows.com
+    const syncFromRows = useCallback(async (): Promise<boolean> => {
+      try {
+        const { data, error: invokeError } = await supabase.functions.invoke(
+          'dynamic-endpoint',
+          { body: { action: 'sync' } }
+        );
 
       if (invokeError) {
         console.error('Sync error:', invokeError);
@@ -213,12 +213,12 @@ export function useInstagramAnalytics(): UseInstagramAnalyticsReturn {
     }
   }, []);
 
-  // Test Rows.com connection (1 lightweight request)
-  const testConnection = useCallback(async (): Promise<{ success: boolean; message: string }> => {
-    try {
-      const { data, error: invokeError } = await supabase.functions.invoke(
-        'instagram-test-connection'
-      );
+    // Test Rows.com connection (1 lightweight request)
+    const testConnection = useCallback(async (): Promise<{ success: boolean; message: string }> => {
+      try {
+        const { data, error: invokeError } = await supabase.functions.invoke(
+          'clever-endpoint'
+        );
 
       if (invokeError) {
         const msg = invokeError.message || 'Edge function error';
