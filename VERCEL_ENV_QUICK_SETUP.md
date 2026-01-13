@@ -69,7 +69,17 @@ TIKTOK_ACCESS_TOKEN=your-tiktok-access-token
 
 ### Other Services
 ```env
-TELEGRAM_BOT_TOKEN=your-telegram-bot-token
+# Telegram Bot
+TELEGRAM_BOT_TOKEN=[YOUR_TELEGRAM_BOT_TOKEN]
+
+# Google Maps API
+BUILT_IN_FORGE_API_KEY=[YOUR_GOOGLE_MAPS_API_KEY]
+BUILT_IN_FORGE_API_URL=https://maps.googleapis.com/maps/api
+
+# Gemini AI
+GEMINI_API_KEY=[YOUR_GEMINI_API_KEY]
+
+# Other
 REDIS_URL=redis://user:password@host:port
 SENTRY_DSN=https://your-sentry-dsn@sentry.io/project-id
 N8N_API_KEY=n8n_orbi_2025_secure_key

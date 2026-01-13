@@ -60,7 +60,13 @@ BUSINESS_PROFILE_LOCATION=locations/123456789
 
 ### AI Services
 ```env
-GEMINI_API_KEY=your-gemini-api-key
+GEMINI_API_KEY=[YOUR_GEMINI_API_KEY]
+```
+
+### Google Maps API
+```env
+BUILT_IN_FORGE_API_KEY=[YOUR_GOOGLE_MAPS_API_KEY]
+BUILT_IN_FORGE_API_URL=https://maps.googleapis.com/maps/api
 ```
 
 ### Social Media APIs
@@ -72,7 +78,7 @@ TIKTOK_ACCESS_TOKEN=your-tiktok-access-token
 
 ### Telegram Bot
 ```env
-TELEGRAM_BOT_TOKEN=your-telegram-bot-token
+TELEGRAM_BOT_TOKEN=[YOUR_TELEGRAM_BOT_TOKEN]
 ```
 
 ---
