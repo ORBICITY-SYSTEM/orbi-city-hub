@@ -42,7 +42,8 @@ export const ceoDashboardRouter = router({
         WHERE check_in >= ${todayStart.toISOString()} 
         AND check_in < ${todayEnd.toISOString()}
       `);
-      todayRevenue = Number((todayRevenueResult[0] as any[])?.[0]?.revenue || 0);
+      const todayRows = Array.isArray(todayRevenueResult[0]) ? todayRevenueResult[0] : [];
+      todayRevenue = Number(todayRows[0]?.revenue || 0);
 
       const yesterdayRevenueResult = await db.execute(sql`
         SELECT COALESCE(SUM(total_amount), 0) as revenue 
@@ -50,7 +51,8 @@ export const ceoDashboardRouter = router({
         WHERE check_in >= ${yesterdayStart.toISOString()} 
         AND check_in < ${todayStart.toISOString()}
       `);
-      yesterdayRevenue = Number((yesterdayRevenueResult[0] as any[])?.[0]?.revenue || 0);
+      const yesterdayRows = Array.isArray(yesterdayRevenueResult[0]) ? yesterdayRevenueResult[0] : [];
+      yesterdayRevenue = Number(yesterdayRows[0]?.revenue || 0);
     } catch (e) {
       console.log('[CEO Dashboard] Revenue query error:', e);
     }
@@ -69,7 +71,8 @@ export const ceoDashboardRouter = router({
         WHERE (check_in <= ${todayEnd.toISOString()} AND check_out >= ${todayStart.toISOString()})
         OR (check_in >= ${todayStart.toISOString()} AND check_in < ${todayEnd.toISOString()})
       `);
-      activeBookings = Number((activeResult[0] as any[])?.[0]?.count || 0);
+      const activeRows = Array.isArray(activeResult[0]) ? activeResult[0] : [];
+      activeBookings = Number(activeRows[0]?.count || 0);
 
       const yesterdayActiveResult = await db.execute(sql`
         SELECT COUNT(*) as count 
@@ -77,7 +80,8 @@ export const ceoDashboardRouter = router({
         WHERE (check_in <= ${todayStart.toISOString()} AND check_out >= ${yesterdayStart.toISOString()})
         OR (check_in >= ${yesterdayStart.toISOString()} AND check_in < ${todayStart.toISOString()})
       `);
-      const yesterdayActive = Number((yesterdayActiveResult[0] as any[])?.[0]?.count || 0);
+      const yesterdayActiveRows = Array.isArray(yesterdayActiveResult[0]) ? yesterdayActiveResult[0] : [];
+      const yesterdayActive = Number(yesterdayActiveRows[0]?.count || 0);
       bookingsChange = activeBookings - yesterdayActive;
     } catch (e) {
       console.log('[CEO Dashboard] Bookings query error:', e);
@@ -92,7 +96,8 @@ export const ceoDashboardRouter = router({
         FROM guestReviews 
         WHERE hasReply = false OR hasReply IS NULL
       `);
-      pendingReviews = Number((pendingResult[0] as any[])?.[0]?.count || 0);
+      const pendingRows = Array.isArray(pendingResult[0]) ? pendingResult[0] : [];
+      pendingReviews = Number(pendingRows[0]?.count || 0);
 
       // Reviews added today
       const newReviewsResult = await db.execute(sql`
@@ -100,7 +105,8 @@ export const ceoDashboardRouter = router({
         FROM guestReviews 
         WHERE importedAt >= ${todayStart.toISOString()}
       `);
-      reviewsChange = Number((newReviewsResult[0] as any[])?.[0]?.count || 0);
+      const newReviewsRows = Array.isArray(newReviewsResult[0]) ? newReviewsResult[0] : [];
+      reviewsChange = Number(newReviewsRows[0]?.count || 0);
     } catch (e) {
       console.log('[CEO Dashboard] Reviews query error:', e);
     }
@@ -116,8 +122,9 @@ export const ceoDashboardRouter = router({
         FROM butler_tasks 
         WHERE createdAt >= ${todayStart.toISOString()}
       `);
-      todayTasks = Number((tasksResult[0] as any[])?.[0]?.total || 0);
-      completedTasks = Number((tasksResult[0] as any[])?.[0]?.completed || 0);
+      const tasksRows = Array.isArray(tasksResult[0]) ? tasksResult[0] : [];
+      todayTasks = Number(tasksRows[0]?.total || 0);
+      completedTasks = Number(tasksRows[0]?.completed || 0);
     } catch (e) {
       console.log('[CEO Dashboard] Tasks query error:', e);
     }
@@ -166,7 +173,8 @@ export const ceoDashboardRouter = router({
           COALESCE(SUM(revenue) * 0.78, 0) as profit
         FROM ota_monthly_stats
       `);
-      const row = (financeResult[0] as any[])?.[0];
+      const financeRows = Array.isArray(financeResult[0]) ? financeResult[0] : [];
+      const row = financeRows[0];
       financeMetrics = {
         annualRevenue: Number(row?.revenue || 0),
         annualProfit: Number(row?.profit || 0),
@@ -199,12 +207,14 @@ export const ceoDashboardRouter = router({
         WHERE check_in >= ${todayStart.toISOString()} 
         AND check_in < ${todayEnd.toISOString()}
       `);
-      reservationsMetrics.todayBookings = Number((bookingsResult[0] as any[])?.[0]?.count || 0);
+      const bookingsRows = Array.isArray(bookingsResult[0]) ? bookingsResult[0] : [];
+      reservationsMetrics.todayBookings = Number(bookingsRows[0]?.count || 0);
 
       const ratingResult = await db.execute(sql`
         SELECT AVG(rating) as avg_rating FROM guestReviews
       `);
-      reservationsMetrics.avgRating = Number((ratingResult[0] as any[])?.[0]?.avg_rating || 4.8).toFixed(1) as any;
+      const ratingRows = Array.isArray(ratingResult[0]) ? ratingResult[0] : [];
+      reservationsMetrics.avgRating = Number(ratingRows[0]?.avg_rating || 4.8).toFixed(1) as any;
     } catch (e) {
       console.log('[CEO Dashboard] Reservations query error:', e);
     }
@@ -223,7 +233,8 @@ export const ceoDashboardRouter = router({
         FROM butler_tasks 
         WHERE createdAt >= ${todayStart.toISOString()}
       `);
-      const row = (tasksResult[0] as any[])?.[0];
+      const tasksRows = Array.isArray(tasksResult[0]) ? tasksResult[0] : [];
+      const row = tasksRows[0];
       if (row) {
         logisticsMetrics = {
           todayTasks: Number(row.total || 12),

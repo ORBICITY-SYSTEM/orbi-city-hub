@@ -103,6 +103,8 @@ export const healthCheckRouter = router({
         params: [],
       });
 
-      return result[0] as any[];
+      // Drizzle execute returns [rows[], FieldPacket[]] for SELECT queries
+      const rows = Array.isArray(result[0]) ? result[0] : [];
+      return rows as any[];
     }),
 });

@@ -51,7 +51,9 @@ export const feedbackRouter = router({
       LIMIT 100
     `);
 
-    return result[0] as any[];
+    // Drizzle execute returns [rows[], FieldPacket[]] for SELECT queries
+    const rows = Array.isArray(result[0]) ? result[0] : [];
+    return rows as any[];
   }),
 
   /**
@@ -139,7 +141,9 @@ export const feedbackRouter = router({
       FROM userFeedback
     `);
 
-    const row = result[0]?.[0] as any;
+    // Drizzle execute returns [rows[], FieldPacket[]] for SELECT queries
+    const rows = Array.isArray(result[0]) ? result[0] : [];
+    const row = rows[0] as any;
 
     return {
       total: Number(row?.total || 0),

@@ -15,14 +15,18 @@ export const otaRouter = router({
     FROM ota_monthly_stats 
     GROUP BY channel 
     ORDER BY SUM(revenue) DESC`);
-    return { channels: result[0] || [] };
+    // Drizzle execute returns [rows[], FieldPacket[]] for SELECT queries
+    const rows = Array.isArray(result[0]) ? result[0] : [];
+    return { channels: rows || [] };
   }),
 
   getMonthlyStats: publicProcedure.query(async () => {
     const db = await getDb();
     if (!db) return { stats: [] };
     const result = await db.execute(sql`SELECT * FROM ota_monthly_stats ORDER BY month DESC, channel ASC`);
-    return { stats: result[0] || [] };
+    // Drizzle execute returns [rows[], FieldPacket[]] for SELECT queries
+    const rows = Array.isArray(result[0]) ? result[0] : [];
+    return { stats: rows || [] };
   }),
 
   getTotals: publicProcedure.query(async () => {
@@ -37,7 +41,8 @@ export const otaRouter = router({
         AVG(revenue / NULLIF(bookings, 0)) as avg_revenue
       FROM ota_monthly_stats
     `);
-    const rows = result[0] as any[];
+    // Drizzle execute returns [rows[], FieldPacket[]] for SELECT queries
+    const rows = Array.isArray(result[0]) ? result[0] : [];
     return rows[0] || { total_bookings: 0, total_revenue: 0, total_nights: 0, active_channels: 0, avg_revenue: 0 };
   }),
 
