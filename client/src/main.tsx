@@ -46,6 +46,48 @@ const trpcClient = trpc.createClient({
         return globalThis.fetch(input, {
           ...(init ?? {}),
           credentials: "include",
+        }).then(async (response) => {
+          // Handle empty or invalid JSON responses (like harmony does)
+          if (!response.ok) {
+            const text = await response.text();
+            let errorData;
+            try {
+              errorData = text ? JSON.parse(text) : { error: `HTTP ${response.status}` };
+            } catch {
+              errorData = { error: text || `HTTP ${response.status}: ${response.statusText}` };
+            }
+            throw new Error(errorData.error || errorData.message || `HTTP ${response.status}`);
+          }
+          
+          // Check if response has content
+          const contentType = response.headers.get("content-type");
+          if (!contentType || !contentType.includes("application/json")) {
+            const text = await response.text();
+            if (!text) {
+              throw new Error("Empty response from server");
+            }
+            // Try to parse as JSON anyway
+            try {
+              return new Response(JSON.stringify({ data: JSON.parse(text) }), {
+                status: response.status,
+                statusText: response.statusText,
+                headers: response.headers,
+              });
+            } catch {
+              throw new Error(`Invalid response format: ${text.substring(0, 100)}`);
+            }
+          }
+          
+          return response;
+        }).catch((error) => {
+          // Handle network errors and JSON parsing errors
+          if (error instanceof TypeError && error.message.includes("fetch")) {
+            throw new Error("Network error: Could not connect to server");
+          }
+          if (error.message.includes("JSON") || error.message.includes("Unexpected end")) {
+            throw new Error("Server returned invalid response. Please try again.");
+          }
+          throw error;
         });
       },
     }),
