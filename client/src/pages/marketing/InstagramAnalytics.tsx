@@ -1,6 +1,6 @@
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import { format } from "date-fns";
-import { trpc } from "@/lib/trpc";
+import { useInstagramAnalytics } from "@/hooks/useInstagramAnalytics";
 import { InstagramHeader } from "@/components/instagram/InstagramHeader";
 import { MediaTypeFilter } from "@/components/instagram/MediaTypeFilter";
 import { HeroKPICard } from "@/components/instagram/modules/HeroKPICard";
@@ -26,53 +26,19 @@ export default function InstagramAnalytics() {
   const [selectedTheme, setSelectedTheme] = useState<string | null>(null);
   const [mediaTypeFilter, setMediaTypeFilter] = useState<string[]>([]);
 
-  // tRPC queries
-  const utils = trpc.useUtils();
-  const { data: metrics, isLoading: loadingMetrics } = trpc.instagram.getMetrics.useQuery({
-    from: dateRange.from ? format(dateRange.from, "yyyy-MM-dd") : undefined,
-    to: dateRange.to ? format(dateRange.to, "yyyy-MM-dd") : undefined,
-  });
-  
-  const { data: posts, isLoading: loadingPosts } = trpc.instagram.getPosts.useQuery({
-    from: dateRange.from ? format(dateRange.from, "yyyy-MM-dd") : undefined,
-    to: dateRange.to ? format(dateRange.to, "yyyy-MM-dd") : undefined,
-    limit: 1000,
-  });
+  // Use Supabase hook (Lovable approach)
+  const { data, isLoading, error, fetchData, syncFromRows, testConnection } = useInstagramAnalytics();
 
-  const { data: summary } = trpc.instagram.getSummary.useQuery();
-  const { data: weeklyStats } = trpc.instagram.getWeeklyStats.useQuery();
+  // Fetch data when date range changes
+  useEffect(() => {
+    fetchData(dateRange);
+  }, [dateRange.from, dateRange.to, fetchData]);
 
-  // Mutations
-  const syncMutation = trpc.instagram.syncFromRows.useMutation({
-    onSuccess: (data) => {
-      const message = (data as any)?.message || `Synced: ${data.synced.metrics} metrics, ${data.synced.posts} posts, ${data.synced.weekly} weekly stats`;
-      toast({
-        title: "Sync Successful",
-        description: message,
-      });
-      setConnectionStatus({ success: true, message: message });
-      utils.instagram.getMetrics.invalidate();
-      utils.instagram.getPosts.invalidate();
-      utils.instagram.getSummary.invalidate();
-      utils.instagram.getWeeklyStats.invalidate();
-      setIsSyncing(false);
-    },
-    onError: (error) => {
-      const errorMessage = error.message || "Failed to sync data from Rows.com";
-      toast({
-        title: "Sync Error",
-        description: errorMessage,
-        variant: "destructive",
-      });
-      setConnectionStatus({ success: false, message: errorMessage });
-      setIsSyncing(false);
-    },
-  });
+  const metrics = data?.metrics || [];
+  const posts = data?.posts || [];
+  const summary = data?.summary || null;
+  const weeklyStats = data?.weeklyStats || [];
 
-  // Test connection mutation - will use mutateAsync in handler
-  const testMutation = trpc.instagram.testConnection.useMutation();
-
-  const isLoading = loadingMetrics || loadingPosts;
   const hasData = (posts && posts.length > 0) || (metrics && metrics.length > 0);
 
   // Processed data
@@ -191,47 +157,75 @@ export default function InstagramAnalytics() {
   const hourlyPerformance: HourlyPerformance[] = [];
   const dayHourPerformance: DayHourCell[] = [];
 
-  // Handlers - exactly like harmony repo
+  // Handlers - exactly like harmony repo (using Supabase)
   const handleRefresh = useCallback(async () => {
     setIsRefreshing(true);
-    await Promise.all([
-      utils.instagram.getMetrics.refetch(),
-      utils.instagram.getPosts.refetch(),
-      utils.instagram.getSummary.refetch(),
-      utils.instagram.getWeeklyStats.refetch(),
-    ]);
+    await fetchData(dateRange);
     setIsRefreshing(false);
-  }, [utils]);
+  }, [fetchData, dateRange]);
 
   const handleSync = useCallback(async () => {
     setIsSyncing(true);
     setConnectionStatus(null);
     try {
-      await syncMutation.mutateAsync();
-      // Refetch data after sync
-      await Promise.all([
-        utils.instagram.getMetrics.refetch(),
-        utils.instagram.getPosts.refetch(),
-        utils.instagram.getSummary.refetch(),
-        utils.instagram.getWeeklyStats.refetch(),
-      ]);
-    } catch (error) {
-      // Error already handled in mutation onError - connectionStatus will be set there
+      const success = await syncFromRows();
+      if (success) {
+        toast({
+          title: "Sync Successful",
+          description: "Data synchronized from Rows.com",
+        });
+        setConnectionStatus({ success: true, message: "Data synchronized successfully" });
+        // Refetch data after sync
+        await fetchData(dateRange);
+      } else {
+        const errorMsg = "Failed to sync data from Rows.com";
+        toast({
+          title: "Sync Error",
+          description: errorMsg,
+          variant: "destructive",
+        });
+        setConnectionStatus({ success: false, message: errorMsg });
+      }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to sync data from Rows.com";
+      toast({
+        title: "Sync Error",
+        description: errorMessage,
+        variant: "destructive",
+      });
+      setConnectionStatus({ success: false, message: errorMessage });
     } finally {
       setIsSyncing(false);
     }
-  }, [syncMutation, utils]);
+  }, [syncFromRows, fetchData, dateRange, toast]);
 
   // Handler - EXACTLY like harmony (async function, not callback)
   const handleTestConnection = async () => {
     setIsTesting(true);
     setConnectionStatus(null);
     try {
-      const result = await testMutation.mutateAsync();
+      const result = await testConnection();
       setConnectionStatus(result);
+      if (result.success) {
+        toast({
+          title: "Connection Test Successful",
+          description: result.message,
+        });
+      } else {
+        toast({
+          title: "Connection Test Failed",
+          description: result.message,
+          variant: "destructive",
+        });
+      }
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Unknown error';
       setConnectionStatus({ success: false, message: msg });
+      toast({
+        title: "Connection Test Failed",
+        description: msg,
+        variant: "destructive",
+      });
     }
     setIsTesting(false);
   };
