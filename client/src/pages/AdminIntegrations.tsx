@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { trpc } from "@/lib/trpc";
+import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,6 +9,23 @@ import { toast } from "sonner";
 import { Loader2, Mail, BarChart3, Star, CheckCircle2, XCircle, Upload, Zap } from "lucide-react";
 
 export default function AdminIntegrations() {
+  // Check authentication
+  const { user, isAuthenticated, loading: authLoading } = useAuth({ redirectOnUnauthenticated: true });
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-8 h-8 animate-spin text-white mx-auto mb-4" />
+          <p className="text-white">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated || !user) {
+    return null; // useAuth will redirect
+  }
   // OTELMS Email Sync State
   const [otelmsEmail, setOtelmsEmail] = useState("tamunamaxaradze@yahoo.com");
   const [otelmsPassword, setOtelmsPassword] = useState("");
