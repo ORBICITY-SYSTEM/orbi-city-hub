@@ -35,14 +35,14 @@ VITE_OTELMS_API_URL=https://otelms-api.run.app
 
 ### Google Services
 ```env
-# Google OAuth
-GOOGLE_CLIENT_ID=your-google-client-id
-GOOGLE_CLIENT_SECRET=your-google-client-secret
+# Google OAuth (Gmail)
+GOOGLE_CLIENT_ID=[YOUR_GOOGLE_CLIENT_ID]
+GOOGLE_CLIENT_SECRET=[YOUR_GOOGLE_CLIENT_SECRET]
 
-# Google Business Profile
-GOOGLE_BUSINESS_CLIENT_ID=your-business-client-id
-GOOGLE_BUSINESS_CLIENT_SECRET=your-business-client-secret
-GOOGLE_BUSINESS_REDIRECT_URI=https://your-domain.com/api/google-business/callback
+# Google Business Profile OAuth
+GOOGLE_BUSINESS_CLIENT_ID=[YOUR_GOOGLE_CLIENT_ID]
+GOOGLE_BUSINESS_CLIENT_SECRET=[YOUR_GOOGLE_CLIENT_SECRET]
+GOOGLE_BUSINESS_REDIRECT_URI=https://orbicityhotel.com/api/google-business/callback
 GOOGLE_BUSINESS_LOCATION_ID=your-location-id
 
 # Google Analytics (GA4)

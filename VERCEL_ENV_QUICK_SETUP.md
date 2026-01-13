@@ -45,8 +45,12 @@ GEMINI_API_KEY=your-gemini-api-key
 
 ### Google Services (თუ Google integrations გჭირდება)
 ```env
-GOOGLE_CLIENT_ID=your-google-client-id
-GOOGLE_CLIENT_SECRET=your-google-client-secret
+# Google OAuth (Gmail & Business Profile)
+GOOGLE_CLIENT_ID=[YOUR_GOOGLE_CLIENT_ID]
+GOOGLE_CLIENT_SECRET=[YOUR_GOOGLE_CLIENT_SECRET]
+GOOGLE_BUSINESS_CLIENT_ID=[YOUR_GOOGLE_CLIENT_ID]
+GOOGLE_BUSINESS_CLIENT_SECRET=[YOUR_GOOGLE_CLIENT_SECRET]
+GOOGLE_BUSINESS_REDIRECT_URI=https://orbicityhotel.com/api/google-business/callback
 GOOGLE_BUSINESS_CLIENT_ID=your-business-client-id
 GOOGLE_BUSINESS_CLIENT_SECRET=your-business-client-secret
 GOOGLE_BUSINESS_REDIRECT_URI=https://orbicityhotel.com/api/google-business/callback
