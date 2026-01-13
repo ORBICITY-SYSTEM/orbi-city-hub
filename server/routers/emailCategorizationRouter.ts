@@ -6,7 +6,7 @@
 import { z } from "zod";
 import { publicProcedure, protectedProcedure, router } from "../_core/trpc";
 import { getDb } from "../db";
-import { emailCategories, unsubscribeSuggestions, emailSummaries } from "../../drizzle/schema";
+import { emails, unsubscribeSuggestions, emailSummaries } from "../../drizzle/schema";
 import { categorizeEmail, categorizeEmailsBatch, detectUnsubscribeLink, type EmailData } from "../emailCategorization";
 import { summarizeEmail, summarizeEmailsBatch, parseNaturalLanguageQuery } from "../emailSummarization";
 import { fetchAndCategorizeEmails, getGmailSyncStatus, searchGmailMessages } from "../gmailIntegration";
@@ -28,10 +28,22 @@ export const emailCategorizationRouter = router({
       const db = await getDb();
       if (!db) throw new Error("Database not available");
 
-      // TODO: emailCategories is a lookup table, not email storage
-      // Should use emails table for email storage and emailSummaries for categorization
-      // For now, skip existing check
-      const existing: any[] = [];
+      // Check if email already exists and is categorized
+      const existing = await db
+        .select()
+        .from(emails)
+        .where(eq(emails.id, input.emailId))
+        .limit(1);
+
+      if (existing.length > 0 && existing[0].category) {
+        return {
+          success: true,
+          category: existing[0].category,
+          confidence: null,
+          reasoning: existing[0].reasoning || null,
+          alreadyCategorized: true,
+        };
+      }
 
       // Categorize with AI
       const emailData: EmailData = {
@@ -43,16 +55,42 @@ export const emailCategorizationRouter = router({
 
       const result = await categorizeEmail(emailData);
 
-      // TODO: emailCategories is a lookup table, not email storage
-      // Should save to emails table and use emailSummaries for categorization
-      // For now, skip database save
+      // Save or update email in database
+      if (existing.length > 0) {
+        // Update existing email with category
+        await db
+          .update(emails)
+          .set({
+            category: result.category as any,
+            sentiment: result.sentiment || "neutral",
+            priority: result.priority || "normal",
+            reasoning: result.reasoning || null,
+          })
+          .where(eq(emails.id, input.emailId));
+      } else {
+        // Insert new email
+        await db.insert(emails).values({
+          id: input.emailId,
+          threadId: input.emailId, // Use emailId as threadId if not available
+          subject: input.subject,
+          sender: input.from,
+          emailDate: input.date ? new Date(input.date) : null,
+          body: input.body,
+          category: result.category as any,
+          sentiment: result.sentiment || "neutral",
+          priority: result.priority || "normal",
+          reasoning: result.reasoning || null,
+        });
+      }
 
       // Check for unsubscribe link
       const unsubscribeDetection = detectUnsubscribeLink(input.body);
       if (unsubscribeDetection.hasUnsubscribeLink || result.category === "marketing") {
-        // TODO: unsubscribeSuggestions schema has different columns
-        // Should use: emailId, sender (not emailFrom), reason (not emailSubject, lastEmailDate)
-        // For now, skip database save
+        await db.insert(unsubscribeSuggestions).values({
+          emailId: input.emailId,
+          sender: input.from,
+          reason: unsubscribeDetection.detectionMethod || "Marketing email detected",
+        });
       }
 
       return {
@@ -85,10 +123,10 @@ export const emailCategorizationRouter = router({
       const emailIds = input.emails.map(e => e.emailId);
       const existing = await db
         .select()
-        .from(emailCategories)
-        .where(sql`${emailCategories.emailId} IN (${sql.join(emailIds.map(id => sql`${id}`), sql`, `)})`);
+        .from(emails)
+        .where(sql`${emails.id} IN (${sql.join(emailIds.map(id => sql`${id}`), sql`, `)})`);
 
-      const existingIds = new Set(existing.map(e => e.emailId));
+      const existingIds = new Set(existing.filter(e => e.category).map(e => e.id));
       const emailsToProcess = input.emails.filter(e => !existingIds.has(e.emailId));
 
       if (emailsToProcess.length === 0) {
@@ -112,44 +150,64 @@ export const emailCategorizationRouter = router({
       const results = await categorizeEmailsBatch(emailDataList);
 
       // Save all results to database
-      const categoriesToInsert = [];
+      const emailsToInsert = [];
+      const emailsToUpdate = [];
       const unsubscribeSuggestionsToInsert = [];
 
       for (const email of emailsToProcess) {
         const result = results.get(email.emailId);
         if (!result) continue;
 
-        categoriesToInsert.push({
-          emailId: email.emailId,
-          emailSubject: email.subject,
-          emailFrom: email.from,
+        const emailData = {
+          id: email.emailId,
+          threadId: email.emailId,
+          subject: email.subject,
+          sender: email.from,
           emailDate: email.date ? new Date(email.date) : null,
-          category: result.category,
-          confidence: result.confidence,
-          aiReasoning: result.reasoning,
-          userId: ctx.user.id,
-        });
+          body: email.body,
+          category: result.category as any,
+          sentiment: result.sentiment || "neutral",
+          priority: result.priority || "normal",
+          reasoning: result.reasoning || null,
+        };
+
+        const existingEmail = existing.find(e => e.id === email.emailId);
+        if (existingEmail) {
+          emailsToUpdate.push({ id: email.emailId, data: emailData });
+        } else {
+          emailsToInsert.push(emailData);
+        }
 
         // Check for unsubscribe
         const unsubscribeDetection = detectUnsubscribeLink(email.body);
         if (unsubscribeDetection.hasUnsubscribeLink || result.category === "marketing") {
           unsubscribeSuggestionsToInsert.push({
             emailId: email.emailId,
-            emailFrom: email.from,
-            emailSubject: email.subject,
-            detectionMethod: unsubscribeDetection.detectionMethod,
-            unsubscribeUrl: unsubscribeDetection.unsubscribeUrl || null,
-            senderEmailCount: 1,
-            lastEmailDate: email.date ? new Date(email.date) : null,
-            userId: ctx.user.id,
+            sender: email.from,
+            reason: unsubscribeDetection.detectionMethod || "Marketing email detected",
           });
         }
       }
 
-      if (categoriesToInsert.length > 0) {
-        await db.insert(emailCategories).values(categoriesToInsert);
+      // Insert new emails
+      if (emailsToInsert.length > 0) {
+        await db.insert(emails).values(emailsToInsert);
       }
 
+      // Update existing emails
+      for (const { id, data } of emailsToUpdate) {
+        await db
+          .update(emails)
+          .set({
+            category: data.category,
+            sentiment: data.sentiment,
+            priority: data.priority,
+            reasoning: data.reasoning,
+          })
+          .where(eq(emails.id, id));
+      }
+
+      // Insert unsubscribe suggestions
       if (unsubscribeSuggestionsToInsert.length > 0) {
         await db.insert(unsubscribeSuggestions).values(unsubscribeSuggestionsToInsert);
       }
@@ -175,9 +233,19 @@ export const emailCategorizationRouter = router({
       const db = await getDb();
       if (!db) throw new Error("Database not available");
 
-      // TODO: emailCategories is a lookup table, not email storage
-      // Should query emails table instead
-      const results: any[] = [];
+      let query = db
+        .select()
+        .from(emails)
+        .where(sql`${emails.category} IS NOT NULL`)
+        .orderBy(desc(emails.emailDate))
+        .limit(input.limit)
+        .offset(input.offset);
+
+      if (input.category) {
+        query = query.where(eq(emails.category, input.category as any));
+      }
+
+      const results = await query;
 
       return {
         emails: results,
@@ -193,12 +261,21 @@ export const emailCategorizationRouter = router({
       const db = await getDb();
       if (!db) throw new Error("Database not available");
 
-      // TODO: emailCategories is a lookup table, not email storage
-      // Should query emails table instead
-      const stats: any[] = [];
+      const stats = await db
+        .select({
+          category: emails.category,
+          count: sql<number>`COUNT(*)`,
+        })
+        .from(emails)
+        .where(sql`${emails.category} IS NOT NULL`)
+        .groupBy(emails.category);
 
       return {
-        stats,
+        stats: stats.map(s => ({
+          category: s.category,
+          count: Number(s.count),
+          avgConfidence: null, // Confidence not stored in emails table
+        })),
         total: stats.reduce((sum, s) => sum + Number(s.count), 0),
       };
     }),
@@ -215,16 +292,14 @@ export const emailCategorizationRouter = router({
       const db = await getDb();
       if (!db) throw new Error("Database not available");
 
-      // TODO: unsubscribeSuggestions schema has different columns
-      // Should use: status enum is "pending", "approved", "rejected" (not "suggested", "dismissed", etc.)
-      // lastEmailDate doesn't exist in schema
-      const query = db
+      let query = db
         .select()
         .from(unsubscribeSuggestions)
+        .orderBy(desc(unsubscribeSuggestions.createdAt))
         .limit(input.limit);
 
       if (input.status && (input.status === "pending" || input.status === "approved" || input.status === "rejected")) {
-        query.where(eq(unsubscribeSuggestions.status, input.status));
+        query = query.where(eq(unsubscribeSuggestions.status, input.status));
       }
 
       const results = await query;
@@ -278,9 +353,13 @@ export const emailCategorizationRouter = router({
       const db = await getDb();
       if (!db) throw new Error("Database not available");
 
-      // TODO: emailCategories is a lookup table, not email storage
-      // Should update emails table instead
-      // manualCategory, manuallyOverridden, userId don't exist in emailCategories schema
+      // Update email category in emails table
+      await db
+        .update(emails)
+        .set({
+          category: input.category as any,
+        })
+        .where(eq(emails.id, input.emailId));
 
       return {
         success: true,
@@ -381,10 +460,42 @@ export const emailCategorizationRouter = router({
       // Parse natural language query
       const parsedQuery = await parseNaturalLanguageQuery(input.query);
 
-      // TODO: emailCategories is a lookup table, not email storage
-      // Should query emails table instead
-      // emailFrom, emailDate, emailSubject don't exist in emailCategories schema
-      const results: any[] = [];
+      // Build query on emails table
+      let query = db.select().from(emails).where(sql`${emails.category} IS NOT NULL`);
+
+      // Apply category filter
+      if (parsedQuery.filters.category) {
+        query = query.where(eq(emails.category, parsedQuery.filters.category as any));
+      }
+
+      // Apply sender filter
+      if (parsedQuery.filters.sender) {
+        query = query.where(sql`${emails.sender} LIKE ${`%${parsedQuery.filters.sender}%`}`);
+      }
+
+      // Apply date range filter
+      if (parsedQuery.filters.dateRange) {
+        const { start, end } = parsedQuery.filters.dateRange;
+        query = query.where(
+          and(
+            sql`${emails.emailDate} >= ${start}`,
+            sql`${emails.emailDate} <= ${end}`
+          )
+        );
+      }
+
+      // Apply text search on subject and body
+      if (parsedQuery.searchTerms.length > 0) {
+        const searchConditions = parsedQuery.searchTerms.map(term =>
+          sql`(${emails.subject} LIKE ${`%${term}%`} OR ${emails.body} LIKE ${`%${term}%`})`
+        );
+        query = query.where(sql`(${sql.join(searchConditions, sql` OR `)})`);
+      }
+
+      // Order by date descending
+      query = query.orderBy(desc(emails.emailDate)).limit(50);
+
+      const results = await query;
 
       return {
         results,
