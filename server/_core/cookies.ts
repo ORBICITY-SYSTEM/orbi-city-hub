@@ -8,21 +8,40 @@ function isIpAddress(host: string) {
   return host.includes(":");
 }
 
-function isSecureRequest(req: Request) {
-  if (req.protocol === "https") return true;
+// Type guard to check if request has protocol property (Express Request)
+function hasProtocol(req: any): req is Request & { protocol: string } {
+  return typeof req.protocol === "string";
+}
 
-  const forwardedProto = req.headers["x-forwarded-proto"];
-  if (!forwardedProto) return false;
+// Type guard to check if request has headers property
+function hasHeaders(req: any): req is { headers: Record<string, string | string[] | undefined> } {
+  return req.headers && typeof req.headers === "object";
+}
 
-  const protoList = Array.isArray(forwardedProto)
-    ? forwardedProto
-    : forwardedProto.split(",");
+function isSecureRequest(req: any): boolean {
+  // Check if it's Express Request with protocol
+  if (hasProtocol(req) && req.protocol === "https") {
+    return true;
+  }
 
-  return protoList.some(proto => proto.trim().toLowerCase() === "https");
+  // Check x-forwarded-proto header (works for both Express and Vercel)
+  if (hasHeaders(req)) {
+    const forwardedProto = req.headers["x-forwarded-proto"];
+    if (!forwardedProto) return false;
+
+    const protoList = Array.isArray(forwardedProto)
+      ? forwardedProto
+      : String(forwardedProto).split(",");
+
+    return protoList.some((proto: string) => proto.trim().toLowerCase() === "https");
+  }
+
+  // Default to secure in production (Vercel always uses HTTPS)
+  return process.env.NODE_ENV === "production" || process.env.VERCEL === "1";
 }
 
 export function getSessionCookieOptions(
-  req: Request
+  req: any
 ): Pick<CookieOptions, "domain" | "httpOnly" | "path" | "sameSite" | "secure"> {
   // const hostname = req.hostname;
   // const shouldSetDomain =
@@ -44,5 +63,6 @@ export function getSessionCookieOptions(
     path: "/",
     sameSite: "none",
     secure: isSecureRequest(req),
+    domain: undefined, // Required by TypeScript, but optional in runtime
   };
 }

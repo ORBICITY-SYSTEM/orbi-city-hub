@@ -7,6 +7,9 @@
 
 import { getDb } from "./db";
 
+// Re-export getDb for use in butlerRouter
+export { getDb };
+
 // ============================================
 // TYPE DEFINITIONS
 // ============================================

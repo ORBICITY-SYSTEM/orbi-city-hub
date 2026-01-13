@@ -45,6 +45,9 @@ export default async function handler(req: any, res: any) {
       originalUrl: url,
       query: req.query || {},
       body: body || req.body,
+      // Add protocol for cookies.ts compatibility
+      protocol: (req.headers?.['x-forwarded-proto'] as string)?.split(',')[0]?.trim() || 
+                (process.env.VERCEL === "1" ? "https" : "http"),
     } as any;
 
     let responseSent = false;
@@ -86,8 +89,12 @@ export default async function handler(req: any, res: any) {
         }
       },
       clearCookie: (name: string, options?: any) => {
-        // Vercel serverless functions don't support clearCookie directly
-        // This is a no-op for now
+        // Vercel serverless functions: clear cookie by setting it with maxAge=0
+        if (!responseSent) {
+          const cookieOptions = options || {};
+          const cookieValue = `${name}=; Path=${cookieOptions.path || '/'}; Max-Age=0; HttpOnly=${cookieOptions.httpOnly !== false}; SameSite=${cookieOptions.sameSite || 'None'}; Secure=${cookieOptions.secure !== false}`;
+          res.setHeader('Set-Cookie', cookieValue);
+        }
       },
     } as any;
 
