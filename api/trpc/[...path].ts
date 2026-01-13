@@ -1,15 +1,16 @@
-import { createExpressMiddleware } from "@trpc/server/adapters/express";
+import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
 import type { CreateExpressContextOptions } from "@trpc/server/adapters/express";
 import { appRouter } from "../../server/routers";
 import { createContext } from "../../server/_core/context";
+import type { VercelRequest, VercelResponse } from '@vercel/node';
 
 export const config = {
   runtime: "nodejs",
   maxDuration: 30,
 };
 
-// Vercel serverless function handler
-export default async function handler(req: any, res: any) {
+// Vercel serverless function handler - using fetchRequestHandler (correct for Vercel)
+export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     // Handle CORS preflight
     if (req.method === 'OPTIONS') {
@@ -19,118 +20,85 @@ export default async function handler(req: any, res: any) {
       return res.status(200).end();
     }
 
-    // Parse body for POST requests (Vercel auto-parses JSON, but ensure it's available)
-    let body = req.body;
-    if (req.method === 'POST' && !body && typeof req.body === 'string') {
-      try {
-        body = JSON.parse(req.body);
-      } catch (e) {
-        // Body might already be parsed or empty
-        body = req.body;
-      }
-    }
-
-    // Convert Vercel request/response to Express-like format
-    // Vercel passes the path in req.url - need to construct full URL
-    const url = req.url || '/';
-    const baseUrl = process.env.VERCEL_URL 
-      ? `https://${process.env.VERCEL_URL}` 
-      : 'http://localhost:3000';
+    // Convert Vercel request to Fetch API Request
+    const protocol = (req.headers?.['x-forwarded-proto'] as string)?.split(',')[0]?.trim() || 
+                     (process.env.VERCEL === "1" ? "https" : "http");
+    const host = req.headers?.host || process.env.VERCEL_URL || 'localhost:3000';
+    const url = `${protocol}://${host}${req.url || '/api/trpc'}`;
     
+    // Create Fetch API Request from Vercel request
+    const fetchReq = new Request(url, {
+      method: req.method || 'GET',
+      headers: new Headers(req.headers as Record<string, string>),
+      body: req.method !== 'GET' && req.method !== 'HEAD' 
+        ? (typeof req.body === 'string' ? req.body : JSON.stringify(req.body || {}))
+        : undefined,
+    });
+
+    // Convert Vercel response to Express-like for createContext
     const expressReq = {
       ...req,
       headers: req.headers || {},
       method: req.method || "GET",
-      url: url,
-      originalUrl: url,
+      url: req.url || '/',
+      originalUrl: req.url || '/',
       query: req.query || {},
-      body: body || req.body,
-      // Add protocol for cookies.ts compatibility
-      protocol: (req.headers?.['x-forwarded-proto'] as string)?.split(',')[0]?.trim() || 
-                (process.env.VERCEL === "1" ? "https" : "http"),
+      body: req.body,
+      protocol: protocol,
     } as any;
-
-    let responseSent = false;
 
     const expressRes = {
       setHeader: (key: string, value: string | string[]) => {
-        if (!responseSent) {
-          res.setHeader(key, value);
-        }
+        res.setHeader(key, value);
       },
       getHeader: (key: string) => res.getHeader(key),
       removeHeader: (key: string) => {
-        if (!responseSent) {
-          res.removeHeader(key);
-        }
+        res.removeHeader(key);
       },
       status: (code: number) => {
-        if (!responseSent) {
-          res.status(code);
-        }
+        res.status(code);
         return expressRes;
       },
       json: (data: any) => {
-        if (!responseSent) {
-          responseSent = true;
-          res.json(data);
-        }
+        res.json(data);
       },
       send: (data: any) => {
-        if (!responseSent) {
-          responseSent = true;
-          res.send(data);
-        }
+        res.send(data);
       },
       end: () => {
-        if (!responseSent) {
-          responseSent = true;
-          res.end();
-        }
+        res.end();
       },
       clearCookie: (name: string, options?: any) => {
         // Vercel serverless functions: clear cookie by setting it with maxAge=0
-        if (!responseSent) {
-          const cookieOptions = options || {};
-          const cookieValue = `${name}=; Path=${cookieOptions.path || '/'}; Max-Age=0; HttpOnly=${cookieOptions.httpOnly !== false}; SameSite=${cookieOptions.sameSite || 'None'}; Secure=${cookieOptions.secure !== false}`;
-          res.setHeader('Set-Cookie', cookieValue);
-        }
+        const cookieOptions = options || {};
+        const cookieValue = `${name}=; Path=${cookieOptions.path || '/'}; Max-Age=0; HttpOnly=${cookieOptions.httpOnly !== false}; SameSite=${cookieOptions.sameSite || 'None'}; Secure=${cookieOptions.secure !== false}`;
+        res.setHeader('Set-Cookie', cookieValue);
       },
     } as any;
 
-    // Use Express middleware adapter with type assertion
-    const middleware = createExpressMiddleware({
+    // Use fetchRequestHandler (correct for Vercel serverless functions)
+    const response = await fetchRequestHandler({
+      endpoint: '/api/trpc',
+      req: fetchReq,
       router: appRouter,
       createContext: async () => createContext({ req: expressReq, res: expressRes } as CreateExpressContextOptions),
     });
 
-    // Call middleware function - createExpressMiddleware returns an Express middleware
-    // Express middleware signature: (req, res, next) => void
-    return new Promise<void>((resolve, reject) => {
-      const next = (err?: any) => {
-        if (err) {
-          console.error("[Vercel tRPC Handler] Middleware error:", err);
-          reject(err);
-        } else if (!responseSent) {
-          // If middleware didn't send a response, resolve
-          resolve();
-        } else {
-          // Response was sent, resolve
-          resolve();
-        }
-      };
-      
-      try {
-        // Call middleware with req, res, next
-        const result = (middleware as any)(expressReq, expressRes, next);
-        // If middleware returns a Promise, wait for it
-        if (result && typeof result.then === 'function') {
-          result.catch(reject);
-        }
-      } catch (err) {
-        reject(err);
-      }
+    // Convert Fetch API Response to Vercel response
+    const responseData = await response.text();
+    const responseHeaders: Record<string, string> = {};
+    response.headers.forEach((value, key) => {
+      responseHeaders[key] = value;
     });
+
+    // Set headers
+    Object.entries(responseHeaders).forEach(([key, value]) => {
+      res.setHeader(key, value);
+    });
+
+    // Set status and send response
+    res.status(response.status);
+    res.send(responseData);
   } catch (error) {
     console.error("[Vercel tRPC Handler] Error:", error);
     if (!res.headersSent) {
