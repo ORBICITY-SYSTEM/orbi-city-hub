@@ -5,6 +5,7 @@
  */
 
 import { useState } from 'react';
+import { useAuth } from '@/_core/hooks/useAuth';
 import DashboardLayout from '@/components/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -16,6 +17,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { SampleDataBadge } from '@/components/SampleDataBadge';
 import { isDemoMode } from '@shared/mode';
 import { toast } from 'sonner';
+import { Loader2 } from 'lucide-react';
 import { 
   Building2, 
   Palette, 
@@ -30,6 +32,24 @@ import {
 } from 'lucide-react';
 
 export default function Settings() {
+  // Check authentication
+  const { user, isAuthenticated, loading: authLoading } = useAuth({ redirectOnUnauthenticated: true });
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-8 h-8 animate-spin text-white mx-auto mb-4" />
+          <p className="text-white">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated || !user) {
+    return null; // useAuth will redirect
+  }
+
   const [activeTab, setActiveTab] = useState('general');
   const [isSaving, setIsSaving] = useState(false);
   
