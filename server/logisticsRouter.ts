@@ -7,7 +7,6 @@ import {
   rooms,
   standardInventoryItems,
   roomInventoryItems,
-  roomInventoryDescriptions,
   housekeepingSchedules,
   maintenanceSchedules,
   logisticsActivityLog,
@@ -49,7 +48,7 @@ export const logisticsRouter = router({
       return await db
         .select()
         .from(standardInventoryItems)
-        .orderBy(standardInventoryItems.category, standardInventoryItems.itemName);
+        .orderBy(standardInventoryItems.category, standardInventoryItems.name);
     }),
     
     getById: protectedProcedure
@@ -95,9 +94,9 @@ export const logisticsRouter = router({
       .input(
         z.object({
           roomId: z.number(),
-          standardItemId: z.number(),
-          actualQuantity: z.number(),
-          condition: z.enum(["good", "fair", "poor", "missing"]).optional(),
+          itemId: z.number(),
+          quantity: z.number(),
+          status: z.enum(["ok", "missing", "damaged", "needs_replacement"]).optional(),
           notes: z.string().optional(),
         })
       )
@@ -112,7 +111,7 @@ export const logisticsRouter = router({
           .where(
             and(
               eq(roomInventoryItems.roomId, input.roomId),
-              eq(roomInventoryItems.standardItemId, input.standardItemId)
+              eq(roomInventoryItems.itemId, input.itemId)
             )
           )
           .limit(1);
@@ -122,8 +121,8 @@ export const logisticsRouter = router({
           await db
             .update(roomInventoryItems)
             .set({
-              actualQuantity: input.actualQuantity,
-              condition: input.condition,
+              quantity: input.quantity,
+              status: input.status || "ok",
               notes: input.notes,
               lastChecked: new Date(),
             })
@@ -136,8 +135,8 @@ export const logisticsRouter = router({
             action: "update",
             entityType: "inventory_item",
             entityId: existing.id,
-            entityName: `Room ${input.roomId} - Item ${input.standardItemId}`,
-            changes: { actualQuantity: input.actualQuantity, condition: input.condition },
+            entityName: `Room ${input.roomId} - Item ${input.itemId}`,
+            changes: { quantity: input.quantity, status: input.status },
           });
           
           return { success: true, id: existing.id };
@@ -147,9 +146,9 @@ export const logisticsRouter = router({
             .insert(roomInventoryItems)
             .values({
               roomId: input.roomId,
-              standardItemId: input.standardItemId,
-              actualQuantity: input.actualQuantity,
-              condition: input.condition || "good",
+              itemId: input.itemId,
+              quantity: input.quantity,
+              status: input.status || "ok",
               notes: input.notes,
               lastChecked: new Date(),
             });
@@ -160,12 +159,12 @@ export const logisticsRouter = router({
             userEmail: ctx.user.email || "",
             action: "create",
             entityType: "inventory_item",
-            entityId: result.insertId,
-            entityName: `Room ${input.roomId} - Item ${input.standardItemId}`,
-            changes: { actualQuantity: input.actualQuantity, condition: input.condition },
+            entityId: Number(result.insertId),
+            entityName: `Room ${input.roomId} - Item ${input.itemId}`,
+            changes: { quantity: input.quantity, status: input.status },
           });
           
-          return { success: true, id: result.insertId };
+          return { success: true, id: Number(result.insertId) };
         }
       }),
   }),
@@ -188,10 +187,13 @@ export const logisticsRouter = router({
     create: protectedProcedure
       .input(
         z.object({
+          roomId: z.number(),
           scheduledDate: z.string(),
-          rooms: z.array(z.string()),
-          totalRooms: z.number(),
-          status: z.enum(["pending", "in_progress", "completed", "cancelled"]).optional(),
+          scheduledTime: z.string().optional(),
+          taskType: z.string(),
+          assignedTo: z.number().optional(),
+          status: z.enum(["scheduled", "in_progress", "completed", "cancelled", "skipped"]).optional(),
+          priority: z.enum(["low", "normal", "high", "urgent"]).optional(),
           notes: z.string().optional(),
         })
       )
@@ -200,11 +202,13 @@ export const logisticsRouter = router({
         if (!db) throw new Error("Database not available");
         
         const [result] = await db.insert(housekeepingSchedules).values({
-          userId: ctx.user.id,
-          scheduledDate: input.scheduledDate,
-          rooms: input.rooms,
-          totalRooms: input.totalRooms,
-          status: input.status || "pending",
+          roomId: input.roomId,
+          scheduledDate: new Date(input.scheduledDate),
+          scheduledTime: input.scheduledTime,
+          taskType: input.taskType,
+          assignedTo: input.assignedTo,
+          status: input.status || "scheduled",
+          priority: input.priority || "normal",
           notes: input.notes,
         });
         
@@ -214,21 +218,20 @@ export const logisticsRouter = router({
           userEmail: ctx.user.email || "",
           action: "create",
           entityType: "housekeeping_schedule",
-          entityId: result.insertId,
-          entityName: `Housekeeping ${input.scheduledDate} (${input.totalRooms} rooms)`,
-          changes: { scheduledDate: input.scheduledDate, totalRooms: input.totalRooms },
+          entityId: Number(result.insertId),
+          entityName: `Housekeeping Room ${input.roomId} - ${input.taskType}`,
+          changes: { scheduledDate: input.scheduledDate, taskType: input.taskType },
         });
         
-        return { success: true, id: result.insertId };
+        return { success: true, id: Number(result.insertId) };
       }),
     
     update: protectedProcedure
       .input(
         z.object({
           id: z.number(),
-          status: z.enum(["pending", "in_progress", "completed", "cancelled"]).optional(),
+          status: z.enum(["scheduled", "in_progress", "completed", "cancelled", "skipped"]).optional(),
           notes: z.string().optional(),
-          additionalNotes: z.string().optional(),
           completedAt: z.date().optional(),
         })
       )
@@ -241,7 +244,6 @@ export const logisticsRouter = router({
           .set({
             status: input.status,
             notes: input.notes,
-            additionalNotes: input.additionalNotes,
             completedAt: input.completedAt,
           })
           .where(eq(housekeepingSchedules.id, input.id));
@@ -279,13 +281,16 @@ export const logisticsRouter = router({
     create: protectedProcedure
       .input(
         z.object({
-          roomNumber: z.string(),
+          roomId: z.number().optional(),
+          equipmentName: z.string().optional(),
+          maintenanceType: z.string(),
           scheduledDate: z.string(),
-          problem: z.string(),
+          assignedTo: z.number().optional(),
+          status: z.enum(["scheduled", "in_progress", "completed", "cancelled", "postponed"]).optional(),
+          priority: z.enum(["low", "normal", "high", "urgent"]).optional(),
+          estimatedDuration: z.number().optional(),
+          cost: z.number().optional(),
           notes: z.string().optional(),
-          status: z.enum(["pending", "in_progress", "completed", "cancelled"]).optional(),
-          estimatedCost: z.number().optional(),
-          priority: z.enum(["low", "medium", "high", "urgent"]).optional(),
         })
       )
       .mutation(async ({ input, ctx }) => {
@@ -293,14 +298,16 @@ export const logisticsRouter = router({
         if (!db) throw new Error("Database not available");
         
         const [result] = await db.insert(maintenanceSchedules).values({
-          userId: ctx.user.id,
-          roomNumber: input.roomNumber,
-          scheduledDate: input.scheduledDate,
-          problem: input.problem,
+          roomId: input.roomId,
+          equipmentName: input.equipmentName,
+          maintenanceType: input.maintenanceType,
+          scheduledDate: new Date(input.scheduledDate),
+          assignedTo: input.assignedTo,
+          status: input.status || "scheduled",
+          priority: input.priority || "normal",
+          estimatedDuration: input.estimatedDuration,
+          cost: input.cost,
           notes: input.notes,
-          status: input.status || "pending",
-          estimatedCost: input.estimatedCost,
-          priority: input.priority || "medium",
         });
         
         // Log activity
@@ -309,23 +316,23 @@ export const logisticsRouter = router({
           userEmail: ctx.user.email || "",
           action: "create",
           entityType: "maintenance_schedule",
-          entityId: result.insertId,
-          entityName: `Maintenance ${input.roomNumber}: ${input.problem}`,
-          changes: { roomNumber: input.roomNumber, problem: input.problem, estimatedCost: input.estimatedCost },
+          entityId: Number(result.insertId),
+          entityName: `Maintenance ${input.equipmentName || 'Equipment'}: ${input.maintenanceType}`,
+          changes: { maintenanceType: input.maintenanceType, cost: input.cost },
         });
         
-        return { success: true, id: result.insertId };
+        return { success: true, id: Number(result.insertId) };
       }),
     
     update: protectedProcedure
       .input(
         z.object({
           id: z.number(),
-          status: z.enum(["pending", "in_progress", "completed", "cancelled"]).optional(),
+          status: z.enum(["scheduled", "in_progress", "completed", "cancelled", "postponed"]).optional(),
           notes: z.string().optional(),
-          estimatedCost: z.number().optional(),
-          actualCost: z.number().optional(),
-          assignedTo: z.string().optional(),
+          cost: z.number().optional(),
+          assignedTo: z.number().optional(),
+          actualDuration: z.number().optional(),
           completedAt: z.date().optional(),
         })
       )
@@ -338,9 +345,9 @@ export const logisticsRouter = router({
           .set({
             status: input.status,
             notes: input.notes,
-            estimatedCost: input.estimatedCost,
-            actualCost: input.actualCost,
+            cost: input.cost,
             assignedTo: input.assignedTo,
+            actualDuration: input.actualDuration,
             completedAt: input.completedAt,
           })
           .where(eq(maintenanceSchedules.id, input.id));
@@ -353,7 +360,7 @@ export const logisticsRouter = router({
           entityType: "maintenance_schedule",
           entityId: input.id,
           entityName: `Maintenance Schedule #${input.id}`,
-          changes: { status: input.status, actualCost: input.actualCost, completedAt: input.completedAt },
+          changes: { status: input.status, cost: input.cost, completedAt: input.completedAt },
         });
         
         return { success: true };

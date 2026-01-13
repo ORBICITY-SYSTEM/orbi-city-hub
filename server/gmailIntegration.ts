@@ -196,7 +196,7 @@ export async function fetchAndCategorizeEmails(
           // Save summary
           await db.insert(emailSummaries).values({
             emailId: message.id,
-            summary: summaryResult.shortSummary,
+            summary: summaryResult.summary || summaryResult.shortSummary || "",
             keyPoints: summaryResult.keyPoints || [],
             actionItems: summaryResult.actionItems || [],
           });

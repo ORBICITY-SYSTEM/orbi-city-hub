@@ -13,10 +13,10 @@ export const realFinanceRouter = router({
     const db = await getDb();
     if (!db) throw new Error("Database not available");
 
-    const [rows] = await db.execute(
+    const result = await db.execute(
       "SELECT * FROM financial_summary ORDER BY created_at DESC LIMIT 1"
     );
-
+    const rows = Array.isArray(result[0]) ? result[0] : [];
     return rows[0] || null;
   }),
 
@@ -27,10 +27,10 @@ export const realFinanceRouter = router({
     const db = await getDb();
     if (!db) throw new Error("Database not available");
 
-    const [rows] = await db.execute(
+    const result = await db.execute(
       "SELECT * FROM monthly_financials ORDER BY year DESC, FIELD(month, 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December') DESC"
     );
-
+    const rows = Array.isArray(result[0]) ? result[0] : [];
     return rows;
   }),
 
@@ -41,10 +41,10 @@ export const realFinanceRouter = router({
     const db = await getDb();
     if (!db) throw new Error("Database not available");
 
-    const [rows] = await db.execute(
+    const result = await db.execute(
       "SELECT month, total_revenue, total_expenses, total_profit FROM monthly_financials ORDER BY year ASC, FIELD(month, 'October', 'November', 'December', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September') ASC"
     );
-
+    const rows = Array.isArray(result[0]) ? result[0] : [];
     return rows;
   }),
 
@@ -55,10 +55,10 @@ export const realFinanceRouter = router({
     const db = await getDb();
     if (!db) throw new Error("Database not available");
 
-    const [rows] = await db.execute(
+    const result = await db.execute(
       "SELECT SUM(cleaning_tech) as cleaning_tech, SUM(marketing) as marketing, SUM(salaries) as salaries, SUM(utilities) as utilities FROM monthly_financials"
     );
-
+    const rows = Array.isArray(result[0]) ? result[0] : [];
     return rows[0] || null;
   }),
 
@@ -69,10 +69,10 @@ export const realFinanceRouter = router({
     const db = await getDb();
     if (!db) throw new Error("Database not available");
 
-    const [rows] = await db.execute(
+    const result = await db.execute(
       "SELECT month, occupancy_percent, avg_price FROM monthly_financials ORDER BY year ASC, FIELD(month, 'October', 'November', 'December', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September') ASC"
     );
-
+    const rows = Array.isArray(result[0]) ? result[0] : [];
     return rows;
   }),
 
@@ -84,47 +84,50 @@ export const realFinanceRouter = router({
     if (!db) throw new Error("Database not available");
 
     // Get summary
-    const [summaryRows] = await db.execute(
+    const summaryResult = await db.execute(
       "SELECT * FROM financial_summary ORDER BY created_at DESC LIMIT 1"
     );
-    const summary = summaryRows[0];
+    const summaryRows = Array.isArray(summaryResult[0]) ? summaryResult[0] : [];
+    const summary = summaryRows[0] || { total_revenue: 0, total_profit: 0 };
 
     // Get latest month
-    const [latestRows] = await db.execute(
+    const latestResult = await db.execute(
       "SELECT * FROM monthly_financials ORDER BY year DESC, FIELD(month, 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December') DESC LIMIT 1"
     );
-    const latestMonth = latestRows[0];
+    const latestRows = Array.isArray(latestResult[0]) ? latestResult[0] : [];
+    const latestMonth = latestRows[0] || { total_revenue: 0, total_profit: 0, occupancy_percent: 0, month: '' };
 
     // Get previous month for comparison
-    const [prevRows] = await db.execute(
+    const prevResult = await db.execute(
       "SELECT * FROM monthly_financials ORDER BY year DESC, FIELD(month, 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December') DESC LIMIT 1 OFFSET 1"
     );
-    const prevMonth = prevRows[0];
+    const prevRows = Array.isArray(prevResult[0]) ? prevResult[0] : [];
+    const prevMonth = prevRows[0] || null;
 
     // Calculate changes
-    const revenueChange = prevMonth
-      ? ((latestMonth.total_revenue - prevMonth.total_revenue) / prevMonth.total_revenue * 100).toFixed(1)
-      : 0;
+    const revenueChange = prevMonth && prevMonth.total_revenue > 0
+      ? ((Number(latestMonth.total_revenue) - Number(prevMonth.total_revenue)) / Number(prevMonth.total_revenue) * 100).toFixed(1)
+      : "0";
 
-    const profitChange = prevMonth
-      ? ((latestMonth.total_profit - prevMonth.total_profit) / prevMonth.total_profit * 100).toFixed(1)
-      : 0;
+    const profitChange = prevMonth && prevMonth.total_profit > 0
+      ? ((Number(latestMonth.total_profit) - Number(prevMonth.total_profit)) / Number(prevMonth.total_profit) * 100).toFixed(1)
+      : "0";
 
     const occupancyChange = prevMonth
-      ? (latestMonth.occupancy_percent - prevMonth.occupancy_percent).toFixed(1)
-      : 0;
+      ? (Number(latestMonth.occupancy_percent) - Number(prevMonth.occupancy_percent)).toFixed(1)
+      : "0";
 
     return {
-      totalRevenue: summary.total_revenue,
-      totalProfit: summary.total_profit,
-      profitMargin: ((summary.total_profit / summary.total_revenue) * 100).toFixed(1),
-      latestMonthRevenue: latestMonth.total_revenue,
-      latestMonthProfit: latestMonth.total_profit,
-      latestMonthOccupancy: latestMonth.occupancy_percent,
+      totalRevenue: Number(summary.total_revenue) || 0,
+      totalProfit: Number(summary.total_profit) || 0,
+      profitMargin: summary.total_revenue > 0 ? ((Number(summary.total_profit) / Number(summary.total_revenue)) * 100).toFixed(1) : "0",
+      latestMonthRevenue: Number(latestMonth.total_revenue) || 0,
+      latestMonthProfit: Number(latestMonth.total_profit) || 0,
+      latestMonthOccupancy: Number(latestMonth.occupancy_percent) || 0,
       revenueChange: parseFloat(revenueChange),
       profitChange: parseFloat(profitChange),
       occupancyChange: parseFloat(occupancyChange),
-      latestMonth: latestMonth.month,
+      latestMonth: latestMonth.month || "",
     };
   }),
 });
