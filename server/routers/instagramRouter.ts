@@ -301,34 +301,110 @@ export const instagramRouter = router({
       }
     }),
 
-  // Test Rows.com connection (public - no auth required for connection test)
+  // Test Rows.com connection (EXACTLY like harmony - lightweight request)
   testConnection: publicProcedure
     .mutation(async () => {
       const ROWS_API_KEY = process.env.ROWS_API_KEY;
       const SPREADSHEET_ID = process.env.ROWS_SPREADSHEET_ID;
 
-      if (!ROWS_API_KEY || !SPREADSHEET_ID) {
-        return { success: false, message: "ROWS_API_KEY or ROWS_SPREADSHEET_ID not configured" };
+      if (!ROWS_API_KEY) {
+        return { 
+          success: false, 
+          message: 'ROWS_API_KEY არ არის კონფიგურირებული' 
+        };
+      }
+
+      if (!SPREADSHEET_ID) {
+        return { 
+          success: false, 
+          message: 'ROWS_SPREADSHEET_ID არ არის კონფიგურირებული' 
+        };
       }
 
       try {
+        console.log(`[Instagram Test] Testing connection to spreadsheet: ${SPREADSHEET_ID}`);
+
+        // Make a lightweight request to get spreadsheet info (EXACTLY like harmony)
         const url = `https://api.rows.com/v1/spreadsheets/${SPREADSHEET_ID}`;
+        
         const response = await fetch(url, {
+          method: 'GET',
           headers: {
             'Authorization': `Bearer ${ROWS_API_KEY}`,
-            'Content-Type': 'application/json',
+            'Accept': 'application/json',
           },
         });
 
+        const responseText = await response.text();
+        console.log('[Instagram Test] Rows API response status:', response.status);
+        console.log('[Instagram Test] Rows API response:', responseText.substring(0, 500));
+
         if (!response.ok) {
-          return { success: false, message: `Rows API error: ${response.status}` };
+          let errorMessage = `Rows API error: ${response.status}`;
+          
+          try {
+            const errorData = JSON.parse(responseText);
+            if (errorData.message) {
+              errorMessage = errorData.message;
+            }
+            
+            // Provide user-friendly error messages (EXACTLY like harmony)
+            if (response.status === 401) {
+              errorMessage = 'ROWS_API_KEY არასწორია ან ვადაგასული';
+            } else if (response.status === 403) {
+              errorMessage = 'API Key-ს არ აქვს წვდომა ამ სპრედშიტზე';
+            } else if (response.status === 404) {
+              errorMessage = 'Spreadsheet ვერ მოიძებნა. შეამოწმეთ ROWS_SPREADSHEET_ID';
+            } else if (errorData.message?.includes('spreadsheet_id is invalid')) {
+              errorMessage = 'ROWS_SPREADSHEET_ID ფორმატი არასწორია. გამოიყენეთ spreadsheet ID (მაგ: 5HGcWJFcQVVAv4mNTYb2RS) და არა URL';
+            }
+          } catch {
+            // Keep default error message
+          }
+
+          return { 
+            success: false,
+            message: errorMessage,
+            details: `Status: ${response.status}`
+          };
         }
 
-        return { success: true, message: "კავშირი წარმატებულია!" };
+        // Parse successful response (EXACTLY like harmony)
+        let spreadsheetInfo;
+        try {
+          spreadsheetInfo = JSON.parse(responseText);
+        } catch {
+          return { 
+            success: false, 
+            message: 'Rows API-დან არასწორი პასუხი მოვიდა'
+          };
+        }
+
+        const spreadsheetName = spreadsheetInfo.name || 'Unknown';
+        const pagesCount = spreadsheetInfo.pages?.length || 0;
+        const tablesCount = spreadsheetInfo.pages?.reduce(
+          (sum: number, page: { tables?: unknown[] }) => sum + (page.tables?.length || 0),
+          0
+        ) || 0;
+
+        console.log(`[Instagram Test] Connection successful! Spreadsheet: ${spreadsheetName}, Pages: ${pagesCount}, Tables: ${tablesCount}`);
+
+        return { 
+          success: true,
+          message: `კავშირი წარმატებულია! სპრედშიტი: "${spreadsheetName}" (${tablesCount} ცხრილი)`,
+          spreadsheet: {
+            id: SPREADSHEET_ID,
+            name: spreadsheetName,
+            pages: pagesCount,
+            tables: tablesCount,
+          }
+        };
       } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        console.error('[Instagram Test] Error:', errorMessage);
         return { 
           success: false, 
-          message: error instanceof Error ? error.message : "Connection failed" 
+          message: `კავშირის შეცდომა: ${errorMessage}`
         };
       }
     }),
