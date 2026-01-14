@@ -16,8 +16,9 @@ export const googleRouter = router({
       })
     )
     .query(async ({ input }) => {
+      const accountId = process.env.GOOGLE_BUSINESS_ACCOUNT_ID || "default";
       const locationId = String(input.locationId || process.env.GOOGLE_BUSINESS_LOCATION_ID || "default");
-      return await fetchGoogleBusinessReviews(locationId, input.pageSize, input.pageToken);
+      return await fetchGoogleBusinessReviews(accountId, locationId, input.pageSize, input.pageToken);
     }),
 
   // Reply to a review
@@ -29,7 +30,11 @@ export const googleRouter = router({
       })
     )
     .mutation(async ({ input }) => {
-      const success = await replyToGoogleReview(input.reviewName, input.replyText);
+      const accountId = process.env.GOOGLE_BUSINESS_ACCOUNT_ID || "default";
+      const locationId = process.env.GOOGLE_BUSINESS_LOCATION_ID || "default";
+      // reviewName format: accounts/{accountId}/locations/{locationId}/reviews/{reviewId}
+      const reviewId = input.reviewName.split('/').pop() || input.reviewName;
+      const success = await replyToGoogleReview(accountId, locationId, reviewId, input.replyText);
       return { success };
     }),
 
@@ -41,7 +46,11 @@ export const googleRouter = router({
       })
     )
     .mutation(async ({ input }) => {
-      const success = await deleteGoogleReviewReply(input.reviewName);
+      const accountId = process.env.GOOGLE_BUSINESS_ACCOUNT_ID || "default";
+      const locationId = process.env.GOOGLE_BUSINESS_LOCATION_ID || "default";
+      // reviewName format: accounts/{accountId}/locations/{locationId}/reviews/{reviewId}
+      const reviewId = input.reviewName.split('/').pop() || input.reviewName;
+      const success = await deleteGoogleReviewReply(accountId, locationId, reviewId);
       return { success };
     }),
 

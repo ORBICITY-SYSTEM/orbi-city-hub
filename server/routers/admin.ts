@@ -70,9 +70,10 @@ export const adminRouter = router({
       const token = createAdminToken(adminUser.id, adminUser.username);
 
       // Set cookie (Vercel serverless functions - use setHeader instead)
-      if (typeof ctx.res.setHeader === 'function') {
+      const res = ctx.res as any;
+      if (typeof res.setHeader === 'function') {
         const cookieOptions = `HttpOnly; Secure; SameSite=None; Max-Age=${7 * 24 * 60 * 60}; Path=/`;
-        ctx.res.setHeader('Set-Cookie', `${ADMIN_SESSION_COOKIE}=${token}; ${cookieOptions}`);
+        res.setHeader('Set-Cookie', `${ADMIN_SESSION_COOKIE}=${token}; ${cookieOptions}`);
       }
 
       return {
@@ -123,8 +124,9 @@ export const adminRouter = router({
   // Admin logout
   logout: publicProcedure.mutation(({ ctx }) => {
     // Vercel serverless functions - clear cookie using setHeader
-    if (typeof ctx.res.setHeader === 'function') {
-      ctx.res.setHeader('Set-Cookie', `${ADMIN_SESSION_COOKIE}=; HttpOnly; Secure; SameSite=None; Max-Age=0; Path=/`);
+    const res = ctx.res as any;
+    if (typeof res.setHeader === 'function') {
+      res.setHeader('Set-Cookie', `${ADMIN_SESSION_COOKIE}=; HttpOnly; Secure; SameSite=None; Max-Age=0; Path=/`);
     }
 
     return { success: true };

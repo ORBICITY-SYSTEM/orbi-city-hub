@@ -448,16 +448,19 @@ export const instagramRouter = router({
         return [];
       }
 
-      let query = db.select().from(instagramDailyMetrics).orderBy(desc(instagramDailyMetrics.date));
-
+      const whereConditions: any[] = [];
       if (input?.from) {
-        query = query.where(gte(instagramDailyMetrics.date, input.from));
+        whereConditions.push(gte(instagramDailyMetrics.date, input.from));
       }
       if (input?.to) {
-        query = query.where(lte(instagramDailyMetrics.date, input.to));
+        whereConditions.push(lte(instagramDailyMetrics.date, input.to));
       }
 
-      return await query;
+      return await db
+        .select()
+        .from(instagramDailyMetrics)
+        .where(whereConditions.length > 0 ? and(...whereConditions) : undefined)
+        .orderBy(desc(instagramDailyMetrics.date));
     }),
 
   // Get posts with date range
@@ -504,13 +507,9 @@ export const instagramRouter = router({
         return [];
       }
 
-      let query = db.select().from(instagramPosts)
-        .orderBy(desc(instagramPosts.post_date))
-        .limit(input?.limit || 1000);
-
       // Note: MySQL doesn't support dynamic where with .where() chaining
       // We need to build conditions array
-      const conditions = [];
+      const conditions: any[] = [];
       if (input?.from) {
         conditions.push(gte(instagramPosts.post_date, input.from));
       }
@@ -518,11 +517,12 @@ export const instagramRouter = router({
         conditions.push(lte(instagramPosts.post_date, input.to));
       }
 
-      if (conditions.length > 0) {
-        query = query.where(and(...conditions)) as any;
-      }
-
-      return await query;
+      return await db
+        .select()
+        .from(instagramPosts)
+        .where(conditions.length > 0 ? and(...conditions) : undefined)
+        .orderBy(desc(instagramPosts.post_date))
+        .limit(input?.limit || 1000);
     }),
 
   // Get latest summary

@@ -3,6 +3,7 @@ import { getGmailClient } from "../googleAuth";
 import { parseOtelmsEmail, isOtelmsEmail } from "../otelmsParser";
 import { getDb } from "../db";
 import { otelmsDailyReports } from "../../drizzle/schema";
+import { desc } from "drizzle-orm";
 import { z } from "zod";
 
 /**
@@ -38,7 +39,7 @@ export const gmailOtelmsRouter = router({
           maxResults,
         });
 
-        const messages = response.data.messages || [];
+        const messages = (response as any).data?.messages || [];
 
         // Fetch full message details
         const emailDetails = await Promise.all(
@@ -48,19 +49,20 @@ export const gmailOtelmsRouter = router({
                 userId: 'me',
                 id: message.id!,
                 format: 'full',
-              });
+              }) as any;
 
-              const headers = msg.data.payload?.headers || [];
-              const subject = headers.find(h => h.name?.toLowerCase() === 'subject')?.value || 'No Subject';
-              const from = headers.find(h => h.name?.toLowerCase() === 'from')?.value || 'Unknown';
-              const date = headers.find(h => h.name?.toLowerCase() === 'date')?.value || '';
+              const msgData = msg.data || msg;
+              const headers = msgData.payload?.headers || [];
+              const subject = headers.find((h: any) => h.name?.toLowerCase() === 'subject')?.value || 'No Subject';
+              const from = headers.find((h: any) => h.name?.toLowerCase() === 'from')?.value || 'Unknown';
+              const date = headers.find((h: any) => h.name?.toLowerCase() === 'date')?.value || '';
 
               // Extract body
               let body = '';
-              if (msg.data.payload?.body?.data) {
-                body = Buffer.from(msg.data.payload.body.data, 'base64').toString('utf-8');
-              } else if (msg.data.payload?.parts) {
-                const textPart = msg.data.payload.parts.find(part => part.mimeType === 'text/plain');
+              if (msgData.payload?.body?.data) {
+                body = Buffer.from(msgData.payload.body.data, 'base64').toString('utf-8');
+              } else if (msgData.payload?.parts) {
+                const textPart = msgData.payload.parts.find((part: any) => part.mimeType === 'text/plain');
                 if (textPart?.body?.data) {
                   body = Buffer.from(textPart.body.data, 'base64').toString('utf-8');
                 }
@@ -72,7 +74,7 @@ export const gmailOtelmsRouter = router({
                 from,
                 date,
                 body: body.substring(0, 1000), // Limit body size
-                snippet: msg.data.snippet || '',
+                snippet: msgData.snippet || '',
                 isOtelms: isOtelmsEmail(subject, body),
               };
             } catch (error) {
@@ -113,7 +115,7 @@ export const gmailOtelmsRouter = router({
         maxResults: 50,
       });
 
-      const messages = response.data.messages || [];
+      const messages = (response as any).data?.messages || [];
       let syncedCount = 0;
       let errorCount = 0;
 
@@ -124,17 +126,18 @@ export const gmailOtelmsRouter = router({
             userId: 'me',
             id: message.id!,
             format: 'full',
-          });
+          }) as any;
 
-          const headers = msg.data.payload?.headers || [];
-          const subject = headers.find(h => h.name?.toLowerCase() === 'subject')?.value || '';
+          const msgData = msg.data || msg;
+          const headers = msgData.payload?.headers || [];
+          const subject = headers.find((h: any) => h.name?.toLowerCase() === 'subject')?.value || '';
 
           // Extract body
           let body = '';
-          if (msg.data.payload?.body?.data) {
-            body = Buffer.from(msg.data.payload.body.data, 'base64').toString('utf-8');
-          } else if (msg.data.payload?.parts) {
-            const textPart = msg.data.payload.parts.find(part => part.mimeType === 'text/plain');
+          if (msgData.payload?.body?.data) {
+            body = Buffer.from(msgData.payload.body.data, 'base64').toString('utf-8');
+          } else if (msgData.payload?.parts) {
+            const textPart = msgData.payload.parts.find((part: any) => part.mimeType === 'text/plain');
             if (textPart?.body?.data) {
               body = Buffer.from(textPart.body.data, 'base64').toString('utf-8');
             }
@@ -143,7 +146,7 @@ export const gmailOtelmsRouter = router({
           // Check if it's an OTELMS email
           if (isOtelmsEmail(subject, body)) {
             // Parse email
-            const parsed = parseOtelmsEmail(body, subject);
+            const parsed = await parseOtelmsEmail(body, subject);
 
             if (parsed) {
               // Save to database
