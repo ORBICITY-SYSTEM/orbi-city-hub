@@ -73,7 +73,7 @@ export const reservationsRouter = router({
         ...input,
         checkIn: new Date(input.checkIn),
         checkOut: new Date(input.checkOut),
-      });
+      } as any);
 
       return reservation;
     }),

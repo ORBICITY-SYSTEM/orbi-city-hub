@@ -128,8 +128,8 @@ export const excelImportRouter = router({
               status: statusMapped,
               guestEmail: guestEmail ? String(guestEmail) : undefined,
               guestPhone: guestPhone ? String(guestPhone) : undefined,
-              source: "excel",
-            });
+              // source property not in schema, remove it
+            } as any);
 
             results.success++;
           } catch (error: any) {

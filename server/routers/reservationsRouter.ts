@@ -121,13 +121,13 @@ export const reservationsRouter = router({
           dueDate: input.dueDate ? new Date(input.dueDate) : null,
           createdBy: input.createdBy,
           status: "pending",
-        })
-        .$returningId();
+        });
 
+      const insertId = (insertResult as any).insertId;
       const [insertedTask] = await db
         .select()
         .from(reservationsTasks)
-        .where(eq(reservationsTasks.id, insertResult.id))
+        .where(eq(reservationsTasks.id, insertId))
         .limit(1);
 
       return insertedTask || null;

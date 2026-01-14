@@ -104,7 +104,7 @@ export const n8nWebhookRouter = router({
           };
 
           // Insert review
-          const [newReview] = await db
+          const insertResult = await db
             .insert(guestReviews)
             .values({
               source: sourceMap[review.platform] || "direct",
@@ -120,11 +120,11 @@ export const n8nWebhookRouter = router({
               reviewDate: new Date(review.reviewDate),
               hasReply: false,
               isRead: false,
-            })
-            .$returningId();
+            });
 
+          const reviewId = (insertResult as any).insertId;
           results.imported++;
-          results.details.push({ externalId: review.externalId, status: "imported", reviewId: newReview.id });
+          results.details.push({ externalId: review.externalId, status: "imported", reviewId });
         } catch (error) {
           console.error(`[n8nWebhook] Failed to import review ${review.externalId}:`, error);
           results.errors++;
@@ -183,16 +183,15 @@ export const n8nWebhookRouter = router({
 
         // If guest doesn't exist, create new guest
         if (!guestId) {
-          const [newGuest] = await db
+          const newGuestResult = await db
             .insert(guests)
             .values({
               name: input.guestName,
               email: input.guestEmail || null,
               phone: input.guestPhone || null,
-            })
-            .$returningId();
+            });
 
-          guestId = newGuest.id;
+          guestId = (newGuestResult as any).insertId;
         }
 
         // Insert chat message
@@ -210,12 +209,11 @@ export const n8nWebhookRouter = router({
               source: input.source,
               ...input.metadata,
             } as any,
-          })
-          .$returningId();
+          });
 
         return {
           success: true,
-          messageId: chatResult.id,
+          messageId: (chatResult as any).insertId,
           guestId,
           message: "Guest message received successfully",
         };
@@ -323,15 +321,14 @@ export const n8nWebhookRouter = router({
             role: "assistant",
             content: input.message,
             metadata: { replyTo: input.originalMessageId } as any,
-          })
-          .$returningId();
+          });
 
         // TODO: chatMessages schema doesn't have status column
         // Skip marking as replied for now
 
         return {
           success: true,
-          messageId: replyResult.id,
+          messageId: (replyResult as any).insertId,
           message: "Reply sent successfully",
         };
       } catch (error) {

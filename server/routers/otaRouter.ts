@@ -77,7 +77,7 @@ export const otaRouter = router({
       
       // Get total count
       const countResult = await db.execute(sql.raw(`SELECT COUNT(*) as total FROM ota_bookings WHERE ${whereClause}`));
-      const total = (countResult[0] as any[])[0]?.total || 0;
+      const total = ((countResult as any) as any[])[0]?.total || 0;
       
       // Get bookings with pagination
       const result = await db.execute(sql.raw(`

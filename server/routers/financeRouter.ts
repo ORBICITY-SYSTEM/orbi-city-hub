@@ -113,13 +113,13 @@ export const financeRouter = router({
           dueDate: input.dueDate ? new Date(input.dueDate) : null,
           createdBy: input.createdBy,
           status: "pending",
-        })
-        .$returningId();
+        });
 
+      const insertId = (insertResult as any).insertId;
       const [insertedTask] = await db
         .select()
         .from(financeTasks)
-        .where(eq(financeTasks.id, insertResult.id))
+        .where(eq(financeTasks.id, insertId))
         .limit(1);
 
       return insertedTask || null;

@@ -110,13 +110,13 @@ export const logisticsRouter = router({
           dueDate: input.dueDate ? new Date(input.dueDate) : null,
           createdBy: input.createdBy,
           status: "pending",
-        })
-        .$returningId();
+        });
 
+      const insertId = (insertResult as any).insertId;
       const [insertedTask] = await db
         .select()
         .from(logisticsTasks)
-        .where(eq(logisticsTasks.id, insertResult.id))
+        .where(eq(logisticsTasks.id, insertId))
         .limit(1);
 
       return insertedTask || null;
@@ -143,11 +143,17 @@ export const logisticsRouter = router({
         updates.completedAt = new Date();
       }
 
-      const [updated] = await db
+      await db
         .update(logisticsTasks)
         .set(updates)
+        .where(eq(logisticsTasks.id, input.id));
+
+      // Fetch updated task
+      const [updated] = await db
+        .select()
+        .from(logisticsTasks)
         .where(eq(logisticsTasks.id, input.id))
-        .returning();
+        .limit(1);
 
       return updated || null;
     }),
@@ -194,11 +200,17 @@ export const logisticsRouter = router({
         updateData.completedAt = new Date();
       }
 
-      const [updated] = await db
+      await db
         .update(logisticsTasks)
         .set(updateData)
+        .where(eq(logisticsTasks.id, id));
+
+      // Fetch updated task
+      const [updated] = await db
+        .select()
+        .from(logisticsTasks)
         .where(eq(logisticsTasks.id, id))
-        .returning();
+        .limit(1);
 
       return updated || null;
     }),

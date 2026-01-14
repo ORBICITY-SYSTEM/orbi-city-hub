@@ -124,13 +124,13 @@ export const marketingRouter = router({
           dueDate: input.dueDate ? new Date(input.dueDate) : null,
           createdBy: input.createdBy,
           status: "pending",
-        })
-        .$returningId();
+        });
 
+      const insertId = (insertResult as any).insertId;
       const [created] = await db
         .select()
         .from(marketingTasks)
-        .where(eq(marketingTasks.id, insertResult.id))
+        .where(eq(marketingTasks.id, insertId))
         .limit(1);
       
       return created || null;

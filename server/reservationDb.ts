@@ -10,7 +10,7 @@ export async function createReservation(data: InsertReservation): Promise<Reserv
   }
 
   const result = await db.insert(reservations).values(data);
-  const insertId = Number(result[0].insertId);
+  const insertId = Number((result as any).insertId);
 
   const created = await db.select().from(reservations).where(eq(reservations.id, insertId)).limit(1);
   
