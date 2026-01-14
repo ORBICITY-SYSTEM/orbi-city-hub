@@ -144,11 +144,14 @@ export function inputValidationMiddleware(
   next: NextFunction
 ) {
   // Validate query parameters
-  if (req.query) {
-    for (const [key, value] of Object.entries(req.query)) {
+  const expressReq = req as any;
+  const expressRes = res as any;
+  
+  if (expressReq.query) {
+    for (const [key, value] of Object.entries(expressReq.query)) {
       if (typeof value === "string") {
         if (!validateXSSInput(value) || !validateSQLInput(value)) {
-          return res.status(400).json({
+          return expressRes.status(400).json({
             error: "Invalid input detected",
             field: key,
           });
@@ -158,11 +161,11 @@ export function inputValidationMiddleware(
   }
 
   // Validate body parameters
-  if (req.body && typeof req.body === "object") {
-    for (const [key, value] of Object.entries(req.body)) {
+  if (expressReq.body && typeof expressReq.body === "object") {
+    for (const [key, value] of Object.entries(expressReq.body)) {
       if (typeof value === "string") {
         if (!validateXSSInput(value) || !validateSQLInput(value)) {
-          return res.status(400).json({
+          return expressRes.status(400).json({
             error: "Invalid input detected",
             field: key,
           });
@@ -182,10 +185,11 @@ export function rateLimitErrorHandler(
   res: Response,
   next: NextFunction
 ) {
-  res.status(429).json({
+  const expressRes = res as any;
+  expressRes.status(429).json({
     error: "Too many requests",
     message: "Please try again later",
-    retryAfter: res.getHeader("Retry-After"),
+    retryAfter: expressRes.getHeader("Retry-After"),
   });
 }
 

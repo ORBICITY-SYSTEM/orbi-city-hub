@@ -220,9 +220,9 @@ export default async function handler(req: any, res: any) {
             total_comments: toIntValue(summaryMap['Total Comments'] || summaryMap['total_comments']),
             total_saved: toIntValue(summaryMap['Total Saved'] || summaryMap['total_saved']),
             total_follows: toIntValue(summaryMap['Total Follows'] || summaryMap['total_follows']),
-            avg_reach_per_post: toNumberValue(summaryMap['Avg Reach / Post'] || summaryMap['avg_reach_per_post']),
-            engagement_rate: toNumberValue(summaryMap['Engagement Rate'] || summaryMap['engagement_rate']),
-          });
+            avg_reach_per_post: toNumberValue(summaryMap['Avg Reach / Post'] || summaryMap['avg_reach_per_post'])?.toString() || null,
+            engagement_rate: toNumberValue(summaryMap['Engagement Rate'] || summaryMap['engagement_rate'])?.toString() || null,
+          } as any);
         }
 
         // Sync weekly stats
@@ -240,9 +240,9 @@ export default async function handler(req: any, res: any) {
             comments: toIntValue(item['Comments']),
             saved: toIntValue(item['Saved']),
             follows: toIntValue(item['Follows']),
-            avg_reach_per_post: toNumberValue(item['Avg reach / post']),
-            engagement_rate: toNumberValue(item['Engagement rate']),
-          });
+            avg_reach_per_post: toNumberValue(item['Avg reach / post'])?.toString() || null,
+            engagement_rate: toNumberValue(item['Engagement rate'])?.toString() || null,
+          } as any);
           weeklySynced++;
         }
 

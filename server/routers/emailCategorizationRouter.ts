@@ -62,8 +62,8 @@ export const emailCategorizationRouter = router({
           .update(emails)
           .set({
             category: result.category as any,
-            sentiment: result.sentiment || "neutral",
-            priority: result.priority || "normal",
+            sentiment: "neutral", // Default sentiment
+            priority: "normal", // Default priority
             reasoning: result.reasoning || null,
           })
           .where(eq(emails.id, input.emailId));
@@ -77,8 +77,8 @@ export const emailCategorizationRouter = router({
           emailDate: input.date ? new Date(input.date) : null,
           body: input.body,
           category: result.category as any,
-          sentiment: result.sentiment || "neutral",
-          priority: result.priority || "normal",
+          sentiment: "neutral", // Default sentiment
+          priority: "normal", // Default priority
           reasoning: result.reasoning || null,
         });
       }
@@ -166,8 +166,8 @@ export const emailCategorizationRouter = router({
           emailDate: email.date ? new Date(email.date) : null,
           body: email.body,
           category: result.category as any,
-          sentiment: result.sentiment || "neutral",
-          priority: result.priority || "normal",
+          sentiment: "neutral" as const, // Default sentiment
+          priority: "normal" as const, // Default priority
           reasoning: result.reasoning || null,
         };
 
@@ -212,11 +212,12 @@ export const emailCategorizationRouter = router({
         await db.insert(unsubscribeSuggestions).values(unsubscribeSuggestionsToInsert);
       }
 
+      const totalCategorized = emailsToInsert.length + emailsToUpdate.length;
       return {
         success: true,
-        categorized: categoriesToInsert.length,
+        categorized: totalCategorized,
         skipped: existingIds.size,
-        message: `Categorized ${categoriesToInsert.length} emails, skipped ${existingIds.size} already categorized`
+        message: `Categorized ${totalCategorized} emails, skipped ${existingIds.size} already categorized`
       };
     }),
 
@@ -233,19 +234,18 @@ export const emailCategorizationRouter = router({
       const db = await getDb();
       if (!db) throw new Error("Database not available");
 
-      let query = db
+      const whereConditions = [sql`${emails.category} IS NOT NULL`];
+      if (input.category) {
+        whereConditions.push(eq(emails.category, input.category as any));
+      }
+
+      const results = await db
         .select()
         .from(emails)
-        .where(sql`${emails.category} IS NOT NULL`)
+        .where(and(...whereConditions))
         .orderBy(desc(emails.emailDate))
         .limit(input.limit)
         .offset(input.offset);
-
-      if (input.category) {
-        query = query.where(eq(emails.category, input.category as any));
-      }
-
-      const results = await query;
 
       return {
         emails: results,
@@ -292,17 +292,17 @@ export const emailCategorizationRouter = router({
       const db = await getDb();
       if (!db) throw new Error("Database not available");
 
-      let query = db
-        .select()
-        .from(unsubscribeSuggestions)
-        .orderBy(desc(unsubscribeSuggestions.createdAt))
-        .limit(input.limit);
-
+      const whereConditions: any[] = [];
       if (input.status && (input.status === "pending" || input.status === "approved" || input.status === "rejected")) {
-        query = query.where(eq(unsubscribeSuggestions.status, input.status));
+        whereConditions.push(eq(unsubscribeSuggestions.status, input.status));
       }
 
-      const results = await query;
+      const results = await db
+        .select()
+        .from(unsubscribeSuggestions)
+        .where(whereConditions.length > 0 ? and(...whereConditions) : undefined)
+        .orderBy(desc(unsubscribeSuggestions.createdAt))
+        .limit(input.limit);
 
       return {
         suggestions: results,
@@ -410,7 +410,7 @@ export const emailCategorizationRouter = router({
       // Save to database
       await db.insert(emailSummaries).values({
         emailId: input.emailId,
-        summary: result.summary || result.shortSummary || "",
+        summary: result.shortSummary || "",
         keyPoints: result.keyPoints || [],
         actionItems: result.actionItems || [],
       });
@@ -460,23 +460,23 @@ export const emailCategorizationRouter = router({
       // Parse natural language query
       const parsedQuery = await parseNaturalLanguageQuery(input.query);
 
-      // Build query on emails table
-      let query = db.select().from(emails).where(sql`${emails.category} IS NOT NULL`);
+      // Build query conditions
+      const whereConditions: any[] = [sql`${emails.category} IS NOT NULL`];
 
       // Apply category filter
       if (parsedQuery.filters.category) {
-        query = query.where(eq(emails.category, parsedQuery.filters.category as any));
+        whereConditions.push(eq(emails.category, parsedQuery.filters.category as any));
       }
 
       // Apply sender filter
       if (parsedQuery.filters.sender) {
-        query = query.where(sql`${emails.sender} LIKE ${`%${parsedQuery.filters.sender}%`}`);
+        whereConditions.push(sql`${emails.sender} LIKE ${`%${parsedQuery.filters.sender}%`}`);
       }
 
       // Apply date range filter
       if (parsedQuery.filters.dateRange) {
         const { start, end } = parsedQuery.filters.dateRange;
-        query = query.where(
+        whereConditions.push(
           and(
             sql`${emails.emailDate} >= ${start}`,
             sql`${emails.emailDate} <= ${end}`
@@ -489,13 +489,16 @@ export const emailCategorizationRouter = router({
         const searchConditions = parsedQuery.searchTerms.map(term =>
           sql`(${emails.subject} LIKE ${`%${term}%`} OR ${emails.body} LIKE ${`%${term}%`})`
         );
-        query = query.where(sql`(${sql.join(searchConditions, sql` OR `)})`);
+        whereConditions.push(sql`(${sql.join(searchConditions, sql` OR `)})`);
       }
 
-      // Order by date descending
-      query = query.orderBy(desc(emails.emailDate)).limit(50);
-
-      const results = await query;
+      // Build and execute query
+      const results = await db
+        .select()
+        .from(emails)
+        .where(and(...whereConditions))
+        .orderBy(desc(emails.emailDate))
+        .limit(50);
 
       return {
         results,

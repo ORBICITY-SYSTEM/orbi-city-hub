@@ -42,7 +42,7 @@ function isSecureRequest(req: any): boolean {
 
 export function getSessionCookieOptions(
   req: any
-): Pick<CookieOptions, "domain" | "httpOnly" | "path" | "sameSite" | "secure"> {
+): Partial<CookieOptions> {
   // const hostname = req.hostname;
   // const shouldSetDomain =
   //   hostname &&
@@ -63,6 +63,6 @@ export function getSessionCookieOptions(
     path: "/",
     sameSite: "none",
     secure: isSecureRequest(req),
-    domain: undefined, // Required by TypeScript, but optional in runtime
+    domain: undefined, // Optional in runtime
   };
 }

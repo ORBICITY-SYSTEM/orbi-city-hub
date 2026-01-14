@@ -291,7 +291,9 @@ Analyze this file and provide the distribution plan in JSON format.`;
       throw new Error("No response from AI");
     }
 
-    return JSON.parse(content);
+    // Handle content that might be string or array
+    const contentString = typeof content === 'string' ? content : JSON.stringify(content);
+    return JSON.parse(contentString);
   } catch (error) {
     console.error("Error analyzing file with AI:", error);
     throw new Error("Failed to analyze file");

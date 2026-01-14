@@ -54,7 +54,7 @@ export async function getTableSizes() {
     ORDER BY (data_length + index_length) DESC
   `);
 
-  return result.rows.map((row: any) => ({
+  return ((result as any) as any[]).map((row: any) => ({
     name: row.tableName,
     rows: row.rows || 0,
     dataSize: `${row.dataSizeMB || 0} MB`,
@@ -84,7 +84,7 @@ export async function getIndexes() {
     ORDER BY table_name, index_name
   `);
 
-  return result.rows.map((row: any) => ({
+  return ((result as any) as any[]).map((row: any) => ({
     table: row.tableName,
     index: row.indexName,
     columns: row.columns,
