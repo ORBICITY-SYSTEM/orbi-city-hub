@@ -113,7 +113,7 @@ export function securityHeadersMiddleware() {
         styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
         fontSrc: ["'self'", "https://fonts.gstatic.com"],
         imgSrc: ["'self'", "data:", "https:", "blob:"],
-        connectSrc: ["'self'", "https://api.manus.im", "wss:"],
+        connectSrc: ["'self'", "https://api.manus.im", "https://*.supabase.co", "https://*.supabase.in", "wss:"],
         frameSrc: ["'self'"],
         objectSrc: ["'none'"],
         upgradeInsecureRequests: [],
