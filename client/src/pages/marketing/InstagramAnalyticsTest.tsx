@@ -48,7 +48,7 @@ export default function InstagramAnalyticsTest() {
     
     try {
       const { data, error: invokeError } = await supabase.functions.invoke(
-        'instagram-test-connection'
+        'clever-endpoint'
       );
 
       if (invokeError) {
