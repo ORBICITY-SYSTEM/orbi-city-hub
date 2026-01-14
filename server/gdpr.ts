@@ -29,25 +29,25 @@ export async function exportUserData(userId: number) {
   const userResult = await db.execute(sql`
     SELECT * FROM users WHERE id = ${userId}
   `);
-  userData.profile = userResult.rows[0];
+  userData.profile = ((userResult as any) as any[])[0];
 
   // Files
   const filesResult = await db.execute(sql`
     SELECT * FROM files WHERE userId = ${userId}
   `);
-  userData.files = filesResult.rows;
+  userData.files = (filesResult as any) as any[];
 
   // AI Conversations
   const conversationsResult = await db.execute(sql`
     SELECT * FROM aiConversations WHERE userId = ${userId}
   `);
-  userData.conversations = conversationsResult.rows;
+  userData.conversations = (conversationsResult as any) as any[];
 
   // Feedback
   const feedbackResult = await db.execute(sql`
     SELECT * FROM userFeedback WHERE userId = ${userId}
   `);
-  userData.feedback = feedbackResult.rows;
+  userData.feedback = (feedbackResult as any) as any[];
 
   // Error logs (if any)
   const errorLogsResult = await db.execute(sql`
@@ -77,25 +77,25 @@ export async function deleteUserData(userId: number) {
   const filesResult = await db.execute(sql`
     DELETE FROM files WHERE userId = ${userId}
   `);
-  deletedRecords.files = filesResult.rowsAffected || 0;
+  deletedRecords.files = (filesResult as any).affectedRows || 0;
 
   // Delete AI conversations
   const conversationsResult = await db.execute(sql`
     DELETE FROM aiConversations WHERE userId = ${userId}
   `);
-  deletedRecords.conversations = conversationsResult.rowsAffected || 0;
+  deletedRecords.conversations = (conversationsResult as any).affectedRows || 0;
 
   // Delete feedback
   const feedbackResult = await db.execute(sql`
     DELETE FROM userFeedback WHERE userId = ${userId}
   `);
-  deletedRecords.feedback = feedbackResult.rowsAffected || 0;
+  deletedRecords.feedback = (feedbackResult as any).affectedRows || 0;
 
   // Delete error logs
   const errorLogsResult = await db.execute(sql`
     DELETE FROM errorLogs WHERE userId = ${userId}
   `);
-  deletedRecords.errorLogs = errorLogsResult.rowsAffected || 0;
+  deletedRecords.errorLogs = (errorLogsResult as any).affectedRows || 0;
 
   // Anonymize user profile (keep for referential integrity)
   await db.execute(sql`
@@ -169,7 +169,7 @@ export async function getUserConsents(userId: number) {
     ORDER BY consentDate DESC
   `);
 
-  return result.rows;
+  return (result as any) as any[];
 }
 
 /**

@@ -6,6 +6,7 @@
  */
 
 import { getDb } from "./db";
+import { sql } from "drizzle-orm";
 import { notifyOwner } from "./_core/notification";
 
 export type AlertSeverity = "low" | "medium" | "high" | "critical";
@@ -40,22 +41,13 @@ export async function createAlert(
   }
 
   try {
-    const result = await db.execute({
-      sql: `
-        INSERT INTO alerts 
-        (type, severity, title, message, metadata, status)
-        VALUES (?, ?, ?, ?, ?, 'active')
-      `,
-      args: [
-        alert.type,
-        alert.severity,
-        alert.title,
-        alert.message,
-        alert.metadata ? JSON.stringify(alert.metadata) : null,
-      ],
-    });
+    const result = await db.execute(sql`
+      INSERT INTO alerts 
+      (type, severity, title, message, metadata, status)
+      VALUES (${alert.type}, ${alert.severity}, ${alert.title}, ${alert.message}, ${alert.metadata ? JSON.stringify(alert.metadata) : null}, 'active')
+    `);
 
-    const alertId = Number(result.lastInsertRowid);
+    const alertId = Number((result as any).insertId);
 
     // Send notification for high and critical alerts
     if (alert.severity === "high" || alert.severity === "critical") {
@@ -85,23 +77,20 @@ export async function getActiveAlerts(): Promise<Alert[]> {
   }
 
   try {
-    const result = await db.execute({
-      sql: `
-        SELECT * FROM alerts
-        WHERE status = 'active'
-        ORDER BY 
-          CASE severity
-            WHEN 'critical' THEN 1
-            WHEN 'high' THEN 2
-            WHEN 'medium' THEN 3
-            WHEN 'low' THEN 4
-          END,
-          createdAt DESC
-      `,
-      args: [],
-    });
+    const result = await db.execute(sql`
+      SELECT * FROM alerts
+      WHERE status = 'active'
+      ORDER BY 
+        CASE severity
+          WHEN 'critical' THEN 1
+          WHEN 'high' THEN 2
+          WHEN 'medium' THEN 3
+          WHEN 'low' THEN 4
+        END,
+        createdAt DESC
+    `);
 
-    return result.rows.map((row: any) => ({
+    return ((result as any) as any[]).map((row: any) => ({
       ...row,
       metadata: row.metadata ? JSON.parse(row.metadata) : null,
     }));
@@ -121,17 +110,14 @@ export async function getAlertsByType(type: string): Promise<Alert[]> {
   }
 
   try {
-    const result = await db.execute({
-      sql: `
-        SELECT * FROM alerts
-        WHERE type = ?
-        ORDER BY createdAt DESC
-        LIMIT 100
-      `,
-      args: [type],
-    });
+    const result = await db.execute(sql`
+      SELECT * FROM alerts
+      WHERE type = ${type}
+      ORDER BY createdAt DESC
+      LIMIT 100
+    `);
 
-    return result.rows.map((row: any) => ({
+    return ((result as any) as any[]).map((row: any) => ({
       ...row,
       metadata: row.metadata ? JSON.parse(row.metadata) : null,
     }));
@@ -154,16 +140,13 @@ export async function acknowledgeAlert(
   }
 
   try {
-    await db.execute({
-      sql: `
-        UPDATE alerts
-        SET status = 'acknowledged',
-            acknowledgedBy = ?,
-            acknowledgedAt = NOW()
-        WHERE id = ? AND status = 'active'
-      `,
-      args: [userId, alertId],
-    });
+    await db.execute(sql`
+      UPDATE alerts
+      SET status = 'acknowledged',
+          acknowledgedBy = ${userId},
+          acknowledgedAt = NOW()
+      WHERE id = ${alertId} AND status = 'active'
+    `);
 
     return true;
   } catch (error) {
@@ -185,16 +168,13 @@ export async function resolveAlert(
   }
 
   try {
-    await db.execute({
-      sql: `
-        UPDATE alerts
-        SET status = 'resolved',
-            resolvedBy = ?,
-            resolvedAt = NOW()
-        WHERE id = ? AND status IN ('active', 'acknowledged')
-      `,
-      args: [userId, alertId],
-    });
+    await db.execute(sql`
+      UPDATE alerts
+      SET status = 'resolved',
+          resolvedBy = ${userId},
+          resolvedAt = NOW()
+      WHERE id = ${alertId} AND status IN ('active', 'acknowledged')
+    `);
 
     return true;
   } catch (error) {
@@ -215,18 +195,15 @@ export async function checkErrorRate(threshold: number = 5): Promise<void> {
   if (!db) return;
 
   try {
-    const result = await db.execute({
-      sql: `
-        SELECT 
-          COUNT(*) as totalRequests,
-          SUM(CASE WHEN statusCode >= 500 THEN 1 ELSE 0 END) as errorCount
-        FROM performanceMetrics
-        WHERE timestamp >= DATE_SUB(NOW(), INTERVAL 5 MINUTE)
-      `,
-      args: [],
-    });
+    const result = await db.execute(sql`
+      SELECT 
+        COUNT(*) as totalRequests,
+        SUM(CASE WHEN statusCode >= 500 THEN 1 ELSE 0 END) as errorCount
+      FROM performanceMetrics
+      WHERE timestamp >= DATE_SUB(NOW(), INTERVAL 5 MINUTE)
+    `);
 
-    const row = result.rows[0] as any;
+    const row = ((result as any) as any[])[0] as any;
     const totalRequests = Number(row?.totalRequests || 0);
     const errorCount = Number(row?.errorCount || 0);
 
@@ -263,18 +240,15 @@ export async function checkResponseTime(threshold: number = 1000): Promise<void>
   if (!db) return;
 
   try {
-    const result = await db.execute({
-      sql: `
-        SELECT 
-          AVG(responseTime) as avgResponseTime,
-          MAX(responseTime) as maxResponseTime
-        FROM performanceMetrics
-        WHERE timestamp >= DATE_SUB(NOW(), INTERVAL 5 MINUTE)
-      `,
-      args: [],
-    });
+    const result = await db.execute(sql`
+      SELECT 
+        AVG(responseTime) as avgResponseTime,
+        MAX(responseTime) as maxResponseTime
+      FROM performanceMetrics
+      WHERE timestamp >= DATE_SUB(NOW(), INTERVAL 5 MINUTE)
+    `);
 
-    const row = result.rows[0] as any;
+    const row = ((result as any) as any[])[0] as any;
     const avgResponseTime = Number(row?.avgResponseTime || 0);
     const maxResponseTime = Number(row?.maxResponseTime || 0);
 
@@ -306,17 +280,14 @@ export async function checkBackupStatus(): Promise<void> {
   if (!db) return;
 
   try {
-    const result = await db.execute({
-      sql: `
-        SELECT status, createdAt
-        FROM backups
-        ORDER BY createdAt DESC
-        LIMIT 1
-      `,
-      args: [],
-    });
+    const result = await db.execute(sql`
+      SELECT status, createdAt
+      FROM backups
+      ORDER BY createdAt DESC
+      LIMIT 1
+    `);
 
-    const lastBackup = result.rows[0] as any;
+    const lastBackup = ((result as any) as any[])[0] as any;
 
     if (!lastBackup) {
       // No backups found

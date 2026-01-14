@@ -6,6 +6,7 @@
  */
 
 import { getDb } from "./db";
+import { sql } from "drizzle-orm";
 
 export interface PerformanceMetric {
   id?: number;
@@ -30,22 +31,11 @@ export async function logPerformanceMetric(metric: Omit<PerformanceMetric, 'id' 
   }
 
   try {
-    await db.execute({
-      sql: `
-        INSERT INTO performanceMetrics 
-        (endpoint, method, responseTime, statusCode, userId, userAgent, ipAddress, timestamp)
-        VALUES (?, ?, ?, ?, ?, ?, ?, NOW())
-      `,
-      args: [
-        metric.endpoint,
-        metric.method,
-        metric.responseTime,
-        metric.statusCode,
-        metric.userId || null,
-        metric.userAgent || null,
-        metric.ipAddress || null,
-      ],
-    });
+    await db.execute(sql`
+      INSERT INTO performanceMetrics 
+      (endpoint, method, responseTime, statusCode, userId, userAgent, ipAddress, timestamp)
+      VALUES (${metric.endpoint}, ${metric.method}, ${metric.responseTime}, ${metric.statusCode}, ${metric.userId || null}, ${metric.userAgent || null}, ${metric.ipAddress || null}, NOW())
+    `);
   } catch (error) {
     // Don't throw - performance logging should never break the app
     console.error("[Performance] Failed to log metric:", error);
@@ -62,23 +52,20 @@ export async function getEndpointStats(endpoint: string, hours: number = 24) {
   }
 
   try {
-    const result = await db.execute({
-      sql: `
-        SELECT 
-          COUNT(*) as requestCount,
-          AVG(responseTime) as avgResponseTime,
-          MIN(responseTime) as minResponseTime,
-          MAX(responseTime) as maxResponseTime,
-          PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY responseTime) as p95ResponseTime,
-          PERCENTILE_CONT(0.99) WITHIN GROUP (ORDER BY responseTime) as p99ResponseTime
-        FROM performanceMetrics
-        WHERE endpoint = ?
-          AND timestamp >= DATE_SUB(NOW(), INTERVAL ? HOUR)
-      `,
-      args: [endpoint, hours],
-    });
+    const result = await db.execute(sql`
+      SELECT 
+        COUNT(*) as requestCount,
+        AVG(responseTime) as avgResponseTime,
+        MIN(responseTime) as minResponseTime,
+        MAX(responseTime) as maxResponseTime,
+        PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY responseTime) as p95ResponseTime,
+        PERCENTILE_CONT(0.99) WITHIN GROUP (ORDER BY responseTime) as p99ResponseTime
+      FROM performanceMetrics
+      WHERE endpoint = ${endpoint}
+        AND timestamp >= DATE_SUB(NOW(), INTERVAL ${hours} HOUR)
+    `);
 
-    return result.rows[0] || null;
+    return ((result as any) as any[])[0] || null;
   } catch (error) {
     console.error("[Performance] Failed to get endpoint stats:", error);
     return null;
@@ -102,41 +89,36 @@ export async function getSystemStats(hours: number = 24) {
 
   try {
     // Overall stats
-    const overallResult = await db.execute({
-      sql: `
-        SELECT 
-          COUNT(*) as totalRequests,
-          AVG(responseTime) as avgResponseTime,
-          PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY responseTime) as p95ResponseTime,
-          SUM(CASE WHEN statusCode >= 500 THEN 1 ELSE 0 END) * 100.0 / COUNT(*) as errorRate
-        FROM performanceMetrics
-        WHERE timestamp >= DATE_SUB(NOW(), INTERVAL ? HOUR)
-      `,
-      args: [hours],
-    });
+    const overallResult = await db.execute(sql`
+      SELECT 
+        COUNT(*) as totalRequests,
+        AVG(responseTime) as avgResponseTime,
+        PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY responseTime) as p95ResponseTime,
+        SUM(CASE WHEN statusCode >= 500 THEN 1 ELSE 0 END) * 100.0 / COUNT(*) as errorRate
+      FROM performanceMetrics
+      WHERE timestamp >= DATE_SUB(NOW(), INTERVAL ${hours} HOUR)
+    `);
 
     // Slowest endpoints
-    const slowestResult = await db.execute({
-      sql: `
-        SELECT 
-          endpoint,
-          COUNT(*) as requestCount,
-          AVG(responseTime) as avgResponseTime
-        FROM performanceMetrics
-        WHERE timestamp >= DATE_SUB(NOW(), INTERVAL ? HOUR)
-        GROUP BY endpoint
-        ORDER BY avgResponseTime DESC
-        LIMIT 10
-      `,
-      args: [hours],
-    });
+    const slowestResult = await db.execute(sql`
+      SELECT 
+        endpoint,
+        COUNT(*) as requestCount,
+        AVG(responseTime) as avgResponseTime
+      FROM performanceMetrics
+      WHERE timestamp >= DATE_SUB(NOW(), INTERVAL ${hours} HOUR)
+      GROUP BY endpoint
+      ORDER BY avgResponseTime DESC
+      LIMIT 10
+    `);
 
+    const overallData = ((overallResult as any) as any[])[0];
     return {
-      totalRequests: Number(overallResult.rows[0]?.totalRequests || 0),
-      avgResponseTime: Number(overallResult.rows[0]?.avgResponseTime || 0),
-      p95ResponseTime: Number(overallResult.rows[0]?.p95ResponseTime || 0),
-      errorRate: Number(overallResult.rows[0]?.errorRate || 0),
-      slowestEndpoints: slowestResult.rows,
+      totalRequests: Number(overallData?.totalRequests || 0),
+      avgResponseTime: Number(overallData?.avgResponseTime || 0),
+      p95ResponseTime: Number(overallData?.p95ResponseTime || 0),
+      errorRate: Number(overallData?.errorRate || 0),
+      slowestEndpoints: (slowestResult as any) as any[],
     };
   } catch (error) {
     console.error("[Performance] Failed to get system stats:", error);
@@ -160,22 +142,19 @@ export async function getMetricsTimeSeries(hours: number = 24, intervalMinutes: 
   }
 
   try {
-    const result = await db.execute({
-      sql: `
-        SELECT 
-          DATE_FORMAT(timestamp, '%Y-%m-%d %H:00:00') as timeSlot,
-          COUNT(*) as requestCount,
-          AVG(responseTime) as avgResponseTime,
-          SUM(CASE WHEN statusCode >= 500 THEN 1 ELSE 0 END) as errorCount
-        FROM performanceMetrics
-        WHERE timestamp >= DATE_SUB(NOW(), INTERVAL ? HOUR)
-        GROUP BY timeSlot
-        ORDER BY timeSlot ASC
-      `,
-      args: [hours],
-    });
+    const result = await db.execute(sql`
+      SELECT 
+        DATE_FORMAT(timestamp, '%Y-%m-%d %H:00:00') as timeSlot,
+        COUNT(*) as requestCount,
+        AVG(responseTime) as avgResponseTime,
+        SUM(CASE WHEN statusCode >= 500 THEN 1 ELSE 0 END) as errorCount
+      FROM performanceMetrics
+      WHERE timestamp >= DATE_SUB(NOW(), INTERVAL ${hours} HOUR)
+      GROUP BY timeSlot
+      ORDER BY timeSlot ASC
+    `);
 
-    return result.rows;
+    return (result as any) as any[];
   } catch (error) {
     console.error("[Performance] Failed to get time series:", error);
     return [];
@@ -193,15 +172,12 @@ export async function cleanupOldMetrics(daysToKeep: number = 30) {
   }
 
   try {
-    const result = await db.execute({
-      sql: `
-        DELETE FROM performanceMetrics
-        WHERE timestamp < DATE_SUB(NOW(), INTERVAL ? DAY)
-      `,
-      args: [daysToKeep],
-    });
+    const result = await db.execute(sql`
+      DELETE FROM performanceMetrics
+      WHERE timestamp < DATE_SUB(NOW(), INTERVAL ${daysToKeep} DAY)
+    `);
 
-    const deletedCount = result.rowsAffected || 0;
+    const deletedCount = (result as any).affectedRows || 0;
     console.log(`[Performance] Cleaned up ${deletedCount} old metrics`);
     return deletedCount;
   } catch (error) {
