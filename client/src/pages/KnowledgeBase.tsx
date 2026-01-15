@@ -103,23 +103,23 @@ export default function KnowledgeBase() {
   const selectedArticle = articles.find(a => a.id === selectedId) || filtered[0] || articles[0] || null;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 max-w-screen-2xl mx-auto px-4 pb-12">
       {/* Header */}
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between rounded-3xl bg-gradient-to-r from-slate-900 via-slate-900/80 to-slate-800 border border-white/5 px-5 py-4 shadow-xl">
         <div className="flex items-center gap-4">
-          <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-primary via-info to-accent flex items-center justify-center shadow-lg">
+          <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-primary via-info to-accent flex items-center justify-center shadow-lg ring-4 ring-primary/10">
             <BookOpen className="h-8 w-8 text-white" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold flex items-center gap-2">
-              Knowledge Base
-              <Badge variant="outline" className="ml-2 bg-primary/10 text-primary border-primary/20">
+            <div className="flex items-center gap-2">
+              <h1 className="text-2xl font-bold tracking-tight">Knowledge Base</h1>
+              <Badge variant="outline" className="ml-1 bg-primary/10 text-primary border-primary/30">
                 <Sparkles className="h-3 w-3 mr-1" />
                 Live Docs
               </Badge>
-            </h1>
-            <p className="text-muted-foreground mt-1">
-              ყველა მასალა ერთ სივრცეში — თანამშრომლებისთვის და AI აგენტებისთვის, დემო მონაცემების გარეშე.
+            </div>
+            <p className="text-muted-foreground mt-1 text-sm leading-relaxed">
+              ყველა საჭირო ცოდნა ერთ ეკრანზე — თანამშრომლებისთვის და AI აგენტებისთვის. გრაფიკები/ციფრები არა, მხოლოდ სუფთა ტექსტი.
             </p>
           </div>
         </div>
@@ -133,17 +133,18 @@ export default function KnowledgeBase() {
             placeholder="ძიება სათაურში, ტეგებში ან ტექსტში…"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
+            className="pl-10 h-12 text-base rounded-xl bg-slate-900/70 border-white/10"
           />
         </div>
         <div className="flex flex-wrap gap-2 items-center">
-          <Badge variant="secondary" className="flex items-center gap-1">
+          <Badge variant="secondary" className="flex items-center gap-1 bg-white/5 border-white/10 text-white/80">
             <Filter className="h-3 w-3" />
             ტეგები
           </Badge>
           <Button
             size="sm"
             variant={activeTag ? "ghost" : "default"}
+            className="rounded-full"
             onClick={() => setActiveTag(null)}
           >
             All
@@ -153,6 +154,7 @@ export default function KnowledgeBase() {
               key={tag}
               size="sm"
               variant={activeTag?.toLowerCase() === tag.toLowerCase() ? "default" : "outline"}
+              className="rounded-full"
               onClick={() => setActiveTag(tag)}
             >
               {tag}
@@ -163,7 +165,7 @@ export default function KnowledgeBase() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Sidebar list */}
-        <Card className="lg:col-span-1">
+        <Card className="lg:col-span-1 rounded-3xl border-white/10 bg-slate-900/70 backdrop-blur">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
               <FileText className="h-5 w-5" />
@@ -213,7 +215,7 @@ export default function KnowledgeBase() {
         </Card>
 
         {/* Content */}
-        <Card className="lg:col-span-2">
+        <Card className="lg:col-span-2 rounded-3xl border-white/10 bg-slate-900/70 backdrop-blur">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <BookOpen className="h-5 w-5" />
@@ -231,7 +233,7 @@ export default function KnowledgeBase() {
           </CardHeader>
           <CardContent>
             {selectedArticle ? (
-              <div className="prose prose-sm dark:prose-invert max-w-none">
+              <div className="prose prose-base md:prose-lg dark:prose-invert max-w-none leading-7">
                 <ReactMarkdown>{selectedArticle.content}</ReactMarkdown>
               </div>
             ) : (
@@ -242,7 +244,9 @@ export default function KnowledgeBase() {
       </div>
 
       {/* RAG panel for agents and staff */}
-      <KbRagPanel />
+      <div className="rounded-3xl border border-white/5 bg-slate-900/60 backdrop-blur shadow-2xl">
+        <KbRagPanel />
+      </div>
     </div>
   );
 }
