@@ -130,6 +130,11 @@ const mainModules: NavItem[] = [
 // System modules (bottom)
 const systemModules: NavItem[] = [
   {
+    nameKey: "nav.knowledgeBase",
+    path: "/knowledge-base",
+    icon: BookOpen,
+  },
+  {
     nameKey: "nav.integrations",
     path: "/integrations",
     icon: Plug,

@@ -1,110 +1,105 @@
-/**
- * Knowledge Base Page
- * Displays Obsidian knowledge base content
- */
-
-import { useState, useEffect } from "react";
+import { useMemo, useState } from "react";
+import ReactMarkdown from "react-markdown";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { BookOpen, Search, ExternalLink, FileText, Folder, AlertCircle, RefreshCw } from "lucide-react";
-import { toast } from "sonner";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
+import { BookOpen, Search, FileText, Sparkles, Filter } from "lucide-react";
+import { kbArticles } from "@/utils/kbArticles";
 
-interface KnowledgeItem {
-  title: string;
-  path: string;
-  type: "file" | "folder";
-  content?: string;
-  lastModified?: string;
+type CategorizedArticle = (typeof kbArticles)[number] & { category: string };
+
+const CATEGORY_ORDER = [
+  "overview",
+  "check-in",
+  "faq",
+  "rooms",
+  "services",
+  "payments",
+  "transfers",
+  "location",
+  "contacts",
+  "policies",
+  "general",
+];
+
+const CATEGORY_LABELS: Record<string, string> = {
+  overview: "Overview & Concept",
+  "check-in": "Check-in Playbook",
+  faq: "FAQ",
+  rooms: "Rooms & Blocks",
+  services: "Services & Housekeeping",
+  payments: "Payments & Finance",
+  transfers: "Transfers",
+  location: "Location & Nearby",
+  contacts: "Contacts & Channels",
+  policies: "Policies & Offers",
+  general: "General",
+};
+
+function deriveCategory(tags: string[]): string {
+  const tagSet = new Set(tags.map(t => t.toLowerCase()));
+  if (tagSet.has("check-in") || tagSet.has("reception")) return "check-in";
+  if (tagSet.has("faq")) return "faq";
+  if (tagSet.has("rooms") || tagSet.has("hospitality") || tagSet.has("overview")) return "overview";
+  if (tagSet.has("services") || tagSet.has("operations")) return "services";
+  if (tagSet.has("payments") || tagSet.has("finance") || tagSet.has("policies")) return "payments";
+  if (tagSet.has("transfers")) return "transfers";
+  if (tagSet.has("location")) return "location";
+  if (tagSet.has("contacts") || tagSet.has("support")) return "contacts";
+  return "general";
 }
 
 export default function KnowledgeBase() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [items, setItems] = useState<KnowledgeItem[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [selectedItem, setSelectedItem] = useState<KnowledgeItem | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [activeTag, setActiveTag] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(kbArticles[0]?.id ?? null);
 
-  const knowledgeBaseUrl = import.meta.env.VITE_KNOWLEDGE_BASE_URL;
-
-  useEffect(() => {
-    if (!knowledgeBaseUrl) {
-      setError("Knowledge Base URL is not configured. Please set VITE_KNOWLEDGE_BASE_URL in environment variables.");
-      setIsLoading(false);
-      return;
-    }
-
-    // Load knowledge base content
-    // For now, we'll show a placeholder structure
-    // In production, this would fetch from Obsidian Publish or Supabase Storage
-    loadKnowledgeBase();
-  }, [knowledgeBaseUrl]);
-
-  const loadKnowledgeBase = async () => {
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      // TODO: Fetch actual content from Obsidian Publish API or Supabase Storage
-      // For now, use mock data
-      const mockItems: KnowledgeItem[] = [
-        {
-          title: "Housekeeping Procedures",
-          path: "operations/housekeeping",
-          type: "file",
-          content: "# Housekeeping Procedures\n\nThis is a placeholder. In production, this will load from Obsidian.",
-          lastModified: new Date().toISOString(),
-        },
-        {
-          title: "Guest Check-in Process",
-          path: "operations/check-in",
-          type: "file",
-          content: "# Guest Check-in Process\n\nThis is a placeholder. In production, this will load from Obsidian.",
-          lastModified: new Date().toISOString(),
-        },
-        {
-          title: "Maintenance Guidelines",
-          path: "operations/maintenance",
-          type: "file",
-          content: "# Maintenance Guidelines\n\nThis is a placeholder. In production, this will load from Obsidian.",
-          lastModified: new Date().toISOString(),
-        },
-        {
-          title: "Marketing Guidelines",
-          path: "marketing/guidelines",
-          type: "file",
-          content: "# Marketing Guidelines\n\nThis is a placeholder. In production, this will load from Obsidian.",
-          lastModified: new Date().toISOString(),
-        },
-      ];
-
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 500));
-
-      setItems(mockItems);
-    } catch (error) {
-      setError(`Failed to load knowledge base: ${error instanceof Error ? error.message : "Unknown error"}`);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const filteredItems = items.filter(item =>
-    item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    item.path.toLowerCase().includes(searchQuery.toLowerCase())
+  const articles: CategorizedArticle[] = useMemo(
+    () =>
+      kbArticles.map(article => ({
+        ...article,
+        category: deriveCategory(article.tags),
+      })),
+    []
   );
 
-  const groupedItems = filteredItems.reduce((acc, item) => {
-    const category = item.path.split("/")[0] || "general";
-    if (!acc[category]) {
-      acc[category] = [];
-    }
-    acc[category].push(item);
-    return acc;
-  }, {} as Record<string, KnowledgeItem[]>);
+  const allTags = useMemo(() => {
+    const tagSet = new Set<string>();
+    kbArticles.forEach(a => a.tags.forEach(tag => tagSet.add(tag)));
+    return Array.from(tagSet).sort((a, b) => a.localeCompare(b));
+  }, []);
+
+  const filtered = useMemo(() => {
+    const query = searchQuery.toLowerCase().trim();
+    return articles.filter(article => {
+      const matchesQuery =
+        !query ||
+        article.title.toLowerCase().includes(query) ||
+        article.tags.some(tag => tag.toLowerCase().includes(query)) ||
+        article.content.toLowerCase().includes(query);
+      const matchesTag = !activeTag || article.tags.map(t => t.toLowerCase()).includes(activeTag.toLowerCase());
+      return matchesQuery && matchesTag;
+    });
+  }, [articles, searchQuery, activeTag]);
+
+  const grouped = useMemo(() => {
+    const buckets: Record<string, CategorizedArticle[]> = {};
+    filtered.forEach(article => {
+      const category = article.category || "general";
+      if (!buckets[category]) buckets[category] = [];
+      buckets[category].push(article);
+    });
+    return buckets;
+  }, [filtered]);
+
+  const orderedCategories = CATEGORY_ORDER.filter(cat => grouped[cat]?.length).concat(
+    Object.keys(grouped).filter(cat => !CATEGORY_ORDER.includes(cat))
+  );
+
+  const selectedArticle = articles.find(a => a.id === selectedId) || filtered[0] || articles[0] || null;
 
   return (
     <div className="space-y-6">
@@ -118,185 +113,132 @@ export default function KnowledgeBase() {
             <h1 className="text-2xl font-bold flex items-center gap-2">
               Knowledge Base
               <Badge variant="outline" className="ml-2 bg-primary/10 text-primary border-primary/20">
-                <FileText className="h-3 w-3 mr-1" />
-                Obsidian
+                <Sparkles className="h-3 w-3 mr-1" />
+                Live Docs
               </Badge>
             </h1>
             <p className="text-muted-foreground mt-1">
-              Staff documentation and operational procedures
+              ყველა მასალა ერთ სივრცეში — თანამშრომლებისთვის და AI აგენტებისთვის, დემო მონაცემების გარეშე.
             </p>
           </div>
         </div>
-        <div className="flex gap-2">
-          {knowledgeBaseUrl && (
-            <Button
-              variant="outline"
-              onClick={() => window.open(knowledgeBaseUrl, "_blank")}
-            >
-              <ExternalLink className="h-4 w-4 mr-2" />
-              Open in Obsidian
-            </Button>
-          )}
-          <Button
-            variant="outline"
-            onClick={loadKnowledgeBase}
-            disabled={isLoading}
-          >
-            <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? "animate-spin" : ""}`} />
-            Refresh
-          </Button>
+      </div>
+
+      {/* Search + Tag filter */}
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:gap-4">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="ძიება სათაურში, ტეგებში ან ტექსტში…"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10"
+          />
         </div>
-      </div>
-
-      {/* Error Alert */}
-      {error && (
-        <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
-
-      {/* Info Card */}
-      {knowledgeBaseUrl && (
-        <Card className="border-primary/30 bg-primary/5">
-          <CardHeader>
-            <CardTitle className="text-sm">Obsidian Integration</CardTitle>
-          </CardHeader>
-          <CardContent className="text-sm text-muted-foreground">
-            <p>
-              This knowledge base is powered by Obsidian. Content is synchronized from your Obsidian vault.
-            </p>
-            <p className="mt-2">
-              <strong>URL:</strong> <a href={knowledgeBaseUrl} target="_blank" rel="noopener noreferrer" className="text-primary underline">{knowledgeBaseUrl}</a>
-            </p>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Search */}
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input
-          placeholder="Search knowledge base..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-10"
-        />
-      </div>
-
-      {/* Content */}
-      {isLoading ? (
-        <div className="space-y-4">
-          {[1, 2, 3].map(i => (
-            <Skeleton key={i} className="h-32 w-full" />
+        <div className="flex flex-wrap gap-2 items-center">
+          <Badge variant="secondary" className="flex items-center gap-1">
+            <Filter className="h-3 w-3" />
+            ტეგები
+          </Badge>
+          <Button
+            size="sm"
+            variant={activeTag ? "ghost" : "default"}
+            onClick={() => setActiveTag(null)}
+          >
+            All
+          </Button>
+          {allTags.map(tag => (
+            <Button
+              key={tag}
+              size="sm"
+              variant={activeTag?.toLowerCase() === tag.toLowerCase() ? "default" : "outline"}
+              onClick={() => setActiveTag(tag)}
+            >
+              {tag}
+            </Button>
           ))}
         </div>
-      ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Sidebar - Categories */}
-          <div className="lg:col-span-1 space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Categories</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  {Object.keys(groupedItems).map(category => (
-                    <Button
-                      key={category}
-                      variant="ghost"
-                      className="w-full justify-start"
-                      onClick={() => {
-                        // Scroll to category
-                        document.getElementById(`category-${category}`)?.scrollIntoView({ behavior: "smooth" });
-                      }}
-                    >
-                      <Folder className="h-4 w-4 mr-2" />
-                      {category.charAt(0).toUpperCase() + category.slice(1)}
-                      <Badge variant="secondary" className="ml-auto">
-                        {groupedItems[category].length}
-                      </Badge>
-                    </Button>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+      </div>
 
-          {/* Main Content - Items */}
-          <div className="lg:col-span-2 space-y-6">
-            {Object.entries(groupedItems).map(([category, categoryItems]) => (
-              <div key={category} id={`category-${category}`}>
-                <h2 className="text-xl font-semibold mb-4 capitalize">{category}</h2>
-                <div className="space-y-3">
-                  {categoryItems.map(item => (
-                    <Card
-                      key={item.path}
-                      className="cursor-pointer hover:shadow-lg transition-shadow"
-                      onClick={() => setSelectedItem(item)}
-                    >
-                      <CardHeader>
-                        <CardTitle className="text-lg flex items-center gap-2">
-                          <FileText className="h-5 w-5" />
-                          {item.title}
-                        </CardTitle>
-                        <CardDescription>{item.path}</CardDescription>
-                      </CardHeader>
-                      {item.content && (
-                        <CardContent>
-                          <p className="text-sm text-muted-foreground line-clamp-3">
-                            {item.content.split("\n")[1] || item.content.slice(0, 150)}...
-                          </p>
-                        </CardContent>
-                      )}
-                    </Card>
-                  ))}
-                </div>
-              </div>
-            ))}
-
-            {filteredItems.length === 0 && (
-              <Card>
-                <CardContent className="py-12 text-center">
-                  <FileText className="h-12 w-12 mx-auto mb-4 opacity-30" />
-                  <p className="text-muted-foreground">
-                    {searchQuery ? "No results found" : "No items available"}
-                  </p>
-                </CardContent>
-              </Card>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Selected Item Modal/Detail */}
-      {selectedItem && (
-        <Card className="mt-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Sidebar list */}
+        <Card className="lg:col-span-1">
           <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle>{selectedItem.title}</CardTitle>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setSelectedItem(null)}
-              >
-                Close
-              </Button>
-            </div>
-            <CardDescription>{selectedItem.path}</CardDescription>
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <FileText className="h-5 w-5" />
+              ყველა სტატია ({filtered.length || articles.length})
+            </CardTitle>
+            <CardDescription>გაფილტრე კატეგორიით ან ტეგით</CardDescription>
+          </CardHeader>
+          <CardContent className="p-0">
+            <ScrollArea className="h-[70vh]">
+              <div className="divide-y divide-border/50">
+                {orderedCategories.map(category => (
+                  <div key={category}>
+                    <div className="px-4 py-3 text-xs uppercase tracking-wide text-muted-foreground flex items-center gap-2">
+                      <span className="h-1.5 w-1.5 rounded-full bg-primary/70" />
+                      {CATEGORY_LABELS[category] ?? category}
+                      <Badge variant="secondary" className="ml-auto">
+                        {grouped[category]?.length ?? 0}
+                      </Badge>
+                    </div>
+                    <div className="space-y-1 pb-2">
+                      {grouped[category]?.map(article => (
+                        <button
+                          key={article.id}
+                          onClick={() => setSelectedId(article.id)}
+                          className={`w-full text-left px-4 py-3 hover:bg-secondary/60 transition ${
+                            selectedId === article.id ? "bg-secondary/80 border-l-2 border-primary" : ""
+                          }`}
+                        >
+                          <div className="font-medium text-sm">{article.title}</div>
+                          <div className="text-xs text-muted-foreground line-clamp-2">
+                            {article.tags.join(", ")}
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                    <Separator />
+                  </div>
+                ))}
+                {orderedCategories.length === 0 && (
+                  <div className="px-4 py-6 text-center text-muted-foreground">
+                    ვერ მოიძებნა შედეგები
+                  </div>
+                )}
+              </div>
+            </ScrollArea>
+          </CardContent>
+        </Card>
+
+        {/* Content */}
+        <Card className="lg:col-span-2">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <BookOpen className="h-5 w-5" />
+              {selectedArticle?.title ?? "აირჩიე სტატია"}
+            </CardTitle>
+            {selectedArticle && (
+              <CardDescription className="flex flex-wrap gap-2">
+                {selectedArticle.tags.map(tag => (
+                  <Badge key={tag} variant="secondary">
+                    {tag}
+                  </Badge>
+                ))}
+              </CardDescription>
+            )}
           </CardHeader>
           <CardContent>
-            <div className="prose prose-sm dark:prose-invert max-w-none">
-              <pre className="whitespace-pre-wrap font-sans">{selectedItem.content || "No content available"}</pre>
-            </div>
-            {selectedItem.lastModified && (
-              <p className="text-xs text-muted-foreground mt-4">
-                Last modified: {new Date(selectedItem.lastModified).toLocaleString()}
-              </p>
+            {selectedArticle ? (
+              <div className="prose prose-sm dark:prose-invert max-w-none">
+                <ReactMarkdown>{selectedArticle.content}</ReactMarkdown>
+              </div>
+            ) : (
+              <div className="text-muted-foreground text-sm">აირჩიე სტატია სიისგან.</div>
             )}
           </CardContent>
         </Card>
-      )}
+      </div>
     </div>
   );
 }
