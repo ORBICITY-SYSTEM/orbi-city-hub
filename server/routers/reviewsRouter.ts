@@ -5,6 +5,9 @@ import { guestReviews, notifications } from "../../drizzle/schema";
 import { eq, desc, sql, and, gte, lte } from "drizzle-orm";
 import { format } from "date-fns";
 
+const buildWhereClause = (conditions: any[]) =>
+  conditions.length > 0 ? and(conditions[0], ...conditions.slice(1)) : undefined;
+
 /**
  * Helper functions for review processing
  */
@@ -236,8 +239,7 @@ export const reviewsRouter = router({
         );
       }
 
-      const whereClause =
-        conditions.length > 0 ? and(...(conditions as [any, ...any[]])) : undefined;
+      const whereClause = buildWhereClause(conditions);
 
       const reviews = await db
         .select()
@@ -285,8 +287,7 @@ export const reviewsRouter = router({
         conditions.push(lte(guestReviews.reviewDate, new Date(filters.dateTo)));
       }
 
-      const whereClause =
-        conditions.length > 0 ? and(...(conditions as [any, ...any[]])) : undefined;
+      const whereClause = buildWhereClause(conditions);
 
       // Get total count and average rating
       const statsResult = await db
@@ -322,12 +323,12 @@ export const reviewsRouter = router({
       const [recentResult] = await db
         .select({ count: sql<number>`COUNT(*)` })
         .from(guestReviews)
-        .where(recentConditions.length > 0 ? and(...recentConditions) : undefined);
+        .where(buildWhereClause(recentConditions));
 
       const [previousResult] = await db
         .select({ count: sql<number>`COUNT(*)` })
         .from(guestReviews)
-        .where(previousConditions.length > 0 ? and(...previousConditions) : undefined);
+        .where(buildWhereClause(previousConditions));
 
       const recentCount = recentResult?.count || 0;
       const previousCount = previousResult?.count || 0;
@@ -465,8 +466,7 @@ export const reviewsRouter = router({
         conditions.push(eq(guestReviews.source, filters.source as any));
       }
 
-      const whereClause =
-        conditions.length > 0 ? and(...(conditions as [any, ...any[]])) : undefined;
+      const whereClause = buildWhereClause(conditions);
 
       const reviews = await db
         .select({ topics: guestReviews.topics, sentiment: guestReviews.sentiment })
