@@ -4,7 +4,8 @@ import mysql from "mysql2/promise";
 import { InsertUser, users } from "../drizzle/schema";
 import { ENV } from "./_core/env";
 
-let _db: ReturnType<typeof drizzle> | null = null;
+type DBInstance = ReturnType<typeof drizzle>;
+let _db: DBInstance | null = null;
 
 // Lazily create the drizzle instance so local tooling can run without a DB.
 export async function getDb() {
@@ -18,7 +19,8 @@ export async function getDb() {
 
   try {
     const pool = mysql.createPool(url);
-    _db = drizzle(pool);
+    // Cast to DBInstance to avoid type mismatch on Pool wrapper
+    _db = drizzle(pool) as DBInstance;
     return _db;
   } catch (error) {
     console.warn("[Database] Failed to connect:", error);
