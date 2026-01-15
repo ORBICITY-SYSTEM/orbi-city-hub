@@ -9,6 +9,7 @@ import { protectedProcedure, router } from "./_core/trpc";
 import { invokeLLM } from "./_core/llm";
 import * as butlerDb from "./butlerDb";
 import { BUTLER_KNOWLEDGE, AI_PROMPTS } from "./butler-knowledge";
+import { sql } from "drizzle-orm";
 
 // AI Response Generation for Regenerate feature
 async function generateNewAIResponse(params: {
@@ -62,7 +63,15 @@ Generate the response:`;
       ]
     });
     
-    return response.choices[0]?.message?.content || getDefaultResponse(reviewerName, rating, language);
+    const content = response.choices[0]?.message?.content;
+    if (typeof content === 'string') {
+      return content;
+    } else if (Array.isArray(content)) {
+      // Handle array of content parts - extract text
+      const textPart = content.find(part => part.type === 'text');
+      return textPart ? (textPart as any).text : getDefaultResponse(reviewerName, rating, language);
+    }
+    return getDefaultResponse(reviewerName, rating, language);
   } catch (error) {
     console.error('[Butler] AI regeneration error:', error);
     return getDefaultResponse(reviewerName, rating, language);
@@ -288,8 +297,7 @@ Customize this template to specifically address the guest's concerns while maint
       const db = await butlerDb.getDb();
       if (db) {
         await db.execute(
-          `UPDATE butler_tasks SET ai_suggestion = ? WHERE id = ?`,
-          [JSON.stringify({ ...task.ai_suggestion, responseText: newResponse }), input.taskId]
+          sql`UPDATE butler_tasks SET ai_suggestion = ${JSON.stringify({ ...task.ai_suggestion, responseText: newResponse })} WHERE id = ${input.taskId}`
         );
       }
 
@@ -515,24 +523,18 @@ Answer questions about any aspect of the business. Be specific, data-driven, and
 
       // 2. Mark task as completed with published status
       await db.execute(
-        `UPDATE butler_tasks 
+        sql`UPDATE butler_tasks 
          SET status = 'completed', 
              updated_at = NOW(),
-             ai_suggestion = JSON_SET(ai_suggestion, '$.publishedAt', ?, '$.publishedBy', ?, '$.finalResponse', ?)
-         WHERE id = ?`,
-        [new Date().toISOString(), ctx.user.name || ctx.user.email, input.responseText, input.taskId]
+             ai_suggestion = JSON_SET(ai_suggestion, '$.publishedAt', ${new Date().toISOString()}, '$.publishedBy', ${ctx.user.name || ctx.user.email}, '$.finalResponse', ${input.responseText})
+         WHERE id = ${input.taskId}`
       );
 
       // 3. Create activity log entry
       try {
         await db.execute(
-          `INSERT INTO activity_logs (user_id, action_type, target_entity, target_id, description, created_at)
-           VALUES (?, 'review_response_published', 'review', ?, ?, NOW())`,
-          [
-            ctx.user.id,
-            String(reviewId),
-            `Published response to ${reviewerName}'s ${rating}★ ${source} review`
-          ]
+          sql`INSERT INTO activity_logs (user_id, action_type, target_entity, target_id, description, created_at)
+           VALUES (${ctx.user.id}, 'review_response_published', 'review', ${String(reviewId)}, ${`Published response to ${reviewerName}'s ${rating}★ ${source} review`}, NOW())`
         );
       } catch (logError) {
         console.log('[Butler] Activity log error (non-critical):', logError);
@@ -590,16 +592,16 @@ Answer questions about any aspect of the business. Be specific, data-driven, and
       daysAgo.setDate(daysAgo.getDate() - input.days);
 
       // Get all review response tasks
-      const [tasks] = await db.execute(
-        `SELECT 
+      const tasksResult = await db.execute(
+        sql`SELECT 
           id, status, created_at, updated_at,
           TIMESTAMPDIFF(SECOND, created_at, updated_at) as processing_time
         FROM butler_tasks 
         WHERE task_type = 'review_response' 
-          AND created_at >= ?
-        ORDER BY created_at DESC`,
-        [daysAgo.toISOString()]
+          AND created_at >= ${daysAgo.toISOString()}
+        ORDER BY created_at DESC`
       ) as any;
+      const tasks = (tasksResult as any) as any[];
 
       const taskList = tasks as any[];
       const totalResponses = taskList.length;
@@ -622,8 +624,8 @@ Answer questions about any aspect of the business. Be specific, data-driven, and
       const avgApprovalTime = Math.max(0, avgProcessingTime - avgGenerationTime);
 
       // Get daily stats for chart
-      const [dailyData] = await db.execute(
-        `SELECT 
+      const dailyDataResult = await db.execute(
+        sql`SELECT 
           DATE(created_at) as date,
           COUNT(*) as total,
           SUM(CASE WHEN status IN ('approved', 'completed') THEN 1 ELSE 0 END) as approved,
@@ -631,12 +633,12 @@ Answer questions about any aspect of the business. Be specific, data-driven, and
           AVG(TIMESTAMPDIFF(SECOND, created_at, updated_at)) as avg_time
         FROM butler_tasks 
         WHERE task_type = 'review_response' 
-          AND created_at >= ?
+          AND created_at >= ${daysAgo.toISOString()}
         GROUP BY DATE(created_at)
         ORDER BY date DESC
-        LIMIT 30`,
-        [daysAgo.toISOString()]
+        LIMIT 30`
       ) as any;
+      const dailyData = (dailyDataResult as any) as any[];
 
       const dailyStats = (dailyData as any[]).map(d => ({
         date: d.date,
