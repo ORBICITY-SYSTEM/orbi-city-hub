@@ -8,6 +8,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { BookOpen, Search, FileText, Sparkles, Filter } from "lucide-react";
 import { kbArticles } from "@/utils/kbArticles";
+import { KbRagPanel } from "@/components/KB/KbRagPanel";
 
 type CategorizedArticle = (typeof kbArticles)[number] & { category: string };
 
@@ -239,6 +240,9 @@ export default function KnowledgeBase() {
           </CardContent>
         </Card>
       </div>
+
+      {/* RAG panel for agents and staff */}
+      <KbRagPanel />
     </div>
   );
 }
