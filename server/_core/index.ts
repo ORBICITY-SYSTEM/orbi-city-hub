@@ -4,6 +4,7 @@ import { errorLoggerMiddleware } from "./errorLogger";
 import { apiLimiter, authLimiter } from "./rateLimiter";
 import { startBackupSchedule } from "../backupScheduler";
 import { startTawktoRowsSchedule } from "../tawktoRowsScheduler";
+import { startWebExtractorSchedule } from "../axiomWebExtractorScheduler";
 import { initRedis } from "./cache";
 import { createServer } from "http";
 import net from "net";
@@ -520,6 +521,8 @@ async function startServer() {
       console.log("[Backup] Automated backup schedule started");
       startTawktoRowsSchedule();
       console.log("[Axiom Automation] Tawk.to → Rows scheduler started");
+      startWebExtractorSchedule();
+      console.log("[Axiom Automation] Web Extractor scheduler started");
     } else {
       console.log("[Backup] Automated backups disabled in development mode");
       console.log("[Axiom Automation] Scheduler disabled in development mode");

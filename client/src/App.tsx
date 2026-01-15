@@ -59,6 +59,7 @@ const EmailManagement = lazy(() => import("./pages/EmailManagement"));
 // Integrations Module - Lazy
 const Integrations = lazy(() => import("./pages/Integrations"));
 const AxiomNewAutomation = lazy(() => import("./pages/integrations/AxiomNewAutomation"));
+const AxiomWebExtractor = lazy(() => import("./pages/integrations/AxiomWebExtractor"));
 
 // Settings Module - Lazy
 const Settings = lazy(() => import("./pages/Settings"));
@@ -175,6 +176,7 @@ function RouterContent() {
         <Route path="/integrations/telegram" component={TelegramBot} />
         <Route path="/integrations/butler" component={Automations} />
         <Route path="/integrations/axiom/new-automation" component={AxiomNewAutomation} />
+        <Route path="/integrations/axiom/web-extractor" component={AxiomWebExtractor} />
 
         {/* Email Management Module */}
         <Route path="/email-management" component={EmailManagement} />
