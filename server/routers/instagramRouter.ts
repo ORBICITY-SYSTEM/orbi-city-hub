@@ -121,6 +121,17 @@ export const instagramRouter = router({
   // Use publicProcedure in development mode (when OAuth is not configured)
   syncFromRows: (process.env.NODE_ENV === "development" ? publicProcedure : protectedProcedure)
     .mutation(async () => {
+      const ROWS_API_KEY = process.env.ROWS_API_KEY;
+      const SPREADSHEET_ID = process.env.ROWS_SPREADSHEET_ID;
+
+      if (!ROWS_API_KEY || !SPREADSHEET_ID) {
+        return {
+          success: false,
+          message: "ROWS_API_KEY ან ROWS_SPREADSHEET_ID არ არის კონფიგურირებული",
+          synced: { metrics: 0, posts: 0, weekly: 0 },
+        };
+      }
+
       // In development mode, if database is not configured, sync data to memory/cache only
       const db = await getDb();
       if (!db) {
@@ -299,7 +310,11 @@ export const instagramRouter = router({
         };
       } catch (error) {
         console.error('Instagram sync error:', error);
-        throw new Error(error instanceof Error ? error.message : 'Sync failed');
+        return {
+          success: false,
+          message: error instanceof Error ? error.message : 'Sync failed',
+          synced: { metrics: 0, posts: 0, weekly: 0 },
+        };
       }
     }),
 
