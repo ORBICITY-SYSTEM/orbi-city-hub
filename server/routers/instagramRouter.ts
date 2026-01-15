@@ -44,6 +44,93 @@ const WEEKLY_HEADERS = [
   'Follows', 'Avg reach / post', 'Engagement rate'
 ];
 
+type DashboardData = {
+  metrics: any[];
+  posts: any[];
+  summary: any | null;
+  weeklyStats: any[];
+};
+
+function toInt(value: string | undefined) {
+  return parseInt(value || "0") || null;
+}
+
+async function fetchDashboardFromRows(): Promise<DashboardData> {
+  const [metricsData, postsData, summaryData, weeklyData] = await Promise.all([
+    fetchTableFromRows(TABLE_IDS.accountMetrics, METRICS_HEADERS),
+    fetchTableFromRows(TABLE_IDS.allPosts, POSTS_HEADERS),
+    fetchTableFromRows(TABLE_IDS.postsSummary, SUMMARY_HEADERS),
+    fetchTableFromRows(TABLE_IDS.weekly, WEEKLY_HEADERS),
+  ]);
+
+  const metrics = metricsData.map((item, idx) => ({
+    id: `m-${idx}`,
+    date: (item["Start Date"]?.split("T")[0] || item["Start Date"]) ?? null,
+    reach: toInt(item["Reach"]),
+    accounts_engaged: toInt(item["Accounts Engaged"]),
+    likes: toInt(item["Likes"]),
+    comments: toInt(item["Comments"]),
+    shares: toInt(item["Shares"]),
+    follows: toInt(item["Follows And Unfollows"]),
+    profile_links_taps: toInt(item["Profile Links Taps"]),
+    views: toInt(item["Views"]),
+    total_interactions: toInt(item["Total Interactions"]),
+  }));
+
+  const posts = postsData.map((item, idx) => ({
+    id: `p-${idx}`,
+    post_url: item["URL"] || null,
+    post_date: item["Date"]?.split("T")[0] || item["Date"] || null,
+    created_time: item["Created Time"] ? new Date(item["Created Time"]) : null,
+    caption: item["Caption"] || null,
+    likes: toInt(item["Likes"]),
+    reach: toInt(item["Reach"]),
+    comments: toInt(item["Comments"]),
+    saved: toInt(item["Saved"]),
+    follows: toInt(item["Follows"]),
+    media_type: item["Media Type"] || null,
+    watch_time_ms: toInt(item["Total Watch Time Milliseconds"]),
+    theme: item["Theme"] || null,
+    media_url: item["Media Url"] || null,
+  }));
+
+  let summary: any | null = null;
+  if (summaryData.length > 0) {
+    const summaryMap: Record<string, string> = {};
+    summaryData.forEach((item) => {
+      summaryMap[item["Metric"] || ""] = item["Value"] || "0";
+    });
+    summary = {
+      id: "s-rows",
+      synced_at: new Date().toISOString(),
+      time_frame: "all_time",
+      posts_count: toInt(summaryMap["Posts"]) ?? toInt(summaryMap["posts_count"]),
+      total_reach: toInt(summaryMap["Total Reach"]) ?? toInt(summaryMap["total_reach"]),
+      total_likes: toInt(summaryMap["Total Likes"]) ?? toInt(summaryMap["total_likes"]),
+      total_comments: toInt(summaryMap["Total Comments"]) ?? toInt(summaryMap["total_comments"]),
+      total_saved: toInt(summaryMap["Total Saved"]) ?? toInt(summaryMap["total_saved"]),
+      total_follows: toInt(summaryMap["Total Follows"]) ?? toInt(summaryMap["total_follows"]),
+      avg_reach_per_post: summaryMap["Avg Reach / Post"] || summaryMap["avg_reach_per_post"] || null,
+      engagement_rate: summaryMap["Engagement Rate"] || summaryMap["engagement_rate"] || null,
+    };
+  }
+
+  const weeklyStats = weeklyData.map((item, idx) => ({
+    id: `w-${idx}`,
+    week_starting: item["Week starting"]?.split("T")[0] || item["Week starting"] || null,
+    posts_count: toInt(item["Posts"]),
+    reach: toInt(item["Reach"]),
+    likes: toInt(item["Likes"]),
+    comments: toInt(item["Comments"]),
+    saved: toInt(item["Saved"]),
+    follows: toInt(item["Follows"]),
+    avg_reach_per_post: item["Avg reach / post"] || null,
+    engagement_rate: item["Engagement rate"] || null,
+  }));
+
+  return { metrics, posts, summary, weeklyStats };
+}
+
 async function fetchTableFromRows(tableId: string, headers: string[]) {
   const ROWS_API_KEY = process.env.ROWS_API_KEY;
   const SPREADSHEET_ID = process.env.ROWS_SPREADSHEET_ID;
@@ -625,13 +712,9 @@ export const instagramRouter = router({
     .query(async ({ input }) => {
       try {
         const db = await getDb();
-        if (!db) {
-          return {
-            metrics: [],
-            posts: [],
-            summary: null,
-            weeklyStats: [],
-          };
+        const hasDb = Boolean(db);
+        if (!hasDb) {
+          return await fetchDashboardFromRows();
         }
 
         const conditionsMetrics: any[] = [];
@@ -673,6 +756,13 @@ export const instagramRouter = router({
             .orderBy(desc(instagramWeeklyStats.week_starting)),
         ]);
 
+        // If DB has no data, fallback to live Rows.com fetch
+        if (
+          (metrics.length === 0 && posts.length === 0 && weeklyStats.length === 0 && !summaryRow[0])
+        ) {
+          return await fetchDashboardFromRows();
+        }
+
         return {
           metrics,
           posts,
@@ -681,12 +771,17 @@ export const instagramRouter = router({
         };
       } catch (error) {
         console.error("[Instagram getDashboard] error:", error);
-        return {
-          metrics: [],
-          posts: [],
-          summary: null,
-          weeklyStats: [],
-        };
+        try {
+          return await fetchDashboardFromRows();
+        } catch (innerError) {
+          console.error("[Instagram getDashboard] fallback rows error:", innerError);
+          return {
+            metrics: [],
+            posts: [],
+            summary: null,
+            weeklyStats: [],
+          };
+        }
       }
     }),
 });
