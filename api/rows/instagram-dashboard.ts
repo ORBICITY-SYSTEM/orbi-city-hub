@@ -166,9 +166,11 @@ async function fetchTableFromRows(tableId: string, headers: string[]) {
   return result;
 }
 
-async function fetchDashboardFromRows(): Promise<DashboardData> {
+async function fetchDashboardFromRows(metricsTableId?: string): Promise<DashboardData> {
+  const accountMetricsTable = metricsTableId || TABLE_IDS.accountMetrics;
+
   const [metricsData, postsData, summaryData, weeklyData] = await Promise.all([
-    fetchTableFromRows(TABLE_IDS.accountMetrics, METRICS_HEADERS),
+    fetchTableFromRows(accountMetricsTable, METRICS_HEADERS),
     fetchTableFromRows(TABLE_IDS.allPosts, POSTS_HEADERS),
     fetchTableFromRows(TABLE_IDS.postsSummary, SUMMARY_HEADERS),
     fetchTableFromRows(TABLE_IDS.weekly, WEEKLY_HEADERS),
@@ -244,6 +246,7 @@ async function fetchDashboardFromRows(): Promise<DashboardData> {
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const refresh = req.query.refresh === "1";
+  const metricsTableId = typeof req.query.tableId === "string" ? req.query.tableId : undefined;
 
   // Env validation early
   if (!process.env.ROWS_API_KEY || !process.env.ROWS_SPREADSHEET_ID) {
@@ -260,16 +263,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const cacheKey = "instagram-dashboard-v1";
 
   try {
-    if (!refresh) {
+    if (!refresh && !metricsTableId) {
       const cached = await redisGet(cacheKey);
       if (cached?.data) {
         return res.status(200).json({ ...cached.data, source: "cache" });
       }
     }
 
-    const data = await fetchDashboardFromRows();
+    const data = await fetchDashboardFromRows(metricsTableId);
 
-    await redisSet(cacheKey, { data, ts: Date.now() }, CACHE_TTL_SECONDS);
+    if (!metricsTableId) {
+      await redisSet(cacheKey, { data, ts: Date.now() }, CACHE_TTL_SECONDS);
+    }
 
     return res.status(200).json(data);
   } catch (error) {
