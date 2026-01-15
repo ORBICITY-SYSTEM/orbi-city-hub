@@ -210,7 +210,7 @@ export const reviewsRouter = router({
       const db = await getDb();
       if (!db) throw new Error("Database not available");
 
-      const filters = input || {} as typeof input;
+      const filters = (input ?? {}) as NonNullable<typeof input>;
       const conditions: any[] = [];
 
       if (filters?.source && filters.source !== "all") {
@@ -274,7 +274,7 @@ export const reviewsRouter = router({
       const db = await getDb();
       if (!db) throw new Error("Database not available");
 
-      const filters = input || {} as typeof input;
+      const filters = (input ?? {}) as NonNullable<typeof input>;
       const conditions: any[] = [];
 
       if (filters?.source && filters.source !== "all") {
@@ -459,7 +459,7 @@ export const reviewsRouter = router({
       const db = await getDb();
       if (!db) throw new Error("Database not available");
 
-      const filters = input || {} as typeof input;
+      const filters = (input ?? {}) as NonNullable<typeof input>;
       const conditions: any[] = [];
       
       if (filters?.source && filters.source !== "all") {
