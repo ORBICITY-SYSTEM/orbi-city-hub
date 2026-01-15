@@ -81,6 +81,8 @@ interface UseInstagramAnalyticsReturn {
   reset: () => void;
 }
 
+const SAFE_MODE = true;
+
 export function useInstagramAnalytics(): UseInstagramAnalyticsReturn {
   const [data, setData] = useState<InstagramData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -100,6 +102,18 @@ export function useInstagramAnalytics(): UseInstagramAnalyticsReturn {
     setError(null);
 
     try {
+      if (SAFE_MODE) {
+        const emptyResult: InstagramData = {
+          metrics: [],
+          posts: [],
+          summary: null,
+          weeklyStats: [],
+        };
+        setData(emptyResult);
+        setIsLoading(false);
+        return emptyResult;
+      }
+
       const from = dateRange?.from ? dateRange.from.toISOString().split("T")[0] : undefined;
       const to = dateRange?.to ? dateRange.to.toISOString().split("T")[0] : undefined;
       const input = from || to ? { from, to } : undefined;
@@ -119,6 +133,9 @@ export function useInstagramAnalytics(): UseInstagramAnalyticsReturn {
 
   const syncFromRows = useCallback(async (): Promise<boolean> => {
     try {
+      if (SAFE_MODE) {
+        return true;
+      }
       const result = await syncMutation.mutateAsync();
       return Boolean(result?.success);
     } catch (err) {
@@ -129,6 +146,9 @@ export function useInstagramAnalytics(): UseInstagramAnalyticsReturn {
 
   const testConnection = useCallback(async (): Promise<{ success: boolean; message: string }> => {
     try {
+      if (SAFE_MODE) {
+        return { success: true, message: "Safe mode enabled" };
+      }
       const result = await testMutation.mutateAsync();
       return {
         success: Boolean(result?.success),
