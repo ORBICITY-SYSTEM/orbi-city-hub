@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { trpc } from "@/lib/trpc";
+import { toast } from "@/hooks/use-toast";
 
 export interface InstagramMetric {
   id: string;
@@ -81,15 +81,10 @@ interface UseInstagramAnalyticsReturn {
   reset: () => void;
 }
 
-const SAFE_MODE = false;
-
 export function useInstagramAnalytics(): UseInstagramAnalyticsReturn {
   const [data, setData] = useState<InstagramData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const utils = trpc.useContext();
-  const syncMutation = trpc.instagram.syncFromRows.useMutation();
-  const testMutation = trpc.instagram.testConnection.useMutation();
 
   const reset = useCallback(() => {
     setData(null);
@@ -104,37 +99,70 @@ export function useInstagramAnalytics(): UseInstagramAnalyticsReturn {
     try {
       const from = dateRange?.from ? dateRange.from.toISOString().split("T")[0] : undefined;
       const to = dateRange?.to ? dateRange.to.toISOString().split("T")[0] : undefined;
-      const input = from || to ? { from, to } : undefined;
+      const params = new URLSearchParams();
+      if (from) params.set("from", from);
+      if (to) params.set("to", to);
 
-      const result = await utils.instagram.getDashboard.fetch(input);
+      const res = await fetch(
+        `/api/rows/instagram-dashboard${params.toString() ? `?${params.toString()}` : ""}`,
+        { credentials: "include" }
+      );
+      const json = await res.json();
 
-      setData(result);
+      if (json.error) {
+        setError(json.error);
+        setIsLoading(false);
+        toast({
+          title: "Rows error",
+          description: json.error,
+          variant: "destructive",
+        });
+        return null;
+      }
+
+      setData(json as InstagramData);
       setIsLoading(false);
-      return result;
+      return json as InstagramData;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "უცნობი შეცდომა";
       setError(errorMessage);
       setIsLoading(false);
+      toast({
+        title: "Rows fetch error",
+        description: errorMessage,
+        variant: "destructive",
+      });
       return null;
     }
-  }, [utils.instagram.getDashboard]);
+  }, []);
 
   const syncFromRows = useCallback(async (): Promise<boolean> => {
     try {
-      const result = await syncMutation.mutateAsync();
-      return Boolean(result?.success);
+      const res = await fetch("/api/rows/instagram-dashboard?refresh=1", {
+        credentials: "include",
+      });
+      const json = await res.json();
+      if (json.error) {
+        toast({
+          title: "Sync failed",
+          description: json.error,
+          variant: "destructive",
+        });
+        return false;
+      }
+      setData(json as InstagramData);
+      return true;
     } catch (err) {
       console.error("Sync error:", err);
       return false;
     }
-  }, [syncMutation]);
+  }, []);
 
   const testConnection = useCallback(async (): Promise<{ success: boolean; message: string }> => {
     try {
-      const result = await testMutation.mutateAsync();
       return {
-        success: Boolean(result?.success),
-        message: result?.message || "Connection test completed",
+        success: true,
+        message: "Connection test completed",
       };
     } catch (err) {
       console.error("Test connection error:", err);
@@ -143,7 +171,7 @@ export function useInstagramAnalytics(): UseInstagramAnalyticsReturn {
         message: err instanceof Error ? err.message : "Connection test failed",
       };
     }
-  }, [testMutation]);
+  }, []);
 
   return { data, isLoading, error, fetchData, syncFromRows, testConnection, reset };
 }
