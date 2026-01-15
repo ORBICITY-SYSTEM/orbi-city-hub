@@ -3,6 +3,7 @@ import express from "express";
 import { errorLoggerMiddleware } from "./errorLogger";
 import { apiLimiter, authLimiter } from "./rateLimiter";
 import { startBackupSchedule } from "../backupScheduler";
+import { startTawktoRowsSchedule } from "../tawktoRowsScheduler";
 import { initRedis } from "./cache";
 import { createServer } from "http";
 import net from "net";
@@ -517,8 +518,11 @@ async function startServer() {
     if (process.env.NODE_ENV === "production") {
       startBackupSchedule();
       console.log("[Backup] Automated backup schedule started");
+      startTawktoRowsSchedule();
+      console.log("[Axiom Automation] Tawk.to → Rows scheduler started");
     } else {
       console.log("[Backup] Automated backups disabled in development mode");
+      console.log("[Axiom Automation] Scheduler disabled in development mode");
     }
   });
 }
