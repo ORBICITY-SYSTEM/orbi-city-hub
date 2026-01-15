@@ -23,7 +23,6 @@ import { healthCheckRouter } from "./routers/healthCheck";
 import { cacheRouter } from "./routers/cache";
 import { performanceRouter } from "./routers/performanceRouter";
 import { alertsRouter } from "./routers/alertsRouter";
-import { securityRouter } from "./routers/securityRouter";
 import { gdprRouter } from "./routers/gdprRouter";
 import { databaseRouter } from "./routers/databaseRouter";
 import { uptimeRouter } from "./routers/uptimeRouter";
@@ -31,13 +30,10 @@ import { otelmsRouter } from "./routers/otelms";
 import { integrationsRouter } from "./routers/integrationsRouter";
 import { googleAnalyticsRouter } from "./routers/googleAnalytics";
 import { googleBusinessRouter } from "./routers/googleBusiness";
-import { gmailOtelmsRouter } from "./routers/gmailOtelms";
 import { gmailSyncRouter } from "./routers/gmailSync";
-import { emailCategorizationRouter } from "./routers/emailCategorizationRouter";
 import { butlerRouter } from "./butlerRouter";
 import { aiAnalyzerRouter } from "./aiAnalyzerRouter";
 import { realFinanceRouter } from "./realFinanceRouter";
-import { n8nWebhookRouter } from "./routers/n8nWebhook";
 import { activityLogRouter } from "./routers/activityLog";
 import { notificationsRouter } from "./routers/notificationsRouter";
 import { analyticsRouter } from "./routers/analyticsRouter";
@@ -74,7 +70,6 @@ export const appRouter = router({
   cache: cacheRouter,
   performance: performanceRouter,
   alerts: alertsRouter,
-  security: securityRouter,
   gdpr: gdprRouter,
   database: databaseRouter,
   uptime: uptimeRouter,
@@ -82,10 +77,7 @@ export const appRouter = router({
   integrations: integrationsRouter,
   googleAnalytics: googleAnalyticsRouter,
   googleBusiness: googleBusinessRouter,
-  gmailOtelms: gmailOtelmsRouter,
   gmailSync: gmailSyncRouter,
-  emailCategorization: emailCategorizationRouter,
-  n8nWebhook: n8nWebhookRouter,
   activityLog: activityLogRouter,
   notifications: notificationsRouter,
   analytics: analyticsRouter,
