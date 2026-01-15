@@ -19,6 +19,7 @@ import {
   Bot,
   Sparkles,
   CalendarDays,
+  FileOutput,
 } from "lucide-react";
 import type { DateRange } from "./types";
 
@@ -33,6 +34,7 @@ interface InstagramHeaderProps {
   onOpenABTesting?: () => void;
   onOpenAIAgent?: () => void;
   onOpenContentCalendar?: () => void;
+  onExportJsonl?: () => void;
   isTesting: boolean;
   isSyncing: boolean;
   isLoading: boolean;
@@ -52,6 +54,7 @@ export const InstagramHeader = ({
   onOpenABTesting,
   onOpenAIAgent,
   onOpenContentCalendar,
+  onExportJsonl,
   isTesting,
   isSyncing,
   isLoading,
@@ -259,6 +262,17 @@ export const InstagramHeader = ({
                   <FileDown className="h-4 w-4 mr-2" />
                   CSV
                 </Button>
+
+                {onExportJsonl && (
+                  <Button 
+                    onClick={onExportJsonl}
+                    variant="outline"
+                    className="bg-card/30 backdrop-blur-md hover:bg-card/50 border-border/30 hover:border-info/30 shadow-lg"
+                  >
+                    <FileOutput className="h-4 w-4 mr-2 text-info" />
+                    JSONL
+                  </Button>
+                )}
 
                 <Button 
                   onClick={onOpenContentCalendar}

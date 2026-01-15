@@ -11,6 +11,8 @@ import { TopPostsModule } from "@/components/instagram/modules/TopPostsModule";
 import { Users, Eye, Heart, MessageCircle, TrendingUp, CheckCircle, XCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import type { DateRange, Post, ThemeData, DayOfWeekPerformance, HourlyPerformance, DayHourCell } from "@/components/instagram/types";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 
 export default function InstagramAnalytics() {
   const { toast } = useToast();
@@ -225,6 +227,47 @@ export default function InstagramAnalytics() {
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
   }, [processedPosts]);
+
+  const handleExportJsonl = useCallback(() => {
+    if (!data) return;
+    const jsonl = data.posts
+      .map((p) =>
+        JSON.stringify({
+          date: p.post_date,
+          type: p.media_type,
+          theme: p.theme,
+          likes: p.likes,
+          reach: p.reach,
+          comments: p.comments,
+          saved: p.saved,
+          follows: p.follows,
+          caption: p.caption,
+          url: p.post_url,
+        })
+      )
+      .join("\n");
+    const blob = new Blob([jsonl], { type: "application/jsonl" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `instagram_posts_${format(new Date(), "yyyy-MM-dd")}.jsonl`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }, [data]);
+
+  const handleExportPDF = useCallback(async () => {
+    const container = document.getElementById("instagram-dashboard");
+    if (!container) return;
+    const canvas = await html2canvas(container, { scale: 1.5 });
+    const imgData = canvas.toDataURL("image/png");
+    const pdf = new jsPDF("p", "mm", "a4");
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = (canvas.height * pageWidth) / canvas.width;
+    pdf.addImage(imgData, "PNG", 0, 0, pageWidth, pageHeight);
+    pdf.save(`instagram_dashboard_${format(new Date(), "yyyy-MM-dd")}.pdf`);
+  }, []);
 
   return (
     <div className="space-y-6 p-6">
