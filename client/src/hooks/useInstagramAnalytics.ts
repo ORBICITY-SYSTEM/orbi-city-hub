@@ -154,16 +154,34 @@ export function useInstagramAnalytics(): UseInstagramAnalyticsReturn {
       return true;
     } catch (err) {
       console.error("Sync error:", err);
+      toast({
+        title: "Sync error",
+        description: err instanceof Error ? err.message : "Unknown sync error",
+        variant: "destructive",
+      });
       return false;
     }
   }, []);
 
   const testConnection = useCallback(async (): Promise<{ success: boolean; message: string }> => {
     try {
-      return {
-        success: true,
-        message: "Connection test completed",
-      };
+      const res = await fetch("/api/rows/instagram-dashboard", {
+        credentials: "include",
+      });
+      const json = await res.json();
+      if (json.error) {
+        toast({
+          title: "Connection test failed",
+          description: json.error,
+          variant: "destructive",
+        });
+        return { success: false, message: json.error };
+      }
+      toast({
+        title: "Connection test successful",
+        description: "Rows API reachable",
+      });
+      return { success: true, message: "Connection test successful" };
     } catch (err) {
       console.error("Test connection error:", err);
       return {

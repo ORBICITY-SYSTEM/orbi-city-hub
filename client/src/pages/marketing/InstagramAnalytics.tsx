@@ -26,7 +26,6 @@ export default function InstagramAnalytics() {
   const [selectedTheme, setSelectedTheme] = useState<string | null>(null);
   const [mediaTypeFilter, setMediaTypeFilter] = useState<string[]>([]);
 
-  // Use Supabase hook (Lovable approach)
   const { data, isLoading, error, fetchData, syncFromRows, testConnection } = useInstagramAnalytics();
 
   // Fetch data when date range changes
@@ -175,25 +174,10 @@ export default function InstagramAnalytics() {
           description: "Data synchronized from Rows.com",
         });
         setConnectionStatus({ success: true, message: "Data synchronized successfully" });
-        // Refetch data after sync
         await fetchData(dateRange);
       } else {
-        const errorMsg = "Failed to sync data from Rows.com";
-        toast({
-          title: "Sync Error",
-          description: errorMsg,
-          variant: "destructive",
-        });
-        setConnectionStatus({ success: false, message: errorMsg });
+        setConnectionStatus({ success: false, message: "Failed to sync data from Rows.com" });
       }
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to sync data from Rows.com";
-      toast({
-        title: "Sync Error",
-        description: errorMessage,
-        variant: "destructive",
-      });
-      setConnectionStatus({ success: false, message: errorMessage });
     } finally {
       setIsSyncing(false);
     }
@@ -206,26 +190,9 @@ export default function InstagramAnalytics() {
     try {
       const result = await testConnection();
       setConnectionStatus(result);
-      if (result.success) {
-        toast({
-          title: "Connection Test Successful",
-          description: result.message,
-        });
-      } else {
-        toast({
-          title: "Connection Test Failed",
-          description: result.message,
-          variant: "destructive",
-        });
-      }
     } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Unknown error';
+      const msg = err instanceof Error ? err.message : "Unknown error";
       setConnectionStatus({ success: false, message: msg });
-      toast({
-        title: "Connection Test Failed",
-        description: msg,
-        variant: "destructive",
-      });
     }
     setIsTesting(false);
   };
