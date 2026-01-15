@@ -512,10 +512,10 @@ export const instagramRouter = router({
       // Note: MySQL doesn't support dynamic where with .where() chaining
       // We need to build conditions array
       const conditions: any[] = [];
-      if (input?.from) {
+      if (input?.from && typeof input.from === 'string') {
         conditions.push(gte(instagramPosts.post_date, input.from));
       }
-      if (input?.to) {
+      if (input?.to && typeof input.to === 'string') {
         conditions.push(lte(instagramPosts.post_date, input.to));
       }
 
