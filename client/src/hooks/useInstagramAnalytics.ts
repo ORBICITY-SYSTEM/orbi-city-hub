@@ -88,6 +88,7 @@ export function useInstagramAnalytics(): UseInstagramAnalyticsReturn {
   const utils = trpc.useContext();
   const syncMutation = trpc.instagram.syncFromRows.useMutation();
   const testMutation = trpc.instagram.testConnection.useMutation();
+  const dashboardQuery = trpc.instagram.getDashboard;
 
   const reset = useCallback(() => {
     setData(null);
@@ -102,22 +103,9 @@ export function useInstagramAnalytics(): UseInstagramAnalyticsReturn {
     try {
       const from = dateRange?.from ? dateRange.from.toISOString().split("T")[0] : undefined;
       const to = dateRange?.to ? dateRange.to.toISOString().split("T")[0] : undefined;
-      const metricsInput = from || to ? { from, to } : undefined;
-      const postsInput = from || to ? { from, to, limit: 1000 } : { limit: 1000 };
+      const input = from || to ? { from, to } : undefined;
 
-      const [metrics, posts, summary, weeklyStats] = await Promise.all([
-        utils.instagram.getMetrics.fetch(metricsInput),
-        utils.instagram.getPosts.fetch(postsInput),
-        utils.instagram.getSummary.fetch(),
-        utils.instagram.getWeeklyStats.fetch(),
-      ]);
-
-      const result: InstagramData = {
-        metrics: (metrics || []) as InstagramMetric[],
-        posts: (posts || []) as InstagramPost[],
-        summary: (summary || null) as InstagramSummary | null,
-        weeklyStats: (weeklyStats || []) as InstagramWeeklyStats[],
-      };
+      const result = await dashboardQuery.fetch(input);
 
       setData(result);
       setIsLoading(false);
@@ -128,7 +116,7 @@ export function useInstagramAnalytics(): UseInstagramAnalyticsReturn {
       setIsLoading(false);
       return null;
     }
-  }, [utils.instagram.getMetrics, utils.instagram.getPosts, utils.instagram.getSummary, utils.instagram.getWeeklyStats]);
+  }, [dashboardQuery, utils.instagram.getDashboard]);
 
   const syncFromRows = useCallback(async (): Promise<boolean> => {
     try {
