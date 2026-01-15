@@ -1,13 +1,13 @@
 /**
- * OtelMS Parser Stub - PowerStack Refactor
+ * OtelMS Parser - DEPRECATED
  * 
- * This is a stub replacement for the legacy OtelMS email parser.
- * The actual parsing logic has been moved to _LEGACY_ARCHIVE.
+ * ⚠️ DEPRECATED: Email parsing is no longer used.
+ * OTELMS data now comes from Python API (otelms-api.run.app) via server/routers/otelms.ts
  * 
- * This stub provides fallback functionality to prevent build errors
- * while we transition to the Google Sheet data bridge.
+ * This file is kept only for backward compatibility during migration.
+ * All email parsing functionality has been removed.
  * 
- * @deprecated Use googleSheetService instead
+ * @deprecated Use Python API integration instead (otelmsRouter.syncCalendar)
  */
 
 export interface OtelmsReservation {

@@ -99,20 +99,16 @@ export async function upsertOtelmsReport(report: InsertOtelmsDailyReport) {
       .values(report)
       .onDuplicateKeyUpdate({
         set: {
-          checkIns: report.checkIns,
-          checkOuts: report.checkOuts,
-          cancellations: report.cancellations,
-          totalRevenue: report.totalRevenue,
+          // Fix schema field names to match actual schema
+          reportDate: report.reportDate,
+          occupancy: report.occupancy,
+          revenue: report.revenue,
           adr: report.adr,
-          occupancyRate: report.occupancyRate,
-          revPAR: report.revPAR,
-          totalGuests: report.totalGuests,
-          totalChildren: report.totalChildren,
-          roomsOccupied: report.roomsOccupied,
-          carsParked: report.carsParked,
-          channelData: report.channelData,
-          emailId: report.emailId,
-          rawContent: report.rawContent,
+          revpar: report.revpar,
+          bookingsCount: report.bookingsCount,
+          checkInsCount: report.checkInsCount,
+          checkOutsCount: report.checkOutsCount,
+          rawData: report.rawData,
         },
       });
     
@@ -157,38 +153,34 @@ export async function getOtelmsStatistics(startDate: Date, endDate: Date) {
     return null;
   }
 
-  // Calculate totals
+  // Calculate totals - using actual schema field names
   const totals = reports.reduce(
     (acc, report) => ({
-      checkIns: acc.checkIns + (report.checkIns || 0),
-      checkOuts: acc.checkOuts + (report.checkOuts || 0),
-      cancellations: acc.cancellations + (report.cancellations || 0),
-      totalRevenue: acc.totalRevenue + (report.totalRevenue || 0),
-      totalGuests: acc.totalGuests + (report.totalGuests || 0),
-      roomsOccupied: acc.roomsOccupied + (report.roomsOccupied || 0),
+      checkInsCount: acc.checkInsCount + (report.checkInsCount || 0),
+      checkOutsCount: acc.checkOutsCount + (report.checkOutsCount || 0),
+      bookingsCount: acc.bookingsCount + (report.bookingsCount || 0),
+      revenue: acc.revenue + (report.revenue || 0),
     }),
     {
-      checkIns: 0,
-      checkOuts: 0,
-      cancellations: 0,
-      totalRevenue: 0,
-      totalGuests: 0,
-      roomsOccupied: 0,
+      checkInsCount: 0,
+      checkOutsCount: 0,
+      bookingsCount: 0,
+      revenue: 0,
     }
   );
 
-  // Calculate averages
+  // Calculate averages - using actual schema field names
   const count = reports.length;
   const averages = {
-    occupancyRate: Math.round(
-      reports.reduce((sum, r) => sum + (r.occupancyRate || 0), 0) / count
-    ),
-    adr: Math.round(
+    occupancy: count > 0 ? Math.round(
+      reports.reduce((sum, r) => sum + (r.occupancy || 0), 0) / count
+    ) : 0,
+    adr: count > 0 ? Math.round(
       reports.reduce((sum, r) => sum + (r.adr || 0), 0) / count
-    ),
-    revPAR: Math.round(
-      reports.reduce((sum, r) => sum + (r.revPAR || 0), 0) / count
-    ),
+    ) : 0,
+    revpar: count > 0 ? Math.round(
+      reports.reduce((sum, r) => sum + (r.revpar || 0), 0) / count
+    ) : 0,
   };
 
   return {

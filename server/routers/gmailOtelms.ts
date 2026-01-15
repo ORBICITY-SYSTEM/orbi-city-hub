@@ -1,19 +1,16 @@
 import { router, protectedProcedure } from "../_core/trpc";
 import { getGmailClient } from "../googleAuth";
-import { parseOtelmsEmail, isOtelmsEmail } from "../otelmsParser";
-import { getDb } from "../db";
-import { otelmsDailyReports } from "../../drizzle/schema";
-import { desc } from "drizzle-orm";
 import { z } from "zod";
 
 /**
- * Gmail OTELMS Router
+ * Gmail OTELMS Router (DEPRECATED - Email Parsing)
  * 
- * Handles Gmail API integration for OTELMS email automation
- * - Read emails from INFO@ORBICITYBATUMI.COM
- * - Parse OTELMS daily reports
- * - Sync to database
- * - Mark emails as read
+ * ⚠️ DEPRECATED: OTELMS data now comes from Python API (otelms-api.run.app)
+ * This router is kept only for Gmail connection testing.
+ * 
+ * For OTELMS data syncing, use: server/routers/otelms.ts
+ * - syncCalendar: calls Python API /scrape
+ * - syncStatus: calls Python API /scrape/status
  */
 
 export const gmailOtelmsRouter = router({
@@ -75,7 +72,7 @@ export const gmailOtelmsRouter = router({
                 date,
                 body: body.substring(0, 1000), // Limit body size
                 snippet: msgData.snippet || '',
-                isOtelms: isOtelmsEmail(subject, body),
+                // Note: OTELMS detection removed - data comes from Python API
               };
             } catch (error) {
               console.error(`[Gmail] Failed to fetch message ${message.id}:`, error);
@@ -96,140 +93,26 @@ export const gmailOtelmsRouter = router({
     }),
 
   /**
-   * Sync OTELMS emails to database
-   * Reads unread OTELMS emails, parses them, and saves to otelmsDailyReports table
+   * @deprecated Email parsing removed - use otelmsRouter.syncCalendar() instead
+   * OTELMS data now comes from Python API (otelms-api.run.app)
    */
   syncOtelmsEmails: protectedProcedure.mutation(async () => {
-    try {
-      const gmail = await getGmailClient();
-      const db = await getDb();
-
-      if (!db) {
-        throw new Error('Database not available');
-      }
-
-      // Search for OTELMS emails
-      const response = await gmail.users.messages.list({
-        userId: 'me',
-        q: 'is:unread (subject:otelms OR subject:ოტელმს OR subject:"daily report")',
-        maxResults: 50,
-      });
-
-      const messages = (response as any).data?.messages || [];
-      let syncedCount = 0;
-      let errorCount = 0;
-
-      for (const message of messages) {
-        try {
-          // Get full message
-          const msg = await gmail.users.messages.get({
-            userId: 'me',
-            id: message.id!,
-            format: 'full',
-          }) as any;
-
-          const msgData = msg.data || msg;
-          const headers = msgData.payload?.headers || [];
-          const subject = headers.find((h: any) => h.name?.toLowerCase() === 'subject')?.value || '';
-
-          // Extract body
-          let body = '';
-          if (msgData.payload?.body?.data) {
-            body = Buffer.from(msgData.payload.body.data, 'base64').toString('utf-8');
-          } else if (msgData.payload?.parts) {
-            const textPart = msgData.payload.parts.find((part: any) => part.mimeType === 'text/plain');
-            if (textPart?.body?.data) {
-              body = Buffer.from(textPart.body.data, 'base64').toString('utf-8');
-            }
-          }
-
-          // Check if it's an OTELMS email
-          if (isOtelmsEmail(subject, body)) {
-            // Parse email
-            const parsed = await parseOtelmsEmail(body, subject);
-
-            if (parsed) {
-              // Save to database
-              await db.insert(otelmsDailyReports).values({
-                reportDate: parsed.date,
-                revenue: parsed.totalRevenue || 0,
-                bookingsCount: parsed.totalBookings || 0,
-                rawData: {
-                  source: parsed.source,
-                  channel: parsed.channel || null,
-                  notes: parsed.notes || null,
-                  rawEmailContent: parsed.rawText,
-                  emailId: message.id!,
-                } as any,
-              });
-
-              // Mark as read
-              await gmail.users.messages.modify({
-                userId: 'me',
-                id: message.id!,
-                requestBody: {
-                  removeLabelIds: ['UNREAD'],
-                },
-              });
-
-              syncedCount++;
-            } else {
-              console.warn(`[Gmail] Failed to parse OTELMS email: ${message.id}`);
-              errorCount++;
-            }
-          }
-        } catch (error) {
-          console.error(`[Gmail] Failed to process message ${message.id}:`, error);
-          errorCount++;
-        }
-      }
-
-      return {
-        success: true,
-        syncedCount,
-        errorCount,
-        totalProcessed: messages.length,
-        timestamp: new Date().toISOString(),
-      };
-    } catch (error) {
-      console.error('[Gmail] Failed to sync OTELMS emails:', error);
-      throw new Error('Failed to sync OTELMS emails');
-    }
+    throw new Error(
+      'Email parsing is deprecated. Use otelmsRouter.syncCalendar() to sync from Python API instead.'
+    );
   }),
 
   /**
-   * Get OTELMS sync history
-   * Returns recent synced reports from database
+   * @deprecated Use otelmsRouter.getAll() instead
    */
   getOtelmsSyncHistory: protectedProcedure
     .input(z.object({
       limit: z.number().min(1).max(100).default(30),
     }).optional())
-    .query(async ({ input }) => {
-      try {
-        const db = await getDb();
-
-        if (!db) {
-          throw new Error('Database not available');
-        }
-
-        const limit = input?.limit || 30;
-
-        const reports = await db
-          .select()
-          .from(otelmsDailyReports)
-          .orderBy(desc(otelmsDailyReports.reportDate))
-          .limit(limit);
-
-        return {
-          reports,
-          totalCount: reports.length,
-          timestamp: new Date().toISOString(),
-        };
-      } catch (error) {
-        console.error('[Gmail] Failed to get sync history:', error);
-        throw new Error('Failed to fetch OTELMS sync history');
-      }
+    .query(async () => {
+      throw new Error(
+        'Use otelmsRouter.getAll() instead. This endpoint is deprecated.'
+      );
     }),
 
   /**
