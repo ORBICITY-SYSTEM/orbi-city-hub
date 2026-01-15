@@ -124,7 +124,7 @@ export async function fetchGoogleBusinessReviews(
     client.setCredentials({ refresh_token: storedRefreshToken });
     
     // Use the My Business API
-    const mybusiness = google.mybusinessaccountmanagement({ version: 'v1', auth: client });
+    const mybusiness = (google as any).mybusinessaccountmanagement({ version: 'v1', auth: client });
     
     // For reviews, we need to use the Business Profile Performance API
     // or the older My Business API v4

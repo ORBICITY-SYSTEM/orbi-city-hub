@@ -236,7 +236,8 @@ export const reviewsRouter = router({
         );
       }
 
-      const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+      const whereClause =
+        conditions.length > 0 ? and(...(conditions as [any, ...any[]])) : undefined;
 
       const reviews = await db
         .select()
@@ -284,7 +285,8 @@ export const reviewsRouter = router({
         conditions.push(lte(guestReviews.reviewDate, new Date(filters.dateTo)));
       }
 
-      const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+      const whereClause =
+        conditions.length > 0 ? and(...(conditions as [any, ...any[]])) : undefined;
 
       // Get total count and average rating
       const statsResult = await db
@@ -463,7 +465,8 @@ export const reviewsRouter = router({
         conditions.push(eq(guestReviews.source, filters.source as any));
       }
 
-      const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+      const whereClause =
+        conditions.length > 0 ? and(...(conditions as [any, ...any[]])) : undefined;
 
       const reviews = await db
         .select({ topics: guestReviews.topics, sentiment: guestReviews.sentiment })

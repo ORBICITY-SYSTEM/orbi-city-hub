@@ -426,11 +426,13 @@ export const instagramRouter = router({
         // In development mode, return data from memory
         if (process.env.NODE_ENV === "development" && memoryStore.metrics.length > 0) {
           let filtered = memoryStore.metrics;
-          if (input?.from) {
-            filtered = filtered.filter((m: any) => m['Start Date'] >= input.from);
+          const from = input?.from;
+          if (from) {
+            filtered = filtered.filter((m: any) => m['Start Date'] >= from);
           }
-          if (input?.to) {
-            filtered = filtered.filter((m: any) => m['End Date'] <= input.to);
+          const to = input?.to;
+          if (to) {
+            filtered = filtered.filter((m: any) => m['End Date'] <= to);
           }
           // Transform to match database schema
           return filtered.map((item: any) => ({
@@ -481,11 +483,13 @@ export const instagramRouter = router({
         // In development mode, return data from memory
         if (process.env.NODE_ENV === "development" && memoryStore.posts.length > 0) {
           let filtered = memoryStore.posts;
-          if (input?.from) {
-            filtered = filtered.filter((p: any) => (p['Date']?.split('T')[0] || p['Date']) >= input.from);
+          const from = input?.from;
+          if (from) {
+            filtered = filtered.filter((p: any) => (p['Date']?.split('T')[0] || p['Date']) >= from);
           }
-          if (input?.to) {
-            filtered = filtered.filter((p: any) => (p['Date']?.split('T')[0] || p['Date']) <= input.to);
+          const to = input?.to;
+          if (to) {
+            filtered = filtered.filter((p: any) => (p['Date']?.split('T')[0] || p['Date']) <= to);
           }
           const limited = filtered.slice(0, input?.limit || 1000);
           // Transform to match database schema

@@ -165,7 +165,7 @@ export async function getCurrentGuests(): Promise<Reservation[]> {
         gte(reservations.checkOut, today),
         or(
           eq(reservations.status, "confirmed"),
-          eq(reservations.status, "checked-in")
+          eq(reservations.status, "checked_in")
         )
       )
     )

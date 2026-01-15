@@ -23,7 +23,7 @@ export const axiomRouter = router({
     .input(
       z.object({
         botId: z.string().min(1, "Bot ID is required"),
-        payload: z.record(z.any()).optional(),
+        payload: z.record(z.string(), z.any()).optional(),
       })
     )
     .mutation(async ({ input }) => {

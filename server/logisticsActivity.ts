@@ -21,14 +21,19 @@ export async function logActivity(params: {
       return;
     }
 
+    const description = `${params.action} ${params.entityType}${params.entityName ? ` (${params.entityName})` : ""}`;
     await db.insert(logisticsActivityLog).values({
-      userId: params.userId,
-      userEmail: params.userEmail,
-      action: params.action,
-      entityType: params.entityType,
-      entityId: params.entityId?.toString(),
-      entityName: params.entityName,
-      changes: params.changes ? JSON.stringify(params.changes) : null,
+      activityType: params.action,
+      description,
+      roomNumber: params.entityType === "room" ? String(params.entityId ?? "") : null,
+      staffId: params.userId,
+      metadata: {
+        userEmail: params.userEmail,
+        entityType: params.entityType,
+        entityId: params.entityId ?? null,
+        entityName: params.entityName ?? null,
+        changes: params.changes ?? null,
+      },
     });
   } catch (error) {
     console.error("[Activity Log] Failed to log activity:", error);

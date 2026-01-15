@@ -47,7 +47,7 @@ export const alertsRouter = router({
         severity: z.enum(["low", "medium", "high", "critical"]),
         title: z.string(),
         message: z.string(),
-        metadata: z.record(z.any()).optional(),
+        metadata: z.record(z.string(), z.any()).optional(),
       })
     )
     .mutation(async ({ input, ctx }) => {

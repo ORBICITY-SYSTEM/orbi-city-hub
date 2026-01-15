@@ -86,7 +86,7 @@ export const googleAnalyticsRouter = router({
         return sum + parseInt(row.metricValues?.[1]?.value || '0', 10);
       }, 0);
 
-      const topPages = rows.map(row => ({
+      const topPages = rows.map((row: any) => ({
         page: row.dimensionValues?.[0]?.value || 'Unknown',
         activeUsers: parseInt(row.metricValues?.[0]?.value || '0', 10),
         pageViews: parseInt(row.metricValues?.[1]?.value || '0', 10),

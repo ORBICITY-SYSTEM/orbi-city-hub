@@ -58,7 +58,7 @@ export async function getAnalyticsDataClient() {
   const scopes = ['https://www.googleapis.com/auth/analytics.readonly'];
   const authClient = await getGoogleAuthClient(scopes);
   
-  const analyticsData = google.analyticsdata({
+  const analyticsData = (google as any).analyticsdata({
     version: 'v1beta',
     auth: authClient as any,
   });
@@ -75,7 +75,7 @@ export async function getBusinessProfileClient() {
   ];
   const authClient = await getGoogleAuthClient(scopes);
   
-  const mybusiness = google.mybusinessbusinessinformation({
+  const mybusiness = (google as any).mybusinessbusinessinformation({
     version: 'v1',
     auth: authClient as any,
   });
@@ -93,7 +93,7 @@ export async function getGmailClient() {
   ];
   const authClient = await getGoogleAuthClient(scopes);
   
-  const gmail = google.gmail({
+  const gmail = (google as any).gmail({
     version: 'v1',
     auth: authClient as any,
   });

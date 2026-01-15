@@ -17,7 +17,7 @@ function getDriveClient() {
         ],
       });
 
-      driveClient = google.drive({ version: 'v3', auth });
+      driveClient = (google as any).drive({ version: 'v3', auth });
     } catch (error) {
       console.warn('[Google Drive] Failed to initialize client:', error);
       return null;
@@ -63,14 +63,14 @@ export async function listDriveFiles(
       ? `'${folderId}' in parents and trashed = false`
       : "trashed = false and 'root' in parents";
 
-    const response = await client.files.list({
+    const response = await (client.files.list({
       q: query,
       pageSize,
       pageToken,
       fields:
         'nextPageToken, files(id, name, mimeType, size, createdTime, modifiedTime, webViewLink, webContentLink, thumbnailLink, iconLink)',
       orderBy: 'modifiedTime desc',
-    });
+    }) as any);
 
     return {
       files: (response.data.files || []) as DriveFile[],
@@ -121,11 +121,11 @@ export async function uploadToDrive(
       body: require('stream').Readable.from(fileBuffer),
     };
 
-    const response = await client.files.create({
+    const response = await (client.files.create({
       requestBody: fileMetadata,
       media,
       fields: 'id, name, mimeType, size, createdTime, modifiedTime, webViewLink, webContentLink',
-    });
+    }) as any);
 
     return {
       success: true,
@@ -162,19 +162,19 @@ export async function downloadFromDrive(
 
   try {
     // Get file metadata first
-    const metadataResponse = await client.files.get({
+    const metadataResponse = await (client.files.get({
       fileId,
       fields: 'mimeType',
-    });
+    }) as any);
 
     // Download file content
-    const response = await client.files.get(
+    const response = await (client.files.get(
       {
         fileId,
         alt: 'media',
       },
       { responseType: 'arraybuffer' }
-    );
+    ) as any);
 
     return {
       success: true,
@@ -253,10 +253,10 @@ export async function createDriveFolder(
       fileMetadata.parents = [parentFolderId];
     }
 
-    const response = await client.files.create({
+    const response = await (client.files.create({
       requestBody: fileMetadata,
       fields: 'id, name, mimeType, createdTime, modifiedTime, webViewLink',
-    });
+    }) as any);
 
     return {
       success: true,

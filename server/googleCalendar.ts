@@ -14,7 +14,7 @@ function getCalendarClient() {
         scopes: ['https://www.googleapis.com/auth/calendar'],
       });
 
-      calendarClient = google.calendar({ version: 'v3', auth });
+      calendarClient = (google as any).calendar({ version: 'v3', auth });
     } catch (error) {
       console.warn('[Google Calendar] Failed to initialize client:', error);
       return null;
@@ -83,11 +83,11 @@ ${booking.notes ? `\nNotes: ${booking.notes}` : ''}
       colorId: '9', // Blue color for bookings
     };
 
-    const response = await client.events.insert({
+    const response = await (client.events.insert({
       calendarId,
       requestBody: event,
       sendUpdates: 'all', // Send email notifications to attendees
-    });
+    }) as any);
 
     console.log('[Google Calendar] Event created:', response.data.id);
     return {

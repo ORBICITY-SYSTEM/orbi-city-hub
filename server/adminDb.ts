@@ -215,7 +215,7 @@ export async function reorderModules(moduleOrders: { id: number; order: number }
   try {
     // Update all module orders in a transaction-like manner
     for (const { id, order } of moduleOrders) {
-      await db.update(modules).set({ order }).where(eq(modules.id, id));
+      await db.update(modules).set({ sortOrder: order }).where(eq(modules.id, id));
     }
     return true;
   } catch (error) {

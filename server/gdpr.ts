@@ -53,7 +53,7 @@ export async function exportUserData(userId: number) {
   const errorLogsResult = await db.execute(sql`
     SELECT * FROM errorLogs WHERE userId = ${userId}
   `);
-  userData.errorLogs = errorLogsResult.rows;
+  userData.errorLogs = (errorLogsResult as any) as any[];
 
   return {
     exportDate: new Date().toISOString(),

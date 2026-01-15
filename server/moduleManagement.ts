@@ -56,7 +56,7 @@ export async function renameSubModule(update: SubModuleUpdate): Promise<{ succes
 
     let moduleConfig: any;
     if (configResult.length > 0) {
-      moduleConfig = JSON.parse(configResult[0]!.value);
+      moduleConfig = JSON.parse(String(configResult[0]!.value));
     } else {
       // Initialize with default configuration
       const { MODULES } = await import("../shared/moduleConfig");
@@ -127,7 +127,7 @@ export async function addSubModule(newSubModule: NewSubModule): Promise<{ succes
 
     let moduleConfig: any;
     if (configResult.length > 0) {
-      moduleConfig = JSON.parse(configResult[0]!.value);
+      moduleConfig = JSON.parse(String(configResult[0]!.value));
     } else {
       const { MODULES } = await import("../shared/moduleConfig");
       moduleConfig = { modules: MODULES };
@@ -207,7 +207,7 @@ export async function updateKnowledgeBase(
 
     let moduleConfig: any;
     if (configResult.length > 0) {
-      moduleConfig = JSON.parse(configResult[0]!.value);
+      moduleConfig = JSON.parse(String(configResult[0]!.value));
     } else {
       const { MODULES } = await import("../shared/moduleConfig");
       moduleConfig = { modules: MODULES };
@@ -268,7 +268,7 @@ export async function getModuleConfiguration(): Promise<any> {
       .limit(1);
 
     if (configResult.length > 0) {
-      return JSON.parse(configResult[0]!.value);
+      return JSON.parse(String(configResult[0]!.value));
     } else {
       // Return default configuration
       const { MODULES } = await import("../shared/moduleConfig");
