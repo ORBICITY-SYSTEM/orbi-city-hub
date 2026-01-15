@@ -103,7 +103,7 @@ export default function KnowledgeBase() {
   const selectedArticle = articles.find(a => a.id === selectedId) || filtered[0] || articles[0] || null;
 
   return (
-    <div className="relative isolate space-y-10 max-w-screen-2xl mx-auto px-4 pb-14">
+    <div className="relative isolate space-y-10 max-w-screen-2xl mx-auto px-4 pb-16">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(59,130,246,0.18),transparent_25%),radial-gradient(circle_at_80%_0%,rgba(16,185,129,0.12),transparent_22%),radial-gradient(circle_at_50%_60%,rgba(244,114,182,0.10),transparent_30%)] blur-2xl" />
 
       {/* Header */}
@@ -130,7 +130,7 @@ export default function KnowledgeBase() {
       {/* Search + Tag filter */}
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:gap-4">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" aria-hidden />
           <Input
             placeholder="ძიება სათაურში, ტეგებში ან ტექსტში…"
             value={searchQuery}
@@ -167,7 +167,7 @@ export default function KnowledgeBase() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Sidebar list */}
-        <Card className="lg:col-span-1 rounded-3xl border-white/8 bg-slate-900/80 backdrop-blur shadow-2xl sticky top-4">
+        <Card className="lg:col-span-1 rounded-3xl border-white/8 bg-slate-900/85 backdrop-blur shadow-2xl sticky top-4">
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center gap-2 text-lg">
               <FileText className="h-5 w-5" />
@@ -192,12 +192,12 @@ export default function KnowledgeBase() {
                         <button
                           key={article.id}
                           onClick={() => setSelectedId(article.id)}
-                          className={`w-full text-left px-4 py-3 hover:bg-white/5 transition ${
-                            selectedId === article.id ? "bg-white/10 border-l-2 border-primary" : ""
+                          className={`w-full text-left px-4 py-3 hover:bg-white/5 transition rounded-xl ${
+                            selectedId === article.id ? "bg-white/10 border border-primary/30 shadow-inner" : ""
                           }`}
                         >
-                          <div className="font-semibold text-sm leading-tight">{article.title}</div>
-                          <div className="text-xs text-muted-foreground line-clamp-2">
+                          <div className="font-semibold text-sm leading-snug text-white/90">{article.title}</div>
+                          <div className="text-xs text-white/60 line-clamp-2">
                             {article.tags.join(", ")}
                           </div>
                         </button>
@@ -217,8 +217,8 @@ export default function KnowledgeBase() {
         </Card>
 
         {/* Content */}
-        <Card className="lg:col-span-2 rounded-3xl border-white/8 bg-slate-900/85 backdrop-blur shadow-2xl">
-          <CardHeader>
+        <Card className="lg:col-span-2 rounded-3xl border-white/8 bg-slate-900/90 backdrop-blur shadow-2xl">
+          <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2">
               <BookOpen className="h-5 w-5" />
               {selectedArticle?.title ?? "აირჩიე სტატია"}
@@ -226,7 +226,7 @@ export default function KnowledgeBase() {
             {selectedArticle && (
               <CardDescription className="flex flex-wrap gap-2">
                 {selectedArticle.tags.map(tag => (
-                  <Badge key={tag} variant="secondary">
+                  <Badge key={tag} variant="secondary" className="bg-white/10 text-white/80 border-white/20">
                     {tag}
                   </Badge>
                 ))}
@@ -235,7 +235,7 @@ export default function KnowledgeBase() {
           </CardHeader>
           <CardContent>
             {selectedArticle ? (
-              <div className="prose prose-base md:prose-lg dark:prose-invert max-w-none leading-7 text-white/90">
+              <div className="prose prose-base md:prose-lg dark:prose-invert max-w-[820px] leading-8 text-white/90 prose-p:mb-3 prose-li:mb-2 prose-strong:text-white prose-em:text-white/90">
                 <ReactMarkdown>{selectedArticle.content}</ReactMarkdown>
               </div>
             ) : (
