@@ -607,13 +607,71 @@ export const instagramRouter = router({
         })
         .optional()
     )
-    .query(async () => {
-      // SAFE MODE: always succeed with empty data to avoid UI errors
-      return {
-        metrics: [],
-        posts: [],
-        summary: null,
-        weeklyStats: [],
-      };
+    .query(async ({ input }) => {
+      try {
+        const db = await getDb();
+        if (!db) {
+          return {
+            metrics: [],
+            posts: [],
+            summary: null,
+            weeklyStats: [],
+          };
+        }
+
+        const conditionsMetrics: any[] = [];
+        if (input?.from && typeof input.from === "string") {
+          conditionsMetrics.push(gte(instagramDailyMetrics.date, input.from));
+        }
+        if (input?.to && typeof input.to === "string") {
+          conditionsMetrics.push(lte(instagramDailyMetrics.date, input.to));
+        }
+
+        const conditionsPosts: any[] = [];
+        if (input?.from && typeof input.from === "string") {
+          conditionsPosts.push(gte(instagramPosts.post_date, input.from));
+        }
+        if (input?.to && typeof input.to === "string") {
+          conditionsPosts.push(lte(instagramPosts.post_date, input.to));
+        }
+
+        const [metrics, posts, summaryRow, weeklyStats] = await Promise.all([
+          db
+            .select()
+            .from(instagramDailyMetrics)
+            .where(conditionsMetrics.length > 0 ? and(...conditionsMetrics) : undefined)
+            .orderBy(desc(instagramDailyMetrics.date)),
+          db
+            .select()
+            .from(instagramPosts)
+            .where(conditionsPosts.length > 0 ? and(...conditionsPosts) : undefined)
+            .orderBy(desc(instagramPosts.post_date))
+            .limit(1000),
+          db
+            .select()
+            .from(instagramSummary)
+            .orderBy(desc(instagramSummary.synced_at))
+            .limit(1),
+          db
+            .select()
+            .from(instagramWeeklyStats)
+            .orderBy(desc(instagramWeeklyStats.week_starting)),
+        ]);
+
+        return {
+          metrics,
+          posts,
+          summary: summaryRow[0] || null,
+          weeklyStats,
+        };
+      } catch (error) {
+        console.error("[Instagram getDashboard] error:", error);
+        return {
+          metrics: [],
+          posts: [],
+          summary: null,
+          weeklyStats: [],
+        };
+      }
     }),
 });
