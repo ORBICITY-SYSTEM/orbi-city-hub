@@ -88,7 +88,6 @@ export function useInstagramAnalytics(): UseInstagramAnalyticsReturn {
   const utils = trpc.useContext();
   const syncMutation = trpc.instagram.syncFromRows.useMutation();
   const testMutation = trpc.instagram.testConnection.useMutation();
-  const dashboardQuery = trpc.instagram.getDashboard;
 
   const reset = useCallback(() => {
     setData(null);
@@ -105,7 +104,7 @@ export function useInstagramAnalytics(): UseInstagramAnalyticsReturn {
       const to = dateRange?.to ? dateRange.to.toISOString().split("T")[0] : undefined;
       const input = from || to ? { from, to } : undefined;
 
-      const result = await dashboardQuery.fetch(input);
+      const result = await utils.instagram.getDashboard.fetch(input);
 
       setData(result);
       setIsLoading(false);
@@ -116,7 +115,7 @@ export function useInstagramAnalytics(): UseInstagramAnalyticsReturn {
       setIsLoading(false);
       return null;
     }
-  }, [dashboardQuery, utils.instagram.getDashboard]);
+  }, [utils.instagram.getDashboard]);
 
   const syncFromRows = useCallback(async (): Promise<boolean> => {
     try {
