@@ -83,6 +83,123 @@ interface UseInstagramAnalyticsReturn {
 
 const SAFE_MODE = true;
 
+const SAMPLE_DATA: InstagramData = {
+  metrics: [
+    {
+      id: "m1",
+      date: "2026-01-07",
+      reach: 9500,
+      accounts_engaged: 1800,
+      likes: 700,
+      comments: 120,
+      shares: 85,
+      follows: 40,
+      profile_links_taps: 55,
+      views: 12000,
+      total_interactions: 945,
+    },
+    {
+      id: "m2",
+      date: "2026-01-06",
+      reach: 8200,
+      accounts_engaged: 1500,
+      likes: 620,
+      comments: 90,
+      shares: 60,
+      follows: 32,
+      profile_links_taps: 48,
+      views: 10500,
+      total_interactions: 802,
+    },
+    {
+      id: "m3",
+      date: "2026-01-05",
+      reach: 6875,
+      accounts_engaged: 1300,
+      likes: 540,
+      comments: 75,
+      shares: 45,
+      follows: 28,
+      profile_links_taps: 42,
+      views: 9800,
+      total_interactions: 688,
+    },
+  ],
+  posts: [
+    {
+      id: "p1",
+      post_url: "https://instagram.com/p/demo1",
+      post_date: "2026-01-06",
+      created_time: "2026-01-06T10:00:00Z",
+      caption: "ვიზუალური ალბომი — ახალი წელი ბათუმში",
+      likes: 180,
+      reach: 5200,
+      comments: 36,
+      saved: 22,
+      follows: 12,
+      media_type: "IMAGE",
+      watch_time_ms: null,
+      theme: "Holiday",
+      media_url: null,
+    },
+    {
+      id: "p2",
+      post_url: "https://instagram.com/p/demo2",
+      post_date: "2026-01-05",
+      created_time: "2026-01-05T15:30:00Z",
+      caption: "ვიდეო რიცხვებით — საუკეთესო მომენტები",
+      likes: 165,
+      reach: 4300,
+      comments: 28,
+      saved: 19,
+      follows: 10,
+      media_type: "VIDEO",
+      watch_time_ms: 320000,
+      theme: "Highlights",
+      media_url: null,
+    },
+  ],
+  summary: {
+    id: "s1",
+    synced_at: "2026-01-07T12:00:00Z",
+    time_frame: "all_time",
+    posts_count: 2,
+    total_reach: 24575,
+    total_likes: 345,
+    total_comments: 75,
+    total_saved: 41,
+    total_follows: 75,
+    avg_reach_per_post: 5120,
+    engagement_rate: 4.8,
+  },
+  weeklyStats: [
+    {
+      id: "w1",
+      week_starting: "2025-12-29",
+      posts_count: 3,
+      reach: 15000,
+      likes: 520,
+      comments: 90,
+      saved: 48,
+      follows: 30,
+      avg_reach_per_post: 5000,
+      engagement_rate: 5.2,
+    },
+    {
+      id: "w2",
+      week_starting: "2025-12-22",
+      posts_count: 2,
+      reach: 9575,
+      likes: 345,
+      comments: 60,
+      saved: 32,
+      follows: 20,
+      avg_reach_per_post: 4788,
+      engagement_rate: 4.5,
+    },
+  ],
+};
+
 export function useInstagramAnalytics(): UseInstagramAnalyticsReturn {
   const [data, setData] = useState<InstagramData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -103,15 +220,9 @@ export function useInstagramAnalytics(): UseInstagramAnalyticsReturn {
 
     try {
       if (SAFE_MODE) {
-        const emptyResult: InstagramData = {
-          metrics: [],
-          posts: [],
-          summary: null,
-          weeklyStats: [],
-        };
-        setData(emptyResult);
+        setData(SAMPLE_DATA);
         setIsLoading(false);
-        return emptyResult;
+        return SAMPLE_DATA;
       }
 
       const from = dateRange?.from ? dateRange.from.toISOString().split("T")[0] : undefined;
@@ -133,9 +244,7 @@ export function useInstagramAnalytics(): UseInstagramAnalyticsReturn {
 
   const syncFromRows = useCallback(async (): Promise<boolean> => {
     try {
-      if (SAFE_MODE) {
-        return true;
-      }
+      if (SAFE_MODE) return true;
       const result = await syncMutation.mutateAsync();
       return Boolean(result?.success);
     } catch (err) {
@@ -146,9 +255,7 @@ export function useInstagramAnalytics(): UseInstagramAnalyticsReturn {
 
   const testConnection = useCallback(async (): Promise<{ success: boolean; message: string }> => {
     try {
-      if (SAFE_MODE) {
-        return { success: true, message: "Safe mode enabled" };
-      }
+      if (SAFE_MODE) return { success: true, message: "Safe mode enabled" };
       const result = await testMutation.mutateAsync();
       return {
         success: Boolean(result?.success),
