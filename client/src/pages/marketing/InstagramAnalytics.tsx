@@ -27,6 +27,7 @@ export default function InstagramAnalytics() {
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [selectedTheme, setSelectedTheme] = useState<string | null>(null);
   const [mediaTypeFilter, setMediaTypeFilter] = useState<string[]>([]);
+  const AUTO_REFRESH_MS = 15 * 60 * 1000; // 15 minutes
 
   const { data, isLoading, error, fetchData, syncFromRows, testConnection } = useInstagramAnalytics();
 
@@ -34,6 +35,14 @@ export default function InstagramAnalytics() {
   useEffect(() => {
     fetchData(dateRange);
   }, [dateRange.from, dateRange.to, fetchData]);
+
+  // Auto-refresh every 15 minutes to keep data fresh without manual sync
+  useEffect(() => {
+    const id = setInterval(() => {
+      fetchData(dateRange);
+    }, AUTO_REFRESH_MS);
+    return () => clearInterval(id);
+  }, [fetchData, dateRange]);
 
   const metrics = data?.metrics || [];
   const posts = data?.posts || [];
