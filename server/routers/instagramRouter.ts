@@ -261,9 +261,10 @@ export const instagramRouter = router({
             total_comments: parseInt(summaryMap['Total Comments'] || summaryMap['total_comments'] || '0') || null,
             total_saved: parseInt(summaryMap['Total Saved'] || summaryMap['total_saved'] || '0') || null,
             total_follows: parseInt(summaryMap['Total Follows'] || summaryMap['total_follows'] || '0') || null,
-            avg_reach_per_post: parseFloat(summaryMap['Avg Reach / Post'] || summaryMap['avg_reach_per_post'] || '0') || null,
-            engagement_rate: parseFloat(summaryMap['Engagement Rate'] || summaryMap['engagement_rate'] || '0') || null,
-          });
+            // Convert to string for decimal fields
+            avg_reach_per_post: summaryMap['Avg Reach / Post'] || summaryMap['avg_reach_per_post'] || null,
+            engagement_rate: summaryMap['Engagement Rate'] || summaryMap['engagement_rate'] || null,
+          } as any);
         }
 
         // Sync weekly stats
@@ -281,9 +282,10 @@ export const instagramRouter = router({
             comments: parseInt(item['Comments'] || '0') || null,
             saved: parseInt(item['Saved'] || '0') || null,
             follows: parseInt(item['Follows'] || '0') || null,
-            avg_reach_per_post: parseFloat(item['Avg reach / post'] || '0') || null,
-            engagement_rate: parseFloat(item['Engagement rate'] || '0') || null,
-          });
+            // Convert to string for decimal fields
+            avg_reach_per_post: item['Avg reach / post'] || null,
+            engagement_rate: item['Engagement rate'] || null,
+          } as any);
           weeklySynced++;
         }
 
@@ -449,10 +451,10 @@ export const instagramRouter = router({
       }
 
       const whereConditions: any[] = [];
-      if (input?.from) {
+      if (input?.from && typeof input.from === 'string') {
         whereConditions.push(gte(instagramDailyMetrics.date, input.from));
       }
-      if (input?.to) {
+      if (input?.to && typeof input.to === 'string') {
         whereConditions.push(lte(instagramDailyMetrics.date, input.to));
       }
 
