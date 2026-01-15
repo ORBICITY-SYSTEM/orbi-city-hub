@@ -15,6 +15,20 @@ export type TawktoRowsSchedule = {
   dayOfWeek?: number; // 0-6 (Sunday-Saturday)
 };
 
+export type TawktoRowsFieldMapping = Record<string, string>;
+
+export const DEFAULT_FIELD_MAPPING: TawktoRowsFieldMapping = {
+  contactId: "Contact ID",
+  name: "Name",
+  email: "Primary Email",
+  phone: "Primary Phone",
+  organization: "Organization",
+  tags: "Tags",
+  createdAt: "Created At",
+  updatedAt: "Updated At",
+  lastSeen: "Last Seen",
+};
+
 export type TawktoRowsConfig = {
   botId: string;
   rowsSpreadsheetId: string;
@@ -22,6 +36,7 @@ export type TawktoRowsConfig = {
   rowsApiKey?: string;
   tawkPropertyId?: string;
   schedule: TawktoRowsSchedule;
+  fieldMapping: TawktoRowsFieldMapping;
 };
 
 type TriggerSource = "manual" | "schedule";
@@ -49,6 +64,20 @@ export function maskSecret(value?: string, visibleChars: number = 4) {
   return `${"•".repeat(Math.max(trimmed.length - visibleChars, 6))}${trimmed.slice(-visibleChars)}`;
 }
 
+export function normalizeFieldMapping(mapping?: TawktoRowsFieldMapping) {
+  const merged = { ...DEFAULT_FIELD_MAPPING, ...(mapping || {}) };
+  return Object.fromEntries(
+    Object.entries(merged).map(([key, value]) => [key, (value ?? "").trim()])
+  ) as TawktoRowsFieldMapping;
+}
+
+export function formatFieldMappingForPayload(mapping?: TawktoRowsFieldMapping) {
+  const normalized = normalizeFieldMapping(mapping);
+  return Object.fromEntries(
+    Object.entries(normalized).filter(([, value]) => value.length > 0)
+  ) as TawktoRowsFieldMapping;
+}
+
 export async function getTawktoRowsIntegration() {
   const db = await getDb();
   if (!db) {
@@ -66,7 +95,13 @@ export async function getTawktoRowsIntegration() {
   }
 
   const config = parseConfig(integration.config);
-  return { integration, config };
+  const normalizedConfig = config
+    ? {
+        ...config,
+        fieldMapping: normalizeFieldMapping(config.fieldMapping),
+      }
+    : null;
+  return { integration, config: normalizedConfig };
 }
 
 export async function saveTawktoRowsConfig(params: {
@@ -76,6 +111,7 @@ export async function saveTawktoRowsConfig(params: {
   rowsApiKey?: string;
   tawkPropertyId?: string;
   schedule: TawktoRowsSchedule;
+  fieldMapping?: TawktoRowsFieldMapping;
   isEnabled: boolean;
 }) {
   const db = await getDb();
@@ -91,6 +127,10 @@ export async function saveTawktoRowsConfig(params: {
     throw new Error("Rows API key is required");
   }
 
+  const fieldMapping = normalizeFieldMapping(
+    params.fieldMapping ?? existingConfig?.fieldMapping
+  );
+
   const mergedConfig: TawktoRowsConfig = {
     botId: params.botId,
     rowsSpreadsheetId: params.rowsSpreadsheetId,
@@ -98,6 +138,7 @@ export async function saveTawktoRowsConfig(params: {
     rowsApiKey,
     tawkPropertyId: params.tawkPropertyId || undefined,
     schedule: params.schedule,
+    fieldMapping,
   };
 
   const encryptedConfig = encrypt(JSON.stringify(mergedConfig));
@@ -128,16 +169,25 @@ export async function saveTawktoRowsConfig(params: {
   return { success: true };
 }
 
-function buildPayload(config: TawktoRowsConfig, lastSync?: Date | null) {
-  const payload: Record<string, string | undefined> = {
+export function buildTawktoRowsPayload(config: TawktoRowsConfig, lastSync?: Date | null) {
+  const payload: Record<string, string | TawktoRowsFieldMapping | undefined> = {
     rowsApiKey: config.rowsApiKey,
     rowsSpreadsheetId: config.rowsSpreadsheetId,
     rowsTableId: config.rowsTableId,
     tawkPropertyId: config.tawkPropertyId,
     since: lastSync ? lastSync.toISOString() : undefined,
+    fieldMapping: formatFieldMappingForPayload(config.fieldMapping),
   };
 
-  return Object.fromEntries(Object.entries(payload).filter(([, value]) => value));
+  return Object.fromEntries(
+    Object.entries(payload).filter(([, value]) => {
+      if (!value) return false;
+      if (typeof value === "object") {
+        return Object.keys(value).length > 0;
+      }
+      return true;
+    })
+  );
 }
 
 export async function triggerTawktoRowsSync(triggeredBy: TriggerSource) {
@@ -169,7 +219,7 @@ export async function triggerTawktoRowsSync(triggeredBy: TriggerSource) {
     };
   }
 
-  const payload = buildPayload(
+  const payload = buildTawktoRowsPayload(
     {
       ...config,
       rowsApiKey,
