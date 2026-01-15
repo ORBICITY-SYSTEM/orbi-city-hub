@@ -138,7 +138,7 @@ export const InstagramHeader = ({
               </h1>
               <p className="text-sm text-muted-foreground flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-primary animate-pulse shadow-sm shadow-primary/50" />
-                Synced from Rows.com
+                Synced from Rows.com • tRPC
               </p>
             </div>
           </div>
