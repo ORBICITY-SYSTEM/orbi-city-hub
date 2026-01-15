@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { trpc } from "@/lib/trpc";
 
 export interface InstagramMetric {
   id: string;
@@ -85,6 +85,9 @@ export function useInstagramAnalytics(): UseInstagramAnalyticsReturn {
   const [data, setData] = useState<InstagramData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const utils = trpc.useContext();
+  const syncMutation = trpc.instagram.syncFromRows.useMutation();
+  const testMutation = trpc.instagram.testConnection.useMutation();
 
   const reset = useCallback(() => {
     setData(null);
@@ -97,147 +100,61 @@ export function useInstagramAnalytics(): UseInstagramAnalyticsReturn {
     setError(null);
 
     try {
-      // Use any type since tables aren't in generated types yet
-      const client = supabase as any;
+      const from = dateRange?.from ? dateRange.from.toISOString().split("T")[0] : undefined;
+      const to = dateRange?.to ? dateRange.to.toISOString().split("T")[0] : undefined;
+      const metricsInput = from || to ? { from, to } : undefined;
+      const postsInput = from || to ? { from, to, limit: 1000 } : { limit: 1000 };
 
-      // Build metrics query with date filter
-      let metricsQuery = client
-        .from('instagram_daily_metrics')
-        .select('*')
-        .order('date', { ascending: false });
-
-      if (dateRange?.from) {
-        metricsQuery = metricsQuery.gte('date', dateRange.from.toISOString().split('T')[0]);
-      }
-      if (dateRange?.to) {
-        metricsQuery = metricsQuery.lte('date', dateRange.to.toISOString().split('T')[0]);
-      }
-
-      // Build posts query with date filter
-      let postsQuery = client
-        .from('instagram_posts')
-        .select('*')
-        .order('post_date', { ascending: false });
-
-      if (dateRange?.from) {
-        postsQuery = postsQuery.gte('post_date', dateRange.from.toISOString().split('T')[0]);
-      }
-      if (dateRange?.to) {
-        postsQuery = postsQuery.lte('post_date', dateRange.to.toISOString().split('T')[0]);
-      }
-
-      // Get latest summary
-      const summaryQuery = client
-        .from('instagram_summary')
-        .select('*')
-        .order('synced_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
-
-      // Get weekly stats
-      let weeklyQuery = client
-        .from('instagram_weekly_stats')
-        .select('*')
-        .order('week_starting', { ascending: false });
-
-      // Execute all queries in parallel
-      const [metricsResult, postsResult, summaryResult, weeklyResult] = await Promise.all([
-        metricsQuery,
-        postsQuery,
-        summaryQuery,
-        weeklyQuery,
+      const [metrics, posts, summary, weeklyStats] = await Promise.all([
+        utils.instagram.getMetrics.fetch(metricsInput),
+        utils.instagram.getPosts.fetch(postsInput),
+        utils.instagram.getSummary.fetch(),
+        utils.instagram.getWeeklyStats.fetch(),
       ]);
 
-      if (metricsResult.error) {
-        console.error('Metrics fetch error:', metricsResult.error);
-        throw new Error(metricsResult.error.message);
-      }
-
-      if (postsResult.error) {
-        console.error('Posts fetch error:', postsResult.error);
-        throw new Error(postsResult.error.message);
-      }
-
-      if (summaryResult.error) {
-        console.error('Summary fetch error:', summaryResult.error);
-        throw new Error(summaryResult.error.message);
-      }
-
-      if (weeklyResult.error) {
-        console.error('Weekly stats fetch error:', weeklyResult.error);
-        // Don't throw, just log - weekly stats might not exist yet
-      }
-
       const result: InstagramData = {
-        metrics: (metricsResult.data || []) as InstagramMetric[],
-        posts: (postsResult.data || []) as InstagramPost[],
-        summary: summaryResult.data as InstagramSummary | null,
-        weeklyStats: (weeklyResult.data || []) as InstagramWeeklyStats[],
+        metrics: (metrics || []) as InstagramMetric[],
+        posts: (posts || []) as InstagramPost[],
+        summary: (summary || null) as InstagramSummary | null,
+        weeklyStats: (weeklyStats || []) as InstagramWeeklyStats[],
       };
 
       setData(result);
       setIsLoading(false);
       return result;
-
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'უცნობი შეცდომა';
+      const errorMessage = err instanceof Error ? err.message : "უცნობი შეცდომა";
       setError(errorMessage);
       setIsLoading(false);
       return null;
     }
-  }, []);
+  }, [utils.instagram.getMetrics, utils.instagram.getPosts, utils.instagram.getSummary, utils.instagram.getWeeklyStats]);
 
-    // Trigger sync from Rows.com
-    const syncFromRows = useCallback(async (): Promise<boolean> => {
-      try {
-        const { data, error: invokeError } = await supabase.functions.invoke(
-          'dynamic-endpoint',
-          { body: { action: 'sync' } }
-        );
-
-      if (invokeError) {
-        console.error('Sync error:', invokeError);
-        return false;
-      }
-
-      // Check for API-level errors in response
-      if (data?.error) {
-        console.error('Sync API error:', data.error);
-        return false;
-      }
-
-      return true;
+  const syncFromRows = useCallback(async (): Promise<boolean> => {
+    try {
+      const result = await syncMutation.mutateAsync();
+      return Boolean(result?.success);
     } catch (err) {
-      console.error('Sync error:', err);
+      console.error("Sync error:", err);
       return false;
     }
-  }, []);
+  }, [syncMutation]);
 
-    // Test Rows.com connection (1 lightweight request)
-    const testConnection = useCallback(async (): Promise<{ success: boolean; message: string }> => {
-      try {
-        const { data, error: invokeError } = await supabase.functions.invoke(
-          'clever-endpoint'
-        );
-
-      if (invokeError) {
-        const msg = invokeError.message || 'Edge function error';
-        return { success: false, message: msg };
-      }
-
-      if (data?.error) {
-        return { success: false, message: data.error };
-      }
-
-      return { 
-        success: true, 
-        message: data?.message || 'კავშირი წარმატებულია!' 
+  const testConnection = useCallback(async (): Promise<{ success: boolean; message: string }> => {
+    try {
+      const result = await testMutation.mutateAsync();
+      return {
+        success: Boolean(result?.success),
+        message: result?.message || "Connection test completed",
       };
     } catch (err) {
-      const msg = err instanceof Error ? err.message : 'უცნობი შეცდომა';
-      return { success: false, message: msg };
+      console.error("Test connection error:", err);
+      return {
+        success: false,
+        message: err instanceof Error ? err.message : "Connection test failed",
+      };
     }
-  }, []);
+  }, [testMutation]);
 
   return { data, isLoading, error, fetchData, syncFromRows, testConnection, reset };
 }
