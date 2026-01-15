@@ -91,7 +91,7 @@ export const adminRouter = router({
     // Vercel serverless functions - get cookie from headers
     const cookieHeader = (ctx.req as any).headers?.cookie || '';
     const cookies = Object.fromEntries(
-      cookieHeader.split(';').map(c => c.trim().split('='))
+      cookieHeader.split(';').map((c: string) => c.trim().split('='))
     );
     const token = cookies[ADMIN_SESSION_COOKIE];
     

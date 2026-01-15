@@ -545,10 +545,9 @@ Answer questions about any aspect of the business. Be specific, data-driven, and
         // Increment completed responses counter
         const today = new Date().toISOString().split('T')[0];
         await db.execute(
-          `INSERT INTO ai_response_stats (date, completed_count, platform)
-           VALUES (?, 1, ?)
-           ON DUPLICATE KEY UPDATE completed_count = completed_count + 1`,
-          [today, source || 'google']
+          sql`INSERT INTO ai_response_stats (date, completed_count, platform)
+           VALUES (${today}, 1, ${source || 'google'})
+           ON DUPLICATE KEY UPDATE completed_count = completed_count + 1`
         );
       } catch (statsError) {
         console.log('[Butler] Stats update error (non-critical):', statsError);
