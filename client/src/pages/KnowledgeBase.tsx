@@ -59,6 +59,7 @@ export default function KnowledgeBase() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTag, setActiveTag] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(kbArticles[0]?.id ?? null);
+  const [readingMode, setReadingMode] = useState(false);
 
   const articles: CategorizedArticle[] = useMemo(
     () =>
@@ -264,6 +265,14 @@ export default function KnowledgeBase() {
               {tag}
             </Button>
           ))}
+          <Button
+            size="sm"
+            variant={readingMode ? "default" : "outline"}
+            className="rounded-full"
+            onClick={() => setReadingMode(!readingMode)}
+          >
+            {readingMode ? "Reading mode: On" : "Reading mode"}
+          </Button>
         </div>
       </div>
 
@@ -319,7 +328,11 @@ export default function KnowledgeBase() {
         </Card>
 
         {/* Content */}
-        <Card className="lg:col-span-2 rounded-3xl border-white/8 bg-slate-900/90 backdrop-blur shadow-2xl relative">
+        <Card
+          className={`lg:col-span-2 rounded-3xl border-white/8 backdrop-blur shadow-2xl relative ${
+            readingMode ? "bg-slate-50 text-slate-900" : "bg-slate-900/90"
+          }`}
+        >
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2">
               <BookOpen className="h-5 w-5" />
@@ -328,7 +341,11 @@ export default function KnowledgeBase() {
             {selectedArticle && (
               <CardDescription className="flex flex-wrap gap-2">
                 {selectedArticle.tags.map(tag => (
-                  <Badge key={tag} variant="secondary" className="bg-white/10 text-white/80 border-white/20">
+                  <Badge
+                    key={tag}
+                    variant="secondary"
+                    className={readingMode ? "bg-slate-200 text-slate-800 border-slate-300" : "bg-white/10 text-white/80 border-white/20"}
+                  >
                     {tag}
                   </Badge>
                 ))}
