@@ -1,4 +1,5 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
+import { setSecurityHeaders } from "../_utils/envGuard";
 
 type CacheEntry = {
   data: DashboardData;
@@ -247,6 +248,7 @@ async function fetchDashboardFromRows(metricsTableId?: string): Promise<Dashboar
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  setSecurityHeaders(res);
   const refresh = req.query.refresh === "1";
   const metricsTableId = typeof req.query.tableId === "string" ? req.query.tableId : undefined;
 
