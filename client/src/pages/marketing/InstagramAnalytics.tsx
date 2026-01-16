@@ -280,6 +280,26 @@ export default function InstagramAnalytics() {
 
   return (
     <div className="space-y-6 p-6">
+      {error && (
+        <div className="rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-100 flex items-start gap-3">
+          <XCircle className="h-4 w-4 mt-0.5 text-red-200" />
+          <div>
+            <div className="font-semibold">Rows connection error</div>
+            <div className="text-red-100/80">
+              {error}
+            </div>
+            <div className="flex flex-wrap gap-2 mt-2">
+              <Button size="sm" variant="outline" onClick={handleTestConnection}>
+                Retest
+              </Button>
+              <Button size="sm" variant="secondary" onClick={handleSync}>
+                Retry sync
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <InstagramHeader
         dateRange={dateRange}
         setDateRange={setDateRange}
@@ -386,10 +406,20 @@ export default function InstagramAnalytics() {
           </div>
         </>
       ) : (
-        <div className="text-center py-12">
-          <p className="text-white/60">
-            {isLoading ? "Loading..." : "No data available. Please synchronize."}
+        <div className="text-center py-12 rounded-2xl border border-dashed border-white/10">
+          <p className="text-white/70 mb-3">
+            {isLoading ? "Loading..." : "No data available."}
           </p>
+          {!isLoading && (
+            <div className="flex gap-2 justify-center">
+              <Button size="sm" onClick={handleSync}>
+                Sync now
+              </Button>
+              <Button size="sm" variant="outline" onClick={handleTestConnection}>
+                Test connection
+              </Button>
+            </div>
+          )}
         </div>
       )}
     </div>
