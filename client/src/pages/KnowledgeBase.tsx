@@ -106,6 +106,34 @@ export default function KnowledgeBase() {
 
   const isFaq = selectedArticle?.id === "faq-50";
 
+  const toc = useMemo(() => {
+    if (!selectedArticle) return [];
+    const lines = selectedArticle.content.split("\n");
+    const entries: { text: string; id: string; level: number }[] = [];
+    lines.forEach((line) => {
+      const match = /^(#{2,3})\s+(.*)/.exec(line.trim());
+      if (match) {
+        const level = match[1].length; // 2 or 3
+        const text = match[2].trim();
+        const id = text.toLowerCase().replace(/[^a-z0-9]+/gi, "-");
+        entries.push({ text, id, level });
+      }
+    });
+    return entries;
+  }, [selectedArticle]);
+
+  function renderHeading(text: string, level: number) {
+    const id = text.toLowerCase().replace(/[^a-z0-9]+/gi, "-");
+    if (level === 2) return <h2 id={id}>{text}</h2>;
+    if (level === 3) return <h3 id={id}>{text}</h3>;
+    return <h4 id={id}>{text}</h4>;
+  }
+
+  const markdownComponents = {
+    h2: ({ children }: any) => renderHeading(String(children), 2),
+    h3: ({ children }: any) => renderHeading(String(children), 3),
+  };
+
   function parseFaq(content: string) {
     const lines = content.split("\n");
     let currentCategory = "FAQ";
@@ -169,7 +197,7 @@ export default function KnowledgeBase() {
 
     return (
       <div className="prose prose-base md:prose-lg dark:prose-invert max-w-[820px] leading-8 text-white/90 prose-p:mb-3 prose-li:mb-2 prose-strong:text-white prose-em:text-white/90 prose-h2:mt-6 prose-h2:mb-3 prose-h2:text-2xl prose-h3:mt-4 prose-h3:mb-2 prose-h3:text-xl">
-        <ReactMarkdown rehypePlugins={[rehypeSanitize]}>
+        <ReactMarkdown rehypePlugins={[rehypeSanitize]} components={markdownComponents}>
           {selectedArticle.content}
         </ReactMarkdown>
       </div>
@@ -291,7 +319,7 @@ export default function KnowledgeBase() {
         </Card>
 
         {/* Content */}
-        <Card className="lg:col-span-2 rounded-3xl border-white/8 bg-slate-900/90 backdrop-blur shadow-2xl">
+        <Card className="lg:col-span-2 rounded-3xl border-white/8 bg-slate-900/90 backdrop-blur shadow-2xl relative">
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2">
               <BookOpen className="h-5 w-5" />
@@ -310,6 +338,23 @@ export default function KnowledgeBase() {
           <CardContent>
             {renderContent()}
           </CardContent>
+
+          {toc.length > 0 && (
+            <div className="hidden xl:block absolute right-4 top-4 bottom-4 w-60 overflow-y-auto">
+              <div className="rounded-2xl border border-white/10 bg-white/5 p-3 text-sm text-white/80 space-y-2">
+                <div className="text-xs uppercase tracking-wide text-white/60">სარჩევი</div>
+                {toc.map((item) => (
+                  <a
+                    key={item.id + item.text}
+                    className="block text-sm hover:text-primary transition ml-[calc((item.level-2)*8px)]"
+                    href={`#${item.id}`}
+                  >
+                    {item.text}
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
         </Card>
       </div>
 

@@ -1,8 +1,9 @@
 // Supabase Client for Instagram Analytics (Lovable approach)
 import { createClient } from '@supabase/supabase-js';
+import { env } from "@/config/env";
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || '';
-const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || '';
+const SUPABASE_URL = env.VITE_SUPABASE_URL;
+const SUPABASE_PUBLISHABLE_KEY = env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
 const isSupabaseConfigured = Boolean(SUPABASE_URL && SUPABASE_PUBLISHABLE_KEY);
 
