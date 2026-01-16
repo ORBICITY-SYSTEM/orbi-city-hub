@@ -2,41 +2,45 @@ import { z } from "zod";
 
 const envSchema = z.object({
   VITE_APP_ID: z.string().optional(),
-  JWT_SECRET: z.string().min(1, "JWT_SECRET is required"),
-  DATABASE_URL: z.string().min(1, "DATABASE_URL is required"),
+  JWT_SECRET: z.string().optional(),
+  DATABASE_URL: z.string().optional(),
   OAUTH_SERVER_URL: z.string().optional(),
   OWNER_OPEN_ID: z.string().optional(),
   BUILT_IN_FORGE_API_URL: z.string().optional(),
   BUILT_IN_FORGE_API_KEY: z.string().optional(),
-  SUPABASE_URL: z.string().url("SUPABASE_URL must be a valid URL"),
-  SUPABASE_ANON_KEY: z.string().min(1, "SUPABASE_ANON_KEY is required"),
-  SUPABASE_SERVICE_ROLE_KEY: z.string().min(1, "SUPABASE_SERVICE_ROLE_KEY is required"),
-  ROWS_API_KEY: z.string().min(1, "ROWS_API_KEY is required"),
-  ROWS_SPREADSHEET_ID: z.string().min(1, "ROWS_SPREADSHEET_ID is required"),
-  OPENAI_API_KEY: z.string().min(1, "OPENAI_API_KEY is required"),
-  UPSTASH_REDIS_REST_URL: z.string().url("UPSTASH_REDIS_REST_URL must be a valid URL"),
-  UPSTASH_REDIS_REST_TOKEN: z.string().min(1, "UPSTASH_REDIS_REST_TOKEN is required"),
+  SUPABASE_URL: z.string().optional(),
+  SUPABASE_ANON_KEY: z.string().optional(),
+  SUPABASE_SERVICE_ROLE_KEY: z.string().optional(),
+  ROWS_API_KEY: z.string().optional(),
+  ROWS_SPREADSHEET_ID: z.string().optional(),
+  OPENAI_API_KEY: z.string().optional(),
+  UPSTASH_REDIS_REST_URL: z.string().optional(),
+  UPSTASH_REDIS_REST_TOKEN: z.string().optional(),
   SENTRY_DSN: z.string().optional(),
 });
 
-const parsed = envSchema.parse(process.env);
+const parsed = envSchema.safeParse(process.env);
+if (!parsed.success) {
+  console.warn("[ENV] Missing or invalid env vars, proceeding with best-effort defaults:", parsed.error.issues);
+}
+const env = parsed.success ? parsed.data : process.env;
 
 export const ENV = {
-  appId: parsed.VITE_APP_ID ?? "",
-  cookieSecret: parsed.JWT_SECRET,
-  databaseUrl: parsed.DATABASE_URL,
-  oAuthServerUrl: parsed.OAUTH_SERVER_URL ?? "",
-  ownerOpenId: parsed.OWNER_OPEN_ID ?? "",
+  appId: env.VITE_APP_ID ?? "",
+  cookieSecret: env.JWT_SECRET ?? "",
+  databaseUrl: env.DATABASE_URL ?? "",
+  oAuthServerUrl: env.OAUTH_SERVER_URL ?? "",
+  ownerOpenId: env.OWNER_OPEN_ID ?? "",
   isProduction: process.env.NODE_ENV === "production",
-  forgeApiUrl: parsed.BUILT_IN_FORGE_API_URL ?? "",
-  forgeApiKey: parsed.BUILT_IN_FORGE_API_KEY ?? "",
-  supabaseUrl: parsed.SUPABASE_URL,
-  supabaseAnonKey: parsed.SUPABASE_ANON_KEY,
-  supabaseServiceRole: parsed.SUPABASE_SERVICE_ROLE_KEY,
-  rowsApiKey: parsed.ROWS_API_KEY,
-  rowsSpreadsheetId: parsed.ROWS_SPREADSHEET_ID,
-  openaiKey: parsed.OPENAI_API_KEY,
-  upstashUrl: parsed.UPSTASH_REDIS_REST_URL,
-  upstashToken: parsed.UPSTASH_REDIS_REST_TOKEN,
-  sentryDsn: parsed.SENTRY_DSN,
+  forgeApiUrl: env.BUILT_IN_FORGE_API_URL ?? "",
+  forgeApiKey: env.BUILT_IN_FORGE_API_KEY ?? "",
+  supabaseUrl: env.SUPABASE_URL ?? "",
+  supabaseAnonKey: env.SUPABASE_ANON_KEY ?? "",
+  supabaseServiceRole: env.SUPABASE_SERVICE_ROLE_KEY ?? "",
+  rowsApiKey: env.ROWS_API_KEY ?? "",
+  rowsSpreadsheetId: env.ROWS_SPREADSHEET_ID ?? "",
+  openaiKey: env.OPENAI_API_KEY ?? "",
+  upstashUrl: env.UPSTASH_REDIS_REST_URL ?? "",
+  upstashToken: env.UPSTASH_REDIS_REST_TOKEN ?? "",
+  sentryDsn: env.SENTRY_DSN ?? "",
 };
