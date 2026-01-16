@@ -45,6 +45,42 @@ export const integrations: Integration[] = [
     icon: '💬'
   },
   {
+    id: 'axiom-tawkto-rows',
+    name: 'Axiom Automation',
+    category: 'support',
+    status: 'available',
+    setupTime: '30 min',
+    planTier: 'pro',
+    description: 'Automated sync of new Tawk.to contacts into Rows.com spreadsheets',
+    features: [
+      'Daily or weekly contact sync',
+      'Only new contacts since last run',
+      'Axiom bot orchestration',
+      'Rows.com API delivery',
+      'Manual run and status tracking'
+    ],
+    demoUrl: '/integrations/axiom/new-automation',
+    icon: '⚡'
+  },
+  {
+    id: 'axiom-web-extractor',
+    name: 'Axiom Web Extractor',
+    category: 'support',
+    status: 'available',
+    setupTime: '30 min',
+    planTier: 'pro',
+    description: 'Extract data from any URL and write to new Rows.com sheets',
+    features: [
+      'Multi-source URL list',
+      'Instructions per page',
+      'Field mapping per source',
+      'Create new sheet per run',
+      'Preview + validation'
+    ],
+    demoUrl: '/integrations/axiom/web-extractor',
+    icon: '🧭'
+  },
+  {
     id: 'gmail',
     name: 'Gmail Inbox AI',
     category: 'email',
