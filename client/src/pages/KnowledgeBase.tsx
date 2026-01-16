@@ -9,6 +9,7 @@ import { Separator } from "@/components/ui/separator";
 import { BookOpen, Search, FileText, Sparkles, Filter } from "lucide-react";
 import { kbArticles } from "@/utils/kbArticles";
 import { KbRagPanel } from "@/components/KB/KbRagPanel";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 type CategorizedArticle = (typeof kbArticles)[number] & { category: string };
 
@@ -101,6 +102,76 @@ export default function KnowledgeBase() {
   );
 
   const selectedArticle = articles.find(a => a.id === selectedId) || filtered[0] || articles[0] || null;
+
+  const isFaq = selectedArticle?.id === "faq-50";
+
+  function parseFaq(content: string) {
+    const lines = content.split("\n");
+    let currentCategory = "FAQ";
+    const items: { category: string; question: string; answer: string }[] = [];
+    for (const raw of lines) {
+      const line = raw.trim();
+      if (!line) continue;
+      const catMatch = /^###\s*(.+)/.exec(line);
+      if (catMatch) {
+        currentCategory = catMatch[1].trim();
+        continue;
+      }
+      const qaMatch = /^(?:\d+\.\s*)?(.+?\?)\s*•\s*პასუხი:\s*(.+)$/i.exec(line);
+      if (qaMatch) {
+        items.push({
+          category: currentCategory,
+          question: qaMatch[1].trim(),
+          answer: qaMatch[2].trim(),
+        });
+      }
+    }
+    const grouped = items.reduce((acc, item) => {
+      if (!acc[item.category]) acc[item.category] = [];
+      acc[item.category].push(item);
+      return acc;
+    }, {} as Record<string, { question: string; answer: string }[]>);
+    return grouped;
+  }
+
+  function renderContent() {
+    if (!selectedArticle) return <div className="text-muted-foreground text-sm">აირჩიე სტატია სიისგან.</div>;
+    if (isFaq) {
+      const grouped = parseFaq(selectedArticle.content);
+      const categories = Object.keys(grouped);
+      return (
+        <div className="space-y-4">
+          {categories.map((cat) => (
+            <Card key={cat} className="bg-white/5 border-white/10 rounded-2xl">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg text-white/90">{cat}</CardTitle>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <Accordion type="single" collapsible className="w-full divide-y divide-white/10">
+                  {grouped[cat].map((qa, idx) => (
+                    <AccordionItem key={`${cat}-${idx}`} value={`${cat}-${idx}`} className="border-white/10">
+                      <AccordionTrigger className="text-base text-white/90">
+                        {qa.question}
+                      </AccordionTrigger>
+                      <AccordionContent className="text-sm leading-7 text-white/80">
+                        {qa.answer}
+                      </AccordionContent>
+                    </AccordionItem>
+                  ))}
+                </Accordion>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      );
+    }
+
+    return (
+      <div className="prose prose-base md:prose-lg dark:prose-invert max-w-[820px] leading-8 text-white/90 prose-p:mb-3 prose-li:mb-2 prose-strong:text-white prose-em:text-white/90 prose-h2:mt-6 prose-h2:mb-3 prose-h2:text-2xl prose-h3:mt-4 prose-h3:mb-2 prose-h3:text-xl">
+        <ReactMarkdown>{selectedArticle.content}</ReactMarkdown>
+      </div>
+    );
+  }
 
   return (
     <div className="relative isolate space-y-10 max-w-screen-2xl mx-auto px-4 pb-16">
@@ -234,13 +305,7 @@ export default function KnowledgeBase() {
             )}
           </CardHeader>
           <CardContent>
-            {selectedArticle ? (
-              <div className="prose prose-base md:prose-lg dark:prose-invert max-w-[820px] leading-8 text-white/90 prose-p:mb-3 prose-li:mb-2 prose-strong:text-white prose-em:text-white/90">
-                <ReactMarkdown>{selectedArticle.content}</ReactMarkdown>
-              </div>
-            ) : (
-              <div className="text-muted-foreground text-sm">აირჩიე სტატია სიისგან.</div>
-            )}
+            {renderContent()}
           </CardContent>
         </Card>
       </div>
