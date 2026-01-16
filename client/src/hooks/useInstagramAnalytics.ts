@@ -113,7 +113,15 @@ export function useInstagramAnalytics(): UseInstagramAnalyticsReturn {
       try {
         json = JSON.parse(text);
       } catch {
-        throw new Error(text || "Non-JSON response from dashboard endpoint");
+        const msg = text || "Non-JSON response from dashboard endpoint";
+        setError(msg);
+        setIsLoading(false);
+        toast({
+          title: "Rows error",
+          description: msg,
+          variant: "destructive",
+        });
+        return null;
       }
 
       if (!res.ok || json.error) {
@@ -154,7 +162,13 @@ export function useInstagramAnalytics(): UseInstagramAnalyticsReturn {
       try {
         json = JSON.parse(text);
       } catch {
-        throw new Error(text || "Non-JSON response from sync endpoint");
+        const msg = text || "Non-JSON response from sync endpoint";
+        toast({
+          title: "Sync failed",
+          description: msg,
+          variant: "destructive",
+        });
+        return false;
       }
       if (!res.ok || json.error) {
         const msg = json?.error || `HTTP ${res.status}`;
@@ -188,7 +202,13 @@ export function useInstagramAnalytics(): UseInstagramAnalyticsReturn {
       try {
         json = JSON.parse(text);
       } catch {
-        throw new Error(text || "Non-JSON response from test endpoint");
+        const msg = text || "Non-JSON response from test endpoint";
+        toast({
+          title: "Connection test failed",
+          description: msg,
+          variant: "destructive",
+        });
+        return { success: false, message: msg };
       }
       if (!res.ok || json.error) {
         const msg = json?.error || `HTTP ${res.status}`;
