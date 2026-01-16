@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import ReactMarkdown from "react-markdown";
+import rehypeSanitize from "rehype-sanitize";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -168,7 +169,9 @@ export default function KnowledgeBase() {
 
     return (
       <div className="prose prose-base md:prose-lg dark:prose-invert max-w-[820px] leading-8 text-white/90 prose-p:mb-3 prose-li:mb-2 prose-strong:text-white prose-em:text-white/90 prose-h2:mt-6 prose-h2:mb-3 prose-h2:text-2xl prose-h3:mt-4 prose-h3:mb-2 prose-h3:text-xl">
-        <ReactMarkdown>{selectedArticle.content}</ReactMarkdown>
+        <ReactMarkdown rehypePlugins={[rehypeSanitize]}>
+          {selectedArticle.content}
+        </ReactMarkdown>
       </div>
     );
   }
