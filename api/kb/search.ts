@@ -4,6 +4,8 @@ import path from "node:path";
 import OpenAI from "openai";
 import crypto from "node:crypto";
 import { validateEnv, setSecurityHeaders } from "../_utils/envGuard";
+import jwt from "jsonwebtoken";
+import { ENV } from "../../server/_core/env";
 
 type ArticleMeta = {
   id: string;
@@ -128,12 +130,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   const ragApiKey = process.env.RAG_API_KEY;
-  if (ragApiKey) {
-    const provided = req.headers["x-rag-key"];
-    if (provided !== ragApiKey) {
-      res.status(401).json({ error: "unauthorized" });
-      return;
-    }
+  const isAdmin = checkAdminSession(req);
+  const provided = req.headers["x-rag-key"];
+  const hasRagKey = ragApiKey && provided === ragApiKey;
+  if (!isAdmin && !hasRagKey) {
+    res.status(401).json({ error: "unauthorized" });
+    return;
   }
 
   try {
@@ -234,7 +236,7 @@ function hashArticles(): string {
 
 // naive in-memory rate limit
 const RATE_LIMIT_WINDOW_MS = 5 * 60 * 1000;
-const RATE_LIMIT_MAX = 30;
+const RATE_LIMIT_MAX = 60;
 const rateMap = new Map<string, { count: number; ts: number }>();
 
 function rateLimitOk(req: VercelRequest): boolean {
@@ -251,4 +253,28 @@ function rateLimitOk(req: VercelRequest): boolean {
   entry.count += 1;
   rateMap.set(key, entry);
   return true;
+}
+
+function parseCookies(cookieHeader: string | undefined) {
+  if (!cookieHeader) return {};
+  return Object.fromEntries(
+    cookieHeader.split(";").map((c) => {
+      const [k, ...v] = c.trim().split("=");
+      return [k, v.join("=")];
+    })
+  );
+}
+
+function checkAdminSession(req: VercelRequest): boolean {
+  const cookies = parseCookies(req.headers.cookie);
+  const token = cookies["admin_session"];
+  if (!token) return false;
+  const secret = (ENV.cookieSecret || process.env.JWT_SECRET || "") + "_admin";
+  if (!secret) return false;
+  try {
+    const decoded = jwt.verify(token, secret) as { type?: string };
+    return decoded?.type === "admin";
+  } catch {
+    return false;
+  }
 }
