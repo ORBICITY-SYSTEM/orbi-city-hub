@@ -2,6 +2,8 @@ import type { VercelRequest, VercelResponse } from "@vercel/node";
 import fs from "node:fs";
 import path from "node:path";
 import OpenAI from "openai";
+import crypto from "node:crypto";
+import { validateEnv, setSecurityHeaders } from "../_utils/envGuard";
 
 type ArticleMeta = {
   id: string;
@@ -16,6 +18,11 @@ type Chunk = {
   tags: string[];
   text: string;
   chunkIndex: number;
+};
+
+type EmbeddedChunk = {
+  chunk: Chunk;
+  embedding: number[];
 };
 
 const ARTICLES: ArticleMeta[] = [
@@ -93,7 +100,12 @@ function cosineSimilarity(a: number[], b: number[]): number {
   return dot / (Math.sqrt(normA) * Math.sqrt(normB));
 }
 
+let cachedEmbeddedChunks: EmbeddedChunk[] | null = null;
+let cachedContentHash: string | null = null;
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  setSecurityHeaders(res);
+
   if (req.method !== "POST") {
     res.status(405).json({ error: "Method not allowed" });
     return;
@@ -104,53 +116,62 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     res.status(400).json({ error: "query is required" });
     return;
   }
-
-  const openaiApiKey = process.env.OPENAI_API_KEY;
-  if (!openaiApiKey) {
-    res.status(500).json({ error: "OPENAI_API_KEY is not configured" });
+  if (query.length > 2000) {
+    res.status(400).json({ error: "query too long" });
     return;
   }
 
+  // simple IP+UA rate-limit (30 req / 5 min)
+  if (!rateLimitOk(req)) {
+    res.status(429).json({ error: "rate limit" });
+    return;
+  }
+
+  const ragApiKey = process.env.RAG_API_KEY;
+  if (ragApiKey) {
+    const provided = req.headers["x-rag-key"];
+    if (provided !== ragApiKey) {
+      res.status(401).json({ error: "unauthorized" });
+      return;
+    }
+  }
+
+  try {
+    validateEnv(["OPENAI_API_KEY"]);
+  } catch (err) {
+    res.status(500).json({ error: err instanceof Error ? err.message : "Env validation failed" });
+    return;
+  }
+
+  const openaiApiKey = process.env.OPENAI_API_KEY!;
+
   const openai = new OpenAI({ apiKey: openaiApiKey });
 
-  // Load and chunk KB
-  const chunks: Chunk[] = [];
-  ARTICLES.forEach(meta => {
-    const content = loadArticle(meta);
-    const chunked = chunkText(content);
-    chunked.forEach((text, idx) => {
-      // filter by tags if requested
-      if (Array.isArray(tags) && tags.length) {
-        const lowerTags = tags.map((t: string) => t.toLowerCase());
-        const articleTags = meta.tags.map(t => t.toLowerCase());
-        const intersects = lowerTags.some(t => articleTags.includes(t));
-        if (!intersects) return;
-      }
-      chunks.push({
-        articleId: meta.id,
-        title: meta.title,
-        tags: meta.tags,
-        text,
-        chunkIndex: idx,
-      });
-    });
+  // Ensure cached embeddings (prevents per-request OpenAI calls)
+  await ensureCachedEmbeddings(openai);
+
+  const lowerTags = Array.isArray(tags) ? tags.map((t: string) => t.toLowerCase()) : null;
+  const filtered = (cachedEmbeddedChunks || []).filter(({ chunk }) => {
+    if (!lowerTags || lowerTags.length === 0) return true;
+    const articleTags = chunk.tags.map(t => t.toLowerCase());
+    return lowerTags.some(t => articleTags.includes(t));
   });
 
-  if (chunks.length === 0) {
+  if (filtered.length === 0) {
     res.status(200).json({ matches: [] });
     return;
   }
 
   const queryEmbedding = await embed(openai, query);
-  const chunkEmbeddings = await embed(openai, chunks.map(c => c.text));
 
-  const scored = chunks.map((chunk, i) => ({
+  const scored = filtered.map(({ chunk, embedding }) => ({
     ...chunk,
-    score: cosineSimilarity(queryEmbedding, chunkEmbeddings[i]),
+    score: cosineSimilarity(queryEmbedding as number[], embedding),
   }));
 
   scored.sort((a, b) => b.score - a.score);
-  const top = scored.slice(0, Math.min(limit, scored.length));
+  const max = Math.min(typeof limit === "number" ? limit : 6, scored.length, 12);
+  const top = scored.slice(0, max);
 
   res.status(200).json({
     matches: top.map(m => ({
@@ -171,4 +192,63 @@ async function embed(openai: OpenAI, input: string | string[]): Promise<number[]
   });
   const data = response.data.map(d => d.embedding);
   return Array.isArray(input) ? data : data[0];
+}
+
+async function ensureCachedEmbeddings(openai: OpenAI) {
+  const hash = hashArticles();
+  if (cachedEmbeddedChunks && cachedContentHash === hash) return;
+
+  const chunks: Chunk[] = [];
+  ARTICLES.forEach(meta => {
+    const content = loadArticle(meta);
+    const chunked = chunkText(content);
+    chunked.forEach((text, idx) => {
+      chunks.push({
+        articleId: meta.id,
+        title: meta.title,
+        tags: meta.tags,
+        text,
+        chunkIndex: idx,
+      });
+    });
+  });
+
+  if (chunks.length === 0) {
+    cachedEmbeddedChunks = [];
+    cachedContentHash = hash;
+    return;
+  }
+
+  const embeddings = await embed(openai, chunks.map(c => c.text)) as number[][];
+  cachedEmbeddedChunks = chunks.map((chunk, idx) => ({
+    chunk,
+    embedding: embeddings[idx],
+  }));
+  cachedContentHash = hash;
+}
+
+function hashArticles(): string {
+  const content = ARTICLES.map(meta => loadArticle(meta)).join("\n---\n");
+  return crypto.createHash("sha256").update(content).digest("hex");
+}
+
+// naive in-memory rate limit
+const RATE_LIMIT_WINDOW_MS = 5 * 60 * 1000;
+const RATE_LIMIT_MAX = 30;
+const rateMap = new Map<string, { count: number; ts: number }>();
+
+function rateLimitOk(req: VercelRequest): boolean {
+  const ip = (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() || req.socket.remoteAddress || "unknown";
+  const ua = req.headers["user-agent"] || "unknown";
+  const key = `${ip}:${ua}`;
+  const now = Date.now();
+  const entry = rateMap.get(key);
+  if (!entry || now - entry.ts > RATE_LIMIT_WINDOW_MS) {
+    rateMap.set(key, { count: 1, ts: now });
+    return true;
+  }
+  if (entry.count >= RATE_LIMIT_MAX) return false;
+  entry.count += 1;
+  rateMap.set(key, entry);
+  return true;
 }

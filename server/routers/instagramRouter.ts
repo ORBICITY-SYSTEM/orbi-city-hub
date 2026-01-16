@@ -712,8 +712,7 @@ export const instagramRouter = router({
     .query(async ({ input }) => {
       try {
         const db = await getDb();
-        const hasDb = Boolean(db);
-        if (!hasDb) {
+        if (!db) {
           return await fetchDashboardFromRows();
         }
 

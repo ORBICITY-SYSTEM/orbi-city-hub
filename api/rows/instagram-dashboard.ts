@@ -21,6 +21,8 @@ const TABLE_IDS = {
   weekly: "b513cbff-82e8-4bf0-9b86-5e44549e9851",
 };
 
+const memoryCache: Record<string, CacheEntry> = {};
+
 const METRICS_HEADERS = [
   "Start Date",
   "End Date",
@@ -264,7 +266,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   try {
     if (!refresh && !metricsTableId) {
-      const cached = await redisGet(cacheKey);
+      const cached = (await redisGet(cacheKey)) || memoryCache[cacheKey];
       if (cached?.data) {
         return res.status(200).json({ ...cached.data, source: "cache" });
       }
@@ -274,6 +276,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     if (!metricsTableId) {
       await redisSet(cacheKey, { data, ts: Date.now() }, CACHE_TTL_SECONDS);
+      memoryCache[cacheKey] = { data, ts: Date.now() };
     }
 
     return res.status(200).json(data);
