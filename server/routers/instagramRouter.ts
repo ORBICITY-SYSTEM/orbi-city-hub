@@ -9,13 +9,24 @@ import {
   instagramWeeklyStats 
 } from "../../drizzle/schema";
 
+type DailyMetric = typeof instagramDailyMetrics.$inferSelect;
+type PostRow = typeof instagramPosts.$inferSelect;
+type SummaryRow = typeof instagramSummary.$inferSelect;
+type WeeklyRow = typeof instagramWeeklyStats.$inferSelect;
+
 // In-memory storage for development mode (when database is not available)
-const memoryStore = {
-  metrics: [] as any[],
-  posts: [] as any[],
-  summary: null as any,
-  weekly: [] as any[],
-  lastSync: null as Date | null,
+const memoryStore: {
+  metrics: DailyMetric[];
+  posts: PostRow[];
+  summary: SummaryRow | null;
+  weekly: WeeklyRow[];
+  lastSync: Date | null;
+} = {
+  metrics: [],
+  posts: [],
+  summary: null,
+  weekly: [],
+  lastSync: null,
 };
 
 // Rows.com Table IDs (from Instagram Page Analytics Dashboard spreadsheet)
