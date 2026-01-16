@@ -107,14 +107,22 @@ export function useInstagramAnalytics(): UseInstagramAnalyticsReturn {
         `/api/rows/instagram-dashboard${params.toString() ? `?${params.toString()}` : ""}`,
         { credentials: "include" }
       );
-      const json = await res.json();
 
-      if (json.error) {
-        setError(json.error);
+      const text = await res.text();
+      let json: any = null;
+      try {
+        json = JSON.parse(text);
+      } catch {
+        throw new Error(text || "Non-JSON response from dashboard endpoint");
+      }
+
+      if (!res.ok || json.error) {
+        const msg = json?.error || `HTTP ${res.status}`;
+        setError(msg);
         setIsLoading(false);
         toast({
           title: "Rows error",
-          description: json.error,
+          description: msg,
           variant: "destructive",
         });
         return null;
@@ -141,11 +149,18 @@ export function useInstagramAnalytics(): UseInstagramAnalyticsReturn {
       const res = await fetch("/api/rows/instagram-dashboard?refresh=1", {
         credentials: "include",
       });
-      const json = await res.json();
-      if (json.error) {
+      const text = await res.text();
+      let json: any = null;
+      try {
+        json = JSON.parse(text);
+      } catch {
+        throw new Error(text || "Non-JSON response from sync endpoint");
+      }
+      if (!res.ok || json.error) {
+        const msg = json?.error || `HTTP ${res.status}`;
         toast({
           title: "Sync failed",
-          description: json.error,
+          description: msg,
           variant: "destructive",
         });
         return false;
@@ -168,14 +183,21 @@ export function useInstagramAnalytics(): UseInstagramAnalyticsReturn {
       const res = await fetch("/api/rows/instagram-dashboard", {
         credentials: "include",
       });
-      const json = await res.json();
-      if (json.error) {
+      const text = await res.text();
+      let json: any = null;
+      try {
+        json = JSON.parse(text);
+      } catch {
+        throw new Error(text || "Non-JSON response from test endpoint");
+      }
+      if (!res.ok || json.error) {
+        const msg = json?.error || `HTTP ${res.status}`;
         toast({
           title: "Connection test failed",
-          description: json.error,
+          description: msg,
           variant: "destructive",
         });
-        return { success: false, message: json.error };
+        return { success: false, message: msg };
       }
       toast({
         title: "Connection test successful",
