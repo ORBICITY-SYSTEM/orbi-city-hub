@@ -179,7 +179,7 @@ Customize this template to specifically address the guest's concerns while maint
 
       // Create a Butler task for approval
       const taskId = await butlerDb.createButlerTask({
-        user_id: 1, // TODO: use ctx.user.id
+        user_id: ctx.user.id,
         task_type: 'review_response',
         priority: rating < 5 ? 'high' : 'medium',
         status: 'pending',
