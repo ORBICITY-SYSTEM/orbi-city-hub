@@ -5,11 +5,20 @@ export const en = {
   // Navigation
   nav: {
     home: "Home",
+    mainDashboard: "Control Center",
     finance: "Finance",
     marketing: "Marketing",
     reservations: "Reservations",
     integrations: "Integrations",
     logistics: "Logistics",
+    settings: "Settings",
+    knowledgeBase: "Knowledge Base",
+  },
+
+  // Navigation Groups
+  navGroup: {
+    modules: "Modules",
+    system: "System",
   },
   
   // Submenu items
