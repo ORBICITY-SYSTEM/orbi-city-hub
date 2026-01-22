@@ -24,6 +24,11 @@ import {
   syncMaintenanceToRows,
   logActivityToRows,
   appendFinanceSummary,
+  // Marketing Analytics
+  getInstagramAnalytics,
+  getFacebookAnalytics,
+  getGoogleReviews,
+  getUnifiedMarketingAnalytics,
   // Types
   type InventorySyncData,
   type HousekeepingSyncData,
@@ -194,6 +199,42 @@ export const rowsRouter = router({
         failed,
       };
     }),
+
+  // ============================================
+  // MARKETING ANALYTICS (READ from ROWS.COM)
+  // ============================================
+
+  /**
+   * Get Instagram analytics from ROWS.COM spreadsheet
+   * Spreadsheet ID: 590R621oSJPeF4u2jPBPzz
+   */
+  getInstagramAnalytics: protectedProcedure.query(async () => {
+    return await getInstagramAnalytics();
+  }),
+
+  /**
+   * Get Facebook analytics from ROWS.COM spreadsheet
+   * Spreadsheet ID: 3rHpzRaBXblvh4iHfrp3EE
+   */
+  getFacebookAnalytics: protectedProcedure.query(async () => {
+    return await getFacebookAnalytics();
+  }),
+
+  /**
+   * Get Google Reviews from ROWS.COM spreadsheet
+   * Spreadsheet ID: 6TlKVBasXTLfKBjZJ0U96e
+   */
+  getGoogleReviews: protectedProcedure.query(async () => {
+    return await getGoogleReviews();
+  }),
+
+  /**
+   * Get unified marketing analytics (all platforms)
+   * Combines Instagram, Facebook, and Google Reviews
+   */
+  getUnifiedMarketingAnalytics: protectedProcedure.query(async () => {
+    return await getUnifiedMarketingAnalytics();
+  }),
 });
 
 export type RowsRouter = typeof rowsRouter;

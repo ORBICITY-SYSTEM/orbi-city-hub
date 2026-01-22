@@ -1,4 +1,5 @@
-import { ArrowLeft, TrendingUp, Users, Globe, Mail, Instagram, Facebook, MessageCircle, BarChart3, Calendar, Target, Zap, Image, Video, DollarSign, ShoppingCart, LayoutDashboard, Download, ExternalLink, Plus, Trash2, ChevronUp, ChevronDown, Edit, Upload, Bot, Sparkles, TrendingDown, Workflow, Activity, Phone, Send } from "lucide-react";
+import { ArrowLeft, TrendingUp, Users, Globe, Mail, Instagram, Facebook, MessageCircle, BarChart3, Calendar, Target, Zap, Image, Video, DollarSign, ShoppingCart, LayoutDashboard, Download, ExternalLink, Plus, Trash2, ChevronUp, ChevronDown, Edit, Upload, Bot, Sparkles, TrendingDown, Workflow, Activity, Phone, Send, PieChart } from "lucide-react";
+import { MarketingAnalyticsDashboard } from "@/components/marketing";
 import VoiceInterface from "@/components/VoiceInterface";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
@@ -391,10 +392,14 @@ const Marketing = () => {
 
       <main className="container mx-auto px-6 py-8">
         <Tabs defaultValue="dashboard" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-7 lg:w-auto lg:inline-grid">
+          <TabsList className="grid w-full grid-cols-8 lg:w-auto lg:inline-grid">
             <TabsTrigger value="dashboard" className="gap-2">
               <LayoutDashboard className="h-4 w-4" />
               {t('common.overview')}
+            </TabsTrigger>
+            <TabsTrigger value="analytics" className="gap-2">
+              <PieChart className="h-4 w-4" />
+              {t('ანალიტიკა', 'Analytics')}
             </TabsTrigger>
             <TabsTrigger value="command-center" className="gap-2">
               <Zap className="h-4 w-4" />
@@ -1599,6 +1604,11 @@ const Marketing = () => {
           <TabsContent value="emails" className="space-y-6">
             <GoogleGmailConnect />
             <GmailMessagesList />
+          </TabsContent>
+
+          {/* Analytics Tab - ROWS.COM Integration */}
+          <TabsContent value="analytics" className="space-y-6">
+            <MarketingAnalyticsDashboard />
           </TabsContent>
         </Tabs>
       </main>
