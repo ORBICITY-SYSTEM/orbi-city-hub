@@ -51,6 +51,10 @@ import { ingestRouter } from "./routers/ingestRouter";
 import { outboxRouter } from "./routers/outboxRouter";
 import { seedLogisticsRouter } from "./routers/seedLogistics";
 import { appscriptBridgeRouter } from "./routers/appscriptBridge";
+import { marketingRouter } from "./routers/marketingRouter";
+import { reservationsRouter as reservationsAIDirectorRouter } from "./routers/reservationsRouter";
+import { financeRouter as financeAIDirectorRouter } from "./routers/financeRouter";
+import { logisticsRouter as logisticsAIDirectorRouter } from "./routers/logisticsRouter";
 
 export const appRouter = router({
   realFinance: realFinanceRouter,
@@ -113,6 +117,10 @@ export const appRouter = router({
   backup: backupRouter,
   health: healthRouter,
   rbac: rbacRouter,
+  marketing: marketingRouter,
+  reservationsAIDirector: reservationsAIDirectorRouter,
+  financeAIDirector: financeAIDirectorRouter,
+  logisticsAIDirector: logisticsAIDirectorRouter,
 });
 
 export type AppRouter = typeof appRouter;

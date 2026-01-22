@@ -23,8 +23,15 @@ export const ka: Translations = {
     otelms: "OTELMS",
     devExpenses: "დევ ხარჯები",
     
-    // Marketing (workflow-based)
+    // Marketing (სოციალური მედია და ანალიტიკა)
     marketingDashboard: "მთავარი",
+    instagram: "ინსტაგრამი",
+    facebook: "ფეისბუქი",
+    tiktok: "ტიკტოკი",
+    website: "ვებსაიტი",
+    youtube: "იუთუბი",
+    googleAds: "Google Ads",
+    otaChannels: "OTA არხები",
     reviewsHub: "მიმოხილვები",
     reputationAnalytics: "რეპუტაციის ანალიტიკა",
     otaPerformance: "OTA შედეგები",
@@ -32,6 +39,7 @@ export const ka: Translations = {
     leadGeneration: "ლიდების გენერაცია",
     
     // Reservations (რესტრუქტურიზებული)
+    reservationsDashboard: "მთავარი",
     reservationsOverview: "მთავარი",
     reservationsList: "ჯავშნების სია",
     reservationsCalendar: "კალენდარი / თაიმლაინი",

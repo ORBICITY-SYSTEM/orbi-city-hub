@@ -28,6 +28,9 @@ const PowerBIFinanceDashboard = lazy(() => import("./pages/finance/PowerBIFinanc
 
 // Marketing Module - Lazy
 const MarketingDashboard = lazy(() => import("./pages/marketing/MarketingDashboard"));
+const InstagramAnalytics = lazy(() => import("./pages/marketing/InstagramAnalytics"));
+const SocialMediaModule = lazy(() => import("./pages/marketing/SocialMediaModule"));
+const GoogleModule = lazy(() => import("./pages/marketing/GoogleModule"));
 const OTAChannels = lazy(() => import("./pages/marketing/OTAChannels"));
 const WebsiteLeads = lazy(() => import("./pages/marketing/WebsiteLeads"));
 const LiveChat = lazy(() => import("./pages/marketing/LiveChat"));
@@ -72,6 +75,23 @@ const WhatsAppQuickStart = lazy(() => import("./pages/QuickStart"));
 // AI Agent Module - Lazy
 const MirrorEffectAgent = lazy(() => import("./pages/ai/MirrorEffectAgent"));
 
+// AI Director Pages - Lazy
+const AIFinanceDirector = lazy(() => import("./pages/finance/AIFinanceDirector"));
+const AILogisticsDirector = lazy(() => import("./pages/logistics/AILogisticsDirector"));
+const AIReservationsDirector = lazy(() => import("./pages/reservations/AIReservationsDirector"));
+
+// Additional Pages - Lazy
+const ChannelManager = lazy(() => import("./pages/ChannelManager"));
+const LivePulse = lazy(() => import("./pages/LivePulse"));
+const MarketRadar = lazy(() => import("./pages/MarketRadar"));
+const OwnersHub = lazy(() => import("./pages/OwnersHub"));
+const RoomInventory = lazy(() => import("./pages/RoomInventory"));
+
+// Channel Manager Sub-Pages - Lazy
+const ChannelManagerCalendar = lazy(() => import("./pages/channel-manager/ChannelManagerCalendar"));
+const ChannelManagerReports = lazy(() => import("./pages/channel-manager/ChannelManagerReports"));
+const ChannelManagerStatus = lazy(() => import("./pages/channel-manager/ChannelManagerStatus"));
+
 // Admin Pages - Lazy
 const SeedLogistics = lazy(() => import("./pages/admin/SeedLogistics"));
 
@@ -105,14 +125,19 @@ function RouterContent() {
         <Route path="/finance/expenses" component={FinanceDevelopmentExpenses} />
         <Route path="/finance/powerbi" component={PowerBIFinanceDashboard} />
 
-        {/* Marketing Module (workflow-based) */}
+        {/* Marketing Module - Social Media & Analytics */}
         <Route path="/marketing" component={MarketingDashboard} />
-        <Route path="/marketing/reviews" component={ReviewsDashboard} />
-        <Route path="/marketing/reputation" component={ReviewsDashboard} />
+        <Route path="/marketing/instagram" component={InstagramAnalytics} />
+        <Route path="/marketing/facebook" component={SocialMediaModule} />
+        <Route path="/marketing/tiktok" component={SocialMediaModule} />
+        <Route path="/marketing/website" component={WebsiteLeads} />
+        <Route path="/marketing/youtube" component={SocialMediaModule} />
+        <Route path="/marketing/google" component={GoogleModule} />
         <Route path="/marketing/ota" component={OTAChannels} />
+        <Route path="/marketing/leads" component={WebsiteLeads} />
         <Route path="/marketing/communications" component={GuestCommunications} />
         <Route path="/marketing/communications/:emailId" component={EmailDetail} />
-        <Route path="/marketing/leads" component={WebsiteLeads} />
+        <Route path="/marketing/reviews" component={ReviewsDashboard} />
         <Route path="/live-chat" component={LiveChatDashboard} />
 
         {/* Reservations Module (restructured - 5 items only) */}
@@ -143,6 +168,24 @@ function RouterContent() {
 
         {/* AI Agent Module */}
         <Route path="/ai-agent" component={MirrorEffectAgent} />
+
+        {/* AI Director Pages */}
+        <Route path="/marketing/ai-director" component={MarketingDashboard} />
+        <Route path="/reservations/ai-director" component={AIReservationsDirector} />
+        <Route path="/finance/ai-director" component={AIFinanceDirector} />
+        <Route path="/logistics/ai-director" component={AILogisticsDirector} />
+
+        {/* Channel Manager Module */}
+        <Route path="/channel-manager" component={ChannelManager} />
+        <Route path="/channel-manager/calendar" component={ChannelManagerCalendar} />
+        <Route path="/channel-manager/reports" component={ChannelManagerReports} />
+        <Route path="/channel-manager/status" component={ChannelManagerStatus} />
+
+        {/* Additional Pages */}
+        <Route path="/live-pulse" component={LivePulse} />
+        <Route path="/market-radar" component={MarketRadar} />
+        <Route path="/owners-hub" component={OwnersHub} />
+        <Route path="/room-inventory" component={RoomInventory} />
 
         {/* Admin Pages */}
         <Route path="/admin/seed-logistics" component={SeedLogistics} />

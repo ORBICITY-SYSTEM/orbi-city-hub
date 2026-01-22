@@ -30,8 +30,15 @@ export const en = {
     otelms: "OTELMS",
     devExpenses: "Dev Expenses",
     
-    // Marketing (workflow-based)
+    // Marketing (Social Media & Analytics)
     marketingDashboard: "Dashboard",
+    instagram: "Instagram",
+    facebook: "Facebook",
+    tiktok: "TikTok",
+    website: "Website",
+    youtube: "YouTube",
+    googleAds: "Google Ads",
+    otaChannels: "OTA Channels",
     reviewsHub: "Reviews Hub",
     reputationAnalytics: "Reputation Analytics",
     otaPerformance: "OTA Performance",
@@ -39,6 +46,7 @@ export const en = {
     leadGeneration: "Lead Generation",
     
     // Reservations (restructured)
+    reservationsDashboard: "Dashboard",
     reservationsOverview: "Dashboard",
     reservationsList: "Reservations List",
     reservationsCalendar: "Calendar / Timeline",

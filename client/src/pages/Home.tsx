@@ -22,6 +22,7 @@ import {
 import { MainAIAgent } from "@/components/MainAIAgent";
 import { PowerStackDashboard } from "@/components/PowerStackDashboard";
 import { IntegrationsShowcase } from "@/components/IntegrationsShowcase";
+import AIDirectorsShowcase from "@/components/AIDirectorsShowcase";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -307,6 +308,14 @@ export default function Home() {
             </div>
           </Link>
         </div>
+      </div>
+
+      {/* AI Directors Showcase - 5D AI Agents with Emojis */}
+      <div className="px-6">
+        <h2 className="text-lg font-semibold text-white/80 mb-3 flex items-center gap-2">
+          {language === 'ka' ? "🤖 AI დირექტორები" : "🤖 AI Directors"}
+        </h2>
+        <AIDirectorsShowcase />
       </div>
 
       {/* PowerStack Dashboard - Google Sheets Integration */}
