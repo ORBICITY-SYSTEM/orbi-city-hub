@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { trpc } from "@/lib/trpc";
 import { cn } from "@/lib/utils";
+import { DataSourceBadge } from "@/components/ui/DataSourceBadge";
 
 // Mock data for demonstration
 const mockBookings = [
@@ -85,9 +86,12 @@ const Reservations = () => {
   return (
     <div className="p-4 sm:p-6 lg:p-8 min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-cyan-400">Reservations</h1>
-        <p className="text-white/60">Manage reservations and guests</p>
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-cyan-400">Reservations</h1>
+          <p className="text-white/60">Manage reservations and guests</p>
+        </div>
+        <DataSourceBadge type="demo" size="md" />
       </div>
 
       {/* KPI Cards */}

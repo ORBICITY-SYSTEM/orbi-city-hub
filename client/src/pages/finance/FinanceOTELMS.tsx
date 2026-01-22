@@ -15,6 +15,7 @@ import { format } from "date-fns";
 import { ka } from "date-fns/locale";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
+import { DataSourceBadge } from "@/components/ui/DataSourceBadge";
 
 const FinanceOtelMS = () => {
   const [, setLocation] = useLocation();
@@ -92,17 +93,11 @@ const FinanceOtelMS = () => {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              {connectionQuery.data?.connected ? (
-                <Badge variant="default" className="bg-green-500">
-                  <CheckCircle2 className="h-3 w-3 mr-1" />
-                  {t("დაკავშირებული", "Connected")}
-                </Badge>
-              ) : (
-                <Badge variant="destructive">
-                  <AlertCircle className="h-3 w-3 mr-1" />
-                  {t("არ არის კავშირი", "Not Connected")}
-                </Badge>
-              )}
+              <DataSourceBadge
+                type={connectionQuery.data?.connected ? "live" : "error"}
+                source="ROWS.COM"
+                size="md"
+              />
               <Button
                 variant="outline"
                 size="sm"

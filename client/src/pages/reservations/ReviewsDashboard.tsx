@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { trpc } from "@/lib/trpc";
+import { DataSourceBadge } from "@/components/ui/DataSourceBadge";
 import { 
   Star, 
   MessageSquare, 
@@ -236,13 +237,16 @@ const ReviewsDashboard = () => {
       <div className="relative rounded-2xl overflow-hidden mb-8">
         <div className="relative z-10 px-8 pt-8 pb-20">
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl md:text-4xl font-bold text-cyan-400 tracking-tight">
-                {t('reviews.title')}
-              </h1>
-              <p className="text-lg text-white/90 mt-2 font-medium">
-                {t('reviews.subtitle')}
-              </p>
+            <div className="flex items-center gap-4">
+              <div>
+                <h1 className="text-3xl md:text-4xl font-bold text-cyan-400 tracking-tight">
+                  {t('reviews.title')}
+                </h1>
+                <p className="text-lg text-white/90 mt-2 font-medium">
+                  {t('reviews.subtitle')}
+                </p>
+              </div>
+              <DataSourceBadge type="live" source="Outscraper" size="md" />
             </div>
             <div className="flex gap-2 items-center">
           {/* Outscraper Webhook Info Button */}

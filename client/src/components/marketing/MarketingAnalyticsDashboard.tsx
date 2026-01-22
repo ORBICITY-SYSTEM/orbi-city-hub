@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { DataSourceBadge } from "@/components/ui/DataSourceBadge";
 import {
   Instagram,
   Facebook,
@@ -118,10 +119,7 @@ export default function MarketingAnalyticsDashboard() {
             {language === "ka" ? "ROWS.COM-დან სინქრონიზებული მონაცემები" : "Data synced from ROWS.COM"}
           </p>
         </div>
-        <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
-          <CheckCircle2 className="w-3 h-3 mr-1" />
-          {language === "ka" ? "ლაივ მონაცემები" : "Live Data"}
-        </Badge>
+        <DataSourceBadge type="live" source="ROWS.COM" size="md" />
       </div>
 
       {/* Summary KPIs */}

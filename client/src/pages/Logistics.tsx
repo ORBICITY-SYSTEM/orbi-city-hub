@@ -12,6 +12,7 @@ import { LogisticsActivityLog } from "@/components/LogisticsActivityLog";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useEffect, useState, Suspense } from "react";
 import { Loader2 } from "lucide-react";
+import { DataSourceBadge } from "@/components/ui/DataSourceBadge";
 
 
 const Logistics = () => {
@@ -25,26 +26,29 @@ const Logistics = () => {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
       <header className="border-b border-white/10 bg-blue-900/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-6 py-4">
-          <div className="flex items-center gap-4">
-            {isAuthenticated && (
-              <Button variant="ghost" size="sm" onClick={() => setLocation("/")}>
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                {t("უკან", "Back")}
-              </Button>
-            )}
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-ai">
-                <Package className="h-6 w-6 text-primary-foreground" />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-foreground">
-                  {t("ოთახები და დასუფთავება", "Rooms & Housekeeping")}
-                </h1>
-                <p className="text-xs text-muted-foreground">
-                  {t("სტუდიოების ინვენტარის მართვა და ანალიტიკა", "Studio inventory management and analytics")}
-                </p>
+          <div className="flex items-center justify-between w-full">
+            <div className="flex items-center gap-4">
+              {isAuthenticated && (
+                <Button variant="ghost" size="sm" onClick={() => setLocation("/")}>
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  {t("უკან", "Back")}
+                </Button>
+              )}
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-ai">
+                  <Package className="h-6 w-6 text-primary-foreground" />
+                </div>
+                <div>
+                  <h1 className="text-xl font-bold text-foreground">
+                    {t("ოთახები და დასუფთავება", "Rooms & Housekeeping")}
+                  </h1>
+                  <p className="text-xs text-muted-foreground">
+                    {t("სტუდიოების ინვენტარის მართვა და ანალიტიკა", "Studio inventory management and analytics")}
+                  </p>
+                </div>
               </div>
             </div>
+            <DataSourceBadge type="live" source="Supabase" size="md" />
           </div>
         </div>
       </header>
