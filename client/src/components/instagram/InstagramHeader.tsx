@@ -21,6 +21,7 @@ import {
   CalendarDays,
 } from "lucide-react";
 import type { DateRange } from "./types";
+import { DataSourceBadge } from "@/components/ui/DataSourceBadge";
 
 interface InstagramHeaderProps {
   dateRange: DateRange;
@@ -133,9 +134,12 @@ export const InstagramHeader = ({
               </div>
             </div>
             <div>
-              <h1 className="text-2xl font-bold tracking-tight text-foreground drop-shadow-sm">
-                Instagram Analytics
-              </h1>
+              <div className="flex items-center gap-2">
+                <h1 className="text-2xl font-bold tracking-tight text-foreground drop-shadow-sm">
+                  Instagram Analytics
+                </h1>
+                <DataSourceBadge type="live" source="ROWS.COM" size="md" />
+              </div>
               <p className="text-sm text-muted-foreground flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-primary animate-pulse shadow-sm shadow-primary/50" />
                 Synced from Rows.com

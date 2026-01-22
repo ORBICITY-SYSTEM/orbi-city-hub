@@ -13,6 +13,7 @@ import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { analyzeExcelFileForMonth } from "@/utils/excelAnalyzerMonthly";
 import { MonthlyFileUploadManager } from "@/components/finance/MonthlyFileUploadManager";
+import { DataSourceBadge } from "@/components/ui/DataSourceBadge";
 
 const months = [
   { value: "1", label: "იანვარი" },
@@ -148,7 +149,10 @@ const FinanceMonthlyAnalysisList = () => {
                   <Calendar className="h-6 w-6 text-white" />
                 </div>
                 <div>
-                  <h1 className="text-xl font-bold text-foreground">თვეების ანალიზი</h1>
+                  <div className="flex items-center gap-2">
+                    <h1 className="text-xl font-bold text-foreground">თვეების ანალიზი</h1>
+                    <DataSourceBadge type="live" source="Supabase" size="md" />
+                  </div>
                   <p className="text-xs text-muted-foreground">
                     თვიური ფინანსური რეპორტები და ანალიტიკა
                   </p>

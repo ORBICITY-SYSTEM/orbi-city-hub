@@ -172,6 +172,7 @@ import {
 import { useState } from "react";
 import { toast as sonnerToast } from "sonner";
 import { AIChatBox, type Message } from "@/components/AIChatBox";
+import { DataSourceBadge } from "@/components/ui/DataSourceBadge";
 
 export default function ComponentsShowcase() {
   const { theme, toggleTheme } = useTheme();
@@ -230,9 +231,12 @@ export default function ComponentsShowcase() {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-foreground">
       <main className="container max-w-6xl mx-auto">
         <div className="space-y-2 justify-between flex">
-          <h2 className="text-3xl font-bold tracking-tight mb-6">
-            Shadcn/ui Component Library
-          </h2>
+          <div className="flex items-center gap-3 mb-6">
+            <h2 className="text-3xl font-bold tracking-tight">
+              Shadcn/ui Component Library
+            </h2>
+            <DataSourceBadge type="demo" size="md" />
+          </div>
           <Button variant="outline" size="icon" onClick={toggleTheme}>
             {theme === "light" ? (
               <Moon className="h-5 w-5" />

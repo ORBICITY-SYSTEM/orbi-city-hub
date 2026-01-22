@@ -14,6 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 import type { DateRange, Post, ThemeData, DayOfWeekPerformance, HourlyPerformance, DayHourCell } from "@/components/instagram/types";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+import { DataSourceBadge } from "@/components/ui/DataSourceBadge";
 
 export default function InstagramAnalytics() {
   const { toast } = useToast();

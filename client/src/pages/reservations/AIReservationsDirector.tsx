@@ -36,6 +36,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { DataSourceBadge } from "@/components/ui/DataSourceBadge";
 
 // Form validation schema
 const taskFormSchema = z.object({
@@ -214,6 +215,7 @@ export default function AIReservationsDirector() {
                 <Sparkles className="h-3 w-3 mr-1" />
                 Gemini 2.5 Pro
               </Badge>
+              <DataSourceBadge type="live" source="Gemini AI" size="md" />
             </h1>
             <p className="text-muted-foreground">ცენტრალიზებული AI მართვა რეზერვაციებისთვის</p>
           </div>

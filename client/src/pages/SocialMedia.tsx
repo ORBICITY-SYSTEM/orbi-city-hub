@@ -21,6 +21,7 @@ import {
 import ContentCalendar from "@/components/ContentCalendar";
 import CompetitorComparison from "@/components/CompetitorComparison";
 import { Loader2 } from "lucide-react";
+import { DataSourceBadge } from "@/components/ui/DataSourceBadge";
 
 export default function SocialMedia() {
   const [activeTab, setActiveTab] = useState("overview");
@@ -69,9 +70,12 @@ export default function SocialMedia() {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 p-6">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-2">
-          Social Media Analytics
-        </h1>
+        <div className="flex items-center gap-3 mb-2">
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white">
+            Social Media Analytics
+          </h1>
+          <DataSourceBadge type="live" source="tRPC" size="md" />
+        </div>
         <p className="text-white/70">
           Track your Facebook, Instagram, and TikTok performance
         </p>

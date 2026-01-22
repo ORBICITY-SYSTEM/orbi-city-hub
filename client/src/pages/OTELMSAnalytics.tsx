@@ -2,6 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { trpc } from "@/lib/trpc";
 import { TrendingUp, TrendingDown, Users, DollarSign, Calendar, Building2 } from "lucide-react";
 import { useMemo } from "react";
+import { DataSourceBadge } from "@/components/ui/DataSourceBadge";
 
 export default function OTELMSAnalytics() {
   // Fetch latest OTELMS report
@@ -111,9 +112,12 @@ export default function OTELMSAnalytics() {
     <div className="p-8 min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-4xl font-bold text-cyan-400 mb-2">
-          OTELMS Analytics
-        </h1>
+        <div className="flex items-center gap-3 mb-2">
+          <h1 className="text-4xl font-bold text-cyan-400">
+            OTELMS Analytics
+          </h1>
+          <DataSourceBadge type="live" source="tRPC" size="md" />
+        </div>
         <p className="text-white/70 text-lg">
           Real-time data from OTELMS Hotel Management System
         </p>

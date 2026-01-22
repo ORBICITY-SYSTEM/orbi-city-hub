@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Link } from "wouter";
+import { DataSourceBadge } from "@/components/ui/DataSourceBadge";
 
 export default function ChannelManager() {
   const { t } = useLanguage();
@@ -9,7 +10,10 @@ export default function ChannelManager() {
   return (
     <div className="space-y-6 p-6">
       <div>
-        <h1 className="text-3xl font-bold">{t("nav.channelManager")}</h1>
+        <div className="flex items-center gap-3">
+          <h1 className="text-3xl font-bold">{t("nav.channelManager")}</h1>
+          <DataSourceBadge type="live" source="tRPC" size="md" />
+        </div>
         <p className="text-muted-foreground">Channel Manager overview and navigation</p>
       </div>
 

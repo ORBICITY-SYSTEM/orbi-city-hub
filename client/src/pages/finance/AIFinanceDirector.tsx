@@ -37,6 +37,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { DataSourceBadge } from "@/components/ui/DataSourceBadge";
 
 const taskFormSchema = z.object({
   title: z.string().min(1, "ამოცანის სახელი სავალდებულოა").max(255, "სახელი ძალიან გრძელია"),
@@ -212,6 +213,7 @@ export default function AIFinanceDirector() {
                 <Sparkles className="h-3 w-3 mr-1" />
                 Gemini 2.5 Pro
               </Badge>
+              <DataSourceBadge type="live" source="Gemini AI" size="md" />
             </h1>
             <p className="text-muted-foreground">ცენტრალიზებული AI მართვა ფინანსებისთვის</p>
           </div>

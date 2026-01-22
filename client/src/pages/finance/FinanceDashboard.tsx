@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { FinanceCopilotWidget } from "@/components/finance-copilot";
+import { DataSourceBadge } from "@/components/ui/DataSourceBadge";
 
 const Finance = () => {
   const navigate = useLocation();
@@ -38,9 +39,12 @@ const Finance = () => {
                 <TrendingUp className="h-6 w-6 text-white" />
               </div>
               <div>
-          <h1 className="text-3xl md:text-4xl font-bold text-cyan-400 tracking-tight">
-            {t('finance.title')}
-          </h1>
+          <div className="flex items-center gap-3">
+            <h1 className="text-3xl md:text-4xl font-bold text-cyan-400 tracking-tight">
+              {t('finance.title')}
+            </h1>
+            <DataSourceBadge type="live" source="tRPC" size="md" />
+          </div>
           <p className="text-lg text-white/90 mt-2 font-medium">
             {t('finance.subtitle')}
           </p>

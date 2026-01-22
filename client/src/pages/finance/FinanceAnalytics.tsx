@@ -12,6 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { DataSourceBadge } from "@/components/ui/DataSourceBadge";
 
 export default function FinanceAnalytics() {
   const { data: summary } = trpc.realFinance.getSummary.useQuery();
@@ -104,7 +105,10 @@ export default function FinanceAnalytics() {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 p-6">
       {/* Header */}
       <div className="relative overflow-hidden bg-gradient-to-r from-blue-600/20 to-cyan-600/20 border border-white/10 text-white p-8 rounded-lg mb-6 shadow-xl">
-        <h1 className="text-4xl font-bold mb-2">📊 Finance Analytics</h1>
+        <div className="flex items-center gap-3 mb-2">
+          <h1 className="text-4xl font-bold">📊 Finance Analytics</h1>
+          <DataSourceBadge type="live" source="tRPC" size="md" />
+        </div>
         <p className="text-white/90 font-bold">
           ROI Calculator • RevPAR Analysis • Forecasting • Profitability Metrics
         </p>

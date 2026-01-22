@@ -27,6 +27,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { trpc } from "@/lib/trpc";
+import { DataSourceBadge } from "@/components/ui/DataSourceBadge";
 
 export default function Home() {
   const { t, language } = useLanguage();
@@ -187,9 +188,12 @@ export default function Home() {
         <div className="relative z-10 px-8 pt-8 pb-16">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-4xl md:text-5xl font-bold text-cyan-400 tracking-tight mb-2">
-                Hotel Management System
-              </h1>
+              <div className="flex items-center gap-3 mb-2">
+                <h1 className="text-4xl md:text-5xl font-bold text-cyan-400 tracking-tight">
+                  Hotel Management System
+                </h1>
+                <DataSourceBadge type="live" source="tRPC" size="md" />
+              </div>
               <p className="text-sm text-white/60 font-medium">
                 {language === 'ka' ? "ყველაფერი ერთ სივრცეში CEO-სთვის" : "All in one for CEO"}
               </p>

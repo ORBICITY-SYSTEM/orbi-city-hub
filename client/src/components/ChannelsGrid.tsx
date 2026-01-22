@@ -14,6 +14,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { useLocation } from "wouter";
+import { DataSourceBadge } from "@/components/ui/DataSourceBadge";
 
 interface Channel {
   id: string;
@@ -116,7 +117,10 @@ export default function ChannelsGrid({ channels, comingSoonChannels = [] }: Chan
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-white">Distribution Channels</h2>
+          <div className="flex items-center gap-3">
+            <h2 className="text-2xl font-bold text-white">Distribution Channels</h2>
+            <DataSourceBadge type="demo" size="md" />
+          </div>
           <p className="text-white/70 mt-1">
             Manage your {channels.length} active booking channels
           </p>

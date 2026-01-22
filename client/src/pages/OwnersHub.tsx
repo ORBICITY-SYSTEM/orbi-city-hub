@@ -1,11 +1,15 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, DollarSign, TrendingUp } from "lucide-react";
+import { DataSourceBadge } from "@/components/ui/DataSourceBadge";
 
 export default function OwnersHub() {
   return (
     <div className="space-y-6 p-6">
       <div>
-        <h1 className="text-3xl font-bold">Owners Hub</h1>
+        <div className="flex items-center gap-3">
+          <h1 className="text-3xl font-bold">Owners Hub</h1>
+          <DataSourceBadge type="demo" size="md" />
+        </div>
         <p className="text-muted-foreground">Inventory management and payouts</p>
       </div>
 
