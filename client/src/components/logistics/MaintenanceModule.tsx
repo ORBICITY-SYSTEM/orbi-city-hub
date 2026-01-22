@@ -16,6 +16,7 @@ import { format } from "date-fns";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { cn } from "@/lib/utils";
 import { useLogisticsActivity } from "@/hooks/useLogisticsActivity";
+import { trpc } from "@/lib/trpc";
 
 interface MaintenanceEntry {
   id?: string;
@@ -43,6 +44,16 @@ export const MaintenanceModule = () => {
   const [selectedSchedule, setSelectedSchedule] = useState<any>(null);
   const [editingEntry, setEditingEntry] = useState<MaintenanceEntry | null>(null);
   const [uploadingFiles, setUploadingFiles] = useState(false);
+
+  // ROWS.COM sync mutation (background, non-blocking)
+  const rowsSyncMutation = trpc.rows.syncMaintenance.useMutation({
+    onSuccess: () => {
+      console.log("[ROWS] Maintenance synced successfully");
+    },
+    onError: (error) => {
+      console.warn("[ROWS] Maintenance sync failed:", error.message);
+    },
+  });
 
   const { data: rooms } = useQuery({
     queryKey: ["rooms"],
@@ -101,6 +112,17 @@ export const MaintenanceModule = () => {
         entityName: `Room ${entry.room_number} - ${entry.problem}`,
         changes: { problem: entry.problem, status: entry.status, cost: entry.cost },
       });
+
+      // Sync to ROWS.COM (background)
+      rowsSyncMutation.mutate({
+        roomNumber: entry.room_number,
+        issue: entry.problem,
+        priority: "medium", // default
+        status: entry.status as 'pending' | 'in_progress' | 'completed',
+        cost: entry.cost,
+        completedAt: entry.status === 'completed' ? new Date().toISOString() : undefined,
+      });
+
       queryClient.invalidateQueries({ queryKey: ["maintenance-schedules"] });
       queryClient.invalidateQueries({ queryKey: ["logistics-activity-log"] });
       toast.success(t("მონაცემები წარმატებით შეინახა", "Schedule saved successfully"));
@@ -149,6 +171,19 @@ export const MaintenanceModule = () => {
         entityName: schedule ? `Room ${schedule.room_number}` : undefined,
         changes: updates,
       });
+
+      // Sync to ROWS.COM (background)
+      if (schedule) {
+        rowsSyncMutation.mutate({
+          roomNumber: schedule.room_number,
+          issue: updates.problem || schedule.problem,
+          priority: "medium",
+          status: (updates.status || schedule.status) as 'pending' | 'in_progress' | 'completed',
+          cost: updates.cost ?? schedule.cost,
+          completedAt: updates.status === 'completed' ? new Date().toISOString() : undefined,
+        });
+      }
+
       queryClient.invalidateQueries({ queryKey: ["maintenance-schedules"] });
       queryClient.invalidateQueries({ queryKey: ["logistics-activity-log"] });
       toast.success(t("მონაცემები განახლდა", "Schedule updated"));

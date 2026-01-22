@@ -56,8 +56,10 @@ import { reservationsRouter as reservationsAIDirectorRouter } from "./routers/re
 import { financeRouter as financeAIDirectorRouter } from "./routers/financeRouter";
 import { logisticsRouter as logisticsAIDirectorRouter } from "./routers/logisticsRouter";
 import { financeCopilotRouter } from "./routers/financeCopilotRouter";
+import { rowsRouter } from "./routers/rowsRouter";
 
 export const appRouter = router({
+  rows: rowsRouter,
   realFinance: realFinanceRouter,
   aiAnalyzer: aiAnalyzerRouter,
   butler: butlerRouter,

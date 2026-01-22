@@ -16,6 +16,7 @@ import { RoomMultiSelect } from "@/components/RoomMultiSelect";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useLogisticsActivity } from "@/hooks/useLogisticsActivity";
+import { trpc } from "@/lib/trpc";
 
 interface ScheduleEntry {
   date: string;
@@ -34,6 +35,16 @@ export const HousekeepingModule = () => {
   const [selectedSchedule, setSelectedSchedule] = useState<any>(null);
   const [uploadingFiles, setUploadingFiles] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // ROWS.COM sync mutation (background, non-blocking)
+  const rowsSyncMutation = trpc.rows.syncHousekeeping.useMutation({
+    onSuccess: () => {
+      console.log("[ROWS] Housekeeping synced successfully");
+    },
+    onError: (error) => {
+      console.warn("[ROWS] Housekeeping sync failed:", error.message);
+    },
+  });
 
   const { data: availableRooms } = useQuery({
     queryKey: ["available-rooms"],
@@ -90,6 +101,15 @@ export const HousekeepingModule = () => {
         entityName: `${entry.rooms.length} rooms - ${entry.date}`,
         changes: { rooms: entry.rooms, notes: entry.notes },
       });
+
+      // Sync to ROWS.COM (background)
+      rowsSyncMutation.mutate({
+        roomNumbers: entry.rooms,
+        scheduledDate: entry.date,
+        status: "pending",
+        notes: entry.notes || undefined,
+      });
+
       queryClient.invalidateQueries({ queryKey: ["housekeeping-schedules"] });
       queryClient.invalidateQueries({ queryKey: ["logistics-activity-log"] });
       toast.success(t("ჩანაწერი დაემატა", "Entry added"));
@@ -122,6 +142,18 @@ export const HousekeepingModule = () => {
         entityName: schedule ? `${schedule.rooms.length} rooms` : undefined,
         changes: { status, previous_status: schedule?.status },
       });
+
+      // Sync status change to ROWS.COM (background)
+      if (schedule) {
+        rowsSyncMutation.mutate({
+          roomNumbers: schedule.rooms,
+          scheduledDate: schedule.scheduled_date,
+          status: status as 'pending' | 'in_progress' | 'completed',
+          completedAt: status === 'completed' ? new Date().toISOString() : undefined,
+          notes: schedule.notes || undefined,
+        });
+      }
+
       queryClient.invalidateQueries({ queryKey: ["housekeeping-schedules"] });
       queryClient.invalidateQueries({ queryKey: ["logistics-activity-log"] });
       toast.success(t("სტატუსი განახლდა", "Status updated"));
