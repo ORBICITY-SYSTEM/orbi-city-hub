@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { TrendingUp, ArrowLeft, Activity } from "lucide-react";
+import { TrendingUp, ArrowLeft, Activity, Brain } from "lucide-react";
 import { useLocation } from "wouter";
 import { FinanceModulesLanding } from "@/components/finance/FinanceModulesLanding";
 import { FinanceActivityLog } from "@/components/finance/FinanceActivityLog";
@@ -7,10 +7,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { FinanceCopilotWidget } from "@/components/finance-copilot";
 
 const Finance = () => {
   const navigate = useLocation();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isCopilotOpen, setIsCopilotOpen] = useState(false);
   const { t } = useLanguage();
 
   useEffect(() => {
@@ -88,6 +90,21 @@ const Finance = () => {
           </TabsContent>
         </Tabs>
       </main>
+
+      {/* AI Finance Copilot Floating Button */}
+      <button
+        onClick={() => setIsCopilotOpen(true)}
+        className="fixed bottom-24 right-6 z-40 flex items-center justify-center w-14 h-14 rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg hover:shadow-cyan-500/50 hover:scale-110 transition-all duration-300"
+        title="AI Finance Copilot"
+      >
+        <Brain className="h-6 w-6" />
+      </button>
+
+      {/* AI Finance Copilot Widget */}
+      <FinanceCopilotWidget
+        isOpen={isCopilotOpen}
+        onClose={() => setIsCopilotOpen(false)}
+      />
     </div>
   );
 };

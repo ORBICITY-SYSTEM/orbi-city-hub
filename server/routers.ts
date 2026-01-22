@@ -55,6 +55,7 @@ import { marketingRouter } from "./routers/marketingRouter";
 import { reservationsRouter as reservationsAIDirectorRouter } from "./routers/reservationsRouter";
 import { financeRouter as financeAIDirectorRouter } from "./routers/financeRouter";
 import { logisticsRouter as logisticsAIDirectorRouter } from "./routers/logisticsRouter";
+import { financeCopilotRouter } from "./routers/financeCopilotRouter";
 
 export const appRouter = router({
   realFinance: realFinanceRouter,
@@ -121,6 +122,7 @@ export const appRouter = router({
   reservationsAIDirector: reservationsAIDirectorRouter,
   financeAIDirector: financeAIDirectorRouter,
   logisticsAIDirector: logisticsAIDirectorRouter,
+  financeCopilot: financeCopilotRouter,
 });
 
 export type AppRouter = typeof appRouter;

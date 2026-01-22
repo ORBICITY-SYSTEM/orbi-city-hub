@@ -1149,3 +1149,81 @@ export const logisticsTasks = mysqlTable("logisticsTasks", {
 
 export type LogisticsTask = typeof logisticsTasks.$inferSelect;
 export type InsertLogisticsTask = typeof logisticsTasks.$inferInsert;
+
+// ============================================================================
+// FINANCE COPILOT TABLES
+// AI-powered financial assistant with briefings, recommendations, and anomaly detection
+// ============================================================================
+
+/**
+ * Finance Copilot Briefings - Daily AI-generated financial summaries
+ * Cached to reduce LLM calls
+ */
+export const financeCopilotBriefings = mysqlTable("financeCopilotBriefings", {
+  id: int("id").autoincrement().primaryKey(),
+  briefingDate: timestamp("briefingDate").notNull(),
+  language: varchar("language", { length: 8 }).notNull().default("ka"),
+  content: json("content").$type<{
+    greeting: string;
+    summary: string;
+    keyMetrics: Array<{
+      label: string;
+      value: string;
+      change: number;
+      trend: string;
+    }>;
+    anomalies: Array<{
+      type: string;
+      message: string;
+      severity: string;
+      value: string;
+    }>;
+    month?: string;
+  }>(),
+  generatedAt: timestamp("generatedAt").defaultNow().notNull(),
+  expiresAt: timestamp("expiresAt"),
+});
+
+export type FinanceCopilotBriefing = typeof financeCopilotBriefings.$inferSelect;
+export type InsertFinanceCopilotBriefing = typeof financeCopilotBriefings.$inferInsert;
+
+/**
+ * Finance Copilot Recommendations - AI-generated actionable recommendations
+ */
+export const financeCopilotRecommendations = mysqlTable("financeCopilotRecommendations", {
+  id: int("id").autoincrement().primaryKey(),
+  type: varchar("type", { length: 64 }).notNull().default("general"), // pricing, expense, revenue, efficiency
+  title: varchar("title", { length: 255 }).notNull(),
+  titleGe: varchar("titleGe", { length: 255 }),
+  description: text("description"),
+  descriptionGe: text("descriptionGe"),
+  estimatedImpact: varchar("estimatedImpact", { length: 128 }), // e.g., "+₾2,400/თვე"
+  priority: int("priority").default(3), // 1-5, 5 being highest
+  status: mysqlEnum("status", ["active", "converted", "dismissed", "expired"]).default("active").notNull(),
+  relatedTaskId: int("relatedTaskId"), // FK to financeTasks if converted
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type FinanceCopilotRecommendation = typeof financeCopilotRecommendations.$inferSelect;
+export type InsertFinanceCopilotRecommendation = typeof financeCopilotRecommendations.$inferInsert;
+
+/**
+ * Finance Anomaly Log - Track detected anomalies
+ */
+export const financeAnomalyLog = mysqlTable("financeAnomalyLog", {
+  id: int("id").autoincrement().primaryKey(),
+  anomalyType: varchar("anomalyType", { length: 64 }).notNull(), // revenue, expense, occupancy
+  severity: mysqlEnum("severity", ["low", "medium", "high"]).default("medium").notNull(),
+  metric: varchar("metric", { length: 64 }).notNull(),
+  expectedValue: decimal("expectedValue", { precision: 15, scale: 2 }),
+  actualValue: decimal("actualValue", { precision: 15, scale: 2 }),
+  deviationPercent: decimal("deviationPercent", { precision: 5, scale: 2 }),
+  description: text("description"),
+  acknowledgedAt: timestamp("acknowledgedAt"),
+  acknowledgedBy: int("acknowledgedBy"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type FinanceAnomalyLog = typeof financeAnomalyLog.$inferSelect;
+export type InsertFinanceAnomalyLog = typeof financeAnomalyLog.$inferInsert;
