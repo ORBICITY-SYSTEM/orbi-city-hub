@@ -7,11 +7,20 @@ export const ka: Translations = {
   // Navigation
   nav: {
     home: "მთავარი",
+    mainDashboard: "მართვის ცენტრი",
     finance: "ფინანსები",
     marketing: "მარკეტინგი",
     reservations: "რეზერვაციები",
     integrations: "ინტეგრაციები",
     logistics: "ლოჯისტიკა",
+    settings: "პარამეტრები",
+    knowledgeBase: "ცოდნის ბაზა",
+  },
+
+  // Navigation Groups
+  navGroup: {
+    modules: "მოდულები",
+    system: "სისტემა",
   },
   
   // Submenu items
