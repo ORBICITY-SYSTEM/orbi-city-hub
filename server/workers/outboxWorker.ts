@@ -402,8 +402,9 @@ export async function getOutboxStats(): Promise<{
 // CRON ENTRYPOINT
 // ============================================================================
 
-// If run directly as a script
-if (require.main === module) {
+// If run directly as a script (ESM compatible)
+const isMainModule = import.meta.url === `file://${process.argv[1]?.replace(/\\/g, '/')}`;
+if (isMainModule) {
   processOutbox()
     .then(result => {
       console.log('Outbox processing complete:', result);

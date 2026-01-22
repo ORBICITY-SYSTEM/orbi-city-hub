@@ -180,6 +180,112 @@ async function startServer() {
   app.use("/api/oauth/", authLimiter);
   // OAuth callback under /api/oauth/callback
   registerOAuthRoutes(app);
+
+  // Instagram Dashboard endpoint (Rows.com integration)
+  // Used by: client/src/hooks/useInstagramAnalytics.ts
+  app.get("/api/rows/instagram-dashboard", async (req, res) => {
+    try {
+      const { from, to, refresh } = req.query;
+      console.log("[Instagram Dashboard] Fetching data", { from, to, refresh });
+
+      // Import the Rows API functions
+      const { getInstagramMetricsFromRows, getInstagramPostsFromRows } = await import("../rowsApi");
+
+      // Fetch metrics and posts from Rows.com
+      const [metricsResult, postsResult] = await Promise.all([
+        getInstagramMetricsFromRows(),
+        getInstagramPostsFromRows(100), // Get more posts for the dashboard
+      ]);
+
+      if (!metricsResult.success || !postsResult.success) {
+        console.error("[Instagram Dashboard] Rows API error:", metricsResult.error || postsResult.error);
+        return res.status(500).json({
+          error: metricsResult.error || postsResult.error || "Failed to fetch Instagram data"
+        });
+      }
+
+      // Transform the data to match the expected format from useInstagramAnalytics
+      const metrics = metricsResult.data ? [{
+        id: "1",
+        date: new Date().toISOString().split("T")[0],
+        reach: metricsResult.data.reach,
+        accounts_engaged: null,
+        likes: null,
+        comments: null,
+        shares: null,
+        follows: metricsResult.data.followers,
+        profile_links_taps: metricsResult.data.websiteClicks,
+        views: metricsResult.data.impressions,
+        total_interactions: metricsResult.data.engagement,
+      }] : [];
+
+      // Transform posts to expected format
+      const posts = (postsResult.posts || []).map((post, index) => ({
+        id: post.id || String(index),
+        post_url: null,
+        post_date: post.timestamp ? post.timestamp.split("T")[0] : null,
+        created_time: post.timestamp,
+        caption: post.caption,
+        likes: post.likes,
+        reach: post.reach,
+        comments: post.comments,
+        saved: null,
+        follows: null,
+        media_type: post.mediaType,
+        watch_time_ms: null,
+        theme: null,
+        media_url: post.mediaUrl,
+      }));
+
+      // Create summary from metrics
+      const summary = metricsResult.data ? {
+        id: "1",
+        synced_at: new Date().toISOString(),
+        time_frame: "all",
+        posts_count: posts.length,
+        total_reach: metricsResult.data.reach,
+        total_likes: posts.reduce((sum, p) => sum + (p.likes || 0), 0),
+        total_comments: posts.reduce((sum, p) => sum + (p.comments || 0), 0),
+        total_saved: 0,
+        total_follows: metricsResult.data.followers,
+        avg_reach_per_post: posts.length > 0 ? Math.round(metricsResult.data.reach / posts.length) : 0,
+        engagement_rate: metricsResult.data.engagement,
+      } : null;
+
+      // Apply date filtering if provided
+      let filteredPosts = posts;
+      if (from || to) {
+        filteredPosts = posts.filter(post => {
+          if (!post.post_date) return true;
+          const postDate = new Date(post.post_date);
+          if (from && postDate < new Date(from as string)) return false;
+          if (to && postDate > new Date(to as string)) return false;
+          return true;
+        });
+      }
+
+      const response = {
+        metrics,
+        posts: filteredPosts,
+        summary,
+        weeklyStats: [],
+      };
+
+      console.log("[Instagram Dashboard] Returning data:", {
+        metricsCount: metrics.length,
+        postsCount: filteredPosts.length,
+        hasSummary: !!summary
+      });
+
+      res.json(response);
+    } catch (error) {
+      console.error("[Instagram Dashboard] Error:", error);
+      res.status(500).json({
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
+
   // Outscraper webhook endpoint (raw Express, not tRPC)
   // Supports: Google, Booking.com, Airbnb, TripAdvisor, Expedia
   // P0 FIX: Strict property whitelist validation added 2025-12-21

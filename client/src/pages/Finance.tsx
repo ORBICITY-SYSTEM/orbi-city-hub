@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Receipt, TrendingUp, Users, FileText, Bot, BarChart3 } from "lucide-react";
+import { Receipt, TrendingUp, Users, FileText, Bot, BarChart3, Brain } from "lucide-react";
 import { AIChatBox } from "@/components/AIChatBox";
 import { Button } from "@/components/ui/button";
 import { FileUpload } from "@/components/FileUpload";
@@ -10,11 +10,13 @@ import { FinanceDashboardContent } from "@/components/FinanceDashboardContent";
 import { FinanceTransactions } from "@/components/FinanceTransactions";
 import { FinancePL } from "@/components/FinancePL";
 import { FinanceInvoices } from "@/components/FinanceInvoices";
+import { FinanceCopilotWidget } from "@/components/finance-copilot";
 
 const Finance = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [chatHistory, setChatHistory] = useState<Array<{ role: "user" | "assistant"; content: string }>>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isCopilotOpen, setIsCopilotOpen] = useState(false);
   const chatMutation = trpc.ai.chat.useMutation();
 
   const handleSendMessage = async (content: string) => {
@@ -100,6 +102,24 @@ const Finance = () => {
           </CardContent></Card>
         </TabsContent>
       </Tabs>
+
+      {/* Finance Copilot Floating Button */}
+      {!isCopilotOpen && (
+        <Button
+          onClick={() => setIsCopilotOpen(true)}
+          className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-lg bg-gradient-to-br from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 z-40"
+          size="icon"
+        >
+          <Brain className="h-6 w-6 text-white" />
+        </Button>
+      )}
+
+      {/* Finance Copilot Widget */}
+      <FinanceCopilotWidget
+        isOpen={isCopilotOpen}
+        onClose={() => setIsCopilotOpen(false)}
+        defaultLanguage="ka"
+      />
     </div>
   );
 };
