@@ -5,7 +5,7 @@
 
 import { trpc } from "@/lib/trpc";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useLanguage } from "@/hooks/useLanguage";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { Star, MessageCircle, CheckCircle2, TrendingUp, TrendingDown, Loader2 } from "lucide-react";
 
 export default function GoogleReviewsCard() {
