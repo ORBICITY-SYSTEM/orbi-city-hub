@@ -4,7 +4,18 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Loader2, Plus } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Loader2, Plus, Building2, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { RoomInventoryTable } from "@/components/RoomInventoryTable";
@@ -19,6 +30,8 @@ export function StudioInventoryList() {
   const { t } = useLanguage();
   const queryClient = useQueryClient();
   const [selectedRoomId, setSelectedRoomId] = useState<string>("");
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [newRoomNumber, setNewRoomNumber] = useState("");
 
   const { data: rooms, isLoading } = useQuery({
     queryKey: ["rooms"],
@@ -66,6 +79,71 @@ export function StudioInventoryList() {
     },
   });
 
+  // Add single room mutation
+  const addRoomMutation = useMutation({
+    mutationFn: async (roomNumber: string) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+
+      // Check if room already exists
+      const { data: existing } = await supabase
+        .from("rooms")
+        .select("id")
+        .eq("room_number", roomNumber)
+        .single();
+
+      if (existing) {
+        throw new Error("ოთახი უკვე არსებობს / Room already exists");
+      }
+
+      const { error } = await supabase.from("rooms").insert({
+        user_id: user.id,
+        room_number: roomNumber.trim(),
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["rooms"] });
+      toast.success(t("ოთახი დაემატა!", "Room added successfully!"));
+      setNewRoomNumber("");
+      setIsAddDialogOpen(false);
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+
+  // Delete room mutation
+  const deleteRoomMutation = useMutation({
+    mutationFn: async (roomId: string) => {
+      // First delete related inventory items
+      await supabase.from("room_inventory_items").delete().eq("room_id", roomId);
+      // Then delete housekeeping schedules
+      await supabase.from("housekeeping_schedules").delete().eq("room_id", roomId);
+      // Then delete maintenance schedules
+      await supabase.from("maintenance_schedules").delete().eq("room_id", roomId);
+      // Finally delete the room
+      const { error } = await supabase.from("rooms").delete().eq("id", roomId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["rooms"] });
+      toast.success(t("ოთახი წაიშალა", "Room deleted"));
+      setSelectedRoomId("");
+    },
+    onError: (error) => {
+      toast.error(t("შეცდომა", "Error") + ": " + error.message);
+    },
+  });
+
+  const handleAddRoom = () => {
+    if (!newRoomNumber.trim()) {
+      toast.error(t("შეიყვანეთ ოთახის ნომერი", "Please enter room number"));
+      return;
+    }
+    addRoomMutation.mutate(newRoomNumber);
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center p-8">
@@ -98,16 +176,74 @@ export function StudioInventoryList() {
     <div className="space-y-6">
       <Card className="p-6">
         <div className="space-y-4">
-          <div>
-            <h3 className="text-lg font-semibold mb-2">
-              {t("სტუდიოს ინვენტარის მართვა", "Studio Inventory Management")}
-            </h3>
-            <p className="text-sm text-muted-foreground">
-              {t(
-                "აირჩიეთ ოთახი ინვენტარის დასათვალიერებლად და განსაახლებლად",
-                "Select a room to view and update its inventory"
-              )}
-            </p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-lg font-semibold mb-2">
+                {t("სტუდიოს ინვენტარის მართვა", "Studio Inventory Management")}
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                {t(
+                  "აირჩიეთ ოთახი ინვენტარის დასათვალიერებლად და განსაახლებლად",
+                  "Select a room to view and update its inventory"
+                )}
+              </p>
+            </div>
+
+            {/* Add Room Button */}
+            <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+              <DialogTrigger asChild>
+                <Button className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700">
+                  <Plus className="h-4 w-4 mr-2" />
+                  {t("ახალი აპარტამენტი", "New Apartment")}
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle className="flex items-center gap-2">
+                    <Building2 className="h-5 w-5 text-emerald-500" />
+                    {t("ახალი აპარტამენტის დამატება", "Add New Apartment")}
+                  </DialogTitle>
+                  <DialogDescription>
+                    {t(
+                      "შეიყვანეთ ახალი აპარტამენტის ნომერი (მაგ: A 1234, C 5678)",
+                      "Enter the new apartment number (e.g., A 1234, C 5678)"
+                    )}
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="roomNumber">
+                      {t("აპარტამენტის ნომერი", "Apartment Number")}
+                    </Label>
+                    <Input
+                      id="roomNumber"
+                      placeholder="A 1234"
+                      value={newRoomNumber}
+                      onChange={(e) => setNewRoomNumber(e.target.value.toUpperCase())}
+                      onKeyDown={(e) => e.key === "Enter" && handleAddRoom()}
+                      className="text-lg font-mono"
+                    />
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
+                    {t("გაუქმება", "Cancel")}
+                  </Button>
+                  <Button
+                    onClick={handleAddRoom}
+                    disabled={addRoomMutation.isPending || !newRoomNumber.trim()}
+                    className="bg-emerald-500 hover:bg-emerald-600"
+                  >
+                    {addRoomMutation.isPending ? (
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    ) : (
+                      <Plus className="h-4 w-4 mr-2" />
+                    )}
+                    {t("დამატება", "Add")}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           </div>
 
           <div className="flex items-center gap-4">
@@ -125,6 +261,31 @@ export function StudioInventoryList() {
                 ))}
               </SelectContent>
             </Select>
+
+            {/* Room count badge */}
+            <span className="text-sm text-muted-foreground bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full">
+              {t("სულ", "Total")}: {rooms.length} {t("აპარტამენტი", "apartments")}
+            </span>
+
+            {/* Delete room button - only show when a specific room is selected */}
+            {selectedRoomId && selectedRoomId !== "all" && (
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={() => {
+                  if (confirm(t("დარწმუნებული ხართ? ეს წაშლის ოთახს და მის ყველა მონაცემს.", "Are you sure? This will delete the room and all its data."))) {
+                    deleteRoomMutation.mutate(selectedRoomId);
+                  }
+                }}
+                disabled={deleteRoomMutation.isPending}
+              >
+                {deleteRoomMutation.isPending ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Trash2 className="h-4 w-4" />
+                )}
+              </Button>
+            )}
           </div>
         </div>
       </Card>
