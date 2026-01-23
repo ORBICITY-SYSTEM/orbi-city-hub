@@ -35,9 +35,15 @@ interface InstagramPost {
 
 // Extract spreadsheet ID from ROWS.COM URL
 function extractSpreadsheetId(url: string): string | null {
-  // URL format: https://rows.com/groot-e50ad778/my-spreadsheets/instagram-page-analytics-dashboard-590R621oSJPeF4u2jPBPzz/...
-  const match = url.match(/my-spreadsheets\/[^\/]+-([A-Za-z0-9]+)\//);
-  return match ? match[1] : null;
+  // URL format: https://rows.com/groot-e50ad778/my-spreadsheets/instagram-page-analytics-dashboard-590R621oSJPeF4u2jPBPzz/29d39fdc-47ac-40e3-9862-5f3d836ea8a2/edit
+  // The UUID after the spreadsheet name is the actual spreadsheet ID for the API
+  const uuidMatch = url.match(/\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/i);
+  if (uuidMatch) {
+    return uuidMatch[1];
+  }
+  // Fallback to old method (short ID)
+  const shortIdMatch = url.match(/my-spreadsheets\/[^\/]+-([A-Za-z0-9]+)\//);
+  return shortIdMatch ? shortIdMatch[1] : null;
 }
 
 // Build ROWS.COM API URL
@@ -54,6 +60,7 @@ function buildRowsApiUrl(spreadsheetId: string, tableName?: string): string {
  */
 async function fetchFromRows(endpoint: string): Promise<RowsApiResponse> {
   const apiKey = process.env.ROWS_API_KEY;
+  console.log(`[ROWS API] Fetching: ${endpoint}`);
 
   if (!apiKey) {
     console.warn('[ROWS API] API key not configured');
@@ -129,6 +136,7 @@ export async function getInstagramMetricsFromRows(): Promise<{
   }
 
   const spreadsheetId = extractSpreadsheetId(spreadsheetUrl);
+  console.log(`[ROWS API] Extracted spreadsheet ID: ${spreadsheetId} from URL: ${spreadsheetUrl}`);
   if (!spreadsheetId) {
     return { success: false, error: 'Could not extract spreadsheet ID' };
   }
