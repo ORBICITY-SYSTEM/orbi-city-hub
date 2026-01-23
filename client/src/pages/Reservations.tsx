@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CalendarDays, List, Users, Mail, Bot, TrendingUp, TrendingDown, Calendar, DollarSign, Star, CheckCircle2, XCircle, Clock } from "lucide-react";
+import { CalendarDays, List, Users, Mail, Bot, TrendingUp, Calendar, DollarSign, Star, CheckCircle2, XCircle, Clock } from "lucide-react";
 import { AIChatBox } from "@/components/AIChatBox";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { trpc } from "@/lib/trpc";
 import { cn } from "@/lib/utils";
-import { DataSourceBadge } from "@/components/ui/DataSourceBadge";
+import { PageHeader } from "@/components/ui/PageHeader";
 
 // Mock data for demonstration
 const mockBookings = [
@@ -84,16 +84,18 @@ const Reservations = () => {
   const totalRevenue = mockBookings.reduce((sum, b) => sum + b.price, 0);
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 space-y-6">
-      {/* Header */}
-      <div className="flex items-start justify-between">
-        <div>
-          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-cyan-400">Reservations</h1>
-          <p className="text-white/60">Manage reservations and guests</p>
-        </div>
-        <DataSourceBadge type="demo" size="md" />
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
+      <PageHeader
+        title="Reservations"
+        titleKa="ჯავშნები"
+        subtitle="Manage reservations and guests"
+        subtitleKa="ჯავშნების და სტუმრების მართვა"
+        icon={CalendarDays}
+        iconGradient="from-blue-500 to-cyan-600"
+        dataSource={{ type: "demo" }}
+      />
 
+      <div className="p-4 sm:p-6 lg:p-8 space-y-6">
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
         <Card className="p-4 bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
@@ -306,6 +308,7 @@ const Reservations = () => {
             />
           </div>
         )}
+      </div>
       </div>
     </div>
   );

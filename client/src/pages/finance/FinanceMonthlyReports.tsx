@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ArrowLeft, Calendar, Plus, Upload, ChevronRight, FileSpreadsheet, TrendingUp, Sparkles } from "lucide-react";
+import { Calendar, Plus, Upload, ChevronRight, FileSpreadsheet, TrendingUp, Sparkles } from "lucide-react";
 import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -13,7 +13,7 @@ import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { analyzeExcelFileForMonth } from "@/utils/excelAnalyzerMonthly";
 import { MonthlyFileUploadManager } from "@/components/finance/MonthlyFileUploadManager";
-import { DataSourceBadge } from "@/components/ui/DataSourceBadge";
+import { PageHeader } from "@/components/ui/PageHeader";
 
 const months = [
   { value: "1", label: "იანვარი" },
@@ -31,7 +31,7 @@ const months = [
 ];
 
 const FinanceMonthlyAnalysisList = () => {
-  const navigate = useLocation();
+  const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -134,106 +134,93 @@ const FinanceMonthlyAnalysisList = () => {
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 5 }, (_, i) => currentYear - i);
 
+  const addNewAnalysisButton = (
+    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+      <DialogTrigger asChild>
+        <Button className="gap-2">
+          <Plus className="h-4 w-4" />
+          <span className="hidden sm:inline">ახალი ანალიზი</span>
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>თვიური ანალიზის დამატება</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4 pt-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>თვე</Label>
+              <Select value={month} onValueChange={setMonth}>
+                <SelectTrigger>
+                  <SelectValue placeholder="აირჩიეთ თვე" />
+                </SelectTrigger>
+                <SelectContent>
+                  {months.map((m) => (
+                    <SelectItem key={m.value} value={m.value}>
+                      {m.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>წელი</Label>
+              <Select value={year} onValueChange={setYear}>
+                <SelectTrigger>
+                  <SelectValue placeholder="აირჩიეთ წელი" />
+                </SelectTrigger>
+                <SelectContent>
+                  {years.map((y) => (
+                    <SelectItem key={y} value={y.toString()}>
+                      {y}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="file">Excel ფაილი</Label>
+            <Input
+              id="file"
+              type="file"
+              accept=".xlsx,.xls"
+              onChange={handleFileChange}
+            />
+            {selectedFile && (
+              <p className="text-xs text-muted-foreground">
+                არჩეული ფაილი: {selectedFile.name}
+              </p>
+            )}
+          </div>
+
+          <Button
+            onClick={handleUpload}
+            disabled={uploading || !selectedFile || !month || !year}
+            className="w-full"
+          >
+            <Upload className="h-4 w-4 mr-2" />
+            {uploading ? "იტვირთება..." : "ატვირთვა"}
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
-      <header className="border-b border-white/10 bg-blue-900/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Button variant="ghost" size="sm" onClick={() => setLocation("/finance")}>
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                უკან
-              </Button>
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-green-500 to-emerald-500">
-                  <Calendar className="h-6 w-6 text-white" />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h1 className="text-xl font-bold text-foreground">თვეების ანალიზი</h1>
-                    <DataSourceBadge type="live" source="Supabase" size="md" />
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    თვიური ფინანსური რეპორტები და ანალიტიკა
-                  </p>
-                </div>
-              </div>
-            </div>
-            
-            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-              <DialogTrigger asChild>
-                <Button className="gap-2">
-                  <Plus className="h-4 w-4" />
-                  ახალი ანალიზი
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>თვიური ანალიზის დამატება</DialogTitle>
-                </DialogHeader>
-                <div className="space-y-4 pt-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label>თვე</Label>
-                      <Select value={month} onValueChange={setMonth}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="აირჩიეთ თვე" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {months.map((m) => (
-                            <SelectItem key={m.value} value={m.value}>
-                              {m.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="space-y-2">
-                      <Label>წელი</Label>
-                      <Select value={year} onValueChange={setYear}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="აირჩიეთ წელი" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {years.map((y) => (
-                            <SelectItem key={y} value={y.toString()}>
-                              {y}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="file">Excel ფაილი</Label>
-                    <Input
-                      id="file"
-                      type="file"
-                      accept=".xlsx,.xls"
-                      onChange={handleFileChange}
-                    />
-                    {selectedFile && (
-                      <p className="text-xs text-muted-foreground">
-                        არჩეული ფაილი: {selectedFile.name}
-                      </p>
-                    )}
-                  </div>
-
-                  <Button
-                    onClick={handleUpload}
-                    disabled={uploading || !selectedFile || !month || !year}
-                    className="w-full"
-                  >
-                    <Upload className="h-4 w-4 mr-2" />
-                    {uploading ? "იტვირთება..." : "ატვირთვა"}
-                  </Button>
-                </div>
-              </DialogContent>
-            </Dialog>
-          </div>
-        </div>
-      </header>
+      <PageHeader
+        title="Monthly Reports"
+        titleKa="თვეების ანალიზი"
+        subtitle="Monthly financial reports and analytics"
+        subtitleKa="თვიური ფინანსური რეპორტები და ანალიტიკა"
+        icon={Calendar}
+        iconGradient="from-purple-500 to-indigo-600"
+        dataSource={{ type: "live", source: "Supabase" }}
+        backUrl="/finance"
+        actions={addNewAnalysisButton}
+      />
 
       <main className="container mx-auto px-6 py-8">
         <div className="mb-8">

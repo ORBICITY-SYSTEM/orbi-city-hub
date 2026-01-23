@@ -1,23 +1,26 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Calendar } from "lucide-react";
+import { Calendar, Link as LinkIcon } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Link } from "wouter";
-import { DataSourceBadge } from "@/components/ui/DataSourceBadge";
+import { PageHeader } from "@/components/ui/PageHeader";
 
 export default function ChannelManager() {
   const { t } = useLanguage();
 
   return (
-    <div className="space-y-6 p-6">
-      <div>
-        <div className="flex items-center gap-3">
-          <h1 className="text-3xl font-bold">{t("nav.channelManager")}</h1>
-          <DataSourceBadge type="live" source="tRPC" size="md" />
-        </div>
-        <p className="text-muted-foreground">Channel Manager overview and navigation</p>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
+      <PageHeader
+        title="Channel Manager"
+        titleKa="არხების მენეჯერი"
+        subtitle="Channel Manager overview and navigation"
+        subtitleKa="არხების მენეჯერის მიმოხილვა და ნავიგაცია"
+        icon={LinkIcon}
+        iconGradient="from-blue-500 to-purple-600"
+        dataSource={{ type: "live", source: "tRPC" }}
+      />
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Link href="/channel-manager/calendar">
           <Card className="cursor-pointer hover:bg-slate-800/50 transition-colors">
             <CardHeader>
@@ -53,6 +56,7 @@ export default function ChannelManager() {
             </CardContent>
           </Card>
         </Link>
+        </div>
       </div>
     </div>
   );

@@ -17,11 +17,12 @@ import {
   Calendar as CalendarIcon,
   Music2,
   Target,
+  Globe,
+  Loader2,
 } from "lucide-react";
 import ContentCalendar from "@/components/ContentCalendar";
 import CompetitorComparison from "@/components/CompetitorComparison";
-import { Loader2 } from "lucide-react";
-import { DataSourceBadge } from "@/components/ui/DataSourceBadge";
+import { PageHeader } from "@/components/ui/PageHeader";
 
 export default function SocialMedia() {
   const [activeTab, setActiveTab] = useState("overview");
@@ -67,20 +68,18 @@ export default function SocialMedia() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 p-6">
-      {/* Header */}
-      <div className="mb-6">
-        <div className="flex items-center gap-3 mb-2">
-          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white">
-            Social Media Analytics
-          </h1>
-          <DataSourceBadge type="live" source="tRPC" size="md" />
-        </div>
-        <p className="text-white/70">
-          Track your Facebook, Instagram, and TikTok performance
-        </p>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
+      <PageHeader
+        title="Social Media Analytics"
+        titleKa="სოციალური მედიის ანალიტიკა"
+        subtitle="Track your Facebook, Instagram, and TikTok performance"
+        subtitleKa="თვალყური ადევნეთ თქვენი Facebook, Instagram და TikTok-ის შედეგებს"
+        icon={Globe}
+        iconGradient="from-pink-500 to-rose-600"
+        dataSource={{ type: "live", source: "tRPC" }}
+      />
 
+      <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
       {/* Overview KPIs */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <Card className="bg-gradient-to-br from-blue-500/20 to-cyan-500/20 backdrop-blur-md border-white/20 p-6">
@@ -695,6 +694,7 @@ export default function SocialMedia() {
           </div>
         </TabsContent>
       </Tabs>
+      </div>
     </div>
   );
 }

@@ -1,6 +1,5 @@
 import { useState, useMemo } from "react";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { trpc } from "@/lib/trpc";
@@ -12,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { DataSourceBadge } from "@/components/ui/DataSourceBadge";
+import { PageHeader } from "@/components/ui/PageHeader";
 
 export default function FinanceAnalytics() {
   const { data: summary } = trpc.realFinance.getSummary.useQuery();
@@ -102,18 +101,18 @@ export default function FinanceAnalytics() {
   }, [summary]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 p-6">
-      {/* Header */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-blue-600/20 to-cyan-600/20 border border-white/10 text-white p-8 rounded-lg mb-6 shadow-xl">
-        <div className="flex items-center gap-3 mb-2">
-          <h1 className="text-4xl font-bold">📊 Finance Analytics</h1>
-          <DataSourceBadge type="live" source="tRPC" size="md" />
-        </div>
-        <p className="text-white/90 font-bold">
-          ROI Calculator • RevPAR Analysis • Forecasting • Profitability Metrics
-        </p>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
+      <PageHeader
+        title="Finance Analytics"
+        titleKa="ფინანსური ანალიტიკა"
+        subtitle="ROI Calculator, RevPAR Analysis, Forecasting, Profitability Metrics"
+        subtitleKa="ROI კალკულატორი, RevPAR ანალიზი, პროგნოზირება, მომგებიანობის მეტრიკები"
+        icon={BarChart3}
+        iconGradient="from-cyan-500 to-blue-600"
+        dataSource={{ type: "live", source: "tRPC" }}
+      />
 
+      <div className="p-6">
       <div className="grid grid-cols-2 gap-6 mb-6">
         {/* ROI Calculator */}
         <Card className="p-6 bg-white/10 backdrop-blur-md border-white/20">
@@ -335,6 +334,7 @@ export default function FinanceAnalytics() {
             </div>
           )}
         </Card>
+      </div>
       </div>
     </div>
   );

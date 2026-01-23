@@ -27,7 +27,6 @@ import {
   Package,
   Wrench,
   Calendar,
-  AlertTriangle,
   ChevronRight,
 } from "lucide-react";
 import { format } from "date-fns";
@@ -35,7 +34,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { DataSourceBadge } from "@/components/ui/DataSourceBadge";
+import { PageHeader } from "@/components/ui/PageHeader";
 
 const taskFormSchema = z.object({
   title: z.string().min(1, "ამოცანის სახელი სავალდებულოა").max(255, "სახელი ძალიან გრძელია"),
@@ -197,35 +196,31 @@ export default function AILogisticsDirector() {
   const completedTasks = taskStats?.completed || 0;
 
   return (
-    <div className="space-y-6 p-6">
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div className="flex items-center gap-4">
-          <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-primary via-info to-accent flex items-center justify-center shadow-lg">
-            <Brain className="h-8 w-8 text-white" />
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-orange-900 to-slate-900">
+      <PageHeader
+        title="AI Logistics Director"
+        titleKa="AI ლოჯისტიკის დირექტორი"
+        subtitle="Centralized AI management for logistics"
+        subtitleKa="ცენტრალიზებული AI მართვა ლოჯისტიკისთვის"
+        icon={Brain}
+        iconGradient="from-orange-500 to-amber-600"
+        dataSource={{ type: "live", source: "Gemini AI" }}
+        backUrl="/logistics"
+        actions={
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" onClick={() => handleQuickAction("daily_briefing", "მოიტანე დღის სრული ბრიფინგი")}>
+              <Clock className="h-4 w-4 mr-2" />
+              <span className="hidden sm:inline">{t("დღის ბრიფინგი", "Daily Briefing")}</span>
+            </Button>
+            <Button size="sm" onClick={() => handleQuickAction("analyze_performance", "გააანალიზე ლოჯისტიკის შედეგები")}>
+              <TrendingUp className="h-4 w-4 mr-2" />
+              <span className="hidden sm:inline">{t("ანალიზი", "Analysis")}</span>
+            </Button>
           </div>
-          <div>
-            <h1 className="text-2xl font-bold flex items-center gap-2">
-              AI Logistics Director
-              <Badge variant="outline" className="ml-2 bg-primary/10 text-primary border-primary/20">
-                <Sparkles className="h-3 w-3 mr-1" />
-                Gemini 2.5 Pro
-              </Badge>
-              <DataSourceBadge type="live" source="Gemini AI" size="md" />
-            </h1>
-            <p className="text-muted-foreground">ცენტრალიზებული AI მართვა ლოჯისტიკისთვის</p>
-          </div>
-        </div>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={() => handleQuickAction("daily_briefing", "მოიტანე დღის სრული ბრიფინგი")}>
-            <Clock className="h-4 w-4 mr-2" />
-            დღის ბრიფინგი
-          </Button>
-          <Button onClick={() => handleQuickAction("analyze_performance", "გააანალიზე ლოჯისტიკის შედეგები")}>
-            <TrendingUp className="h-4 w-4 mr-2" />
-            ანალიზი
-          </Button>
-        </div>
-      </div>
+        }
+      />
+
+      <main className="container mx-auto px-6 py-8 space-y-6">
 
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
         {AI_AGENTS.map((agent) => {
@@ -328,16 +323,16 @@ export default function AILogisticsDirector() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="mb-4">
-          <TabsTrigger value="overview" className="gap-2">
+        <TabsList className="mb-4 bg-slate-800/50 border border-white/10">
+          <TabsTrigger value="overview" className="gap-2 data-[state=active]:bg-orange-600 data-[state=active]:text-white">
             <PieChart className="h-4 w-4" />
             Overview
           </TabsTrigger>
-          <TabsTrigger value="tasks" className="gap-2">
+          <TabsTrigger value="tasks" className="gap-2 data-[state=active]:bg-orange-600 data-[state=active]:text-white">
             <ListTodo className="h-4 w-4" />
             Tasks ({pendingTasks + inProgressTasks})
           </TabsTrigger>
-          <TabsTrigger value="chat" className="gap-2">
+          <TabsTrigger value="chat" className="gap-2 data-[state=active]:bg-orange-600 data-[state=active]:text-white">
             <MessageSquare className="h-4 w-4" />
             AI Chat
           </TabsTrigger>
@@ -727,6 +722,7 @@ export default function AILogisticsDirector() {
           </Card>
         </TabsContent>
       </Tabs>
+      </main>
     </div>
   );
 }

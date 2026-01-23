@@ -4,9 +4,9 @@
 
 import { trpc } from "@/lib/trpc";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { DollarSign, TrendingUp, TrendingDown, Percent, Calendar } from "lucide-react";
+import { DollarSign, TrendingUp, Percent, Calendar } from "lucide-react";
 import { Loader2 } from "lucide-react";
-import { DataSourceBadge } from "@/components/ui/DataSourceBadge";
+import { PageHeader } from "@/components/ui/PageHeader";
 
 export default function RealFinanceDashboard() {
   const { data: summary, isLoading: summaryLoading } = trpc.realFinance.getSummary.useQuery();
@@ -23,16 +23,16 @@ export default function RealFinanceDashboard() {
   }
 
   return (
-    <div className="space-y-8 p-8 min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
-      {/* Header */}
-      <div className="flex items-start justify-between">
-        <div>
-          <h1 className="text-4xl font-bold text-white mb-2">💰 Real Finance Dashboard</h1>
-          <p className="text-gray-400 text-lg">ORBI City Financial Report (Oct 2024 - Sep 2025)</p>
-        </div>
-        <DataSourceBadge type="live" source="MySQL" size="md" />
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
+      <PageHeader
+        title="Real Finance Dashboard"
+        subtitle="ORBI City Financial Report (Oct 2024 - Sep 2025)"
+        icon={DollarSign}
+        iconGradient="from-emerald-500 to-green-600"
+        dataSource={{ type: "live", source: "MySQL" }}
+      />
 
+      <div className="space-y-8 p-8">
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* Total Revenue */}
@@ -222,6 +222,7 @@ export default function RealFinanceDashboard() {
           </div>
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 }

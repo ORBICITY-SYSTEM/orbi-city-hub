@@ -1,19 +1,22 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, DollarSign, TrendingUp } from "lucide-react";
-import { DataSourceBadge } from "@/components/ui/DataSourceBadge";
+import { PageHeader } from "@/components/ui/PageHeader";
 
 export default function OwnersHub() {
   return (
-    <div className="space-y-6 p-6">
-      <div>
-        <div className="flex items-center gap-3">
-          <h1 className="text-3xl font-bold">Owners Hub</h1>
-          <DataSourceBadge type="demo" size="md" />
-        </div>
-        <p className="text-muted-foreground">Inventory management and payouts</p>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
+      <PageHeader
+        title="Owners Hub"
+        titleKa="მფლობელების ჰაბი"
+        subtitle="Inventory management and payouts"
+        subtitleKa="ინვენტარის მართვა და გადახდები"
+        icon={Users}
+        iconGradient="from-emerald-500 to-green-600"
+        dataSource={{ type: "demo" }}
+      />
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -49,6 +52,7 @@ export default function OwnersHub() {
             <p className="text-sm text-muted-foreground">Performance metrics will be displayed here</p>
           </CardContent>
         </Card>
+        </div>
       </div>
     </div>
   );

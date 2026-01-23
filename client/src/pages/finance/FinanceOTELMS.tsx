@@ -4,22 +4,18 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  ArrowLeft, Building2, Database, RefreshCw,
-  Calendar, Users, DollarSign, TrendingUp,
-  Plane, LogIn, LogOut, AlertCircle, CheckCircle2
+  Database, RefreshCw,
+  Calendar, Users, TrendingUp,
+  LogIn, LogOut
 } from "lucide-react";
-import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { format } from "date-fns";
-import { ka } from "date-fns/locale";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
-import { DataSourceBadge } from "@/components/ui/DataSourceBadge";
+import { PageHeader } from "@/components/ui/PageHeader";
 
 const FinanceOtelMS = () => {
-  const [, setLocation] = useLocation();
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState("today");
 
   // ROWS.COM connection check
@@ -70,47 +66,30 @@ const FinanceOtelMS = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
-      <header className="border-b border-white/10 bg-blue-900/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Button variant="ghost" size="sm" onClick={() => setLocation("/finance")}>
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                {t("უკან", "Back")}
-              </Button>
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-purple-500 to-pink-500">
-                  <Building2 className="h-6 w-6 text-white" />
-                </div>
-                <div>
-                  <h1 className="text-xl font-bold text-foreground">
-                    OtelMS + ROWS.COM
-                  </h1>
-                  <p className="text-xs text-muted-foreground">
-                    {t("რეალურ დროში მონაცემები", "Real-time Data")}
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <DataSourceBadge
-                type={connectionQuery.data?.connected ? "live" : "error"}
-                source="ROWS.COM"
-                size="md"
-              />
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleRefresh}
-                disabled={calendarQuery.isFetching}
-              >
-                <RefreshCw className={`h-4 w-4 mr-2 ${calendarQuery.isFetching ? 'animate-spin' : ''}`} />
-                {t("განახლება", "Refresh")}
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
+      <PageHeader
+        title="OtelMS Integration"
+        titleKa="OtelMS ინტეგრაცია"
+        subtitle="ROWS.COM financial data integration"
+        subtitleKa="ROWS.COM ფინანსური მონაცემების ინტეგრაცია"
+        icon={TrendingUp}
+        iconGradient="from-blue-500 to-indigo-600"
+        dataSource={{
+          type: connectionQuery.data?.connected ? "live" : "error",
+          source: "ROWS.COM"
+        }}
+        backUrl="/finance"
+        actions={
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleRefresh}
+            disabled={calendarQuery.isFetching}
+          >
+            <RefreshCw className={`h-4 w-4 mr-2 ${calendarQuery.isFetching ? 'animate-spin' : ''}`} />
+            {t("განახლება", "Refresh")}
+          </Button>
+        }
+      />
 
       <main className="container mx-auto px-6 py-8 space-y-6">
         {/* Quick Stats */}
@@ -190,14 +169,14 @@ const FinanceOtelMS = () => {
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="bg-white/5 border-white/10">
-            <TabsTrigger value="today">
+          <TabsList className="bg-slate-800/50 border border-white/10">
+            <TabsTrigger value="today" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
               {t("დღევანდელი", "Today")}
             </TabsTrigger>
-            <TabsTrigger value="calendar">
+            <TabsTrigger value="calendar" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
               {t("კალენდარი", "Calendar")}
             </TabsTrigger>
-            <TabsTrigger value="rlist">
+            <TabsTrigger value="rlist" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
               {t("RList", "RList")}
             </TabsTrigger>
           </TabsList>
