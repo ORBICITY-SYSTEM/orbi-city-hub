@@ -11,6 +11,9 @@ import { LogisticsActivityLog } from "@/components/LogisticsActivityLog";
 import { Suspense } from "react";
 import { Loader2 } from "lucide-react";
 import { useLogisticsRealtimeNotifications } from "@/hooks/useLogisticsRealtimeNotifications";
+import { DataSourceBadge } from "@/components/ui/DataSourceBadge";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 const Logistics = () => {
   const [, setLocation] = useLocation();
@@ -19,20 +22,42 @@ const Logistics = () => {
   // Enable real-time notifications
   useLogisticsRealtimeNotifications();
 
+  // Check if we have real data
+  const { data: roomsCount } = useQuery({
+    queryKey: ["logistics-rooms-count"],
+    queryFn: async () => {
+      const { count, error } = await supabase
+        .from("rooms")
+        .select("*", { count: "exact", head: true });
+      if (error) return 0;
+      return count || 0;
+    },
+  });
+
+  const hasRealData = (roomsCount || 0) > 0;
+  const dataSource = hasRealData ? "live" : "demo";
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
       {/* Header with Ocean Wave */}
       <div className="relative rounded-2xl overflow-hidden mx-6 mt-6 mb-8">
         <div className="relative z-10 px-8 pt-8 pb-20">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-500 to-cyan-600 shadow-lg">
                 <Package className="h-6 w-6 text-white" />
               </div>
               <div>
-                <h1 className="text-3xl md:text-4xl font-bold text-cyan-400 tracking-tight">
-                  {t("ლოჯისტიკის ცენტრი", "Logistics Command Center")}
-                </h1>
+                <div className="flex items-center gap-3">
+                  <h1 className="text-3xl md:text-4xl font-bold text-cyan-400 tracking-tight">
+                    {t("ლოჯისტიკის ცენტრი", "Logistics Command Center")}
+                  </h1>
+                  <DataSourceBadge
+                    type={dataSource}
+                    source={hasRealData ? "Supabase" : undefined}
+                    size="md"
+                  />
+                </div>
                 <p className="text-lg text-white/90 mt-1 font-medium">
                   {t("სტუდიოების ინვენტარის მართვა და ანალიტიკა", "Studio inventory management and analytics")}
                 </p>

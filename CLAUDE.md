@@ -70,6 +70,43 @@ A **"handsfree" AI operating system** where the founder gives strategic directio
 - Finance Copilot - AI assistant for financial insights
 - Instagram Analytics module
 - Monthly financial reports system
+- **Video Marketing Pipeline** - Automated video generation & social media posting
+
+---
+
+## Video Marketing Pipeline (NEW)
+
+Automated video creation and distribution system for apartment marketing.
+
+### n8n Workflows (ACTIVE)
+| Workflow | Schedule | Purpose |
+|----------|----------|---------|
+| Orbi City Video Marketing Pipeline | Every 6 hours | Generate videos & post to social |
+| Orbi City Video Metrics Collector | Daily | Track views/likes across platforms |
+| Orbi City Auto Video Scheduler | Weekly | Auto-queue videos for apartments |
+
+### Integration Points
+- **Runway ML (PRO)** - AI video generation from photos
+- **Google Drive** - Apartment photo storage
+- **Google Sheets** - Video queue & performance tracking
+- **Social Media** - YouTube, Instagram, TikTok, Facebook
+
+### Google Sheets (Video Marketing)
+- `Video Content Queue` - Pending videos to generate
+- `Video Performance` - Posted videos with metrics
+
+---
+
+## API Keys & Credentials
+
+### Runway ML (Video Generation)
+- **Plan**: Pro ($28/month)
+- **Features**: Custom voices, unlimited generations, 500GB storage
+- **API Key**: Stored in `.env` as `RUNWAY_API_KEY`
+
+### n8n Cloud
+- **URL**: https://orbicity.app.n8n.cloud
+- **Credentials**: Stored in `.env`
 
 ---
 
@@ -79,6 +116,7 @@ A **"handsfree" AI operating system** where the founder gives strategic directio
 2. OTA integration for automatic responses
 3. WhatsApp/Telegram bot for guest communication
 4. Predictive maintenance based on cleaning patterns
+5. **Connect social media APIs** (YouTube, Instagram, TikTok, Facebook) to video pipeline
 
 ---
 
