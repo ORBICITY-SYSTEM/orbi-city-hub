@@ -109,21 +109,20 @@ function MetricCard({ label, value, change, icon, color, delay = 0 }: MetricCard
 export function FloatingMetrics() {
   const { t } = useLanguage();
 
-  // Fetch real metrics from the backend
-  const { data: metrics } = trpc.powerStack.getMetrics.useQuery(undefined, {
+  // Fetch real metrics from CEO dashboard
+  const { data: todayOverview } = trpc.ceoDashboard.getTodayOverview.useQuery(undefined, {
     refetchInterval: 30000,
   });
 
-  const { data: financeData } = trpc.realFinance.getDashboardData.useQuery(
-    { period: "month" },
-    { refetchInterval: 60000 }
-  );
+  const { data: moduleSummaries } = trpc.ceoDashboard.getModuleSummaries.useQuery(undefined, {
+    refetchInterval: 60000,
+  });
 
-  // Calculate metrics
-  const totalRevenue = (financeData as any)?.totalRevenue || 92500;
-  const occupancyRate = (metrics as any)?.occupancy || 78;
-  const todayBookings = (metrics as any)?.todayBookings || 12;
-  const pendingTasks = 8; // placeholder
+  // Calculate metrics from real data
+  const totalRevenue = moduleSummaries?.finance?.annualRevenue || 92500;
+  const occupancyRate = moduleSummaries?.marketing?.avgOccupancy || 78;
+  const todayBookings = todayOverview?.activeBookings?.value || 12;
+  const pendingTasks = todayOverview?.todayTasks?.value || 8;
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
