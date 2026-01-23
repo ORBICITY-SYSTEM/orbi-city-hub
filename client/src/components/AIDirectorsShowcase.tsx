@@ -20,9 +20,8 @@ interface AIDirector {
   id: string;
   nameEn: string;
   nameKa: string;
-  roleEn: string;
-  roleKa: string;
   avatar: string;
+  style: string;
   path: string;
   gradient: string;
   accentColor: string;
@@ -32,11 +31,11 @@ interface AIDirector {
 const AI_DIRECTORS: AIDirector[] = [
   {
     id: "ceo",
-    nameEn: "Sofia AI",
-    nameKa: "სოფია AI",
-    roleEn: "CEO",
-    roleKa: "გენერალური დირექტორი",
-    avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&h=200&fit=crop&crop=face",
+    nameEn: "CEO AI",
+    nameKa: "CEO AI",
+    // Style 1: "Ex Machina" - White metallic android with human-like features
+    avatar: "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=200&h=200&fit=crop&crop=face",
+    style: "Ex Machina",
     path: "/",
     gradient: "from-purple-600 via-pink-500 to-rose-500",
     accentColor: "rgb(168, 85, 247)",
@@ -44,11 +43,11 @@ const AI_DIRECTORS: AIDirector[] = [
   },
   {
     id: "marketing",
-    nameEn: "Marcus AI",
-    nameKa: "მარკუსი AI",
-    roleEn: "Marketing",
-    roleKa: "მარკეტინგი",
-    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face",
+    nameEn: "MARKETING AI",
+    nameKa: "მარკეტინგი AI",
+    // Style 2: "Detroit: Become Human" - Almost human with LED indicator
+    avatar: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=200&h=200&fit=crop&crop=face",
+    style: "Detroit",
     path: "/marketing/ai-director",
     gradient: "from-blue-600 via-cyan-500 to-teal-500",
     accentColor: "rgb(6, 182, 212)",
@@ -56,11 +55,11 @@ const AI_DIRECTORS: AIDirector[] = [
   },
   {
     id: "reservations",
-    nameEn: "Maya AI",
-    nameKa: "მაია AI",
-    roleEn: "Reservations",
-    roleKa: "რეზერვაციები",
-    avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=200&h=200&fit=crop&crop=face",
+    nameEn: "RESERVATIONS AI",
+    nameKa: "რეზერვაციები AI",
+    // Style 3: "Westworld" - Fully human appearance with glowing eyes
+    avatar: "https://images.unsplash.com/photo-1531746790731-6c087fecd65a?w=200&h=200&fit=crop&crop=face",
+    style: "Westworld",
     path: "/reservations/ai-director",
     gradient: "from-green-600 via-emerald-500 to-teal-500",
     accentColor: "rgb(16, 185, 129)",
@@ -68,11 +67,11 @@ const AI_DIRECTORS: AIDirector[] = [
   },
   {
     id: "finance",
-    nameEn: "David AI",
-    nameKa: "დავით AI",
-    roleEn: "Finance",
-    roleKa: "ფინანსები",
-    avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop&crop=face",
+    nameEn: "FINANCE AI",
+    nameKa: "ფინანსები AI",
+    // Style 4: "Cyberpunk/Neon" - Metallic with neon accents
+    avatar: "https://images.unsplash.com/photo-1635002962487-2c1d4d2f63c2?w=200&h=200&fit=crop&crop=face",
+    style: "Cyberpunk",
     path: "/finance/ai-director",
     gradient: "from-amber-500 via-yellow-500 to-orange-500",
     accentColor: "rgb(245, 158, 11)",
@@ -80,11 +79,11 @@ const AI_DIRECTORS: AIDirector[] = [
   },
   {
     id: "logistics",
-    nameEn: "Nadia AI",
-    nameKa: "ნადია AI",
-    roleEn: "Logistics",
-    roleKa: "ლოჯისტიკა",
-    avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop&crop=face",
+    nameEn: "LOGISTICS AI",
+    nameKa: "ლოჯისტიკა AI",
+    // Style 5: "I, Robot / Blade Runner" - Sleek chrome humanoid
+    avatar: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=200&h=200&fit=crop&crop=face",
+    style: "I, Robot",
     path: "/logistics/ai-director",
     gradient: "from-indigo-600 via-purple-500 to-pink-500",
     accentColor: "rgb(129, 140, 248)",
@@ -213,10 +212,10 @@ export default function AIDirectorsShowcase() {
                       )}
                     </div>
 
-                    {/* Name & Role */}
+                    {/* Name & Style */}
                     <div className="text-center mb-2">
                       <h3
-                        className="text-sm font-bold text-white truncate transition-all duration-300"
+                        className="text-xs font-bold text-white truncate transition-all duration-300 tracking-wider"
                         style={{
                           textShadow: isHovered ? `0 0 10px ${director.glowColor}` : 'none',
                         }}
@@ -224,10 +223,10 @@ export default function AIDirectorsShowcase() {
                         {language === 'ka' ? director.nameKa : director.nameEn}
                       </h3>
                       <p
-                        className="text-xs transition-all duration-300"
-                        style={{ color: isHovered ? director.accentColor : 'rgba(148, 163, 184, 0.8)' }}
+                        className="text-[10px] transition-all duration-300 italic opacity-60"
+                        style={{ color: isHovered ? director.accentColor : 'rgba(148, 163, 184, 0.6)' }}
                       >
-                        {language === 'ka' ? director.roleKa : director.roleEn}
+                        {director.style}
                       </p>
                     </div>
 
