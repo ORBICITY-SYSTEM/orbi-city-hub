@@ -1,59 +1,87 @@
+import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Package, BarChart3, ClipboardList, Wrench, History } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Package, ArrowLeft, BarChart3, ClipboardList, Wrench, History } from "lucide-react";
+import { useLocation } from "wouter";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { InventoryDashboardStats } from "@/components/InventoryDashboardStats";
 import { StudioInventoryList } from "@/components/StudioInventoryList";
 import { HousekeepingModule } from "@/components/HousekeepingModule";
 import { MaintenanceModule } from "@/components/MaintenanceModule";
 import { LogisticsActivityLog } from "@/components/LogisticsActivityLog";
-import { Suspense } from "react";
+import { useAuth } from "@/_core/hooks/useAuth";
+import { useEffect, useState, Suspense } from "react";
 import { Loader2 } from "lucide-react";
-import { PageHeader } from "@/components/ui/PageHeader";
+import { DataSourceBadge } from "@/components/ui/DataSourceBadge";
+
 
 const Logistics = () => {
+  const [, setLocation] = useLocation();
   const { t } = useLanguage();
+  const { isAuthenticated } = useAuth();
+
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
-      <PageHeader
-        title="Rooms & Housekeeping"
-        titleKa="ოთახები და დასუფთავება"
-        subtitle="Studio inventory management and analytics"
-        subtitleKa="სტუდიოების ინვენტარის მართვა და ანალიტიკა"
-        icon={Package}
-        iconGradient="from-orange-500 to-amber-600"
-        dataSource={{ type: "live", source: "Supabase" }}
-      />
+      <header className="border-b border-white/10 bg-blue-900/50 backdrop-blur-sm sticky top-0 z-50">
+        <div className="container mx-auto px-6 py-4">
+          <div className="flex items-center justify-between w-full">
+            <div className="flex items-center gap-4">
+              {isAuthenticated && (
+                <Button variant="ghost" size="sm" onClick={() => setLocation("/")}>
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  {t("უკან", "Back")}
+                </Button>
+              )}
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-ai">
+                  <Package className="h-6 w-6 text-primary-foreground" />
+                </div>
+                <div>
+                  <h1 className="text-xl font-bold text-foreground">
+                    {t("ოთახები და დასუფთავება", "Rooms & Housekeeping")}
+                  </h1>
+                  <p className="text-xs text-muted-foreground">
+                    {t("სტუდიოების ინვენტარის მართვა და ანალიტიკა", "Studio inventory management and analytics")}
+                  </p>
+                </div>
+              </div>
+            </div>
+            <DataSourceBadge type="live" source="Supabase" size="md" />
+          </div>
+        </div>
+      </header>
 
-      <main className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
+      <main className="container mx-auto px-6 py-8">
         <Tabs defaultValue="dashboard" className="w-full">
-          <TabsList className="grid w-full grid-cols-5 mb-8 bg-slate-800/50 border border-white/10">
-            <TabsTrigger value="dashboard" className="flex items-center gap-2 data-[state=active]:bg-orange-600 data-[state=active]:text-white">
+          <TabsList className="grid w-full grid-cols-5 mb-8">
+            <TabsTrigger value="dashboard" className="flex items-center gap-2">
               <BarChart3 className="h-4 w-4" />
-              <span className="hidden sm:inline">{t("დეშბორდი", "Dashboard")}</span>
+              {t("დეშბორდი", "Dashboard")}
             </TabsTrigger>
-            <TabsTrigger value="inventory" className="flex items-center gap-2 data-[state=active]:bg-orange-600 data-[state=active]:text-white">
+            <TabsTrigger value="inventory" className="flex items-center gap-2">
               <Package className="h-4 w-4" />
-              <span className="hidden sm:inline">{t("ინვენტარი", "Inventory")}</span>
+              {t("ინვენტარი", "Inventory")}
             </TabsTrigger>
-            <TabsTrigger value="housekeeping" className="flex items-center gap-2 data-[state=active]:bg-orange-600 data-[state=active]:text-white">
+            <TabsTrigger value="housekeeping" className="flex items-center gap-2">
               <ClipboardList className="h-4 w-4" />
-              <span className="hidden sm:inline">{t("დასუფთავება", "Housekeeping")}</span>
+              {t("დასუფთავება", "Housekeeping")}
             </TabsTrigger>
-            <TabsTrigger value="maintenance" className="flex items-center gap-2 data-[state=active]:bg-orange-600 data-[state=active]:text-white">
+            <TabsTrigger value="maintenance" className="flex items-center gap-2">
               <Wrench className="h-4 w-4" />
-              <span className="hidden sm:inline">{t("ტექნიკური", "Maintenance")}</span>
+              {t("ტექნიკური", "Maintenance")}
             </TabsTrigger>
-            <TabsTrigger value="activity" className="flex items-center gap-2 data-[state=active]:bg-orange-600 data-[state=active]:text-white">
+            <TabsTrigger value="activity" className="flex items-center gap-2">
               <History className="h-4 w-4" />
-              <span className="hidden sm:inline">{t("აქტივობა", "Activity")}</span>
+              {t("აქტივობა", "Activity")}
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="dashboard">
             <Suspense fallback={
               <div className="flex items-center justify-center p-12">
-                <Loader2 className="h-8 w-8 animate-spin text-orange-400" />
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
               </div>
             }>
               <InventoryDashboardStats />
@@ -63,7 +91,7 @@ const Logistics = () => {
           <TabsContent value="inventory">
             <Suspense fallback={
               <div className="flex items-center justify-center p-12">
-                <Loader2 className="h-8 w-8 animate-spin text-orange-400" />
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
               </div>
             }>
               <StudioInventoryList />
@@ -73,7 +101,7 @@ const Logistics = () => {
           <TabsContent value="housekeeping">
             <Suspense fallback={
               <div className="flex items-center justify-center p-12">
-                <Loader2 className="h-8 w-8 animate-spin text-orange-400" />
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
               </div>
             }>
               <HousekeepingModule />
@@ -83,7 +111,7 @@ const Logistics = () => {
           <TabsContent value="maintenance">
             <Suspense fallback={
               <div className="flex items-center justify-center p-12">
-                <Loader2 className="h-8 w-8 animate-spin text-orange-400" />
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
               </div>
             }>
               <MaintenanceModule />
@@ -93,7 +121,7 @@ const Logistics = () => {
           <TabsContent value="activity">
             <Suspense fallback={
               <div className="flex items-center justify-center p-12">
-                <Loader2 className="h-8 w-8 animate-spin text-orange-400" />
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
               </div>
             }>
               <LogisticsActivityLog />
