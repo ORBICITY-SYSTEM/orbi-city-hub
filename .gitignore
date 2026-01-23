@@ -131,3 +131,4 @@ coverage.xml
 # Archive folder (historical experiments)
 /archive/
 .vercel
+.claude/settings.local.json

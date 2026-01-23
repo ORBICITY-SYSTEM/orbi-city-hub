@@ -101,6 +101,9 @@ const AnalyticsDashboardPage = lazy(() => import("./pages/system/AnalyticsDashbo
 const WhiteLabelSettingsPage = lazy(() => import("./pages/system/WhiteLabelSettingsPage"));
 const UserManagementPage = lazy(() => import("./pages/system/UserManagementPage"));
 
+// Command Center - AI Operating System Hub
+const CommandCenter = lazy(() => import("./pages/CommandCenter"));
+
 function Router() {
   return (
     <Suspense fallback={<PageLoadingSkeleton />}>
@@ -115,6 +118,7 @@ function RouterContent() {
       <Switch>
         {/* Home */}
         <Route path={"/"} component={Home} />
+        <Route path={"/command-center"} component={CommandCenter} />
         <Route path={"/real-finance"} component={RealFinanceDashboard} />
 
         {/* Finance Module */}
