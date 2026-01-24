@@ -4,18 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Loader2, Plus, Building2, Trash2 } from "lucide-react";
+import { Loader2, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { RoomInventoryTable } from "@/components/RoomInventoryTable";
@@ -30,8 +19,6 @@ export function StudioInventoryList() {
   const { t } = useLanguage();
   const queryClient = useQueryClient();
   const [selectedRoomId, setSelectedRoomId] = useState<string>("");
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [newRoomNumber, setNewRoomNumber] = useState("");
 
   const { data: rooms, isLoading } = useQuery({
     queryKey: ["rooms"],
@@ -79,40 +66,6 @@ export function StudioInventoryList() {
     },
   });
 
-  // Add single room mutation
-  const addRoomMutation = useMutation({
-    mutationFn: async (roomNumber: string) => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
-
-      // Check if room already exists
-      const { data: existing } = await supabase
-        .from("rooms")
-        .select("id")
-        .eq("room_number", roomNumber)
-        .single();
-
-      if (existing) {
-        throw new Error("ოთახი უკვე არსებობს / Room already exists");
-      }
-
-      const { error } = await supabase.from("rooms").insert({
-        user_id: user.id,
-        room_number: roomNumber.trim(),
-      });
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["rooms"] });
-      toast.success(t("ოთახი დაემატა!", "Room added successfully!"));
-      setNewRoomNumber("");
-      setIsAddDialogOpen(false);
-    },
-    onError: (error) => {
-      toast.error(error.message);
-    },
-  });
-
   // Delete room mutation
   const deleteRoomMutation = useMutation({
     mutationFn: async (roomId: string) => {
@@ -135,14 +88,6 @@ export function StudioInventoryList() {
       toast.error(t("შეცდომა", "Error") + ": " + error.message);
     },
   });
-
-  const handleAddRoom = () => {
-    if (!newRoomNumber.trim()) {
-      toast.error(t("შეიყვანეთ ოთახის ნომერი", "Please enter room number"));
-      return;
-    }
-    addRoomMutation.mutate(newRoomNumber);
-  };
 
   if (isLoading) {
     return (
@@ -189,61 +134,6 @@ export function StudioInventoryList() {
               </p>
             </div>
 
-            {/* Add Room Button */}
-            <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-              <DialogTrigger asChild>
-                <Button className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700">
-                  <Plus className="h-4 w-4 mr-2" />
-                  {t("ახალი აპარტამენტი", "New Apartment")}
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[425px]">
-                <DialogHeader>
-                  <DialogTitle className="flex items-center gap-2">
-                    <Building2 className="h-5 w-5 text-emerald-500" />
-                    {t("ახალი აპარტამენტის დამატება", "Add New Apartment")}
-                  </DialogTitle>
-                  <DialogDescription>
-                    {t(
-                      "შეიყვანეთ ახალი აპარტამენტის ნომერი (მაგ: A 1234, C 5678)",
-                      "Enter the new apartment number (e.g., A 1234, C 5678)"
-                    )}
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="grid gap-4 py-4">
-                  <div className="grid gap-2">
-                    <Label htmlFor="roomNumber">
-                      {t("აპარტამენტის ნომერი", "Apartment Number")}
-                    </Label>
-                    <Input
-                      id="roomNumber"
-                      placeholder="A 1234"
-                      value={newRoomNumber}
-                      onChange={(e) => setNewRoomNumber(e.target.value.toUpperCase())}
-                      onKeyDown={(e) => e.key === "Enter" && handleAddRoom()}
-                      className="text-lg font-mono"
-                    />
-                  </div>
-                </div>
-                <DialogFooter>
-                  <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
-                    {t("გაუქმება", "Cancel")}
-                  </Button>
-                  <Button
-                    onClick={handleAddRoom}
-                    disabled={addRoomMutation.isPending || !newRoomNumber.trim()}
-                    className="bg-emerald-500 hover:bg-emerald-600"
-                  >
-                    {addRoomMutation.isPending ? (
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    ) : (
-                      <Plus className="h-4 w-4 mr-2" />
-                    )}
-                    {t("დამატება", "Add")}
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
           </div>
 
           <div className="flex items-center gap-4">
