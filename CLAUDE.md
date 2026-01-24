@@ -33,12 +33,52 @@ A **"handsfree" AI operating system** where the founder gives strategic directio
 | **Finance Director** | Revenue tracking, expense monitoring, profitability analysis |
 | **Logistics Director** | Cleaning schedules, maintenance, inventory management |
 
-### 3. Integration Architecture
+### 3. CEO AI (Claude Code) - Autonomous Controller
 
-- **OtelMS** (Hotel Management System) - Primary data source
-- **OTA Platforms** - Booking.com, Airbnb, Expedia, etc.
-- **Google Sheets** - Financial data backup and reporting
-- **Power BI style dashboards** - Real-time analytics
+The CEO AI has full autonomy to:
+- **Create new UI elements** (buttons, widgets, charts)
+- **Add statistics and metrics** to any module
+- **Generate analytics and visualizations**
+- **Distribute data** across modules automatically
+- **Make independent decisions** based on business context
+
+---
+
+## Data Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  External Scrapers (Cloud Run / Python)                        │
+│  https://github.com/ORBICITY-SYSTEM/otelms-rows-api            │
+├─────────────────────────────────────────────────────────────────┤
+│                           ↓                                     │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │              SUPABASE (Single Source of Truth)          │   │
+│  │  • rooms, room_inventory_items                           │   │
+│  │  • housekeeping_schedules, maintenance_schedules         │   │
+│  │  • bookings, guests                                      │   │
+│  │  • finance_data, revenue, expenses                       │   │
+│  │  • social_media_metrics, reviews                         │   │
+│  └─────────────────────────────────────────────────────────┘   │
+│                           ↓                                     │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │              DATA HUB (/data) - Raw Materials            │   │
+│  │  Password Protected Admin Access                         │   │
+│  │  All Supabase data visible in structured format          │   │
+│  └─────────────────────────────────────────────────────────┘   │
+│                           ↓                                     │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │              CEO AI (Claude Code)                        │   │
+│  │  Autonomous data distribution and visualization          │   │
+│  │  Creates widgets, charts, analytics on demand            │   │
+│  └─────────────────────────────────────────────────────────┘   │
+│                           ↓                                     │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐       │
+│  │ Finance  │  │Reserv.   │  │Marketing │  │Logistics │       │
+│  │ Module   │  │ Module   │  │ Module   │  │ Module   │       │
+│  └──────────┘  └──────────┘  └──────────┘  └──────────┘       │
+└─────────────────────────────────────────────────────────────────┘
+```
 
 ---
 
@@ -46,10 +86,11 @@ A **"handsfree" AI operating system** where the founder gives strategic directio
 
 - **Frontend**: React + TypeScript + Vite + TailwindCSS + shadcn/ui
 - **Backend**: Node.js + Express + tRPC
-- **Database**: MySQL (via Drizzle ORM)
-- **AI**: Google Gemini 2.5 Flash (via `invokeLLM()`)
+- **Database**: Supabase (PostgreSQL)
+- **AI**: Claude Code (CEO AI) + Claude Haiku 3.5 (assistants)
 - **Auth**: Session-based with Supabase fallback
 - **Deployment**: Vercel
+- **Data Source**: ORBICITY-SYSTEM/otelms-rows-api (Cloud Run scrapers)
 
 ---
 
@@ -57,67 +98,58 @@ A **"handsfree" AI operating system** where the founder gives strategic directio
 
 1. **AI-First**: Every feature should consider AI automation potential
 2. **Bilingual**: All UI must support Georgian (ka) and English (en)
-3. **Demo Mode**: Features should work with demo data when DB unavailable
+3. **Supabase Only**: All data flows through Supabase - NO external spreadsheets
 4. **Mobile-First**: All interfaces must be responsive
-5. **Real Data**: Connect to OtelMS and Google Sheets for actual metrics
+5. **CEO AI Autonomy**: Claude Code can create/modify UI elements independently
 
 ---
 
 ## Current State
 
-- Core dashboard with PowerStack real-time metrics
+- Core dashboard with real-time metrics from Supabase
 - Four AI Director pages (Marketing, Reservations, Finance, Logistics)
 - Finance Copilot - AI assistant for financial insights
-- Instagram Analytics module
-- Monthly financial reports system
-- **Video Marketing Pipeline** - Automated video generation & social media posting
+- Logistics module - fully connected to Supabase
+- Data Hub - admin access to raw Supabase data
 
 ---
 
-## Video Marketing Pipeline (NEW)
+## Deprecated Integrations (REMOVED)
 
-Automated video creation and distribution system for apartment marketing.
+The following integrations have been removed:
+- ~~n8n Cloud workflows~~
+- ~~Google Sheets integration~~
+- ~~rows.com API~~
 
-### n8n Workflows (ACTIVE)
-| Workflow | Schedule | Purpose |
-|----------|----------|---------|
-| Orbi City Video Marketing Pipeline | Every 6 hours | Generate videos & post to social |
-| Orbi City Video Metrics Collector | Daily | Track views/likes across platforms |
-| Orbi City Auto Video Scheduler | Weekly | Auto-queue videos for apartments |
-
-### Integration Points
-- **Runway ML (PRO)** - AI video generation from photos
-- **Google Drive** - Apartment photo storage
-- **Google Sheets** - Video queue & performance tracking
-- **Social Media** - YouTube, Instagram, TikTok, Facebook
-
-### Google Sheets (Video Marketing)
-- `Video Content Queue` - Pending videos to generate
-- `Video Performance` - Posted videos with metrics
+All data now flows through Supabase exclusively.
 
 ---
 
 ## API Keys & Credentials
 
-### Runway ML (Video Generation)
-- **Plan**: Pro ($28/month)
-- **Features**: Custom voices, unlimited generations, 500GB storage
-- **API Key**: Stored in `.env` as `RUNWAY_API_KEY`
+### Supabase
+- **URL**: `VITE_SUPABASE_URL`
+- **Key**: `VITE_SUPABASE_ANON_KEY`
 
-### n8n Cloud
-- **URL**: https://orbicity.app.n8n.cloud
-- **Credentials**: Stored in `.env`
+### Claude AI (Assistants)
+- **API Key**: `ANTHROPIC_API_KEY`
+
+### Data Hub Password
+- **Access**: Password protected for admin access
 
 ---
 
 ## Next Priorities
 
-1. Complete AI Director autonomous actions
-2. OTA integration for automatic responses
-3. WhatsApp/Telegram bot for guest communication
-4. Predictive maintenance based on cleaning patterns
-5. **Connect social media APIs** (YouTube, Instagram, TikTok, Facebook) to video pipeline
+1. Connect Cloud Run scrapers to Supabase
+2. Build comprehensive Data Hub with all tables
+3. Implement CEO AI with Claude Code
+4. Complete autonomous module data distribution
+5. OTA integration for automatic responses
+6. WhatsApp/Telegram bot for guest communication
 
 ---
 
 *This document defines the soul of the project. Every feature and decision should align with this vision.*
+
+*CEO AI (Claude Code) has authority to modify this codebase autonomously within these guidelines.*

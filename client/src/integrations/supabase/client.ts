@@ -1,15 +1,24 @@
 // Supabase Client for ORBICITY
-// Connects to the same database as the Lovable app (orbi-ai-nexus)
+// Connects to the ORBI CITY HUB Supabase project
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || "https://akxwboxrwrryroftutpd.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFreHdib3hyd3JyeXJvZnR1dHBkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjExNjAzNTQsImV4cCI6MjA3NjczNjM1NH0.DWFC_kaCThY9IzCod21-DFjloV_DbPK8lUa64daZNUY";
+// Use environment variables from .env
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
-  auth: {
-    storage: localStorage,
-    persistSession: true,
-    autoRefreshToken: true,
+if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+  console.warn('[Supabase] Missing VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY in environment');
+}
+
+export const supabase = createClient<Database>(
+  SUPABASE_URL || 'https://lusagtvxjtfxgfadulgv.supabase.co',
+  SUPABASE_ANON_KEY || '',
+  {
+    auth: {
+      storage: localStorage,
+      persistSession: true,
+      autoRefreshToken: true,
+    }
   }
-});
+);

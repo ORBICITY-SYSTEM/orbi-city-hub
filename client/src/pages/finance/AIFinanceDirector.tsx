@@ -207,7 +207,7 @@ export default function AIFinanceDirector() {
         subtitleKa="ცენტრალიზებული AI მართვა ფინანსებისთვის"
         icon={Brain}
         iconGradient="from-violet-500 to-purple-600"
-        dataSource={{ type: "live", source: "Gemini AI" }}
+        dataSource={{ type: "live", source: "Claude AI" }}
         backUrl="/finance"
         actions={
           <div className="flex gap-2">

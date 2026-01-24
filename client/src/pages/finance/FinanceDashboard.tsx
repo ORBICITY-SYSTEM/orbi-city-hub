@@ -1,56 +1,141 @@
-import { TrendingUp, Activity, Brain } from "lucide-react";
-import { FinanceModulesLanding } from "@/components/finance/FinanceModulesLanding";
-import { FinanceActivityLog } from "@/components/finance/FinanceActivityLog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useState } from "react";
-import { useLanguage } from "@/contexts/LanguageContext";
+/**
+ * Finance Module - Professional Financial Management Dashboard
+ * Revenue, Expenses, Reports, Investors, Forecasting
+ */
+
+import { Suspense, lazy, useState } from "react";
+import {
+  DollarSign, TrendingUp, TrendingDown, FileText, Users,
+  Brain, PieChart, Loader2, BarChart3, Target, Building2
+} from "lucide-react";
+import { ModulePageLayout, SubModule } from "@/components/ModulePageLayout";
 import { FinanceCopilotWidget } from "@/components/finance-copilot";
-import { PageHeader } from "@/components/ui/PageHeader";
+
+// Lazy load sub-module components
+const FinanceOverviewContent = lazy(() => import("@/components/finance/FinanceModulesLanding").then(m => ({ default: m.FinanceModulesLanding })));
+const RevenueModule = lazy(() => import("@/components/finance/RevenueModule").then(m => ({ default: m.RevenueModule })));
+const ExpensesModule = lazy(() => import("@/components/finance/ExpensesModule").then(m => ({ default: m.ExpensesModule })));
+const FinanceReportsContent = lazy(() => import("./FinanceMonthlyReports").then(m => ({ default: m.default })));
+const InvestorsContent = lazy(() => import("./InvestorsDashboard").then(m => ({ default: m.default })));
+const ForecastModule = lazy(() => import("@/components/finance/FutureForecastModule").then(m => ({ default: m.FutureForecastModule })));
+
+// Loading component
+const LoadingSpinner = () => (
+  <div className="flex items-center justify-center min-h-[400px]">
+    <Loader2 className="w-8 h-8 animate-spin text-cyan-400" />
+  </div>
+);
+
+// Overview Tab
+const OverviewTab = () => (
+  <Suspense fallback={<LoadingSpinner />}>
+    <FinanceOverviewContent />
+  </Suspense>
+);
+
+// Revenue Tab
+const RevenueTab = () => (
+  <Suspense fallback={<LoadingSpinner />}>
+    <div className="bg-slate-800/30 rounded-xl p-6 border border-white/10">
+      <RevenueModule />
+    </div>
+  </Suspense>
+);
+
+// Expenses Tab
+const ExpensesTab = () => (
+  <Suspense fallback={<LoadingSpinner />}>
+    <div className="bg-slate-800/30 rounded-xl p-6 border border-white/10">
+      <ExpensesModule />
+    </div>
+  </Suspense>
+);
+
+// Reports Tab
+const ReportsTab = () => (
+  <Suspense fallback={<LoadingSpinner />}>
+    <div className="bg-slate-800/30 rounded-xl p-6 border border-white/10">
+      <FinanceReportsContent />
+    </div>
+  </Suspense>
+);
+
+// Investors Tab
+const InvestorsTab = () => (
+  <Suspense fallback={<LoadingSpinner />}>
+    <InvestorsContent />
+  </Suspense>
+);
+
+// Forecast Tab
+const ForecastTab = () => (
+  <Suspense fallback={<LoadingSpinner />}>
+    <div className="bg-slate-800/30 rounded-xl p-6 border border-white/10">
+      <ForecastModule />
+    </div>
+  </Suspense>
+);
 
 const Finance = () => {
   const [isCopilotOpen, setIsCopilotOpen] = useState(false);
-  const { t } = useLanguage();
+
+  const subModules: SubModule[] = [
+    {
+      id: "overview",
+      nameKey: "finance.overview",
+      nameFallback: "Overview",
+      icon: PieChart,
+      component: <OverviewTab />,
+    },
+    {
+      id: "revenue",
+      nameKey: "finance.revenue",
+      nameFallback: "Revenue",
+      icon: TrendingUp,
+      component: <RevenueTab />,
+    },
+    {
+      id: "expenses",
+      nameKey: "finance.expenses",
+      nameFallback: "Expenses",
+      icon: TrendingDown,
+      component: <ExpensesTab />,
+    },
+    {
+      id: "reports",
+      nameKey: "finance.reports",
+      nameFallback: "Reports",
+      icon: FileText,
+      component: <ReportsTab />,
+    },
+    {
+      id: "investors",
+      nameKey: "finance.investors",
+      nameFallback: "Investors",
+      icon: Users,
+      component: <InvestorsTab />,
+    },
+    {
+      id: "forecast",
+      nameKey: "finance.forecast",
+      nameFallback: "Forecast",
+      icon: Target,
+      component: <ForecastTab />,
+    },
+  ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
-      <PageHeader
-        title={t('finance.title')}
-        subtitle={t('finance.subtitle')}
-        icon={TrendingUp}
-        iconGradient="from-cyan-500 to-cyan-600"
-        dataSource={{ type: "live", source: "tRPC" }}
+    <>
+      <ModulePageLayout
+        moduleTitle="Finance"
+        moduleTitleKa="ფინანსები"
+        moduleSubtitle="Revenue, expenses, reports, and investment tracking"
+        moduleSubtitleKa="შემოსავლები, ხარჯები, ანგარიშები და ინვესტიციები"
+        moduleIcon={DollarSign}
+        moduleColor="cyan"
+        subModules={subModules}
+        defaultTab="overview"
       />
-
-      <main className="container mx-auto px-6 py-8">
-        <Tabs defaultValue="modules" className="w-full">
-          <TabsList className="mb-8 bg-slate-800/50 border border-white/10">
-            <TabsTrigger value="modules" className="data-[state=active]:bg-cyan-600 data-[state=active]:text-white">
-              <TrendingUp className="h-4 w-4 mr-2" />
-              {t('home.mainModules')}
-            </TabsTrigger>
-            <TabsTrigger value="activity" className="data-[state=active]:bg-cyan-600 data-[state=active]:text-white">
-              <Activity className="h-4 w-4 mr-2" />
-              {t('common.overview')}
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="modules">
-            <div className="mb-8">
-              <h2 className="text-2xl font-bold text-white mb-2">
-                {t('home.mainModules')}
-              </h2>
-              <p className="text-cyan-300/70">
-                {t('modules.finance.description')}
-              </p>
-            </div>
-            <FinanceModulesLanding />
-          </TabsContent>
-
-          <TabsContent value="activity">
-            <FinanceActivityLog />
-          </TabsContent>
-        </Tabs>
-      </main>
 
       {/* AI Finance Copilot Floating Button */}
       <button
@@ -66,7 +151,7 @@ const Finance = () => {
         isOpen={isCopilotOpen}
         onClose={() => setIsCopilotOpen(false)}
       />
-    </div>
+    </>
   );
 };
 

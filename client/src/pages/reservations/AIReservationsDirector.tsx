@@ -208,7 +208,7 @@ export default function AIReservationsDirector() {
         subtitleKa="ცენტრალიზებული AI მართვა რეზერვაციებისთვის"
         icon={Brain}
         iconGradient="from-blue-500 to-cyan-600"
-        dataSource={{ type: "live", source: "Gemini AI" }}
+        dataSource={{ type: "live", source: "Claude AI" }}
         backUrl="/reservations"
         actions={
           <div className="flex gap-2">

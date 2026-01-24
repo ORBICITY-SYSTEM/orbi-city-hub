@@ -33,12 +33,12 @@ function getNestedValue(obj: any, path: string): string {
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<Language>(() => {
-    // Get from localStorage or default to Georgian
+    // Get from localStorage or default to English
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("orbi-language");
-      return (saved as Language) || "ka";
+      return (saved as Language) || "en";
     }
-    return "ka";
+    return "en";
   });
 
   const setLanguage = (lang: Language) => {

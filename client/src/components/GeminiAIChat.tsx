@@ -16,8 +16,8 @@ interface GeminiAIChatProps {
 
 export default function GeminiAIChat({
   module,
-  title = "Gemini AI Assistant",
-  description = "Powered by Google Gemini - Ask me anything about your data",
+  title = "Claude AI Assistant",
+  description = "Powered by Anthropic Claude - Ask me anything about your data",
   placeholder = "Type your question here..."
 }: GeminiAIChatProps) {
   const [userMessage, setUserMessage] = useState("");
@@ -95,7 +95,7 @@ export default function GeminiAIChat({
                   <div className="bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-lg p-3 border border-blue-200 dark:border-blue-800">
                     <div className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-1 flex items-center gap-2">
                       <Sparkles className="w-4 h-4 text-blue-500" />
-                      Gemini AI:
+                      Claude AI:
                     </div>
                     <div className="text-sm text-blue-800 dark:text-blue-200 prose prose-sm max-w-none dark:prose-invert">
                       <Streamdown>{msg.aiResponse}</Streamdown>
@@ -166,7 +166,7 @@ export default function GeminiAIChat({
                 ) : (
                   <>
                     <Sparkles className="w-4 h-4 mr-2" />
-                    Ask Gemini
+                    Ask Claude
                   </>
                 )}
               </Button>
@@ -178,7 +178,7 @@ export default function GeminiAIChat({
             <div className="mt-4 bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-800">
               <div className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-2 flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-blue-500" />
-                Gemini AI Response:
+                Claude AI Response:
               </div>
               <div className="text-sm text-blue-800 dark:text-blue-200 prose prose-sm max-w-none dark:prose-invert">
                 <Streamdown>{chatMutation.data.response}</Streamdown>

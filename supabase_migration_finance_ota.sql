@@ -220,6 +220,36 @@ CREATE POLICY "Allow service update" ON ota_reservations FOR UPDATE USING (true)
 CREATE POLICY "Allow service update" ON ota_performance FOR UPDATE USING (true);
 
 -- =========================
+-- SOCIAL MEDIA TABLE
+-- =========================
+
+-- Social Media Metrics
+CREATE TABLE IF NOT EXISTS social_media_metrics (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    platform TEXT NOT NULL, -- instagram, facebook, youtube, tiktok
+    profile_name TEXT,
+    followers TEXT,
+    following TEXT,
+    posts_count TEXT,
+    likes TEXT,
+    subscribers TEXT,
+    video_count TEXT,
+    raw_data JSONB,
+    extracted_at TIMESTAMPTZ DEFAULT NOW(),
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    UNIQUE(platform)
+);
+
+-- Index
+CREATE INDEX IF NOT EXISTS idx_social_media_platform ON social_media_metrics(platform);
+
+-- RLS
+ALTER TABLE social_media_metrics ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow public read" ON social_media_metrics FOR SELECT USING (true);
+CREATE POLICY "Allow service insert" ON social_media_metrics FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow service update" ON social_media_metrics FOR UPDATE USING (true);
+
+-- =========================
 -- DONE!
 -- =========================
 -- Tables created:
@@ -232,3 +262,4 @@ CREATE POLICY "Allow service update" ON ota_performance FOR UPDATE USING (true);
 -- - ota_reviews
 -- - ota_reservations
 -- - ota_performance
+-- - social_media_metrics

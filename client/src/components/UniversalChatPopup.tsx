@@ -1,6 +1,6 @@
 /**
- * Universal Gemini Chat Popup
- * 
+ * Universal Claude Chat Popup
+ *
  * Context-aware AI assistant that knows everything about the dashboard.
  * Floating button accessible from any page.
  */
@@ -109,7 +109,7 @@ export function UniversalChatPopup() {
               <Sparkles className="h-5 w-5" />
               <div>
                 <h3 className="font-semibold">ORBI AI Assistant</h3>
-                <p className="text-xs opacity-90">Powered by Gemini</p>
+                <p className="text-xs opacity-90">Powered by Claude</p>
               </div>
             </div>
             <Button

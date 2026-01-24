@@ -33,8 +33,8 @@ const AI_DIRECTORS: AIDirector[] = [
     id: "ceo",
     nameEn: "CEO AI",
     nameKa: "CEO AI",
-    // Style 1: "Ex Machina" - White metallic android with human-like features
-    avatar: "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=200&h=200&fit=crop&crop=face",
+    // Style 1: "Ex Machina" - Sleek feminine android
+    avatar: "https://images.unsplash.com/photo-1676277791608-ac54525aa94d?w=200&h=200&fit=crop&crop=face",
     style: "Ex Machina",
     path: "/",
     gradient: "from-purple-600 via-pink-500 to-rose-500",
@@ -45,8 +45,8 @@ const AI_DIRECTORS: AIDirector[] = [
     id: "marketing",
     nameEn: "MARKETING AI",
     nameKa: "მარკეტინგი AI",
-    // Style 2: "Detroit: Become Human" - Almost human with LED indicator
-    avatar: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=200&h=200&fit=crop&crop=face",
+    // Style 2: "Detroit: Become Human" - Humanoid robot with LED
+    avatar: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=200&h=200&fit=crop",
     style: "Detroit",
     path: "/marketing/ai-director",
     gradient: "from-blue-600 via-cyan-500 to-teal-500",
@@ -57,8 +57,8 @@ const AI_DIRECTORS: AIDirector[] = [
     id: "reservations",
     nameEn: "RESERVATIONS AI",
     nameKa: "რეზერვაციები AI",
-    // Style 3: "Westworld" - Fully human appearance with glowing eyes
-    avatar: "https://images.unsplash.com/photo-1531746790731-6c087fecd65a?w=200&h=200&fit=crop&crop=face",
+    // Style 3: "Westworld" - Advanced android
+    avatar: "https://images.unsplash.com/photo-1546776310-eef45dd6d63c?w=200&h=200&fit=crop",
     style: "Westworld",
     path: "/reservations/ai-director",
     gradient: "from-green-600 via-emerald-500 to-teal-500",
@@ -69,8 +69,8 @@ const AI_DIRECTORS: AIDirector[] = [
     id: "finance",
     nameEn: "FINANCE AI",
     nameKa: "ფინანსები AI",
-    // Style 4: "Cyberpunk/Neon" - Metallic with neon accents
-    avatar: "https://images.unsplash.com/photo-1635002962487-2c1d4d2f63c2?w=200&h=200&fit=crop&crop=face",
+    // Style 4: "Cyberpunk/Neon" - Futuristic chrome robot
+    avatar: "https://images.unsplash.com/photo-1555255707-c07966088b7b?w=200&h=200&fit=crop",
     style: "Cyberpunk",
     path: "/finance/ai-director",
     gradient: "from-amber-500 via-yellow-500 to-orange-500",
@@ -81,8 +81,8 @@ const AI_DIRECTORS: AIDirector[] = [
     id: "logistics",
     nameEn: "LOGISTICS AI",
     nameKa: "ლოჯისტიკა AI",
-    // Style 5: "I, Robot / Blade Runner" - Sleek chrome humanoid
-    avatar: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=200&h=200&fit=crop&crop=face",
+    // Style 5: "I, Robot" - Sleek chrome humanoid
+    avatar: "https://images.unsplash.com/photo-1535378620166-273708d44e4c?w=200&h=200&fit=crop",
     style: "I, Robot",
     path: "/logistics/ai-director",
     gradient: "from-indigo-600 via-purple-500 to-pink-500",

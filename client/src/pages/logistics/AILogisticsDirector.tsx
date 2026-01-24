@@ -204,7 +204,7 @@ export default function AILogisticsDirector() {
         subtitleKa="ცენტრალიზებული AI მართვა ლოჯისტიკისთვის"
         icon={Brain}
         iconGradient="from-orange-500 to-amber-600"
-        dataSource={{ type: "live", source: "Gemini AI" }}
+        dataSource={{ type: "live", source: "Claude AI" }}
         backUrl="/logistics"
         actions={
           <div className="flex gap-2">

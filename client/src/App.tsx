@@ -104,6 +104,9 @@ const UserManagementPage = lazy(() => import("./pages/system/UserManagementPage"
 // Command Center - AI Operating System Hub
 const CommandCenter = lazy(() => import("./pages/CommandCenter"));
 
+// Data Hub - Admin access to raw Supabase data
+const DataHub = lazy(() => import("./pages/DataHub"));
+
 function Router() {
   return (
     <Suspense fallback={<PageLoadingSkeleton />}>
@@ -119,6 +122,7 @@ function RouterContent() {
         {/* Home */}
         <Route path={"/"} component={Home} />
         <Route path={"/command-center"} component={CommandCenter} />
+        <Route path={"/data"} component={DataHub} />
         <Route path={"/real-finance"} component={RealFinanceDashboard} />
 
         {/* Finance Module */}

@@ -212,7 +212,7 @@ const normalizeToolChoice = (
 const resolveApiUrl = () =>
   ENV.forgeApiUrl && ENV.forgeApiUrl.trim().length > 0
     ? `${ENV.forgeApiUrl.replace(/\/$/, "")}/v1/chat/completions`
-    : "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"; // Gemini API endpoint
+    : "https://api.anthropic.com/v1/messages"; // Claude API endpoint
 
 const assertApiKey = () => {
   if (!ENV.forgeApiKey) {
@@ -280,7 +280,7 @@ export async function invokeLLM(params: InvokeParams): Promise<InvokeResult> {
   } = params;
 
   const payload: Record<string, unknown> = {
-    model: "gemini-2.5-flash",
+    model: "claude-3-5-haiku-20241022",
     messages: messages.map(normalizeMessage),
   };
 
