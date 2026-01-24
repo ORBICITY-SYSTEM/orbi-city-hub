@@ -4,11 +4,21 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Loader2, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { RoomInventoryTable } from "@/components/RoomInventoryTable";
 import { AllRoomsInventory } from "@/components/AllRoomsInventory";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 interface Room {
   id: string;
@@ -19,6 +29,8 @@ export function StudioInventoryList() {
   const { t } = useLanguage();
   const queryClient = useQueryClient();
   const [selectedRoomId, setSelectedRoomId] = useState<string>("");
+  const [newRoomNumber, setNewRoomNumber] = useState<string>("");
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
 
   const { data: rooms, isLoading } = useQuery({
     queryKey: ["rooms"],
@@ -33,11 +45,32 @@ export function StudioInventoryList() {
     },
   });
 
+  // Add single room mutation
+  const addRoomMutation = useMutation({
+    mutationFn: async (roomNumber: string) => {
+      // Extract building from room number (e.g., "A 1234" -> "A")
+      const building = roomNumber.split(' ')[0] || 'A';
+
+      const { error } = await supabase.from("rooms").insert({
+        room_number: roomNumber.trim(),
+        building: building,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["rooms"] });
+      queryClient.invalidateQueries({ queryKey: ["logistics-rooms"] });
+      toast.success(t("ოთახი დაემატა", "Room added successfully"));
+      setNewRoomNumber("");
+      setIsAddDialogOpen(false);
+    },
+    onError: (error) => {
+      toast.error(t("შეცდომა", "Error") + ": " + error.message);
+    },
+  });
+
   const createRoomsMutation = useMutation({
     mutationFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
-
       const roomNumbers = [
         'A 1821', 'A 1033', 'A 1806', 'A 2035', 'C 2936', 'C 3834', 'C 3928',
         'C 4638', 'C 2107', 'C 2529', 'C 2609', 'C 3611', 'C 4011', 'C 4704',
@@ -50,8 +83,8 @@ export function StudioInventoryList() {
       ];
 
       const roomsToInsert = roomNumbers.map((num) => ({
-        user_id: user.id,
         room_number: num,
+        building: num.split(' ')[0],
       }));
 
       const { error } = await supabase.from("rooms").insert(roomsToInsert);
@@ -134,6 +167,60 @@ export function StudioInventoryList() {
               </p>
             </div>
 
+            {/* Add New Room Button */}
+            <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+              <DialogTrigger asChild>
+                <Button className="bg-gradient-to-r from-purple-500 to-cyan-500 hover:from-purple-600 hover:to-cyan-600">
+                  <Plus className="h-4 w-4 mr-2" />
+                  {t("ახალი ოთახი", "Add Room")}
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle>{t("ახალი ოთახის დამატება", "Add New Room")}</DialogTitle>
+                  <DialogDescription>
+                    {t("შეიყვანეთ ოთახის ნომერი (მაგ: A 1234, C 2567, D1 3418)", "Enter room number (e.g., A 1234, C 2567, D1 3418)")}
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <label htmlFor="room-number" className="text-right text-sm font-medium">
+                      {t("ნომერი", "Number")}
+                    </label>
+                    <Input
+                      id="room-number"
+                      value={newRoomNumber}
+                      onChange={(e) => setNewRoomNumber(e.target.value)}
+                      placeholder="A 1234"
+                      className="col-span-3"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && newRoomNumber.trim()) {
+                          addRoomMutation.mutate(newRoomNumber);
+                        }
+                      }}
+                    />
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button
+                    type="submit"
+                    onClick={() => {
+                      if (newRoomNumber.trim()) {
+                        addRoomMutation.mutate(newRoomNumber);
+                      }
+                    }}
+                    disabled={!newRoomNumber.trim() || addRoomMutation.isPending}
+                  >
+                    {addRoomMutation.isPending ? (
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    ) : (
+                      <Plus className="h-4 w-4 mr-2" />
+                    )}
+                    {t("დამატება", "Add")}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           </div>
 
           <div className="flex items-center gap-4">
