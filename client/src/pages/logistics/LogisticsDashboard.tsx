@@ -3,10 +3,12 @@
  * Connected to Supabase for real-time data
  */
 
-import { Suspense } from "react";
+import { Suspense, lazy } from "react";
 import { Truck, Package, BarChart3, ClipboardList, Wrench, History, Loader2, PieChart } from "lucide-react";
 import { ModulePageLayout, SubModule } from "@/components/ModulePageLayout";
-import { InventoryDashboardStats } from "@/components/InventoryDashboardStats";
+
+// Lazy load overview component
+const LogisticsOverviewContent = lazy(() => import("@/components/logistics/LogisticsOverviewDashboard").then(m => ({ default: m.LogisticsOverviewDashboard })));
 import { StudioInventoryList } from "@/components/StudioInventoryList";
 import { HousekeepingModule } from "@/components/HousekeepingModule";
 import { MaintenanceModule } from "@/components/MaintenanceModule";
@@ -23,7 +25,7 @@ const LoadingSpinner = () => (
 // Overview Tab - Dashboard Stats
 const OverviewTab = () => (
   <Suspense fallback={<LoadingSpinner />}>
-    <InventoryDashboardStats />
+    <LogisticsOverviewContent />
   </Suspense>
 );
 

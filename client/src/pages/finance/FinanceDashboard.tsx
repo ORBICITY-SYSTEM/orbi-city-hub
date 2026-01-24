@@ -12,7 +12,7 @@ import { ModulePageLayout, SubModule } from "@/components/ModulePageLayout";
 import { FinanceCopilotWidget } from "@/components/finance-copilot";
 
 // Lazy load sub-module components
-const FinanceOverviewContent = lazy(() => import("@/components/finance/FinanceModulesLanding").then(m => ({ default: m.FinanceModulesLanding })));
+const FinanceOverviewContent = lazy(() => import("@/components/finance/FinanceOverviewDashboard").then(m => ({ default: m.FinanceOverviewDashboard })));
 const RevenueModule = lazy(() => import("@/components/finance/RevenueModule").then(m => ({ default: m.RevenueModule })));
 const ExpensesModule = lazy(() => import("@/components/finance/ExpensesModule").then(m => ({ default: m.ExpensesModule })));
 const FinanceReportsContent = lazy(() => import("./FinanceMonthlyReports").then(m => ({ default: m.default })));
