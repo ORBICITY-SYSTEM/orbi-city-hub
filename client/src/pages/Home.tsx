@@ -23,6 +23,7 @@ import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { AICEOAvatar } from "@/components/command-center/AICEOAvatar";
 import { FloatingMetrics } from "@/components/command-center/FloatingMetrics";
 import { HolographicCard } from "@/components/command-center/HolographicCard";
+import { CEOAIDashboard } from "@/components/CEOAIDashboard";
 
 // Lazy load 3D Globe for performance
 const Globe3D = lazy(() =>
@@ -1054,6 +1055,20 @@ export default function Home() {
                 color="#a855f7"
               />
             </div>
+          </motion.div>
+        </section>
+
+        {/* ═══════════════════════════════════════════════════════════════════ */}
+        {/* CEO AI DASHBOARD - DATA CONTROL CENTER */}
+        {/* ═══════════════════════════════════════════════════════════════════ */}
+        <section className="py-4 md:py-6 px-4 md:px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.75 }}
+            className="max-w-6xl mx-auto"
+          >
+            <CEOAIDashboard />
           </motion.div>
         </section>
 
