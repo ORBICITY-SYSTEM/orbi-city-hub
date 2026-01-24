@@ -72,21 +72,27 @@ export const MaintenanceModule = () => {
 
   const addScheduleMutation = useMutation({
     mutationFn: async (entry: MaintenanceEntry) => {
+      // Get user if authenticated (optional)
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("User not authenticated");
+
+      const insertData: any = {
+        scheduled_date: format(entry.scheduled_date, "yyyy-MM-dd"),
+        room_number: entry.room_number,
+        problem: entry.problem,
+        notes: entry.notes,
+        status: entry.status,
+        solving_date: entry.solving_date ? format(entry.solving_date, "yyyy-MM-dd") : null,
+        cost: entry.cost || 0,
+      };
+
+      // Only add user_id if user is authenticated
+      if (user?.id) {
+        insertData.user_id = user.id;
+      }
 
       const { data, error } = await supabase
         .from("maintenance_schedules")
-        .insert({
-          user_id: user.id,
-          scheduled_date: format(entry.scheduled_date, "yyyy-MM-dd"),
-          room_number: entry.room_number,
-          problem: entry.problem,
-          notes: entry.notes,
-          status: entry.status,
-          solving_date: entry.solving_date ? format(entry.solving_date, "yyyy-MM-dd") : null,
-          cost: entry.cost || 0,
-        })
+        .insert(insertData)
         .select()
         .single();
 
@@ -197,15 +203,16 @@ export const MaintenanceModule = () => {
 
     setUploadingFiles(true);
     try {
+      // Get user if authenticated (optional for file naming)
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("User not authenticated");
+      const userFolder = user?.id || "anonymous";
 
       const uploadedUrls: string[] = [];
 
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
         const fileExt = file.name.split(".").pop();
-        const fileName = `${user.id}/${scheduleId}_${Date.now()}_${i}.${fileExt}`;
+        const fileName = `${userFolder}/${scheduleId}_${Date.now()}_${i}.${fileExt}`;
 
         const { error: uploadError } = await supabase.storage
           .from("housekeeping-media")

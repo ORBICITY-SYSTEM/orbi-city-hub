@@ -63,19 +63,25 @@ export const HousekeepingModule = () => {
 
   const addScheduleMutation = useMutation({
     mutationFn: async (entry: ScheduleEntry) => {
+      // Get user if authenticated (optional)
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
+
+      const insertData: any = {
+        scheduled_date: entry.date,
+        rooms: entry.rooms,
+        total_rooms: entry.rooms.length,
+        notes: entry.notes.trim() || null,
+        status: "pending",
+      };
+
+      // Only add user_id if user is authenticated
+      if (user?.id) {
+        insertData.user_id = user.id;
+      }
 
       const { data, error } = await supabase
         .from("housekeeping_schedules")
-        .insert({
-          user_id: user.id,
-          scheduled_date: entry.date,
-          rooms: entry.rooms,
-          total_rooms: entry.rooms.length,
-          notes: entry.notes.trim() || null,
-          status: "pending",
-        })
+        .insert(insertData)
         .select()
         .single();
 
