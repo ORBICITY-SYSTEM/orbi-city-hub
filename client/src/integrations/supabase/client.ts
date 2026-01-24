@@ -3,17 +3,15 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
-// Use environment variables from .env
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
+// HARDCODED - Supabase credentials for ORBI CITY HUB
+const SUPABASE_URL = 'https://lusagtvxjtfxgfadulgv.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1c2FndHZ4anRmeGdmYWR1bGd2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgzMDg2MzYsImV4cCI6MjA4Mzg4NDYzNn0.D3F6xMDNLm8a9AC6tDMsT68Ad6F6xOlhoXTxEFmtPM8';
 
-if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-  console.warn('[Supabase] Missing VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY in environment');
-}
+console.log('[Supabase] Connecting to:', SUPABASE_URL);
 
 export const supabase = createClient<Database>(
-  SUPABASE_URL || 'https://lusagtvxjtfxgfadulgv.supabase.co',
-  SUPABASE_ANON_KEY || '',
+  SUPABASE_URL,
+  SUPABASE_ANON_KEY,
   {
     auth: {
       storage: localStorage,

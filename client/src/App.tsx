@@ -24,7 +24,6 @@ const FinanceAnalytics = lazy(() => import("./pages/finance/FinanceAnalytics"));
 const FinanceMonthlyReports = lazy(() => import("./pages/finance/FinanceMonthlyReports"));
 const FinanceOTELMS = lazy(() => import("./pages/finance/FinanceOTELMS"));
 const FinanceDevelopmentExpenses = lazy(() => import("./pages/finance/FinanceDevelopmentExpenses"));
-const PowerBIFinanceDashboard = lazy(() => import("./pages/finance/PowerBIFinanceDashboard"));
 
 // Marketing Module - Lazy
 const MarketingDashboard = lazy(() => import("./pages/marketing/MarketingDashboard"));
@@ -131,7 +130,6 @@ function RouterContent() {
         <Route path="/finance/reports" component={FinanceMonthlyReports} />
         <Route path="/finance/otelms" component={FinanceOTELMS} />
         <Route path="/finance/expenses" component={FinanceDevelopmentExpenses} />
-        <Route path="/finance/powerbi" component={PowerBIFinanceDashboard} />
 
         {/* Marketing Module - Social Media & Analytics */}
         <Route path="/marketing" component={MarketingDashboard} />
