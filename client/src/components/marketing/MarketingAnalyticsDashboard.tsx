@@ -1,6 +1,7 @@
 /**
- * Marketing Analytics Dashboard - ROWS.COM Unified View
- * Displays real data from Instagram, Facebook, and Google Reviews spreadsheets
+ * Marketing Analytics Dashboard - Supabase Unified View
+ * Displays real data from Instagram, Facebook, and Google Reviews
+ * NOTE: Migrating from rows.com to Supabase (2025-01-26)
  */
 
 import { useState } from "react";
@@ -60,7 +61,7 @@ export default function MarketingAnalyticsDashboard() {
   const { t, language } = useLanguage();
   const [activeTab, setActiveTab] = useState("overview");
 
-  // Fetch unified marketing analytics from ROWS.COM
+  // Fetch unified marketing analytics (TODO: migrate to Supabase)
   const {
     data: analytics,
     isLoading,
@@ -77,7 +78,7 @@ export default function MarketingAnalyticsDashboard() {
         <div className="text-center space-y-4">
           <Loader2 className="w-12 h-12 animate-spin text-cyan-400 mx-auto" />
           <p className="text-white/70">
-            {language === "ka" ? "მონაცემები იტვირთება ROWS.COM-დან..." : "Loading data from ROWS.COM..."}
+            {language === "ka" ? "მონაცემები იტვირთება..." : "Loading marketing data..."}
           </p>
         </div>
       </div>
@@ -116,10 +117,10 @@ export default function MarketingAnalyticsDashboard() {
             {language === "ka" ? "მარკეტინგის ანალიტიკა" : "Marketing Analytics"}
           </h2>
           <p className="text-white/60 mt-1">
-            {language === "ka" ? "ROWS.COM-დან სინქრონიზებული მონაცემები" : "Data synced from ROWS.COM"}
+            {language === "ka" ? "სოციალური მედიის მონაცემები" : "Social media metrics"}
           </p>
         </div>
-        <DataSourceBadge type="live" source="ROWS.COM" size="md" />
+        <DataSourceBadge type="live" source="Supabase" size="md" />
       </div>
 
       {/* Summary KPIs */}
