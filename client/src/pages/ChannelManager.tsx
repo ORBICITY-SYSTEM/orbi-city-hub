@@ -23,6 +23,9 @@ import {
   Star,
   TrendingUp,
   Brain,
+  Wifi,
+  Layers,
+  PieChart,
 } from "lucide-react";
 import { ModulePageLayout, SubModule } from "@/components/ModulePageLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -37,6 +40,10 @@ const GuestCommunicationHub = lazy(() => import("@/components/telegram/GuestComm
 const OTAReviewAutoResponder = lazy(() => import("@/components/reviews/OTAReviewAutoResponder"));
 const OTADashboard = lazy(() => import("@/pages/reservations/OTADashboard"));
 const OtelmsCalendar = lazy(() => import("@/components/channel-manager/OtelmsCalendar"));
+const RateManagement = lazy(() => import("@/components/channel-manager/RateManagement"));
+const OTASyncStatus = lazy(() => import("@/components/channel-manager/OTASyncStatus"));
+const BulkOperations = lazy(() => import("@/components/channel-manager/BulkOperations"));
+const EnhancedReports = lazy(() => import("@/components/channel-manager/EnhancedReports"));
 
 // Loading component
 const LoadingSpinner = () => (
@@ -393,6 +400,34 @@ const OTAAnalyticsTab = () => (
   </Suspense>
 );
 
+// Rate Management Tab
+const RateManagementTab = () => (
+  <Suspense fallback={<LoadingSpinner />}>
+    <RateManagement />
+  </Suspense>
+);
+
+// OTA Sync Status Tab
+const SyncStatusTab = () => (
+  <Suspense fallback={<LoadingSpinner />}>
+    <OTASyncStatus />
+  </Suspense>
+);
+
+// Bulk Operations Tab
+const BulkOperationsTab = () => (
+  <Suspense fallback={<LoadingSpinner />}>
+    <BulkOperations />
+  </Suspense>
+);
+
+// Enhanced Reports Tab
+const EnhancedReportsTab = () => (
+  <Suspense fallback={<LoadingSpinner />}>
+    <EnhancedReports />
+  </Suspense>
+);
+
 const ChannelManager = () => {
   const subModules: SubModule[] = [
     {
@@ -436,6 +471,34 @@ const ChannelManager = () => {
       nameFallback: "OTA Analytics",
       icon: TrendingUp,
       component: <OTAAnalyticsTab />,
+    },
+    {
+      id: "rate-management",
+      nameKey: "channel.rateManagement",
+      nameFallback: "Rate Management",
+      icon: DollarSign,
+      component: <RateManagementTab />,
+    },
+    {
+      id: "sync-status",
+      nameKey: "channel.syncStatus",
+      nameFallback: "Sync Status",
+      icon: Wifi,
+      component: <SyncStatusTab />,
+    },
+    {
+      id: "bulk-operations",
+      nameKey: "channel.bulkOperations",
+      nameFallback: "Bulk Operations",
+      icon: Layers,
+      component: <BulkOperationsTab />,
+    },
+    {
+      id: "enhanced-reports",
+      nameKey: "channel.enhancedReports",
+      nameFallback: "Analytics",
+      icon: PieChart,
+      component: <EnhancedReportsTab />,
     },
   ];
 

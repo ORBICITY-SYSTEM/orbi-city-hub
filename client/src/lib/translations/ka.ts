@@ -561,6 +561,20 @@ export const ka: Translations = {
     contactSupport: "მხარდაჭერასთან დაკავშირება",
   },
   
+  // Channel Manager
+  channel: {
+    overview: "მიმოხილვა",
+    calendar: "კალენდარი",
+    reports: "რეპორტები",
+    communication: "სტუმრების ჩატი",
+    reviews: "AI მიმოხილვები",
+    otaAnalytics: "OTA ანალიტიკა",
+    rateManagement: "ფასების მართვა",
+    syncStatus: "სინქ სტატუსი",
+    bulkOperations: "მასიური ოპერაციები",
+    enhancedReports: "ანალიტიკა",
+  },
+
   // Auth
   auth: {
     login: "შესვლა",

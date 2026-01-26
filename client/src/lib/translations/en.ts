@@ -557,6 +557,20 @@ export const en = {
     contactSupport: "Contact Support",
   },
   
+  // Channel Manager
+  channel: {
+    overview: "Overview",
+    calendar: "Calendar",
+    reports: "Reports",
+    communication: "Guest Chat",
+    reviews: "AI Reviews",
+    otaAnalytics: "OTA Analytics",
+    rateManagement: "Rate Management",
+    syncStatus: "Sync Status",
+    bulkOperations: "Bulk Operations",
+    enhancedReports: "Analytics",
+  },
+
   // Auth
   auth: {
     login: "Login",
