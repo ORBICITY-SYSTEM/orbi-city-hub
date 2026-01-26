@@ -1,46 +1,201 @@
 # ORBICITY AI Operating System - Project Vision
 
 > **IMPORTANT**: Read this document FIRST before making any changes to this repository.
+> This file is Claude Code's memory for future sessions.
 
-## Who We Are
+---
 
-**Founder**: Tamara
+## რა პროექტია (What This Project Is)
+
+**Founder**: Tamara (Tamuna)
 **Company**: ORBICITY SYSTEM
 **Location**: Orbi City Batumi, Georgia
 **Scale**: 60 luxury apartments
 
-We're building an **AI-first hotel management infrastructure** that lets us compete with large hospitality chains through technology, not headcount.
+**Mission**: AI-first hotel management infrastructure - "handsfree" AI operating system where the founder gives strategic direction and AI handles execution.
+
+### Four AI Directors (Modules)
+
+| Director | Role | Status |
+|----------|------|--------|
+| **Marketing Director** | Content, OTA optimization, review responses | Active |
+| **Reservations Director** | Booking management, availability sync | Active |
+| **Finance Director** | Revenue tracking, expense monitoring | Active |
+| **Logistics Director** | Cleaning, maintenance, inventory | Active |
+
+### CEO AI (Claude Code)
+
+Claude Code acts as CEO AI with full autonomy to:
+- Create new UI elements (buttons, widgets, charts)
+- Add statistics and metrics to any module
+- Generate analytics and visualizations
+- Distribute data across modules automatically
+- Make independent decisions based on business context
 
 ---
 
-## What We Want to Achieve
+## Technical Stack
 
-A **"handsfree" AI operating system** where the founder gives strategic direction and AI handles execution.
+```
+Frontend:  React + TypeScript + Vite + TailwindCSS + shadcn/ui
+Backend:   Node.js + Express + tRPC
+Database:  Supabase (PostgreSQL) - SINGLE SOURCE OF TRUTH
+AI:        Claude Code (CEO AI) + Claude Haiku 3.5 (assistants)
+Auth:      Session-based with Supabase fallback
+Deploy:    Vercel
+Scrapers:  Cloud Run (Python) - github.com/ORBICITY-SYSTEM/otelms-rows-api
+```
 
-### 1. Autonomous Decision-Making
+### Key Principles
 
-- **Dynamic pricing** based on demand, seasonality, competitor rates, and occupancy
-- **Automatic response** to booking inquiries across all OTA platforms
-- **Predictive maintenance** scheduling
-- **Guest communication** automation
+1. **AI-First** - Every feature should consider AI automation
+2. **Bilingual** - All UI must support Georgian (ka) and English (en)
+3. **Supabase Only** - NO external spreadsheets, ALL data through Supabase
+4. **Mobile-First** - All interfaces must be responsive
 
-### 2. Four AI Directors (Modules)
+---
 
-| Director | Responsibilities |
-|----------|-----------------|
-| **Marketing Director** | Content generation, OTA listing optimization, review responses |
-| **Reservations Director** | Booking management, availability sync, rate optimization |
-| **Finance Director** | Revenue tracking, expense monitoring, profitability analysis |
-| **Logistics Director** | Cleaning schedules, maintenance, inventory management |
+## Credentials & Access
 
-### 3. CEO AI (Claude Code) - Autonomous Controller
+### Supabase (Main Database)
+- **URL**: `https://lusagtvxjtfxgfadulgv.supabase.co`
+- **Dashboard**: https://supabase.com/dashboard/project/lusagtvxjtfxgfadulgv
+- **Login**: `info@orbicitybatumi.com` / `SHAKOniniamasho1!`
+- **Env vars**: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`
 
-The CEO AI has full autonomy to:
-- **Create new UI elements** (buttons, widgets, charts)
-- **Add statistics and metrics** to any module
-- **Generate analytics and visualizations**
-- **Distribute data** across modules automatically
-- **Make independent decisions** based on business context
+### GitHub Repository
+- **Repo**: https://github.com/ORBICITY-SYSTEM/orbi-city-hub
+- **Branch**: main
+
+### Local Development
+- **Command**: `pnpm dev`
+- **Default Port**: 3000 (falls back to 3001 if busy)
+- **URL**: http://localhost:3000 or http://localhost:3001
+
+---
+
+## Claude Code Profiles
+
+| Batch File | Project | MCP Profile |
+|------------|---------|-------------|
+| `claude-cloud-deploy.bat` | cloud-deploy (scrapers) | mcp-profiles\python |
+| `claude-orbi-hub.bat` | orbi-city-hub | mcp-profiles\hub |
+
+---
+
+# SESSION LOGS (ჩემი მეხსიერება)
+
+---
+
+## SESSION: 2025-01-26 - AI Agents System
+
+### რა გავაკეთეთ (What We Did)
+
+#### 1. AI Agents Supabase Tables
+შევქმენით 6 ცხრილი Supabase-ში:
+
+```sql
+-- ai_agents - აგენტების მონაცემები
+CREATE TABLE ai_agents (
+    id UUID PRIMARY KEY,
+    name TEXT NOT NULL,
+    name_ka TEXT,
+    role TEXT NOT NULL,
+    description TEXT,
+    description_ka TEXT,
+    module TEXT NOT NULL,
+    capabilities JSONB DEFAULT '[]',
+    is_active BOOLEAN DEFAULT true
+);
+
+-- ai_agent_tasks - დავალებები
+-- ai_agent_plans - გეგმები
+-- ai_agent_conversations - ჩატის ისტორია
+-- ai_agent_execution_log - მოქმედებების ლოგი
+-- ai_agent_permissions - უფლებები
+```
+
+**SQL File**: `supabase_migration_ai_agents.sql` ან Desktop/AI_AGENTS_SQL.txt
+
+#### 2. Default Agents (ჩასმულია Supabase-ში)
+| Agent | Role | Module | Capabilities |
+|-------|------|--------|--------------|
+| 📊 Marketing AI Director | marketing_director | marketing | create_plan, analyze |
+| 🤖 ClawdBot | clawdbot | marketing | answer, analyze |
+| 👥 Cowork | cowork | marketing | coordinate, assign |
+
+#### 3. React Hooks
+**File**: `client/src/hooks/useAIAgents.ts`
+
+```typescript
+useAIAgents()         // აგენტების სია Supabase-დან
+useAIAgentTasks()     // დავალებები
+useAIAgentPlans()     // გეგმები
+useAIAgentChat()      // ჩატის ფუნქციონალი
+useAIAgentApprovals() // დამტკიცების სისტემა
+```
+
+#### 4. UI Component
+**File**: `client/src/components/ai-agents/AIAgentsPanel.tsx`
+- Marketing გვერდზე "AI Agents" tab
+- ქართული/ინგლისური ენების მხარდაჭერა
+- აგენტების კარტები capabilities-ით
+
+#### 5. ROWS.COM References Removed
+**File**: `client/src/components/marketing/MarketingAnalyticsDashboard.tsx`
+- Loading text: "Loading marketing data..." (was "Loading data from ROWS.COM...")
+- DataSourceBadge: "Supabase" (was "ROWS.COM")
+
+---
+
+### პრობლემები და გადაწყვეტილებები (Problems & Solutions)
+
+#### Problem 1: Playwright Browser Conflict
+**Error**: "Opening in existing browser session" - Chrome already running
+**Solution**: User manually ran SQL in Supabase Dashboard
+**Lesson**: When Playwright fails, create SQL file for manual execution
+
+#### Problem 2: ROWS.COM Code Still Present
+**Problem**: Marketing page showed "Loading data from ROWS.COM..."
+**Solution**: Changed text to generic, but tRPC endpoint still uses rows router
+**TODO**: Full migration needed - replace `trpc.rows.*` with Supabase hooks
+
+#### Problem 3: Port 3000 Busy
+**Solution**: Server auto-switches to port 3001
+
+---
+
+### Commits Made
+```
+48bf0ae - docs: Update CLAUDE.md with AI Agents session log and remove ROWS.COM references
+9942ca0 - (previous commits)
+```
+
+---
+
+## TODO - Next Priorities
+
+### 🔴 URGENT - rows.com Code Removal
+The following files still contain rows.com references that need to be replaced with Supabase:
+
+```
+server/rowsApi.ts
+server/lib/rowsClient.ts
+server/routers/rowsRouter.ts
+server/services/rowsService.ts (if exists)
+```
+
+**Action**: Replace `trpc.rows.*` calls with direct Supabase queries
+
+### Medium Priority
+1. Connect Cloud Run scrapers to Supabase
+2. Build comprehensive Data Hub with all tables
+3. Complete autonomous module data distribution
+
+### Lower Priority
+1. OTA integration for automatic responses
+2. WhatsApp/Telegram bot for guest communication
+3. Vercel deployment optimization
 
 ---
 
@@ -59,18 +214,12 @@ The CEO AI has full autonomy to:
 │  │  • bookings, guests                                      │   │
 │  │  • finance_data, revenue, expenses                       │   │
 │  │  • social_media_metrics, reviews                         │   │
-│  └─────────────────────────────────────────────────────────┘   │
-│                           ↓                                     │
-│  ┌─────────────────────────────────────────────────────────┐   │
-│  │              DATA HUB (/data) - Raw Materials            │   │
-│  │  Password Protected Admin Access                         │   │
-│  │  All Supabase data visible in structured format          │   │
+│  │  • ai_agents, ai_agent_tasks, ai_agent_plans (NEW!)      │   │
 │  └─────────────────────────────────────────────────────────┘   │
 │                           ↓                                     │
 │  ┌─────────────────────────────────────────────────────────┐   │
 │  │              CEO AI (Claude Code)                        │   │
 │  │  Autonomous data distribution and visualization          │   │
-│  │  Creates widgets, charts, analytics on demand            │   │
 │  └─────────────────────────────────────────────────────────┘   │
 │                           ↓                                     │
 │  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐       │
@@ -82,160 +231,30 @@ The CEO AI has full autonomy to:
 
 ---
 
-## Technical Stack
+## Deprecated (DO NOT USE)
 
-- **Frontend**: React + TypeScript + Vite + TailwindCSS + shadcn/ui
-- **Backend**: Node.js + Express + tRPC
-- **Database**: Supabase (PostgreSQL)
-- **AI**: Claude Code (CEO AI) + Claude Haiku 3.5 (assistants)
-- **Auth**: Session-based with Supabase fallback
-- **Deployment**: Vercel
-- **Data Source**: ORBICITY-SYSTEM/otelms-rows-api (Cloud Run scrapers)
-
----
-
-## Key Principles for Development
-
-1. **AI-First**: Every feature should consider AI automation potential
-2. **Bilingual**: All UI must support Georgian (ka) and English (en)
-3. **Supabase Only**: All data flows through Supabase - NO external spreadsheets
-4. **Mobile-First**: All interfaces must be responsive
-5. **CEO AI Autonomy**: Claude Code can create/modify UI elements independently
-
----
-
-## Current State
-
-- Core dashboard with real-time metrics from Supabase
-- Four AI Director pages (Marketing, Reservations, Finance, Logistics)
-- Finance Copilot - AI assistant for financial insights
-- Logistics module - fully connected to Supabase
-- Data Hub - admin access to raw Supabase data
-- **AI Agents System** - აგენტების სისტემა Supabase-ით (2025-01-26)
-
----
-
-## AI Agents System (შექმნილია 2025-01-26)
-
-### რა შევქმენით:
-
-**Supabase Tables:**
-- `ai_agents` - აგენტების მონაცემები (name, role, module, capabilities)
-- `ai_agent_tasks` - აგენტების დავალებები
-- `ai_agent_plans` - გეგმები (მარკეტინგის, ფინანსების და ა.შ.)
-- `ai_agent_conversations` - აგენტებთან ჩატის ისტორია
-- `ai_agent_execution_log` - აგენტების მოქმედებების ლოგი
-- `ai_agent_permissions` - აგენტების უფლებები
-
-**Default Agents:**
-1. 📊 **Marketing AI Director** - მარკეტინგის სტრატეგი
-2. 🤖 **ClawdBot** - Claude AI ასისტენტი
-3. 👥 **Cowork** - დავალებების კოორდინატორი
-
-**React Hooks (client/src/hooks/useAIAgents.ts):**
-- `useAIAgents()` - აგენტების სია
-- `useAIAgentTasks()` - დავალებების სია
-- `useAIAgentPlans()` - გეგმების სია
-- `useAIAgentChat()` - ჩატის ფუნქციონალი
-- `useAIAgentApprovals()` - დამტკიცების სისტემა
-
-**UI Component:**
-- `client/src/components/ai-agents/AIAgentsPanel.tsx` - მთავარი პანელი
-
-### როგორ გავუშვათ SQL:
-1. გახსენი: https://supabase.com/dashboard/project/lusagtvxjtfxgfadulgv/sql/new
-2. დაალოგინე: `info@orbicitybatumi.com` / `SHAKOniniamasho1!`
-3. ჩააკოპირე SQL ფაილიდან: `supabase_migration_ai_agents.sql`
-4. დააჭირე RUN
-
----
-
-## Claude Code Profiles
-
-პროექტში სამი Claude Code profile გამოიყენება:
-
-| Batch File | Project | MCP Profile |
-|------------|---------|-------------|
-| `claude-cloud-deploy.bat` | cloud-deploy (scrapers) | mcp-profiles\python |
-| `claude-orbi-hub.bat` | orbi-city-hub | mcp-profiles\hub |
-
----
-
-## პრობლემები და გადაწყვეტილებები
-
-### 1. Playwright Browser Session კონფლიქტი
-**პრობლემა:** Chrome უკვე გახსნილია და Playwright ვერ შედის
-**გადაწყვეტა:** მომხმარებელმა ხელით გაუშვა SQL Supabase Dashboard-ში
-
-### 2. rows.com კოდი ჯერ კიდევ არის
-**პრობლემა:** Marketing გვერდზე ჩანს "Loading data from ROWS.COM..."
-**გადაწყვეტა:** TODO - წაშალეთ rows.com references კოდიდან
-
-### 3. Port 3000 დაკავებული
-**გადაწყვეტა:** სერვერი ავტომატურად გადადის 3001 პორტზე
-
----
-
-## Deprecated Integrations (წასაშლელია კოდიდან!)
-
-⚠️ **ეს ინტეგრაციები მოშორებულია, მაგრამ კოდი ჯერ კიდევ არის:**
+These integrations have been removed:
 - ~~n8n Cloud workflows~~
 - ~~Google Sheets integration~~
-- ~~**rows.com API**~~ ← კოდი ჯერ კიდევ არის, უნდა წაიშალოს!
-
-**TODO:** მოძებნე და წაშალე ყველა rows.com reference:
-- `server/services/rowsService.ts`
-- Marketing page-ის rows.com loading
-- `.env`-ში ROWS_* variables
-
-ყველა მონაცემი უნდა მოდიოდეს მხოლოდ **Supabase**-იდან!
+- ~~rows.com API~~ (code still exists, needs cleanup)
 
 ---
 
-## API Keys & Credentials
+## Quick Commands
 
-### Supabase
-- **URL**: `VITE_SUPABASE_URL` = `https://lusagtvxjtfxgfadulgv.supabase.co`
-- **Key**: `VITE_SUPABASE_ANON_KEY`
-- **Dashboard**: https://supabase.com/dashboard/project/lusagtvxjtfxgfadulgv
-- **Login Email**: `info@orbicitybatumi.com`
-- **Login Password**: `SHAKOniniamasho1!`
+```bash
+# Start development server
+pnpm dev
 
-### Claude AI (Assistants)
-- **API Key**: `ANTHROPIC_API_KEY`
+# Build for production
+pnpm build
 
-### Data Hub Password
-- **Access**: Password protected for admin access
+# Push to GitHub
+git add -A && git commit -m "message" && git push
 
----
-
-## Next Priorities
-
-1. ✅ ~~AI Agents System - Supabase tables და hooks~~
-2. 🔴 **წაშალე rows.com კოდი** - მთავარი პრიორიტეტი!
-3. Connect Cloud Run scrapers to Supabase
-4. Build comprehensive Data Hub with all tables
-5. Implement CEO AI with Claude Code
-6. Complete autonomous module data distribution
-7. OTA integration for automatic responses
-8. WhatsApp/Telegram bot for guest communication
-
----
-
-## Session Log (2025-01-26)
-
-**რა გაკეთდა:**
-1. შეიქმნა AI Agents SQL migration
-2. შეიქმნა useAIAgents.ts hooks
-3. განახლდა AIAgentsPanel.tsx Supabase-ით
-4. მომხმარებელმა ხელით გაუშვა SQL Supabase-ში
-5. დაემატა credentials CLAUDE.md-ში და .env-ში
-6. დაიპუშა GitHub-ზე
-
-**რა დარჩა:**
-1. rows.com კოდის წაშლა
-2. AI Agents tab-ის ტესტირება
-3. Vercel-ზე deploy
+# Run SQL in Supabase
+# Open: https://supabase.com/dashboard/project/lusagtvxjtfxgfadulgv/sql/new
+```
 
 ---
 
@@ -243,4 +262,4 @@ The CEO AI has full autonomy to:
 
 *CEO AI (Claude Code) has authority to modify this codebase autonomously within these guidelines.*
 
-*Last updated: 2025-01-26 by Claude Code*
+*Last updated: 2025-01-26 by Claude Code (Opus 4.5)*
