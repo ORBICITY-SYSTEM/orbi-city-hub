@@ -1,6 +1,7 @@
 /**
  * AI Agents Panel
  * Comprehensive UI for managing AI agents, tasks, and marketing plans
+ * Uses Supabase directly for data management
  */
 
 import { useState } from "react";
@@ -47,8 +48,17 @@ import {
   AlertCircle,
   ChevronRight,
 } from "lucide-react";
-import { trpc } from "@/lib/trpc";
 import { useToast } from "@/hooks/use-toast";
+import {
+  useAIAgents,
+  useAIAgentTasks,
+  useAIAgentPlans,
+  useAIAgentChat,
+  useAIAgentApprovals,
+  AIAgent,
+  AIAgentTask,
+  AIAgentPlan
+} from "@/hooks/useAIAgents";
 
 interface AIAgentsPanelProps {
   module?: string;
@@ -68,52 +78,33 @@ export function AIAgentsPanel({
   const [chatHistory, setChatHistory] = useState<Array<{role: "user" | "assistant"; content: string}>>([]);
   const [showNewTaskDialog, setShowNewTaskDialog] = useState(false);
   const [showGeneratePlanDialog, setShowGeneratePlanDialog] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
   // New task form state
   const [newTask, setNewTask] = useState({
     title: "",
+    title_ka: "",
     description: "",
-    taskType: "general" as const,
+    description_ka: "",
+    taskType: "one_time" as const,
     priority: "medium" as const,
-    scheduledFor: "",
   });
 
   // Plan generation form state
   const [planConfig, setPlanConfig] = useState({
-    planType: "weekly" as "weekly" | "monthly",
+    planType: "monthly" as "monthly" | "quarterly",
     budget: 500,
     goals: [] as string[],
     newGoal: "",
   });
 
-  // tRPC queries and mutations
-  const agentsQuery = trpc.aiAgents.getAgents.useQuery(
-    { module, isActive: true },
-    { staleTime: 60000 }
-  );
-
-  const tasksQuery = trpc.aiAgents.getTasks.useQuery(
-    { module, limit: 20 },
-    { staleTime: 30000 }
-  );
-
-  const plansQuery = trpc.aiAgents.getPlans.useQuery(
-    { module, limit: 5 },
-    { staleTime: 60000 }
-  );
-
-  const pendingApprovalsQuery = trpc.aiAgents.getPendingApprovals.useQuery(
-    { module },
-    { staleTime: 15000 }
-  );
-
-  const chatMutation = trpc.aiAgents.chat.useMutation();
-  const createTaskMutation = trpc.aiAgents.createTask.useMutation();
-  const approveTaskMutation = trpc.aiAgents.approveTask.useMutation();
-  const rejectTaskMutation = trpc.aiAgents.rejectTask.useMutation();
-  const generatePlanMutation = trpc.aiAgents.generatePlan.useMutation();
-  const approvePlanMutation = trpc.aiAgents.approvePlan.useMutation();
+  // Supabase hooks
+  const { agents, loading: agentsLoading, error: agentsError, refetch: refetchAgents } = useAIAgents(module);
+  const { tasks, loading: tasksLoading, refetch: refetchTasks, createTask, updateTask } = useAIAgentTasks(undefined, module);
+  const { plans, loading: plansLoading, refetch: refetchPlans, createPlan, updatePlan } = useAIAgentPlans(undefined, module);
+  const { approvals, loading: approvalsLoading, refetch: refetchApprovals, approveTask, approvePlan, rejectTask, rejectPlan } = useAIAgentApprovals(module);
+  const { sendMessage, loading: chatLoading } = useAIAgentChat(selectedAgent || '');
 
   // Handlers
   const handleSendChat = async () => {
@@ -124,12 +115,8 @@ export function AIAgentsPanel({
     setChatHistory(prev => [...prev, { role: "user", content: message }]);
 
     try {
-      const response = await chatMutation.mutateAsync({
-        agentId: selectedAgent,
-        message,
-        language,
-      });
-      setChatHistory(prev => [...prev, { role: "assistant", content: response.response }]);
+      const response = await sendMessage(message);
+      setChatHistory(prev => [...prev, { role: "assistant", content: response.content }]);
     } catch (error) {
       setChatHistory(prev => [...prev, {
         role: "assistant",
@@ -141,15 +128,18 @@ export function AIAgentsPanel({
   const handleCreateTask = async () => {
     if (!selectedAgent || !newTask.title.trim()) return;
 
+    setIsLoading(true);
     try {
-      await createTaskMutation.mutateAsync({
-        agentId: selectedAgent,
+      await createTask({
+        agent_id: selectedAgent,
         title: newTask.title,
-        description: newTask.description,
-        taskType: newTask.taskType,
+        title_ka: newTask.title_ka || undefined,
+        description: newTask.description || undefined,
+        description_ka: newTask.description_ka || undefined,
+        task_type: newTask.taskType,
         priority: newTask.priority,
-        module,
-        scheduledFor: newTask.scheduledFor || undefined,
+        status: 'pending',
+        requires_approval: true,
       });
 
       toast({
@@ -162,13 +152,14 @@ export function AIAgentsPanel({
       setShowNewTaskDialog(false);
       setNewTask({
         title: "",
+        title_ka: "",
         description: "",
-        taskType: "general",
+        description_ka: "",
+        taskType: "one_time",
         priority: "medium",
-        scheduledFor: "",
       });
-      tasksQuery.refetch();
-      pendingApprovalsQuery.refetch();
+      refetchTasks();
+      refetchApprovals();
     } catch (error) {
       toast({
         title: language === "ka" ? "შეცდომა" : "Error",
@@ -177,20 +168,20 @@ export function AIAgentsPanel({
           : "Failed to create task",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleApproveTask = async (taskId: string) => {
     try {
-      await approveTaskMutation.mutateAsync({ taskId });
+      await approveTask(taskId, "admin");
       toast({
         title: language === "ka" ? "დამტკიცებულია" : "Approved",
         description: language === "ka"
           ? "დავალება დამტკიცდა და შესრულდება"
           : "Task approved and will be executed",
       });
-      tasksQuery.refetch();
-      pendingApprovalsQuery.refetch();
     } catch (error) {
       toast({
         title: language === "ka" ? "შეცდომა" : "Error",
@@ -199,14 +190,12 @@ export function AIAgentsPanel({
     }
   };
 
-  const handleRejectTask = async (taskId: string, reason: string) => {
+  const handleRejectTask = async (taskId: string) => {
     try {
-      await rejectTaskMutation.mutateAsync({ taskId, reason });
+      await rejectTask(taskId);
       toast({
         title: language === "ka" ? "უარყოფილია" : "Rejected",
       });
-      tasksQuery.refetch();
-      pendingApprovalsQuery.refetch();
     } catch (error) {
       toast({
         title: language === "ka" ? "შეცდომა" : "Error",
@@ -218,14 +207,32 @@ export function AIAgentsPanel({
   const handleGeneratePlan = async () => {
     if (!selectedAgent) return;
 
+    setIsLoading(true);
     try {
-      const result = await generatePlanMutation.mutateAsync({
-        agentId: selectedAgent,
-        module,
-        planType: planConfig.planType,
-        language,
+      const startDate = new Date();
+      const endDate = new Date();
+      if (planConfig.planType === 'monthly') {
+        endDate.setMonth(endDate.getMonth() + 1);
+      } else {
+        endDate.setMonth(endDate.getMonth() + 3);
+      }
+
+      await createPlan({
+        agent_id: selectedAgent,
+        title: `${planConfig.planType === 'monthly' ? 'Monthly' : 'Quarterly'} Marketing Plan`,
+        title_ka: `${planConfig.planType === 'monthly' ? 'თვიური' : 'კვარტალური'} მარკეტინგული გეგმა`,
+        plan_type: planConfig.planType,
+        period_start: startDate.toISOString().split('T')[0],
+        period_end: endDate.toISOString().split('T')[0],
+        content: {
+          objectives: planConfig.goals,
+          strategies: [],
+          channels: ['instagram', 'facebook', 'booking.com'],
+        },
+        goals: planConfig.goals.map(g => ({ title: g, status: 'pending' })),
         budget: planConfig.budget,
-        goals: planConfig.goals.length > 0 ? planConfig.goals : undefined,
+        currency: 'GEL',
+        status: 'pending_approval',
       });
 
       toast({
@@ -237,33 +244,32 @@ export function AIAgentsPanel({
 
       setShowGeneratePlanDialog(false);
       setPlanConfig({
-        planType: "weekly",
+        planType: "monthly",
         budget: 500,
         goals: [],
         newGoal: "",
       });
-      plansQuery.refetch();
-      pendingApprovalsQuery.refetch();
+      refetchPlans();
+      refetchApprovals();
     } catch (error) {
       toast({
         title: language === "ka" ? "შეცდომა" : "Error",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleApprovePlan = async (planId: string) => {
     try {
-      await approvePlanMutation.mutateAsync({ planId, createTasks: true });
+      await approvePlan(planId, "admin");
       toast({
         title: language === "ka" ? "გეგმა დამტკიცდა" : "Plan approved",
         description: language === "ka"
           ? "დავალებები შეიქმნა გეგმის მიხედვით"
           : "Tasks created from plan",
       });
-      plansQuery.refetch();
-      tasksQuery.refetch();
-      pendingApprovalsQuery.refetch();
     } catch (error) {
       toast({
         title: language === "ka" ? "შეცდომა" : "Error",
@@ -276,14 +282,21 @@ export function AIAgentsPanel({
     setLanguage(prev => prev === "ka" ? "en" : "ka");
   };
 
-  const agents = agentsQuery.data?.agents || [];
-  const tasks = tasksQuery.data?.tasks || [];
-  const plans = plansQuery.data?.plans || [];
-  const pendingTasks = pendingApprovalsQuery.data?.pendingTasks || [];
-  const pendingPlans = pendingApprovalsQuery.data?.pendingPlans || [];
-  const totalPending = pendingApprovalsQuery.data?.totalPending || 0;
+  const pendingTasks = approvals.tasks || [];
+  const pendingPlans = approvals.plans || [];
+  const totalPending = pendingTasks.length + pendingPlans.length;
 
-  const selectedAgentData = agents.find(a => a.agentId === selectedAgent);
+  const selectedAgentData = agents.find(a => a.id === selectedAgent);
+
+  // Agent avatar based on role
+  const getAgentAvatar = (role: string) => {
+    switch (role) {
+      case 'marketing_director': return '📊';
+      case 'clawdbot': return '🤖';
+      case 'cowork': return '👥';
+      default: return '🤖';
+    }
+  };
 
   return (
     <div className={cn("space-y-6", className)}>
@@ -321,6 +334,22 @@ export function AIAgentsPanel({
         </div>
       </div>
 
+      {/* Error Display */}
+      {agentsError && (
+        <Card className="bg-red-900/20 border-red-500/50">
+          <CardContent className="py-4">
+            <p className="text-red-400 text-sm">
+              {language === "ka"
+                ? "შეცდომა აგენტების ჩატვირთვისას. გთხოვთ გაუშვათ SQL მიგრაცია Supabase-ში."
+                : "Error loading agents. Please run the SQL migration in Supabase."}
+            </p>
+            <p className="text-red-300 text-xs mt-1">
+              {agentsError}
+            </p>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Main Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid w-full grid-cols-4 bg-slate-800/50">
@@ -349,54 +378,77 @@ export function AIAgentsPanel({
 
         {/* Agents Tab */}
         <TabsContent value="agents" className="mt-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {agents.map((agent) => (
-              <Card
-                key={agent.agentId}
-                className={cn(
-                  "bg-slate-800/50 border-slate-700 cursor-pointer transition-all hover:border-purple-500",
-                  selectedAgent === agent.agentId && "border-purple-500 ring-2 ring-purple-500/20"
-                )}
-                onClick={() => setSelectedAgent(agent.agentId)}
-              >
-                <CardHeader className="pb-2">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-3">
-                      <span className="text-3xl">{agent.avatar}</span>
-                      <div>
-                        <CardTitle className="text-base text-white">
-                          {language === "ka" && agent.nameGe ? agent.nameGe : agent.name}
-                        </CardTitle>
-                        <Badge variant="outline" className="mt-1 text-xs">
-                          {agent.agentType}
-                        </Badge>
+          {agentsLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-purple-400" />
+            </div>
+          ) : agents.length === 0 ? (
+            <Card className="bg-slate-800/50 border-slate-700">
+              <CardContent className="py-12 text-center">
+                <Bot className="h-16 w-16 mx-auto mb-4 text-slate-500" />
+                <h3 className="text-lg font-semibold text-white mb-2">
+                  {language === "ka" ? "აგენტები არ მოიძებნა" : "No Agents Found"}
+                </h3>
+                <p className="text-slate-400 mb-4">
+                  {language === "ka"
+                    ? "გთხოვთ გაუშვათ SQL მიგრაცია Supabase-ში აგენტების შესაქმნელად."
+                    : "Please run the SQL migration in Supabase to create agents."}
+                </p>
+                <code className="text-xs text-cyan-400 bg-slate-900 px-3 py-2 rounded">
+                  supabase_migration_ai_agents.sql
+                </code>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {agents.map((agent) => (
+                <Card
+                  key={agent.id}
+                  className={cn(
+                    "bg-slate-800/50 border-slate-700 cursor-pointer transition-all hover:border-purple-500",
+                    selectedAgent === agent.id && "border-purple-500 ring-2 ring-purple-500/20"
+                  )}
+                  onClick={() => setSelectedAgent(agent.id)}
+                >
+                  <CardHeader className="pb-2">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center gap-3">
+                        <span className="text-3xl">{getAgentAvatar(agent.role)}</span>
+                        <div>
+                          <CardTitle className="text-base text-white">
+                            {language === "ka" && agent.name_ka ? agent.name_ka : agent.name}
+                          </CardTitle>
+                          <Badge variant="outline" className="mt-1 text-xs">
+                            {agent.role}
+                          </Badge>
+                        </div>
                       </div>
+                      {agent.is_active && (
+                        <span className="h-2 w-2 bg-green-500 rounded-full animate-pulse" />
+                      )}
                     </div>
-                    {agent.isActive && (
-                      <span className="h-2 w-2 bg-green-500 rounded-full animate-pulse" />
-                    )}
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-slate-400 line-clamp-2">
-                    {language === "ka" && agent.descriptionGe ? agent.descriptionGe : agent.description}
-                  </p>
-                  <div className="flex flex-wrap gap-1 mt-3">
-                    {agent.capabilities?.slice(0, 3).map((cap) => (
-                      <Badge key={cap} variant="secondary" className="text-xs">
-                        {cap}
-                      </Badge>
-                    ))}
-                    {(agent.capabilities?.length || 0) > 3 && (
-                      <Badge variant="secondary" className="text-xs">
-                        +{(agent.capabilities?.length || 0) - 3}
-                      </Badge>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-slate-400 line-clamp-2">
+                      {language === "ka" && agent.description_ka ? agent.description_ka : agent.description}
+                    </p>
+                    <div className="flex flex-wrap gap-1 mt-3">
+                      {agent.capabilities?.slice(0, 3).map((cap) => (
+                        <Badge key={cap} variant="secondary" className="text-xs">
+                          {cap}
+                        </Badge>
+                      ))}
+                      {(agent.capabilities?.length || 0) > 3 && (
+                        <Badge variant="secondary" className="text-xs">
+                          +{(agent.capabilities?.length || 0) - 3}
+                        </Badge>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
 
           {/* Agent Actions & Chat */}
           {selectedAgent && selectedAgentData && (
@@ -404,11 +456,11 @@ export function AIAgentsPanel({
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <span className="text-2xl">{selectedAgentData.avatar}</span>
+                    <span className="text-2xl">{getAgentAvatar(selectedAgentData.role)}</span>
                     <div>
                       <CardTitle className="text-white">
-                        {language === "ka" && selectedAgentData.nameGe
-                          ? selectedAgentData.nameGe
+                        {language === "ka" && selectedAgentData.name_ka
+                          ? selectedAgentData.name_ka
                           : selectedAgentData.name}
                       </CardTitle>
                       <CardDescription>
@@ -431,19 +483,30 @@ export function AIAgentsPanel({
                           </DialogTitle>
                           <DialogDescription>
                             {language === "ka"
-                              ? `მიეცით დავალება ${selectedAgentData.nameGe || selectedAgentData.name}-ს`
+                              ? `მიეცით დავალება ${selectedAgentData.name_ka || selectedAgentData.name}-ს`
                               : `Assign a task to ${selectedAgentData.name}`}
                           </DialogDescription>
                         </DialogHeader>
                         <div className="space-y-4 py-4">
                           <div>
                             <label className="text-sm text-slate-400">
-                              {language === "ka" ? "სათაური" : "Title"}
+                              {language === "ka" ? "სათაური (EN)" : "Title (EN)"}
                             </label>
                             <Input
                               value={newTask.title}
                               onChange={(e) => setNewTask(prev => ({ ...prev, title: e.target.value }))}
-                              placeholder={language === "ka" ? "დავალების სათაური" : "Task title"}
+                              placeholder="Task title"
+                              className="mt-1 bg-slate-800 border-slate-600"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-sm text-slate-400">
+                              {language === "ka" ? "სათაური (KA)" : "Title (KA)"}
+                            </label>
+                            <Input
+                              value={newTask.title_ka}
+                              onChange={(e) => setNewTask(prev => ({ ...prev, title_ka: e.target.value }))}
+                              placeholder="დავალების სათაური"
                               className="mt-1 bg-slate-800 border-slate-600"
                             />
                           </div>
@@ -472,12 +535,10 @@ export function AIAgentsPanel({
                                   <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent className="bg-slate-800 border-slate-600">
-                                  <SelectItem value="social_post">Social Post</SelectItem>
-                                  <SelectItem value="ad_campaign">Ad Campaign</SelectItem>
-                                  <SelectItem value="content_creation">Content</SelectItem>
-                                  <SelectItem value="analytics_report">Analytics</SelectItem>
-                                  <SelectItem value="review_response">Review Response</SelectItem>
-                                  <SelectItem value="general">General</SelectItem>
+                                  <SelectItem value="weekly">Weekly</SelectItem>
+                                  <SelectItem value="daily">Daily</SelectItem>
+                                  <SelectItem value="one_time">One Time</SelectItem>
+                                  <SelectItem value="recurring">Recurring</SelectItem>
                                 </SelectContent>
                               </Select>
                             </div>
@@ -496,7 +557,7 @@ export function AIAgentsPanel({
                                   <SelectItem value="low">Low</SelectItem>
                                   <SelectItem value="medium">Medium</SelectItem>
                                   <SelectItem value="high">High</SelectItem>
-                                  <SelectItem value="urgent">Urgent</SelectItem>
+                                  <SelectItem value="critical">Critical</SelectItem>
                                 </SelectContent>
                               </Select>
                             </div>
@@ -508,9 +569,9 @@ export function AIAgentsPanel({
                           </Button>
                           <Button
                             onClick={handleCreateTask}
-                            disabled={createTaskMutation.isPending || !newTask.title.trim()}
+                            disabled={isLoading || !newTask.title.trim()}
                           >
-                            {createTaskMutation.isPending && (
+                            {isLoading && (
                               <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                             )}
                             {language === "ka" ? "შექმნა" : "Create"}
@@ -544,7 +605,7 @@ export function AIAgentsPanel({
                             </label>
                             <Select
                               value={planConfig.planType}
-                              onValueChange={(value: "weekly" | "monthly") =>
+                              onValueChange={(value: "monthly" | "quarterly") =>
                                 setPlanConfig(prev => ({ ...prev, planType: value }))
                               }
                             >
@@ -552,18 +613,18 @@ export function AIAgentsPanel({
                                 <SelectValue />
                               </SelectTrigger>
                               <SelectContent className="bg-slate-800 border-slate-600">
-                                <SelectItem value="weekly">
-                                  {language === "ka" ? "კვირის გეგმა" : "Weekly Plan"}
-                                </SelectItem>
                                 <SelectItem value="monthly">
                                   {language === "ka" ? "თვის გეგმა" : "Monthly Plan"}
+                                </SelectItem>
+                                <SelectItem value="quarterly">
+                                  {language === "ka" ? "კვარტალური გეგმა" : "Quarterly Plan"}
                                 </SelectItem>
                               </SelectContent>
                             </Select>
                           </div>
                           <div>
                             <label className="text-sm text-slate-400">
-                              {language === "ka" ? "ბიუჯეტი ($)" : "Budget ($)"}
+                              {language === "ka" ? "ბიუჯეტი (GEL)" : "Budget (GEL)"}
                             </label>
                             <Input
                               type="number"
@@ -640,9 +701,9 @@ export function AIAgentsPanel({
                           </Button>
                           <Button
                             onClick={handleGeneratePlan}
-                            disabled={generatePlanMutation.isPending}
+                            disabled={isLoading}
                           >
-                            {generatePlanMutation.isPending ? (
+                            {isLoading ? (
                               <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                             ) : (
                               <Sparkles className="h-4 w-4 mr-2" />
@@ -665,7 +726,7 @@ export function AIAgentsPanel({
                           <MessageSquare className="h-8 w-8 mx-auto mb-2 opacity-50" />
                           <p className="text-sm">
                             {language === "ka"
-                              ? `დაიწყეთ საუბარი ${selectedAgentData.nameGe || selectedAgentData.name}-თან`
+                              ? `დაიწყეთ საუბარი ${selectedAgentData.name_ka || selectedAgentData.name}-თან`
                               : `Start chatting with ${selectedAgentData.name}`}
                           </p>
                         </div>
@@ -692,7 +753,7 @@ export function AIAgentsPanel({
                         </div>
                       ))
                     )}
-                    {chatMutation.isPending && (
+                    {chatLoading && (
                       <div className="flex justify-start">
                         <div className="bg-slate-700 rounded-lg px-4 py-2">
                           <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
@@ -715,7 +776,7 @@ export function AIAgentsPanel({
                     />
                     <Button
                       onClick={handleSendChat}
-                      disabled={chatMutation.isPending || !chatMessage.trim()}
+                      disabled={chatLoading || !chatMessage.trim()}
                     >
                       <Send className="h-4 w-4" />
                     </Button>
@@ -736,14 +797,18 @@ export function AIAgentsPanel({
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => tasksQuery.refetch()}
-                disabled={tasksQuery.isLoading}
+                onClick={() => refetchTasks()}
+                disabled={tasksLoading}
               >
-                <RefreshCw className={cn("h-4 w-4", tasksQuery.isLoading && "animate-spin")} />
+                <RefreshCw className={cn("h-4 w-4", tasksLoading && "animate-spin")} />
               </Button>
             </div>
 
-            {tasks.length === 0 ? (
+            {tasksLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="h-6 w-6 animate-spin text-purple-400" />
+              </div>
+            ) : tasks.length === 0 ? (
               <Card className="bg-slate-800/50 border-slate-700">
                 <CardContent className="py-8 text-center">
                   <Target className="h-12 w-12 mx-auto mb-4 text-slate-500" />
@@ -763,41 +828,41 @@ export function AIAgentsPanel({
                         <div className="flex-1">
                           <div className="flex items-center gap-2">
                             <h4 className="font-medium text-white">
-                              {language === "ka" && task.titleGe ? task.titleGe : task.title}
+                              {language === "ka" && task.title_ka ? task.title_ka : task.title}
                             </h4>
                             <Badge
                               variant={
-                                task.executionStatus === "completed" ? "default" :
-                                task.executionStatus === "failed" ? "destructive" :
-                                task.executionStatus === "running" ? "secondary" :
+                                task.status === "completed" ? "default" :
+                                task.status === "failed" ? "destructive" :
+                                task.status === "in_progress" ? "secondary" :
                                 "outline"
                               }
                             >
-                              {task.executionStatus}
+                              {task.status}
                             </Badge>
-                            <Badge variant="outline">{task.taskType}</Badge>
+                            <Badge variant="outline">{task.task_type}</Badge>
                           </div>
                           <p className="text-sm text-slate-400 mt-1">
-                            {language === "ka" && task.descriptionGe ? task.descriptionGe : task.description}
+                            {language === "ka" && task.description_ka ? task.description_ka : task.description}
                           </p>
                           <div className="flex items-center gap-4 mt-2 text-xs text-slate-500">
                             <span className="flex items-center gap-1">
                               <Clock className="h-3 w-3" />
-                              {new Date(task.createdAt).toLocaleDateString()}
+                              {new Date(task.created_at).toLocaleDateString()}
                             </span>
-                            <span>
-                              {language === "ka" ? "აგენტი:" : "Agent:"} {task.agentId}
-                            </span>
+                            <Badge variant="outline" className="text-xs">
+                              {task.priority}
+                            </Badge>
                           </div>
                         </div>
                         <div className="flex gap-2">
-                          {task.approvalStatus === "pending" && (
+                          {task.requires_approval && task.status === "pending" && (
                             <>
                               <Button
                                 size="sm"
                                 variant="outline"
                                 className="border-green-600 text-green-500 hover:bg-green-600/20"
-                                onClick={() => handleApproveTask(task.taskId)}
+                                onClick={() => handleApproveTask(task.id)}
                               >
                                 <Check className="h-4 w-4" />
                               </Button>
@@ -805,7 +870,7 @@ export function AIAgentsPanel({
                                 size="sm"
                                 variant="outline"
                                 className="border-red-600 text-red-500 hover:bg-red-600/20"
-                                onClick={() => handleRejectTask(task.taskId, "Rejected by user")}
+                                onClick={() => handleRejectTask(task.id)}
                               >
                                 <X className="h-4 w-4" />
                               </Button>
@@ -831,14 +896,18 @@ export function AIAgentsPanel({
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => plansQuery.refetch()}
-                disabled={plansQuery.isLoading}
+                onClick={() => refetchPlans()}
+                disabled={plansLoading}
               >
-                <RefreshCw className={cn("h-4 w-4", plansQuery.isLoading && "animate-spin")} />
+                <RefreshCw className={cn("h-4 w-4", plansLoading && "animate-spin")} />
               </Button>
             </div>
 
-            {plans.length === 0 ? (
+            {plansLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="h-6 w-6 animate-spin text-purple-400" />
+              </div>
+            ) : plans.length === 0 ? (
               <Card className="bg-slate-800/50 border-slate-700">
                 <CardContent className="py-8 text-center">
                   <Calendar className="h-12 w-12 mx-auto mb-4 text-slate-500" />
@@ -857,16 +926,16 @@ export function AIAgentsPanel({
                       <div className="flex items-start justify-between">
                         <div>
                           <CardTitle className="text-white flex items-center gap-2">
-                            {language === "ka" && plan.titleGe ? plan.titleGe : plan.title}
-                            <Badge variant="outline">{plan.planType}</Badge>
+                            {language === "ka" && plan.title_ka ? plan.title_ka : plan.title}
+                            <Badge variant="outline">{plan.plan_type}</Badge>
                           </CardTitle>
                           <CardDescription>
-                            {new Date(plan.startDate).toLocaleDateString()} - {new Date(plan.endDate).toLocaleDateString()}
+                            {new Date(plan.period_start).toLocaleDateString()} - {new Date(plan.period_end).toLocaleDateString()}
                           </CardDescription>
                         </div>
                         <Badge
                           variant={
-                            plan.status === "active" ? "default" :
+                            plan.status === "approved" || plan.status === "in_progress" ? "default" :
                             plan.status === "completed" ? "secondary" :
                             plan.status === "pending_approval" ? "outline" :
                             "destructive"
@@ -883,48 +952,28 @@ export function AIAgentsPanel({
                             {language === "ka" ? "მიზნები" : "Goals"}
                           </h4>
                           <div className="space-y-1">
-                            {plan.goals.slice(0, 3).map((goal) => (
-                              <div key={goal.id} className="flex items-center gap-2 text-sm text-slate-400">
+                            {plan.goals.slice(0, 3).map((goal: any, idx: number) => (
+                              <div key={idx} className="flex items-center gap-2 text-sm text-slate-400">
                                 <ChevronRight className="h-3 w-3" />
-                                {language === "ka" && goal.titleGe ? goal.titleGe : goal.title}
+                                {typeof goal === 'string' ? goal : goal.title}
                               </div>
                             ))}
-                          </div>
-                        </div>
-                      )}
-                      {plan.tasks && plan.tasks.length > 0 && (
-                        <div className="mb-4">
-                          <h4 className="text-sm font-medium text-slate-300 mb-2">
-                            {language === "ka" ? "დავალებები" : "Tasks"} ({plan.tasks.length})
-                          </h4>
-                          <div className="space-y-1">
-                            {plan.tasks.slice(0, 3).map((task) => (
-                              <div key={task.id} className="flex items-center gap-2 text-sm text-slate-400">
-                                <Target className="h-3 w-3" />
-                                {language === "ka" && task.titleGe ? task.titleGe : task.title}
-                              </div>
-                            ))}
-                            {plan.tasks.length > 3 && (
-                              <p className="text-xs text-slate-500">
-                                +{plan.tasks.length - 3} {language === "ka" ? "მეტი" : "more"}
-                              </p>
-                            )}
                           </div>
                         </div>
                       )}
                       {plan.budget && (
                         <div className="text-sm text-slate-400">
-                          {language === "ka" ? "ბიუჯეტი:" : "Budget:"} ${plan.budget.total}
+                          {language === "ka" ? "ბიუჯეტი:" : "Budget:"} {plan.budget} {plan.currency}
                         </div>
                       )}
                       {plan.status === "pending_approval" && (
                         <div className="flex gap-2 mt-4">
                           <Button
                             size="sm"
-                            onClick={() => handleApprovePlan(plan.planId)}
-                            disabled={approvePlanMutation.isPending}
+                            onClick={() => handleApprovePlan(plan.id)}
+                            disabled={isLoading}
                           >
-                            {approvePlanMutation.isPending ? (
+                            {isLoading ? (
                               <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                             ) : (
                               <CheckCircle2 className="h-4 w-4 mr-2" />
@@ -954,7 +1003,11 @@ export function AIAgentsPanel({
                 )}
               </h3>
 
-              {pendingTasks.length === 0 ? (
+              {approvalsLoading ? (
+                <div className="flex items-center justify-center py-6">
+                  <Loader2 className="h-6 w-6 animate-spin text-purple-400" />
+                </div>
+              ) : pendingTasks.length === 0 ? (
                 <Card className="bg-slate-800/50 border-slate-700">
                   <CardContent className="py-6 text-center text-slate-400">
                     <CheckCircle2 className="h-8 w-8 mx-auto mb-2 text-green-500" />
@@ -970,18 +1023,20 @@ export function AIAgentsPanel({
                       <CardContent className="p-4">
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
-                            <h4 className="font-medium text-white">{task.title}</h4>
+                            <h4 className="font-medium text-white">
+                              {language === "ka" && task.title_ka ? task.title_ka : task.title}
+                            </h4>
                             <p className="text-sm text-slate-400 mt-1">{task.description}</p>
                             <div className="flex items-center gap-4 mt-2 text-xs text-slate-500">
-                              <Badge variant="outline">{task.taskType}</Badge>
-                              <span>Agent: {task.agentId}</span>
+                              <Badge variant="outline">{task.task_type}</Badge>
+                              <Badge variant="outline">{task.priority}</Badge>
                             </div>
                           </div>
                           <div className="flex gap-2">
                             <Button
                               size="sm"
                               className="bg-green-600 hover:bg-green-700"
-                              onClick={() => handleApproveTask(task.taskId)}
+                              onClick={() => handleApproveTask(task.id)}
                             >
                               <Check className="h-4 w-4 mr-1" />
                               {language === "ka" ? "დამტკიცება" : "Approve"}
@@ -989,7 +1044,7 @@ export function AIAgentsPanel({
                             <Button
                               size="sm"
                               variant="destructive"
-                              onClick={() => handleRejectTask(task.taskId, "Rejected")}
+                              onClick={() => handleRejectTask(task.id)}
                             >
                               <X className="h-4 w-4 mr-1" />
                               {language === "ka" ? "უარყოფა" : "Reject"}
@@ -1030,19 +1085,19 @@ export function AIAgentsPanel({
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
                             <h4 className="font-medium text-white flex items-center gap-2">
-                              {plan.title}
-                              <Badge variant="outline">{plan.planType}</Badge>
+                              {language === "ka" && plan.title_ka ? plan.title_ka : plan.title}
+                              <Badge variant="outline">{plan.plan_type}</Badge>
                             </h4>
                             <p className="text-sm text-slate-400 mt-1">{plan.description}</p>
                             <div className="text-xs text-slate-500 mt-2">
-                              {new Date(plan.startDate).toLocaleDateString()} - {new Date(plan.endDate).toLocaleDateString()}
-                              {plan.budget && ` | Budget: $${plan.budget.total}`}
+                              {new Date(plan.period_start).toLocaleDateString()} - {new Date(plan.period_end).toLocaleDateString()}
+                              {plan.budget && ` | ${language === "ka" ? "ბიუჯეტი" : "Budget"}: ${plan.budget} ${plan.currency}`}
                             </div>
                           </div>
                           <Button
                             size="sm"
                             className="bg-blue-600 hover:bg-blue-700"
-                            onClick={() => handleApprovePlan(plan.planId)}
+                            onClick={() => handleApprovePlan(plan.id)}
                           >
                             <Check className="h-4 w-4 mr-1" />
                             {language === "ka" ? "დამტკიცება" : "Approve"}
