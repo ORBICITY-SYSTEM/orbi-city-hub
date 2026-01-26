@@ -5,10 +5,11 @@
 import { Suspense, lazy } from "react";
 import {
   Megaphone, Instagram, Facebook, Youtube, Globe, TrendingUp,
-  Users, MessageCircle, Hotel, Sparkles, PieChart, Loader2, BarChart3
+  Users, MessageCircle, Hotel, Sparkles, PieChart, Loader2, BarChart3, Brain
 } from "lucide-react";
 import { ModulePageLayout, SubModule } from "@/components/ModulePageLayout";
 import { MarketingAnalyticsDashboard } from "@/components/marketing";
+import { AIAgentsPanel } from "@/components/ai-agents/AIAgentsPanel";
 
 // Lazy load sub-module components
 const InstagramAnalyticsContent = lazy(() => import("./InstagramAnalytics"));
@@ -97,6 +98,11 @@ const CommunicationsTab = () => (
   </Suspense>
 );
 
+// AI Agents Tab
+const AIAgentsTab = () => (
+  <AIAgentsPanel module="marketing" defaultLanguage="ka" />
+);
+
 const Marketing = () => {
   const subModules: SubModule[] = [
     {
@@ -147,6 +153,13 @@ const Marketing = () => {
       nameFallback: "Communications",
       icon: MessageCircle,
       component: <CommunicationsTab />,
+    },
+    {
+      id: "ai-agents",
+      nameKey: "marketing.aiAgents",
+      nameFallback: "AI Agents",
+      icon: Brain,
+      component: <AIAgentsTab />,
     },
   ];
 
