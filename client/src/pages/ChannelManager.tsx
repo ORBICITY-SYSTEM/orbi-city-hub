@@ -21,6 +21,8 @@ import {
   DollarSign,
   Database,
   Star,
+  TrendingUp,
+  Brain,
 } from "lucide-react";
 import { ModulePageLayout, SubModule } from "@/components/ModulePageLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -33,6 +35,7 @@ import { toast } from "sonner";
 // Lazy load components
 const GuestCommunicationHub = lazy(() => import("@/components/telegram/GuestCommunicationHub"));
 const OTAReviewAutoResponder = lazy(() => import("@/components/reviews/OTAReviewAutoResponder"));
+const OTADashboard = lazy(() => import("@/pages/reservations/OTADashboard"));
 
 // Loading component
 const LoadingSpinner = () => (
@@ -448,6 +451,13 @@ const ReviewsTab = () => (
   </Suspense>
 );
 
+// OTA Analytics Tab (from Reservations module)
+const OTAAnalyticsTab = () => (
+  <Suspense fallback={<LoadingSpinner />}>
+    <OTADashboard />
+  </Suspense>
+);
+
 const ChannelManager = () => {
   const subModules: SubModule[] = [
     {
@@ -484,6 +494,13 @@ const ChannelManager = () => {
       nameFallback: "AI Reviews",
       icon: Star,
       component: <ReviewsTab />,
+    },
+    {
+      id: "ota-analytics",
+      nameKey: "channel.otaAnalytics",
+      nameFallback: "OTA Analytics",
+      icon: TrendingUp,
+      component: <OTAAnalyticsTab />,
     },
   ];
 
