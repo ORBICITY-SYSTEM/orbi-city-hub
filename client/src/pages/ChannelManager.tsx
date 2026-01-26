@@ -36,6 +36,7 @@ import { toast } from "sonner";
 const GuestCommunicationHub = lazy(() => import("@/components/telegram/GuestCommunicationHub"));
 const OTAReviewAutoResponder = lazy(() => import("@/components/reviews/OTAReviewAutoResponder"));
 const OTADashboard = lazy(() => import("@/pages/reservations/OTADashboard"));
+const OtelmsCalendar = lazy(() => import("@/components/channel-manager/OtelmsCalendar"));
 
 // Loading component
 const LoadingSpinner = () => (
@@ -272,78 +273,12 @@ const OverviewTab = () => {
   );
 };
 
-// Calendar Tab - Full Calendar View
-const CalendarTab = () => {
-  const { language } = useLanguage();
-  const { data: bookings, isLoading, refetch } = useCalendarBookings();
-
-  const getPlatformColor = (source: string) => {
-    const s = source?.toLowerCase() || "";
-    if (s.includes("booking")) return "bg-blue-500/20 text-blue-400 border-blue-500/30";
-    if (s.includes("airbnb")) return "bg-pink-500/20 text-pink-400 border-pink-500/30";
-    if (s.includes("expedia")) return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30";
-    return "bg-slate-500/20 text-slate-400 border-slate-500/30";
-  };
-
-  return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold text-white">
-          {language === "ka" ? "ჯავშნების კალენდარი" : "Bookings Calendar"}
-        </h2>
-        <Button onClick={() => refetch()} disabled={isLoading} variant="outline" className="border-slate-700">
-          <RefreshCw className={`mr-2 h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
-          {language === "ka" ? "განახლება" : "Refresh"}
-        </Button>
-      </div>
-
-      <Card className="bg-slate-800/50 border-slate-700">
-        <CardContent className="pt-6">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-slate-700">
-                  <th className="text-left py-3 px-4 text-slate-400 font-medium">{language === "ka" ? "სტუმარი" : "Guest"}</th>
-                  <th className="text-left py-3 px-4 text-slate-400 font-medium">{language === "ka" ? "ოთახი" : "Room"}</th>
-                  <th className="text-left py-3 px-4 text-slate-400 font-medium">{language === "ka" ? "წყარო" : "Source"}</th>
-                  <th className="text-left py-3 px-4 text-slate-400 font-medium">{language === "ka" ? "ჩექინი" : "Check-in"}</th>
-                  <th className="text-left py-3 px-4 text-slate-400 font-medium">{language === "ka" ? "ჩექაუთი" : "Check-out"}</th>
-                  <th className="text-left py-3 px-4 text-slate-400 font-medium">{language === "ka" ? "ღამეები" : "Nights"}</th>
-                  <th className="text-right py-3 px-4 text-slate-400 font-medium">{language === "ka" ? "თანხა" : "Amount"}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {(bookings || []).map((booking, idx) => {
-                  const checkIn = new Date(booking.checkIn);
-                  const checkOut = new Date(booking.checkOut);
-                  const nights = Math.ceil((checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24));
-                  return (
-                    <tr key={idx} className="border-b border-slate-800 hover:bg-slate-700/30">
-                      <td className="py-3 px-4 text-white">{booking.guestName}</td>
-                      <td className="py-3 px-4 text-slate-300">{booking.room}</td>
-                      <td className="py-3 px-4">
-                        <Badge className={getPlatformColor(booking.source)}>{booking.source}</Badge>
-                      </td>
-                      <td className="py-3 px-4 text-slate-300">{booking.checkIn}</td>
-                      <td className="py-3 px-4 text-slate-300">{booking.checkOut}</td>
-                      <td className="py-3 px-4 text-slate-300">{nights > 0 ? nights : "-"}</td>
-                      <td className="py-3 px-4 text-right text-emerald-400">₾{booking.amount}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-            {(!bookings || bookings.length === 0) && (
-              <p className="text-slate-500 text-center py-8">
-                {language === "ka" ? "ჯავშნები არ მოიძებნა" : "No bookings found"}
-              </p>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
-};
+// Calendar Tab - OtelMS Style Availability Calendar
+const CalendarTab = () => (
+  <Suspense fallback={<LoadingSpinner />}>
+    <OtelmsCalendar />
+  </Suspense>
+);
 
 // Reports Tab - Analytics & Reports
 const ReportsTab = () => {
