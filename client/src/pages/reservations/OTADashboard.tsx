@@ -4,7 +4,8 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { RefreshCw, TrendingUp, TrendingDown, Calendar, Building2, Activity, BarChart3, Search, Filter, ChevronLeft, ChevronRight, User, MapPin, Clock, Download, Brain, Sparkles, ArrowUpRight, ArrowDownRight, Minus, Banknote, X, Check, ChevronsUpDown } from "lucide-react";
+import { RefreshCw, TrendingUp, TrendingDown, Calendar, Building2, Activity, BarChart3, Search, Filter, ChevronLeft, ChevronRight, User, MapPin, Clock, Download, Brain, Sparkles, ArrowUpRight, ArrowDownRight, Minus, Banknote, X, Check, ChevronsUpDown, Link as LinkIcon } from "lucide-react";
+import { Link } from "wouter";
 import * as XLSX from "xlsx";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -269,6 +270,30 @@ export default function OTADashboard() {
           {/* Background */}
           <div className="absolute inset-0 -z-10" style={{ background: 'linear-gradient(135deg, #0a1628 0%, #0d2847 50%, #0f3460 100%)' }} />
         </div>
+
+        {/* Channel Manager Link */}
+        <Link href="/channel-manager">
+          <Card className="border-blue-500/30 bg-gradient-to-r from-blue-600/10 to-cyan-600/10 hover:border-blue-400/50 transition-all cursor-pointer group">
+            <CardContent className="py-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center">
+                    <LinkIcon className="w-6 h-6 text-blue-400" />
+                  </div>
+                  <div>
+                    <div className="text-lg font-semibold text-white">Channel Manager</div>
+                    <div className="text-sm text-white/60">
+                      {language === 'ka'
+                        ? 'OTA კალენდარი, ფასები, სინქრონიზაცია, მასიური ოპერაციები'
+                        : 'OTA Calendar, Rates, Sync Status, Bulk Operations'}
+                    </div>
+                  </div>
+                </div>
+                <ArrowUpRight className="w-6 h-6 text-blue-400 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+              </div>
+            </CardContent>
+          </Card>
+        </Link>
 
         {/* Month Filter - Professional Dropdown */}
         <Card className="border-cyan-500/30 bg-slate-900/50">

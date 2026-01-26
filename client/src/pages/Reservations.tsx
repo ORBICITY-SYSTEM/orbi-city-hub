@@ -4,7 +4,8 @@
  */
 
 import { Suspense, lazy } from "react";
-import { Calendar, CalendarDays, List, Users, Star, MessageCircle, Loader2, PieChart } from "lucide-react";
+import { Calendar, CalendarDays, List, Users, Star, MessageCircle, Loader2, PieChart, Link as LinkIcon, ArrowRight } from "lucide-react";
+import { Link } from "wouter";
 import { ModulePageLayout, SubModule } from "@/components/ModulePageLayout";
 import { BookingsTable } from "@/components/BookingsTable";
 import { ReservationsCalendar } from "@/components/ReservationsCalendar";
@@ -25,6 +26,24 @@ const LoadingSpinner = () => (
 const OverviewTab = () => {
   return (
     <div className="space-y-6">
+      {/* Channel Manager Link */}
+      <Link href="/channel-manager">
+        <div className="bg-gradient-to-r from-blue-600/20 to-cyan-600/20 rounded-xl p-4 border border-blue-500/30 hover:border-blue-400/50 transition-all cursor-pointer group">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center">
+                <LinkIcon className="w-5 h-5 text-blue-400" />
+              </div>
+              <div>
+                <div className="text-white font-semibold">Channel Manager</div>
+                <div className="text-sm text-white/60">OTA ჯავშნები, კალენდარი, ფასები</div>
+              </div>
+            </div>
+            <ArrowRight className="w-5 h-5 text-blue-400 group-hover:translate-x-1 transition-transform" />
+          </div>
+        </div>
+      </Link>
+
       {/* Quick Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="bg-slate-800/50 rounded-xl p-4 border border-green-500/20">
