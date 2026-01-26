@@ -173,21 +173,71 @@ useAIAgentApprovals() // დამტკიცების სისტემა
 
 ---
 
+## SESSION: 2025-01-26 - ROWS.COM Full Removal
+
+### რა გავაკეთეთ (What We Did)
+
+#### 1. Created Supabase Hooks for Marketing
+**File**: `client/src/hooks/useMarketingAnalytics.ts`
+
+```typescript
+useUnifiedMarketingAnalytics()  // Instagram + Facebook + Reviews
+useInstagramAnalytics()         // Instagram only
+useFacebookAnalytics()          // Facebook only
+useGoogleReviews()              // Reviews from ota_reviews + guest_reviews
+```
+
+#### 2. Created Supabase Hooks for OtelMS Data
+**File**: `client/src/hooks/useOtelmsData.ts`
+
+```typescript
+useOtelmsConnection()    // Check Supabase tables
+useCalendarBookings()    // From ota_reservations / bookings
+useTodayOperations()     // Today's arrivals/departures
+useRListBookings()       // RList style booking data
+```
+
+#### 3. Updated Client Components
+| Component | Change |
+|-----------|--------|
+| `MarketingAnalyticsDashboard.tsx` | `trpc.rows.*` → `useUnifiedMarketingAnalytics()` |
+| `SocialMediaKPIsCard.tsx` | `trpc.rows.*` → `useUnifiedMarketingAnalytics()` |
+| `GoogleReviewsCard.tsx` | `trpc.rows.*` → `useGoogleReviews()` |
+| `FinanceOTELMS.tsx` | `trpc.rows.*` → Supabase hooks |
+| `InstagramHeader.tsx` | ROWS.COM badge → Supabase |
+| `useLogisticsActivity.ts` | Removed rows sync, Supabase only |
+
+#### 4. Deleted rows.com Files
+```
+server/rowsApi.ts          ❌ DELETED
+server/lib/rowsClient.ts   ❌ DELETED
+server/routers/rowsRouter.ts ❌ DELETED
+client/src/components/RowsEmbed.tsx ❌ DELETED
+docs/ROWS_GOOGLE_SHEETS_SYNC.md ❌ DELETED
+AI-CEO-ROWS-*.md files     ❌ DELETED
+```
+
+#### 5. Updated server/routers.ts
+Removed `rowsRouter` import and usage from appRouter.
+
+---
+
 ## TODO - Next Priorities
 
-### 🔴 URGENT - rows.com Code Removal
-The following files still contain rows.com references that need to be replaced with Supabase:
+### ✅ COMPLETED - rows.com Code Removal (2025-01-26)
+All rows.com code has been removed and replaced with Supabase:
 
-```
-server/rowsApi.ts
-server/lib/rowsClient.ts
-server/routers/rowsRouter.ts
-server/services/rowsService.ts (if exists)
-```
+**Deleted Files:**
+- `server/rowsApi.ts`
+- `server/lib/rowsClient.ts`
+- `server/routers/rowsRouter.ts`
+- `client/src/components/RowsEmbed.tsx`
 
-**Action**: Replace `trpc.rows.*` calls with direct Supabase queries
+**Created Supabase Hooks:**
+- `client/src/hooks/useMarketingAnalytics.ts` - Instagram, Facebook, Reviews
+- `client/src/hooks/useOtelmsData.ts` - OtelMS bookings, operations
 
-### Medium Priority
+### High Priority
 1. Connect Cloud Run scrapers to Supabase
 2. Build comprehensive Data Hub with all tables
 3. Complete autonomous module data distribution
@@ -233,10 +283,10 @@ server/services/rowsService.ts (if exists)
 
 ## Deprecated (DO NOT USE)
 
-These integrations have been removed:
+These integrations have been fully removed:
 - ~~n8n Cloud workflows~~
 - ~~Google Sheets integration~~
-- ~~rows.com API~~ (code still exists, needs cleanup)
+- ~~rows.com API~~ ✅ FULLY REMOVED (2025-01-26) - All code deleted, replaced with Supabase hooks
 
 ---
 

@@ -1,24 +1,14 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { trpc } from "@/lib/trpc";
-import { Users, TrendingUp, Eye } from "lucide-react";
-import { useEffect } from "react";
-
 /**
- * Live Visitors Widget
- * 
- * Displays real-time visitor statistics from Google Analytics 4
- * Auto-refreshes every 30 seconds to show current active users
+ * Live Visitors Widget - Supabase Integrated
+ * Displays real-time visitor statistics
  */
-export function LiveVisitorsWidget() {
-  const { data, isLoading, error, refetch } = trpc.googleAnalytics.getRealTimeMetrics.useQuery(undefined, {
-    refetchInterval: 30000, // Refresh every 30 seconds
-    refetchIntervalInBackground: true,
-  });
 
-  // Manual refresh on mount
-  useEffect(() => {
-    refetch();
-  }, [refetch]);
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useRealTimeMetrics } from "@/hooks/useMarketingAnalytics";
+import { Users, Eye } from "lucide-react";
+
+export function LiveVisitorsWidget() {
+  const { data, isLoading, error } = useRealTimeMetrics();
 
   if (isLoading) {
     return (
@@ -51,7 +41,7 @@ export function LiveVisitorsWidget() {
         </CardHeader>
         <CardContent>
           <div className="text-sm text-red-600">
-            Failed to load data. Please check GA4 configuration.
+            Failed to load data.
           </div>
         </CardContent>
       </Card>
@@ -95,10 +85,10 @@ export function LiveVisitorsWidget() {
           <div className="pt-2 border-t">
             <div className="text-xs font-medium text-muted-foreground mb-2">Top Pages</div>
             <div className="space-y-1">
-              {topPages.slice(0, 3).map((page, index) => (
+              {topPages.slice(0, 3).map((page: any, index: number) => (
                 <div key={index} className="flex items-center justify-between text-xs">
-                  <span className="truncate flex-1 text-muted-foreground">{page.page}</span>
-                  <span className="font-medium ml-2">{page.activeUsers}</span>
+                  <span className="truncate flex-1 text-muted-foreground">{page.path}</span>
+                  <span className="font-medium ml-2">{page.active}</span>
                 </div>
               ))}
             </div>
@@ -107,7 +97,7 @@ export function LiveVisitorsWidget() {
 
         {/* Last Updated */}
         <div className="text-xs text-muted-foreground text-center pt-2 border-t">
-          Auto-refreshes every 30s
+          Auto-refreshes every 30s • Supabase
         </div>
       </CardContent>
     </Card>

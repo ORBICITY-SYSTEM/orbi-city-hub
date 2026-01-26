@@ -1,11 +1,11 @@
 /**
  * Marketing Analytics Dashboard - Supabase Unified View
  * Displays real data from Instagram, Facebook, and Google Reviews
- * NOTE: Migrating from rows.com to Supabase (2025-01-26)
+ * MIGRATED: Now uses Supabase directly (2025-01-26)
  */
 
 import { useState } from "react";
-import { trpc } from "@/lib/trpc";
+import { useUnifiedMarketingAnalytics } from "@/hooks/useMarketingAnalytics";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -61,16 +61,13 @@ export default function MarketingAnalyticsDashboard() {
   const { t, language } = useLanguage();
   const [activeTab, setActiveTab] = useState("overview");
 
-  // Fetch unified marketing analytics (TODO: migrate to Supabase)
+  // Fetch unified marketing analytics from Supabase
   const {
     data: analytics,
     isLoading,
     error,
     refetch,
-  } = trpc.rows.getUnifiedMarketingAnalytics.useQuery(undefined, {
-    refetchInterval: 5 * 60 * 1000, // Refresh every 5 minutes
-    staleTime: 2 * 60 * 1000,
-  });
+  } = useUnifiedMarketingAnalytics();
 
   if (isLoading) {
     return (

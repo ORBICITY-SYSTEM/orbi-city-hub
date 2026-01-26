@@ -1,9 +1,9 @@
 /**
  * Social Media KPIs Card - Compact widget for Home/Dashboard
- * Shows combined Instagram + Facebook metrics from ROWS.COM
+ * Shows combined Instagram + Facebook metrics from Supabase
  */
 
-import { trpc } from "@/lib/trpc";
+import { useUnifiedMarketingAnalytics } from "@/hooks/useMarketingAnalytics";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useLanguage } from "@/contexts/LanguageContext";
 import {
@@ -20,9 +20,7 @@ import {
 export default function SocialMediaKPIsCard() {
   const { language } = useLanguage();
 
-  const { data: analytics, isLoading } = trpc.rows.getUnifiedMarketingAnalytics.useQuery(undefined, {
-    staleTime: 5 * 60 * 1000,
-  });
+  const { data: analytics, isLoading } = useUnifiedMarketingAnalytics();
 
   if (isLoading) {
     return (

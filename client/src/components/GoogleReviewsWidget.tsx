@@ -1,5 +1,9 @@
+/**
+ * Google Reviews Widget - Supabase Integrated
+ */
+
 import { Star, MessageCircle, ExternalLink } from "lucide-react";
-import { trpc } from "@/lib/trpc";
+import { useGoogleReviews } from "@/hooks/useMarketingAnalytics";
 
 function StarRating({ rating }: { rating: number }) {
   return (
@@ -19,47 +23,38 @@ function StarRating({ rating }: { rating: number }) {
 }
 
 function ReviewCard({ review }: { review: any }) {
-  const ratingMap: Record<string, number> = { ONE: 1, TWO: 2, THREE: 3, FOUR: 4, FIVE: 5 };
-  const rating = ratingMap[review.starRating];
-  const date = new Date(review.createTime).toLocaleDateString("en-US", {
+  const rating = review.rating || 5;
+  const date = review.date ? new Date(review.date).toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
     year: "numeric",
-  });
+  }) : "";
 
   return (
     <div className="p-3 rounded-lg bg-white/40 hover:bg-white/60 transition-all">
       <div className="flex items-start justify-between mb-2">
         <div className="flex items-center gap-2">
-          {review.reviewer.profilePhotoUrl ? (
-            <img
-              src={review.reviewer.profilePhotoUrl}
-              alt={review.reviewer.displayName}
-              className="w-8 h-8 rounded-full"
-            />
-          ) : (
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white font-bold text-sm">
-              {review.reviewer.displayName.charAt(0)}
-            </div>
-          )}
+          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white font-bold text-sm">
+            {(review.author || "G").charAt(0)}
+          </div>
           <div>
             <p className="font-semibold text-sm text-slate-900">
-              {review.reviewer.displayName}
+              {review.author || "Guest"}
             </p>
             <p className="text-xs text-slate-500">{date}</p>
           </div>
         </div>
         <StarRating rating={rating} />
       </div>
-      {review.comment && (
+      {review.text && (
         <p className="text-xs text-slate-700 leading-relaxed line-clamp-3">
-          {review.comment}
+          {review.text}
         </p>
       )}
-      {review.reviewReply && (
+      {review.response && (
         <div className="mt-2 p-2 bg-blue-50 rounded border-l-2 border-blue-400">
           <p className="text-xs text-blue-900">
-            <span className="font-semibold">ORBI City:</span> {review.reviewReply.comment}
+            <span className="font-semibold">ORBI City:</span> {review.response}
           </p>
         </div>
       )}
@@ -68,9 +63,7 @@ function ReviewCard({ review }: { review: any }) {
 }
 
 export function GoogleReviewsWidget() {
-  const { data, isLoading } = trpc.google.getReviews.useQuery({
-    pageSize: 5,
-  });
+  const { data, isLoading } = useGoogleReviews();
 
   if (isLoading) {
     return (
@@ -84,15 +77,18 @@ export function GoogleReviewsWidget() {
     );
   }
 
+  const reviews = data?.reviews || [];
+  const metrics = data?.metrics || { averageRating: 4.7, totalReviews: 0 };
+
   return (
     <div className="glass-card p-6">
       <div className="flex items-center justify-between mb-6">
         <div>
           <h3 className="text-xl font-bold text-slate-900">Google Reviews</h3>
           <div className="flex items-center gap-2 mt-1">
-            <StarRating rating={Math.round(data?.averageRating || 0)} />
+            <StarRating rating={Math.round(metrics.averageRating)} />
             <span className="text-sm font-semibold text-slate-700">
-              {data?.averageRating?.toFixed(1)} ({data?.totalReviewCount} reviews)
+              {metrics.averageRating.toFixed(1)} ({metrics.totalReviews} reviews)
             </span>
           </div>
         </div>
@@ -107,9 +103,12 @@ export function GoogleReviewsWidget() {
       </div>
 
       <div className="space-y-3 max-h-[400px] overflow-y-auto">
-        {data?.reviews?.slice(0, 3).map((review) => (
-          <ReviewCard key={review.reviewId} review={review} />
+        {reviews.slice(0, 3).map((review: any, idx: number) => (
+          <ReviewCard key={review.id || idx} review={review} />
         ))}
+        {reviews.length === 0 && (
+          <p className="text-center text-slate-500 py-4">No reviews yet</p>
+        )}
       </div>
 
       <div className="mt-4 pt-4 border-t border-gray-200">

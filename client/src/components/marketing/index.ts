@@ -1,5 +1,5 @@
 /**
- * Marketing Components - ROWS.COM Integrated
+ * Marketing Components - Supabase Integrated
  */
 
 export { default as MarketingAnalyticsDashboard } from "./MarketingAnalyticsDashboard";

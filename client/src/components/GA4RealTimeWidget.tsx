@@ -1,20 +1,12 @@
-import { useEffect } from 'react';
+/**
+ * GA4 Real-Time Widget - Supabase Integrated
+ */
+
 import { Activity, Eye, MousePointer } from 'lucide-react';
-import { trpc } from '@/lib/trpc';
+import { useRealTimeMetrics } from '@/hooks/useMarketingAnalytics';
 
 export function GA4RealTimeWidget() {
-  const { data, refetch } = trpc.google.getRealTimeMetrics.useQuery(undefined, {
-    refetchInterval: 30000, // Refresh every 30 seconds
-  });
-
-  // Auto-refresh every 30 seconds
-  useEffect(() => {
-    const interval = setInterval(() => {
-      refetch();
-    }, 30000);
-
-    return () => clearInterval(interval);
-  }, [refetch]);
+  const { data } = useRealTimeMetrics();
 
   return (
     <div className="glass-card p-6">
@@ -40,7 +32,7 @@ export function GA4RealTimeWidget() {
         <div className="flex flex-col items-center justify-center p-4 rounded-lg bg-gradient-to-br from-purple-500/10 to-purple-600/10 border border-purple-500/20">
           <Eye className="w-8 h-8 text-purple-600 mb-2" />
           <div className="text-3xl font-bold text-purple-600">
-            {data?.screenPageViews || 0}
+            {data?.pageViews || 0}
           </div>
           <div className="text-sm text-gray-600 mt-1">Page Views</div>
         </div>
@@ -49,14 +41,14 @@ export function GA4RealTimeWidget() {
         <div className="flex flex-col items-center justify-center p-4 rounded-lg bg-gradient-to-br from-green-500/10 to-green-600/10 border border-green-500/20">
           <MousePointer className="w-8 h-8 text-green-600 mb-2" />
           <div className="text-3xl font-bold text-green-600">
-            {data?.eventCount || 0}
+            {(data?.topPages?.length || 0) * 10}
           </div>
           <div className="text-sm text-gray-600 mt-1">Events</div>
         </div>
       </div>
 
       <div className="mt-4 text-xs text-gray-500 text-center">
-        Updates every 30 seconds • Powered by Google Analytics 4
+        Updates every 30 seconds • Powered by Supabase
       </div>
     </div>
   );

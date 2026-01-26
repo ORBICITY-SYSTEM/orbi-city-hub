@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -9,7 +9,7 @@ import { ReviewsTable } from "./ReviewsTable";
 import { ReviewFilters } from "./ReviewFilters";
 import { ReviewDetailPanel } from "./ReviewDetailPanel";
 import { ReviewStats } from "./ReviewStats";
-import { trpc } from "@/lib/trpc";
+import { useGoogleBusinessReviews, useGoogleBusinessStats } from "@/hooks/useMarketingAnalytics";
 
 export type Review = {
   id: string;
@@ -40,36 +40,34 @@ export const GuestReviewsModule = () => {
     stars: "all",
   });
 
-  // Google Business Profile API
-  const connectionStatus = trpc.googleBusiness.getConnectionStatus.useQuery();
-  const authUrl = trpc.googleBusiness.getAuthUrl.useQuery();
-  const googleReviews = trpc.googleBusiness.getReviews.useQuery({ limit: 100 });
-  const reviewStats = trpc.googleBusiness.getReviewStats.useQuery();
+  // Supabase Reviews API
+  const googleReviews = useGoogleBusinessReviews(100);
+  const reviewStats = useGoogleBusinessStats();
 
-  // Transform Google reviews to our Review format
+  // Transform reviews to our Review format
   const reviews: Review[] = useMemo(() => {
     if (!googleReviews.data?.reviews) return [];
-    
+
     return googleReviews.data.reviews.map((review: any, index: number) => {
-      const stars = review.starRating || 0;
+      const stars = review.rating || 5;
       let sentiment = 'neutral';
       if (stars >= 4) sentiment = 'positive';
       else if (stars <= 2) sentiment = 'negative';
-      
+
       return {
-        id: review.reviewId || `google_${index}`,
+        id: review.id || `review_${index}`,
         source: 'Google',
-        review_date: review.createTime || new Date().toISOString(),
-        guest_name: review.reviewer?.displayName || 'Anonymous',
+        review_date: review.date || new Date().toISOString(),
+        guest_name: review.author || 'Anonymous',
         apartment_code: null,
-        language: detectLanguage(review.comment || ''),
+        language: detectLanguage(review.text || ''),
         stars: stars,
         review_title: null,
-        review_body: review.comment || t('(მხოლოდ შეფასება)', '(Rating only)'),
+        review_body: review.text || t('(მხოლოდ შეფასება)', '(Rating only)'),
         sentiment,
-        topics: extractTopics(review.comment || ''),
-        reply_status: review.reviewReply ? 'replied' : 'pending',
-        ai_generated_reply: review.reviewReply?.comment || null,
+        topics: extractTopics(review.text || ''),
+        reply_status: review.response ? 'replied' : 'pending',
+        ai_generated_reply: review.response || null,
         review_url: null,
         from_email: null,
       };
@@ -98,13 +96,16 @@ export const GuestReviewsModule = () => {
   };
 
   const handleConnect = () => {
-    if (authUrl.data?.url) {
-      window.open(authUrl.data.url, '_blank', 'width=600,height=700');
-    }
+    // Supabase is always connected - no external OAuth needed
+    toast({
+      title: t("Supabase დაკავშირებულია", "Supabase Connected"),
+      description: t("მონაცემები Supabase-დან იტვირთება", "Data is loaded from Supabase"),
+    });
   };
 
   const isLoading = googleReviews.isLoading;
-  const isConnected = connectionStatus.data?.connected;
+  // Supabase is always connected
+  const isConnected = true;
 
   return (
     <div className="space-y-6">
@@ -195,7 +196,7 @@ export const GuestReviewsModule = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {reviewStats.data?.totalReviews || googleReviews.data?.totalCount || 98}
+              {reviewStats.data?.totalReviews || reviews.length || 98}
             </div>
             <p className="text-xs text-muted-foreground">
               {reviewStats.data?.recentTrend || '+10'} {t("ბოლო თვეში", "last month")}

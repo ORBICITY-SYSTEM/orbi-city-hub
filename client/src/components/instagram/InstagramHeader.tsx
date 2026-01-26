@@ -138,11 +138,11 @@ export const InstagramHeader = ({
                 <h1 className="text-2xl font-bold tracking-tight text-foreground drop-shadow-sm">
                   Instagram Analytics
                 </h1>
-                <DataSourceBadge type="live" source="ROWS.COM" size="md" />
+                <DataSourceBadge type="live" source="Supabase" size="md" />
               </div>
               <p className="text-sm text-muted-foreground flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-primary animate-pulse shadow-sm shadow-primary/50" />
-                Synced from Rows.com
+                Synced from Supabase
               </p>
             </div>
           </div>

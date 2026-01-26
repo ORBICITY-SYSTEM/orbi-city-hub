@@ -16,7 +16,7 @@ import { reservationsRouter } from "./routers/reservations";
 import { excelImportRouter } from "./routers/excelImport";
 import { financeRouter } from "./routers/finance";
 import { fileRouter } from "./fileRouter";
-import { socialMediaRouter } from "./routers/socialMediaRouter";
+// socialMediaRouter - REMOVED (migrated to Supabase)
 import { logisticsRouter } from "./logisticsRouter";
 import { feedbackRouter } from "./feedbackRouter";
 import { healthCheckRouter } from "./routers/healthCheck";
@@ -29,8 +29,8 @@ import { databaseRouter } from "./routers/databaseRouter";
 import { uptimeRouter } from "./routers/uptimeRouter";
 import { otelmsRouter } from "./routers/otelms";
 import { integrationsRouter } from "./routers/integrationsRouter";
-import { googleAnalyticsRouter } from "./routers/googleAnalytics";
-import { googleBusinessRouter } from "./routers/googleBusiness";
+// googleAnalyticsRouter - REMOVED (migrated to Supabase)
+// googleBusinessRouter - REMOVED (migrated to Supabase)
 import { gmailOtelmsRouter } from "./routers/gmailOtelms";
 import { gmailSyncRouter } from "./routers/gmailSync";
 import { emailCategorizationRouter } from "./routers/emailCategorizationRouter";
@@ -56,11 +56,9 @@ import { reservationsRouter as reservationsAIDirectorRouter } from "./routers/re
 import { financeRouter as financeAIDirectorRouter } from "./routers/financeRouter";
 import { logisticsRouter as logisticsAIDirectorRouter } from "./routers/logisticsRouter";
 import { financeCopilotRouter } from "./routers/financeCopilotRouter";
-import { rowsRouter } from "./routers/rowsRouter";
 import { aiAgentsRouter } from "./routers/aiAgentsRouter";
 
 export const appRouter = router({
-  rows: rowsRouter,
   realFinance: realFinanceRouter,
   aiAnalyzer: aiAnalyzerRouter,
   butler: butlerRouter,
@@ -73,7 +71,7 @@ export const appRouter = router({
   excelImport: excelImportRouter,
   finance: financeRouter,
   file: fileRouter,
-  socialMedia: socialMediaRouter,
+  // socialMedia: - REMOVED (migrated to Supabase)
   logistics: logisticsRouter,
   feedback: feedbackRouter,
   healthCheck: healthCheckRouter,
@@ -86,8 +84,8 @@ export const appRouter = router({
   uptime: uptimeRouter,
   otelms: otelmsRouter,
   integrations: integrationsRouter,
-  googleAnalytics: googleAnalyticsRouter,
-  googleBusiness: googleBusinessRouter,
+  // googleAnalytics: - REMOVED (migrated to Supabase)
+  // googleBusiness: - REMOVED (migrated to Supabase)
   gmailOtelms: gmailOtelmsRouter,
   gmailSync: gmailSyncRouter,
   emailCategorization: emailCategorizationRouter,

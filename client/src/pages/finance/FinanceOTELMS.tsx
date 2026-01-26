@@ -8,7 +8,12 @@ import {
   Calendar, Users, TrendingUp,
   LogIn, LogOut
 } from "lucide-react";
-import { trpc } from "@/lib/trpc";
+import {
+  useOtelmsConnection,
+  useCalendarBookings,
+  useTodayOperations,
+  useRListBookings,
+} from "@/hooks/useOtelmsData";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -18,22 +23,13 @@ const FinanceOtelMS = () => {
   const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState("today");
 
-  // ROWS.COM connection check
-  const connectionQuery = trpc.rows.checkConnection.useQuery();
+  // Supabase connection check
+  const connectionQuery = useOtelmsConnection();
 
-  // OtelMS data from ROWS.COM
-  const calendarQuery = trpc.rows.getCalendarBookings.useQuery(undefined, {
-    enabled: connectionQuery.data?.connected === true,
-  });
-
-  const todayOpsQuery = trpc.rows.getTodayOperations.useQuery(undefined, {
-    enabled: connectionQuery.data?.connected === true,
-  });
-
-  const rlistQuery = trpc.rows.getRListBookings.useQuery(
-    { sortType: "checkin" },
-    { enabled: connectionQuery.data?.connected === true }
-  );
+  // OtelMS data from Supabase
+  const calendarQuery = useCalendarBookings();
+  const todayOpsQuery = useTodayOperations();
+  const rlistQuery = useRListBookings("checkin");
 
   const handleRefresh = () => {
     connectionQuery.refetch();
@@ -69,13 +65,13 @@ const FinanceOtelMS = () => {
       <PageHeader
         title="OtelMS Integration"
         titleKa="OtelMS ინტეგრაცია"
-        subtitle="ROWS.COM financial data integration"
-        subtitleKa="ROWS.COM ფინანსური მონაცემების ინტეგრაცია"
+        subtitle="Supabase financial data integration"
+        subtitleKa="Supabase ფინანსური მონაცემების ინტეგრაცია"
         icon={TrendingUp}
         iconGradient="from-blue-500 to-indigo-600"
         dataSource={{
           type: connectionQuery.data?.connected ? "live" : "error",
-          source: "ROWS.COM"
+          source: "Supabase"
         }}
         backUrl="/finance"
         actions={
@@ -381,7 +377,7 @@ const FinanceOtelMS = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Database className="h-5 w-5" />
-                ROWS.COM {t("კონფიგურაცია", "Configuration")}
+                Supabase {t("კონფიგურაცია", "Configuration")}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -397,8 +393,8 @@ const FinanceOtelMS = () => {
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Spreadsheet ID</p>
-                  <p className="font-mono text-xs">{connectionQuery.data.spreadsheetId || '-'}</p>
+                  <p className="text-sm text-muted-foreground">{t("მონაცემთა წყარო", "Data Source")}</p>
+                  <p className="font-mono text-xs">{connectionQuery.data.spreadsheetId || 'Supabase'}</p>
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">{t("ტაბულები", "Tables")}</p>

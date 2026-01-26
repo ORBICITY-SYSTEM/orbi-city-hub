@@ -1,9 +1,9 @@
 /**
  * Google Reviews Card - Compact widget for Home/Dashboard
- * Uses ROWS.COM Google Reviews data
+ * Uses Supabase reviews data (ota_reviews + guest_reviews)
  */
 
-import { trpc } from "@/lib/trpc";
+import { useGoogleReviews } from "@/hooks/useMarketingAnalytics";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Star, MessageCircle, CheckCircle2, TrendingUp, TrendingDown, Loader2 } from "lucide-react";
@@ -11,9 +11,7 @@ import { Star, MessageCircle, CheckCircle2, TrendingUp, TrendingDown, Loader2 } 
 export default function GoogleReviewsCard() {
   const { language } = useLanguage();
 
-  const { data: reviews, isLoading } = trpc.rows.getGoogleReviews.useQuery(undefined, {
-    staleTime: 5 * 60 * 1000,
-  });
+  const { data: reviews, isLoading } = useGoogleReviews();
 
   if (isLoading) {
     return (
