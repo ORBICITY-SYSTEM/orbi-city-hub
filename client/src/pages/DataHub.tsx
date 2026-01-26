@@ -19,8 +19,9 @@ import {
   Database, Lock, Unlock, Table2, RefreshCw, Download,
   Home, Users, Calendar, DollarSign, Package, Wrench,
   ClipboardList, BarChart3, Eye, AlertCircle, CheckCircle2,
-  Loader2, ArrowLeft
+  Loader2, ArrowLeft, Brain, Sparkles
 } from "lucide-react";
+import { AISQLCopilot } from "@/components/ai/AISQLCopilot";
 import { Link } from "wouter";
 import { toast } from "sonner";
 
@@ -52,6 +53,19 @@ const SUPABASE_TABLES = [
   // === RESERVATIONS / BOOKINGS ===
   { name: "bookings", icon: Calendar, color: "cyan", category: "reservations", description: "Reservation data" },
   { name: "guest_reviews", icon: Users, color: "yellow", category: "reservations", description: "Guest reviews" },
+  { name: "ota_reservations", icon: Calendar, color: "emerald", category: "reservations", description: "OTA channel bookings" },
+  { name: "ota_reviews", icon: Users, color: "orange", category: "reservations", description: "OTA platform reviews" },
+
+  // === OTELMS DATA ===
+  { name: "otelms_revenue", icon: DollarSign, color: "green", category: "finance", description: "OtelMS revenue data" },
+  { name: "otelms_sources", icon: BarChart3, color: "blue", category: "finance", description: "OtelMS booking sources" },
+  { name: "otelms_occupancy", icon: BarChart3, color: "purple", category: "finance", description: "OtelMS occupancy rates" },
+  { name: "otelms_adr", icon: DollarSign, color: "cyan", category: "finance", description: "Average Daily Rate" },
+  { name: "otelms_revpar", icon: DollarSign, color: "amber", category: "finance", description: "Revenue Per Available Room" },
+  { name: "otelms_change_history", icon: BarChart3, color: "slate", category: "finance", description: "OtelMS change tracking" },
+
+  // === SOCIAL MEDIA ===
+  { name: "social_media_metrics", icon: BarChart3, color: "pink", category: "marketing", description: "Social media metrics" },
 
   // === AI / SYSTEM ===
   { name: "ai_director_conversations", icon: BarChart3, color: "purple", category: "ai", description: "AI chat history" },
@@ -302,6 +316,7 @@ const CATEGORIES = [
   { id: "logistics", name: "Logistics", nameKa: "ლოჯისტიკა", color: "purple" },
   { id: "finance", name: "Finance", nameKa: "ფინანსები", color: "cyan" },
   { id: "reservations", name: "Reservations", nameKa: "რეზერვაციები", color: "green" },
+  { id: "marketing", name: "Marketing", nameKa: "მარკეტინგი", color: "pink" },
   { id: "ai", name: "AI", nameKa: "AI", color: "indigo" },
   { id: "system", name: "System", nameKa: "სისტემა", color: "orange" },
 ];
@@ -476,6 +491,11 @@ const DataHubContent = () => {
             ))}
           </CardContent>
         </Card>
+      </div>
+
+      {/* AI SQL Copilot */}
+      <div className="px-6 pb-6">
+        <AISQLCopilot />
       </div>
 
       {/* CEO AI Dashboard */}
