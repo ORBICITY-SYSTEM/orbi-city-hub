@@ -128,8 +128,11 @@ All data now flows through Supabase exclusively.
 ## API Keys & Credentials
 
 ### Supabase
-- **URL**: `VITE_SUPABASE_URL`
+- **URL**: `VITE_SUPABASE_URL` = `https://lusagtvxjtfxgfadulgv.supabase.co`
 - **Key**: `VITE_SUPABASE_ANON_KEY`
+- **Dashboard**: https://supabase.com/dashboard/project/lusagtvxjtfxgfadulgv
+- **Login Email**: `info@orbicitybatumi.com`
+- **Login Password**: `SHAKOniniamasho1!`
 
 ### Claude AI (Assistants)
 - **API Key**: `ANTHROPIC_API_KEY`
