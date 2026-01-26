@@ -1227,3 +1227,284 @@ export const financeAnomalyLog = mysqlTable("financeAnomalyLog", {
 
 export type FinanceAnomalyLog = typeof financeAnomalyLog.$inferSelect;
 export type InsertFinanceAnomalyLog = typeof financeAnomalyLog.$inferInsert;
+
+// ============================================================================
+// AI AGENTS SYSTEM
+// Autonomous AI agents with permission-based execution (ClawdBot, Cowork, Marketing AI)
+// ============================================================================
+
+/**
+ * AI Agents - Define autonomous AI agents
+ * Each agent has specific capabilities and works within assigned modules
+ */
+export const aiAgents = mysqlTable("aiAgents", {
+  id: int("id").autoincrement().primaryKey(),
+  agentId: varchar("agentId", { length: 64 }).notNull().unique(), // clawdbot, cowork, marketing-ai
+  name: varchar("name", { length: 128 }).notNull(),
+  nameGe: varchar("nameGe", { length: 128 }), // Georgian name
+  avatar: varchar("avatar", { length: 64 }), // Emoji or icon name
+  description: text("description"),
+  descriptionGe: text("descriptionGe"),
+
+  // Agent type and capabilities
+  agentType: mysqlEnum("agentType", ["marketing", "finance", "logistics", "reservations", "general", "executive"]).default("general").notNull(),
+  capabilities: json("capabilities").$type<string[]>(), // ["social_media", "ads", "content", "analytics"]
+
+  // Module access
+  assignedModules: json("assignedModules").$type<string[]>(), // ["marketing", "finance"]
+
+  // Permissions (what requires human approval)
+  autoApprove: json("autoApprove").$type<string[]>(), // Actions that don't need approval
+  requiresApproval: json("requiresApproval").$type<string[]>(), // Actions needing approval
+
+  // AI Configuration
+  systemPrompt: text("systemPrompt"),
+  temperature: decimal("temperature", { precision: 2, scale: 1 }).default("0.7"),
+  model: varchar("model", { length: 64 }).default("claude-3-haiku"),
+
+  // Status
+  isActive: boolean("isActive").default(true),
+  lastActiveAt: timestamp("lastActiveAt"),
+
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type AiAgent = typeof aiAgents.$inferSelect;
+export type InsertAiAgent = typeof aiAgents.$inferInsert;
+
+/**
+ * AI Agent Tasks - Tasks assigned to or created by AI agents
+ * With approval workflow and execution tracking
+ */
+export const aiAgentTasks = mysqlTable("aiAgentTasks", {
+  id: int("id").autoincrement().primaryKey(),
+  taskId: varchar("taskId", { length: 64 }).notNull().unique(), // at_xxx
+
+  // Agent assignment
+  agentId: varchar("agentId", { length: 64 }).notNull(), // Reference to aiAgents.agentId
+  assignedBy: varchar("assignedBy", { length: 64 }).default("human").notNull(), // human, ceo-ai, system
+
+  // Task details
+  title: varchar("title", { length: 255 }).notNull(),
+  titleGe: varchar("titleGe", { length: 255 }),
+  description: text("description"),
+  descriptionGe: text("descriptionGe"),
+
+  // Categorization
+  taskType: mysqlEnum("taskType", [
+    "social_post", "ad_campaign", "content_creation", "analytics_report",
+    "review_response", "email_campaign", "booking_management", "pricing_update",
+    "financial_analysis", "maintenance_schedule", "inventory_check", "general"
+  ]).default("general").notNull(),
+
+  module: varchar("module", { length: 64 }).notNull(), // marketing, finance, logistics, reservations
+
+  // Scheduling
+  frequency: mysqlEnum("frequency", ["once", "daily", "weekly", "monthly"]).default("once").notNull(),
+  scheduledFor: timestamp("scheduledFor"),
+  lastExecutedAt: timestamp("lastExecutedAt"),
+  nextExecutionAt: timestamp("nextExecutionAt"),
+
+  // Approval workflow
+  approvalStatus: mysqlEnum("approvalStatus", ["pending", "approved", "rejected", "auto_approved"]).default("pending").notNull(),
+  approvedBy: int("approvedBy"),
+  approvedAt: timestamp("approvedAt"),
+  rejectionReason: text("rejectionReason"),
+
+  // Execution status
+  executionStatus: mysqlEnum("executionStatus", ["not_started", "queued", "running", "completed", "failed", "paused"]).default("not_started").notNull(),
+  executionStartedAt: timestamp("executionStartedAt"),
+  executionCompletedAt: timestamp("executionCompletedAt"),
+
+  // Results and notes
+  resultSummary: text("resultSummary"),
+  resultData: json("resultData"), // Structured result data
+  aiNotes: text("aiNotes"),
+  humanFeedback: text("humanFeedback"),
+
+  // Priority and status
+  priority: mysqlEnum("priority", ["low", "medium", "high", "urgent"]).default("medium").notNull(),
+  status: mysqlEnum("status", ["draft", "scheduled", "active", "completed", "cancelled"]).default("draft").notNull(),
+
+  // Parent task (for sub-tasks)
+  parentTaskId: int("parentTaskId"),
+
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type AiAgentTask = typeof aiAgentTasks.$inferSelect;
+export type InsertAiAgentTask = typeof aiAgentTasks.$inferInsert;
+
+/**
+ * AI Agent Plans - Weekly/Monthly marketing and operational plans
+ * Generated by AI agents for human review
+ */
+export const aiAgentPlans = mysqlTable("aiAgentPlans", {
+  id: int("id").autoincrement().primaryKey(),
+  planId: varchar("planId", { length: 64 }).notNull().unique(), // plan_xxx
+
+  // Plan ownership
+  agentId: varchar("agentId", { length: 64 }).notNull(),
+  module: varchar("module", { length: 64 }).notNull(),
+
+  // Plan details
+  title: varchar("title", { length: 255 }).notNull(),
+  titleGe: varchar("titleGe", { length: 255 }),
+  description: text("description"),
+  descriptionGe: text("descriptionGe"),
+
+  // Period
+  planType: mysqlEnum("planType", ["weekly", "monthly", "quarterly"]).default("monthly").notNull(),
+  startDate: timestamp("startDate").notNull(),
+  endDate: timestamp("endDate").notNull(),
+
+  // Plan content
+  goals: json("goals").$type<Array<{
+    id: string;
+    title: string;
+    titleGe?: string;
+    targetMetric?: string;
+    targetValue?: number;
+    currentValue?: number;
+  }>>(),
+
+  tasks: json("tasks").$type<Array<{
+    id: string;
+    title: string;
+    titleGe?: string;
+    description?: string;
+    scheduledDate?: string;
+    frequency?: string;
+    taskType?: string;
+    estimatedBudget?: number;
+  }>>(),
+
+  budget: json("budget").$type<{
+    total: number;
+    breakdown: Array<{category: string; amount: number}>;
+  }>(),
+
+  // Approval
+  status: mysqlEnum("status", ["draft", "pending_approval", "approved", "active", "completed", "cancelled"]).default("draft").notNull(),
+  approvedBy: int("approvedBy"),
+  approvedAt: timestamp("approvedAt"),
+
+  // Execution tracking
+  progressPercent: int("progressPercent").default(0),
+  completedTasksCount: int("completedTasksCount").default(0),
+  totalTasksCount: int("totalTasksCount").default(0),
+
+  // AI analysis
+  aiAnalysis: text("aiAnalysis"),
+  aiRecommendations: json("aiRecommendations").$type<string[]>(),
+
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type AiAgentPlan = typeof aiAgentPlans.$inferSelect;
+export type InsertAiAgentPlan = typeof aiAgentPlans.$inferInsert;
+
+/**
+ * AI Agent Execution Log - Detailed log of agent actions
+ * For audit trail and debugging
+ */
+export const aiAgentExecutionLog = mysqlTable("aiAgentExecutionLog", {
+  id: int("id").autoincrement().primaryKey(),
+
+  // Execution context
+  agentId: varchar("agentId", { length: 64 }).notNull(),
+  taskId: int("taskId"),
+  planId: int("planId"),
+
+  // Action details
+  actionType: varchar("actionType", { length: 64 }).notNull(), // post_created, ad_launched, report_generated
+  actionDescription: text("actionDescription"),
+
+  // Input/Output
+  inputData: json("inputData"),
+  outputData: json("outputData"),
+
+  // External references
+  externalId: varchar("externalId", { length: 255 }), // Facebook post ID, etc.
+  externalUrl: text("externalUrl"),
+
+  // Status
+  status: mysqlEnum("status", ["started", "in_progress", "completed", "failed"]).default("started").notNull(),
+  errorMessage: text("errorMessage"),
+
+  // Metrics
+  tokensUsed: int("tokensUsed"),
+  executionTimeMs: int("executionTimeMs"),
+  cost: decimal("cost", { precision: 10, scale: 4 }),
+
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type AiAgentExecutionLog = typeof aiAgentExecutionLog.$inferSelect;
+export type InsertAiAgentExecutionLog = typeof aiAgentExecutionLog.$inferInsert;
+
+/**
+ * AI Agent Permissions - Fine-grained permission control
+ * Defines what each agent can do and what requires approval
+ */
+export const aiAgentPermissions = mysqlTable("aiAgentPermissions", {
+  id: int("id").autoincrement().primaryKey(),
+
+  agentId: varchar("agentId", { length: 64 }).notNull(),
+  permission: varchar("permission", { length: 128 }).notNull(), // create_post, launch_ad, modify_pricing
+
+  // Permission settings
+  isAllowed: boolean("isAllowed").default(true),
+  requiresApproval: boolean("requiresApproval").default(true),
+
+  // Limits
+  dailyLimit: int("dailyLimit"), // Max times per day
+  budgetLimit: decimal("budgetLimit", { precision: 10, scale: 2 }), // Max budget per action
+
+  // Conditions
+  conditions: json("conditions").$type<{
+    timeWindow?: { start: string; end: string };
+    maxAmount?: number;
+    allowedChannels?: string[];
+  }>(),
+
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type AiAgentPermission = typeof aiAgentPermissions.$inferSelect;
+export type InsertAiAgentPermission = typeof aiAgentPermissions.$inferInsert;
+
+/**
+ * AI Agent Conversations - Track agent conversations with users
+ */
+export const aiAgentConversations = mysqlTable("aiAgentConversations", {
+  id: int("id").autoincrement().primaryKey(),
+
+  agentId: varchar("agentId", { length: 64 }).notNull(),
+  userId: int("userId"),
+
+  // Conversation content
+  messages: json("messages").$type<Array<{
+    role: "user" | "agent" | "system";
+    content: string;
+    timestamp: number;
+    metadata?: Record<string, unknown>;
+  }>>(),
+
+  // Context
+  module: varchar("module", { length: 64 }),
+  contextData: json("contextData"),
+
+  // Status
+  status: mysqlEnum("status", ["active", "completed", "archived"]).default("active").notNull(),
+
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type AiAgentConversation = typeof aiAgentConversations.$inferSelect;
+export type InsertAiAgentConversation = typeof aiAgentConversations.$inferInsert;

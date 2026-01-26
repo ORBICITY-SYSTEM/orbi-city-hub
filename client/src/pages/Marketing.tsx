@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BarChart3, Globe, Users, Mail, Bot } from "lucide-react";
+import { BarChart3, Globe, Users, Mail, Bot, Brain } from "lucide-react";
 import { AIChatBox } from "@/components/AIChatBox";
 import { Button } from "@/components/ui/button";
 import { FileUpload } from "@/components/FileUpload";
@@ -12,6 +12,7 @@ import { CHANNELS, COMING_SOON_CHANNELS } from "@/../../shared/channelsData";
 import GoogleModule from "@/pages/marketing/GoogleModule";
 import SocialMediaModule from "@/pages/marketing/SocialMediaModule";
 import OthersModule from "@/pages/marketing/OthersModule";
+import { AIAgentsPanel } from "@/components/ai-agents/AIAgentsPanel";
 
 const Marketing = () => {
   const [chatHistory, setChatHistory] = useState<Array<{ role: "user" | "assistant"; content: string }>>([]);
@@ -79,8 +80,8 @@ const Marketing = () => {
             Others
           </TabsTrigger>
           <TabsTrigger value="ai">
-            <Bot className="h-4 w-4 mr-2" />
-            🤖 AI
+            <Brain className="h-4 w-4 mr-2" />
+            AI Agents
           </TabsTrigger>
         </TabsList>
 
@@ -109,50 +110,9 @@ const Marketing = () => {
           <OthersModule />
         </TabsContent>
 
-        {/* AI Agent Tab */}
+        {/* AI Agents Tab */}
         <TabsContent value="ai">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Bot className="h-5 w-5 text-purple-500" />
-                🤖 Marketing AI Agent
-              </CardTitle>
-              <CardDescription>
-                AI agent for creative content and campaign ideas
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <FileUpload
-                module="marketing"
-                onUploadSuccess={(url, fileName) => {
-                  handleSendMessage(`Analyze this file: ${fileName} (${url})`);
-                }}
-              />
-              <AIChatBox 
-                messages={chatHistory} 
-                onSendMessage={handleSendMessage} 
-                isLoading={isLoading} 
-                placeholder="e.g., 'Write Instagram post' or 'Analyze review sentiment'" 
-                height={400} 
-              />
-              <div className="grid grid-cols-2 gap-2">
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={() => handleSendMessage("Write an Instagram post for summer season")}
-                >
-                  Instagram Post
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={() => handleSendMessage("Analyze review sentiment from recent feedback")}
-                >
-                  Sentiment Analysis
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+          <AIAgentsPanel module="marketing" defaultLanguage="ka" />
         </TabsContent>
       </Tabs>
     </div>
