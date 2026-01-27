@@ -113,42 +113,42 @@ export interface UnifiedMarketingAnalytics {
 }
 
 // ============================================
-// DEFAULT/MOCK DATA (fallback when no data)
+// DEFAULT DATA (zeros - no mock data!)
 // ============================================
 
 function getDefaultInstagramMetrics(): InstagramMetrics {
   return {
-    followers: 12450,
-    following: 892,
-    posts: 234,
-    engagement: { total: 45600, rate: 4.8 },
-    reach: 156000,
-    impressions: 234000,
-    profileViews: 8900,
-    websiteClicks: 1250,
-    kpis: { avgLikes: 890, avgComments: 45, avgReach: 4500 },
+    followers: 0,
+    following: 0,
+    posts: 0,
+    engagement: { total: 0, rate: 0 },
+    reach: 0,
+    impressions: 0,
+    profileViews: 0,
+    websiteClicks: 0,
+    kpis: { avgLikes: 0, avgComments: 0, avgReach: 0 },
   };
 }
 
 function getDefaultFacebookMetrics(): FacebookMetrics {
   return {
-    pageFollowers: 8920,
-    pageLikes: 8750,
-    reach: { organic: 45000, paid: 12000, total: 57000 },
-    engagement: { total: 12340, reactions: 8500, comments: 2100, shares: 1740 },
-    impressions: 85000,
-    postCount: 156,
-    videoViews: 23400,
+    pageFollowers: 0,
+    pageLikes: 0,
+    reach: { organic: 0, paid: 0, total: 0 },
+    engagement: { total: 0, reactions: 0, comments: 0, shares: 0 },
+    impressions: 0,
+    postCount: 0,
+    videoViews: 0,
   };
 }
 
 function getDefaultReviewsMetrics(): ReviewsMetrics {
   return {
-    averageRating: 4.7,
-    totalReviews: 256,
-    ratingDistribution: { 5: 180, 4: 52, 3: 15, 2: 6, 1: 3 },
-    responseRate: 85,
-    recentTrend: "up",
+    averageRating: 0,
+    totalReviews: 0,
+    ratingDistribution: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 },
+    responseRate: 0,
+    recentTrend: "stable",
   };
 }
 
@@ -180,12 +180,12 @@ async function fetchInstagramData(): Promise<{
     };
   }
 
-  // Parse raw_data if available
+  // Parse raw_data if available - NO MOCK DATA, only real values or zeros
   const rawData = data.raw_data as any || {};
-  const followers = parseInt(data.followers || "0") || rawData.followers || 12450;
-  const following = parseInt(data.following || "0") || rawData.following || 892;
-  const posts = parseInt(data.posts_count || "0") || rawData.posts || 234;
-  const likes = parseInt(data.likes || "0") || rawData.likes || 45600;
+  const followers = parseInt(data.followers || "0") || rawData.followers || 0;
+  const following = parseInt(data.following || "0") || rawData.following || 0;
+  const posts = parseInt(data.posts_count || "0") || rawData.posts || 0;
+  const likes = parseInt(data.likes || "0") || rawData.likes || 0;
 
   const metrics: InstagramMetrics = {
     followers,
@@ -193,16 +193,16 @@ async function fetchInstagramData(): Promise<{
     posts,
     engagement: {
       total: likes,
-      rate: rawData.engagement_rate || 4.8
+      rate: rawData.engagement_rate || 0
     },
-    reach: rawData.reach || 156000,
-    impressions: rawData.impressions || 234000,
-    profileViews: rawData.profile_views || 8900,
-    websiteClicks: rawData.website_clicks || 1250,
+    reach: rawData.reach || 0,
+    impressions: rawData.impressions || 0,
+    profileViews: rawData.profile_views || 0,
+    websiteClicks: rawData.website_clicks || 0,
     kpis: {
-      avgLikes: rawData.avg_likes || 890,
-      avgComments: rawData.avg_comments || 45,
-      avgReach: rawData.avg_reach || 4500,
+      avgLikes: rawData.avg_likes || 0,
+      avgComments: rawData.avg_comments || 0,
+      avgReach: rawData.avg_reach || 0,
     },
   };
 
@@ -233,24 +233,25 @@ async function fetchFacebookData(): Promise<{
       posts: [],
       topPosts: [],
       demographics: {
-        countries: { Georgia: 45, Russia: 22, Turkey: 15, Ukraine: 10, Other: 8 },
-        ageGroups: { "18-24": 15, "25-34": 35, "35-44": 28, "45-54": 15, "55+": 7 },
+        countries: {},
+        ageGroups: {},
       },
     };
   }
 
+  // Parse raw_data - NO MOCK DATA, only real values or zeros
   const rawData = data.raw_data as any || {};
-  const followers = parseInt(data.followers || "0") || rawData.followers || 8920;
-  const likes = parseInt(data.likes || "0") || rawData.likes || 8750;
+  const followers = parseInt(data.followers || "0") || rawData.followers || 0;
+  const likes = parseInt(data.likes || "0") || rawData.likes || 0;
 
   const metrics: FacebookMetrics = {
     pageFollowers: followers,
     pageLikes: likes,
-    reach: rawData.reach || { organic: 45000, paid: 12000, total: 57000 },
-    engagement: rawData.engagement || { total: 12340, reactions: 8500, comments: 2100, shares: 1740 },
-    impressions: rawData.impressions || 85000,
-    postCount: parseInt(data.posts_count || "0") || rawData.post_count || 156,
-    videoViews: rawData.video_views || 23400,
+    reach: rawData.reach || { organic: 0, paid: 0, total: 0 },
+    engagement: rawData.engagement || { total: 0, reactions: 0, comments: 0, shares: 0 },
+    impressions: rawData.impressions || 0,
+    postCount: parseInt(data.posts_count || "0") || rawData.post_count || 0,
+    videoViews: rawData.video_views || 0,
   };
 
   return {
@@ -258,8 +259,8 @@ async function fetchFacebookData(): Promise<{
     posts: rawData.posts_data || [],
     topPosts: rawData.top_posts || [],
     demographics: rawData.demographics || {
-      countries: { Georgia: 45, Russia: 22, Turkey: 15, Ukraine: 10, Other: 8 },
-      ageGroups: { "18-24": 15, "25-34": 35, "35-44": 28, "45-54": 15, "55+": 7 },
+      countries: {},
+      ageGroups: {},
     },
   };
 }
@@ -438,20 +439,25 @@ async function fetchCombinedStats(): Promise<{ data: CombinedSocialStats }> {
   const facebook = metrics?.find((m: any) => m.platform === "facebook");
   const tiktok = metrics?.find((m: any) => m.platform === "tiktok");
 
-  const igFollowers = parseInt(instagram?.followers || "0") || 12450;
-  const fbFollowers = parseInt(facebook?.followers || "0") || 8920;
-  const ttFollowers = parseInt(tiktok?.followers || "0") || 5600;
+  // NO MOCK DATA - only real values or zeros
+  const igFollowers = parseInt(instagram?.followers || "0") || 0;
+  const fbFollowers = parseInt(facebook?.followers || "0") || 0;
+  const ttFollowers = parseInt(tiktok?.followers || "0") || 0;
+
+  const igRawData = instagram?.raw_data as any || {};
+  const fbRawData = facebook?.raw_data as any || {};
+  const ttRawData = tiktok?.raw_data as any || {};
 
   return {
     data: {
       totalFollowers: igFollowers + fbFollowers + ttFollowers,
-      totalReach: 156000 + 57000 + 89000,
-      totalEngagement: 45600 + 12340 + 23400,
-      totalPosts: 234 + 156 + 89,
+      totalReach: (igRawData.reach || 0) + (fbRawData.reach?.total || 0) + (ttRawData.reach || 0),
+      totalEngagement: (igRawData.engagement?.total || 0) + (fbRawData.engagement?.total || 0) + (ttRawData.engagement?.total || 0),
+      totalPosts: parseInt(instagram?.posts_count || "0") + parseInt(facebook?.posts_count || "0") + parseInt(tiktok?.posts_count || "0"),
       platforms: {
-        facebook: { followers: fbFollowers, reach: 57000, engagement: 12340 },
-        instagram: { followers: igFollowers, reach: 156000, engagement: 45600 },
-        tiktok: { followers: ttFollowers, views: 890000, engagement: 23400 },
+        facebook: { followers: fbFollowers, reach: fbRawData.reach?.total || 0, engagement: fbRawData.engagement?.total || 0 },
+        instagram: { followers: igFollowers, reach: igRawData.reach || 0, engagement: igRawData.engagement?.total || 0 },
+        tiktok: { followers: ttFollowers, views: ttRawData.video_views || 0, engagement: ttRawData.engagement?.total || 0 },
       },
     },
   };
@@ -495,25 +501,26 @@ async function fetchTikTokInsights(): Promise<TikTokInsights> {
     .eq("platform", "tiktok")
     .maybeSingle();
 
+  // NO MOCK DATA - only real values or zeros
   if (!data) {
     return {
-      followers: 5600,
-      following: 234,
-      likes: 89000,
-      videoViews: 890000,
-      profileViews: 12300,
-      engagement: { total: 23400, rate: 4.2 },
+      followers: 0,
+      following: 0,
+      likes: 0,
+      videoViews: 0,
+      profileViews: 0,
+      engagement: { total: 0, rate: 0 },
     };
   }
 
   const rawData = data.raw_data as any || {};
   return {
-    followers: parseInt(data.followers || "0") || 5600,
-    following: parseInt(data.following || "0") || 234,
-    likes: parseInt(data.likes || "0") || 89000,
-    videoViews: rawData.video_views || 890000,
-    profileViews: rawData.profile_views || 12300,
-    engagement: rawData.engagement || { total: 23400, rate: 4.2 },
+    followers: parseInt(data.followers || "0") || 0,
+    following: parseInt(data.following || "0") || 0,
+    likes: parseInt(data.likes || "0") || 0,
+    videoViews: rawData.video_views || 0,
+    profileViews: rawData.profile_views || 0,
+    engagement: rawData.engagement || { total: 0, rate: 0 },
   };
 }
 
@@ -529,11 +536,8 @@ async function fetchTikTokVideos(limit: number = 12): Promise<TikTokVideo[]> {
 }
 
 async function fetchTikTokTrendingSounds(): Promise<{ name: string; uses: number }[]> {
-  return [
-    { name: "Chill Vibes", uses: 1200000 },
-    { name: "Summer Beat", uses: 890000 },
-    { name: "Travel Music", uses: 560000 },
-  ];
+  // NO MOCK DATA - return empty until API integration
+  return [];
 }
 
 export function useTikTokInsights() {
@@ -586,11 +590,12 @@ async function fetchInstagramAudience(): Promise<{
     .eq("platform", "instagram")
     .maybeSingle();
 
+  // NO MOCK DATA - return empty or real data only
   const rawData = data?.raw_data as any;
   return rawData?.audience || {
-    countries: { Georgia: 45, Russia: 22, Turkey: 15, Ukraine: 10, Other: 8 },
-    ageGroups: { "18-24": 15, "25-34": 35, "35-44": 28, "45-54": 15, "55+": 7 },
-    genderSplit: { male: 42, female: 58 },
+    countries: {},
+    ageGroups: {},
+    genderSplit: { male: 0, female: 0 },
   };
 }
 
@@ -635,10 +640,11 @@ async function fetchFacebookAudience(): Promise<{
     .eq("platform", "facebook")
     .maybeSingle();
 
+  // NO MOCK DATA - return empty or real data only
   const rawData = data?.raw_data as any;
   return rawData?.demographics || {
-    countries: { Georgia: 45, Russia: 22, Turkey: 15, Ukraine: 10, Other: 8 },
-    ageGroups: { "18-24": 15, "25-34": 35, "35-44": 28, "45-54": 15, "55+": 7 },
+    countries: {},
+    ageGroups: {},
   };
 }
 
@@ -687,34 +693,18 @@ async function fetchGoogleAnalytics(): Promise<GoogleAnalyticsData> {
     return data.raw_data as GoogleAnalyticsData;
   }
 
-  // Default/mock data
+  // NO MOCK DATA - return zeros until API integration
   return {
-    activeUsers: 42,
-    pageViews: 15600,
-    pageviews: 45230,
-    sessions: 12450,
-    users: 8320,
-    bounceRate: 35.2,
-    avgSessionDuration: 185,
-    topPages: [
-      { path: "/apartments", views: 12340, avgTime: 145 },
-      { path: "/booking", views: 8920, avgTime: 230 },
-      { path: "/gallery", views: 6780, avgTime: 95 },
-      { path: "/location", views: 4560, avgTime: 120 },
-      { path: "/contact", views: 2340, avgTime: 85 },
-    ],
-    topCountries: [
-      { country: "Georgia", users: 3200 },
-      { country: "Russia", users: 1800 },
-      { country: "Turkey", users: 1200 },
-    ],
-    trafficSources: [
-      { source: "Google Search", sessions: 5420, percentage: 43.5 },
-      { source: "Direct", sessions: 3210, percentage: 25.8 },
-      { source: "Booking.com", sessions: 1890, percentage: 15.2 },
-      { source: "Social Media", sessions: 1230, percentage: 9.9 },
-      { source: "Other", sessions: 700, percentage: 5.6 },
-    ],
+    activeUsers: 0,
+    pageViews: 0,
+    pageviews: 0,
+    sessions: 0,
+    users: 0,
+    bounceRate: 0,
+    avgSessionDuration: 0,
+    topPages: [],
+    topCountries: [],
+    trafficSources: [],
   };
 }
 
@@ -723,14 +713,11 @@ async function fetchRealTimeMetrics(): Promise<{
   pageViews: number;
   topPages: { path: string; active: number }[];
 }> {
+  // NO MOCK DATA - return zeros until GA4 real-time API integration
   return {
-    activeUsers: Math.floor(Math.random() * 50) + 20,
-    pageViews: Math.floor(Math.random() * 200) + 100,
-    topPages: [
-      { path: "/", active: Math.floor(Math.random() * 20) + 5 },
-      { path: "/apartments", active: Math.floor(Math.random() * 15) + 3 },
-      { path: "/booking", active: Math.floor(Math.random() * 10) + 2 },
-    ],
+    activeUsers: 0,
+    pageViews: 0,
+    topPages: [],
   };
 }
 

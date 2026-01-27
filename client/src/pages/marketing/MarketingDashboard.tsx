@@ -29,22 +29,22 @@ const LoadingSpinner = () => (
 // Overview Tab - Analytics Dashboard
 const OverviewTab = () => (
   <div className="space-y-6">
-    {/* Quick Stats */}
+    {/* Quick Stats - API Integration Pending */}
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
       <div className="bg-slate-800/50 rounded-xl p-4 border border-cyan-500/20">
-        <div className="text-2xl font-bold text-cyan-400">12.5K</div>
+        <div className="text-lg font-bold text-amber-400">Coming Soon</div>
         <div className="text-sm text-white/60">Instagram Followers</div>
       </div>
       <div className="bg-slate-800/50 rounded-xl p-4 border border-pink-500/20">
-        <div className="text-2xl font-bold text-pink-400">8.2K</div>
+        <div className="text-lg font-bold text-amber-400">Coming Soon</div>
         <div className="text-sm text-white/60">TikTok Followers</div>
       </div>
       <div className="bg-slate-800/50 rounded-xl p-4 border border-blue-500/20">
-        <div className="text-2xl font-bold text-blue-400">3.4K</div>
+        <div className="text-lg font-bold text-amber-400">Coming Soon</div>
         <div className="text-sm text-white/60">Facebook Likes</div>
       </div>
       <div className="bg-slate-800/50 rounded-xl p-4 border border-red-500/20">
-        <div className="text-2xl font-bold text-red-400">1.2K</div>
+        <div className="text-lg font-bold text-amber-400">Coming Soon</div>
         <div className="text-sm text-white/60">YouTube Subs</div>
       </div>
     </div>

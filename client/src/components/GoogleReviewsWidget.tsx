@@ -78,19 +78,26 @@ export function GoogleReviewsWidget() {
   }
 
   const reviews = data?.reviews || [];
-  const metrics = data?.metrics || { averageRating: 4.7, totalReviews: 0 };
+  const hasRealData = data?.metrics?.totalReviews > 0;
+  const metrics = data?.metrics || { averageRating: 0, totalReviews: 0 };
 
   return (
     <div className="glass-card p-6">
       <div className="flex items-center justify-between mb-6">
         <div>
           <h3 className="text-xl font-bold text-slate-900">Google Reviews</h3>
-          <div className="flex items-center gap-2 mt-1">
-            <StarRating rating={Math.round(metrics.averageRating)} />
-            <span className="text-sm font-semibold text-slate-700">
-              {metrics.averageRating.toFixed(1)} ({metrics.totalReviews} reviews)
+          {hasRealData ? (
+            <div className="flex items-center gap-2 mt-1">
+              <StarRating rating={Math.round(metrics.averageRating)} />
+              <span className="text-sm font-semibold text-slate-700">
+                {metrics.averageRating.toFixed(1)} ({metrics.totalReviews} reviews)
+              </span>
+            </div>
+          ) : (
+            <span className="text-sm text-amber-600 font-medium mt-1 inline-block">
+              API Integration Coming Soon
             </span>
-          </div>
+          )}
         </div>
         <a
           href="https://www.google.com/maps"

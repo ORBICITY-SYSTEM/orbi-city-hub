@@ -24,7 +24,7 @@ import { AICEOAvatar } from "@/components/command-center/AICEOAvatar";
 import { FloatingMetrics } from "@/components/command-center/FloatingMetrics";
 import { HolographicCard } from "@/components/command-center/HolographicCard";
 import { CEOAIDashboard } from "@/components/CEOAIDashboard";
-import { VoiceGreeting } from "@/components/VoiceGreeting";
+// VoiceGreeting removed per user request
 
 // Lazy load 3D Globe for performance
 const Globe3D = lazy(() =>
@@ -783,9 +783,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen text-white overflow-x-hidden relative">
-      {/* Voice Greeting Popup */}
-      <VoiceGreeting userName="თამარ" />
-
       <BatumiSeaBackground />
 
       <div className="relative z-10 min-h-screen">
