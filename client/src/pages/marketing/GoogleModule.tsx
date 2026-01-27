@@ -1,13 +1,13 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
-import { 
-  BarChart3, 
-  MessageCircle, 
-  Calendar, 
-  FolderOpen, 
-  TrendingUp, 
-  Users, 
-  Eye, 
+import {
+  BarChart3,
+  MessageCircle,
+  Calendar,
+  FolderOpen,
+  TrendingUp,
+  Users,
+  Eye,
   Clock,
   Star,
   ExternalLink,
@@ -15,10 +15,12 @@ import {
   FileSpreadsheet,
   DollarSign,
   Target,
-  MousePointer
+  MousePointer,
+  Sparkles
 } from "lucide-react";
 import { GoogleReviewsWidget } from "@/components/GoogleReviewsWidget";
 import { useGoogleAnalytics } from "@/hooks/useMarketingAnalytics";
+import { ReviewApprovalPanel } from "@/components/reviews";
 
 export default function Google() {
   const { data: analyticsData } = useGoogleAnalytics();
@@ -203,39 +205,48 @@ export default function Google() {
 
         {/* Reviews Tab */}
         <TabsContent value="reviews" className="space-y-6">
+          {/* AI Review Response Approval Panel */}
+          <div className="bg-slate-900/50 rounded-xl p-6 border border-slate-700/50">
+            <ReviewApprovalPanel />
+          </div>
+
+          {/* Reviews Overview Section */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <GoogleReviewsWidget />
-            
+
             <div className="glass-card p-6">
-              <h3 className="text-xl font-bold text-slate-900 mb-6">Review Management</h3>
+              <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-purple-600" />
+                ClawdBot Review AI
+              </h3>
               <div className="space-y-4">
-                <div className="p-4 rounded-lg bg-blue-50 border border-blue-200">
+                <div className="p-4 rounded-lg bg-purple-50 border border-purple-200">
                   <div className="flex items-center gap-2 mb-2">
-                    <Star className="w-5 h-5 text-blue-600" />
-                    <h4 className="font-semibold text-blue-900">Respond to Reviews</h4>
+                    <Sparkles className="w-5 h-5 text-purple-600" />
+                    <h4 className="font-semibold text-purple-900">AI-Powered Responses</h4>
                   </div>
-                  <p className="text-sm text-blue-800">
-                    Reply to customer reviews directly from this dashboard to improve engagement and ratings.
-                  </p>
-                </div>
-                
-                <div className="p-4 rounded-lg bg-green-50 border border-green-200">
-                  <div className="flex items-center gap-2 mb-2">
-                    <TrendingUp className="w-5 h-5 text-green-600" />
-                    <h4 className="font-semibold text-green-900">Rating Trends</h4>
-                  </div>
-                  <p className="text-sm text-green-800">
-                    Monitor your average rating over time and identify areas for improvement.
+                  <p className="text-sm text-purple-800">
+                    ClawdBot (Claude Sonnet 4) automatically generates professional, personalized responses for each review.
                   </p>
                 </div>
 
-                <div className="p-4 rounded-lg bg-purple-50 border border-purple-200">
+                <div className="p-4 rounded-lg bg-blue-50 border border-blue-200">
                   <div className="flex items-center gap-2 mb-2">
-                    <MessageCircle className="w-5 h-5 text-purple-600" />
-                    <h4 className="font-semibold text-purple-900">AI Review Analysis</h4>
+                    <Star className="w-5 h-5 text-blue-600" />
+                    <h4 className="font-semibold text-blue-900">Approval Workflow</h4>
                   </div>
-                  <p className="text-sm text-purple-800">
-                    Get AI-powered insights from customer feedback to improve service quality.
+                  <p className="text-sm text-blue-800">
+                    Review and edit AI responses before posting. Approve, reject, or customize each reply.
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-lg bg-green-50 border border-green-200">
+                  <div className="flex items-center gap-2 mb-2">
+                    <TrendingUp className="w-5 h-5 text-green-600" />
+                    <h4 className="font-semibold text-green-900">Multi-Language Support</h4>
+                  </div>
+                  <p className="text-sm text-green-800">
+                    Generate responses in English, Georgian, or Russian to match your guests' languages.
                   </p>
                 </div>
               </div>

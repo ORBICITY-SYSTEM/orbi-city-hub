@@ -58,6 +58,7 @@ import { logisticsRouter as logisticsAIDirectorRouter } from "./routers/logistic
 import { financeCopilotRouter } from "./routers/financeCopilotRouter";
 import { aiAgentsRouter } from "./routers/aiAgentsRouter";
 import { clawdbotRouter } from "./routers/clawdbot";
+import { googleReviewsRouter } from "./routers/googleReviews";
 
 export const appRouter = router({
   realFinance: realFinanceRouter,
@@ -127,6 +128,7 @@ export const appRouter = router({
   financeCopilot: financeCopilotRouter,
   aiAgents: aiAgentsRouter,
   clawdbot: clawdbotRouter,
+  googleReviews: googleReviewsRouter,
 });
 
 export type AppRouter = typeof appRouter;
