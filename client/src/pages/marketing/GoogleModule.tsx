@@ -16,35 +16,52 @@ import {
   DollarSign,
   Target,
   MousePointer,
-  Sparkles
+  Sparkles,
+  RefreshCw,
+  Globe
 } from "lucide-react";
 import { GoogleReviewsWidget } from "@/components/GoogleReviewsWidget";
-import { useGoogleAnalytics } from "@/hooks/useMarketingAnalytics";
 import { ReviewApprovalPanel } from "@/components/reviews";
+import { trpc } from "@/lib/trpc";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 export default function Google() {
-  const { data: analyticsData } = useGoogleAnalytics();
+  // GA4 Data from tRPC
+  const { data: ga4Report, isLoading: ga4Loading, refetch: refetchGA4 } = trpc.ga4.getReport.useQuery();
 
-  // Default analytics data when Supabase table is empty
-  const analytics = analyticsData || {
-    sessions: 12450,
-    users: 8320,
-    pageviews: 45230,
-    avgSessionDuration: 185,
-    trafficSources: [
-      { source: "Google Search", sessions: 5420, percentage: 43.5 },
-      { source: "Direct", sessions: 3210, percentage: 25.8 },
-      { source: "Booking.com", sessions: 1890, percentage: 15.2 },
-      { source: "Social Media", sessions: 1230, percentage: 9.9 },
-      { source: "Other", sessions: 700, percentage: 5.6 },
+  // Transform GA4 data for display
+  const analytics = {
+    sessions: ga4Report?.metrics?.sessions || 101,
+    users: ga4Report?.metrics?.activeUsers || 65,
+    pageviews: ga4Report?.metrics?.pageViews || 178,
+    avgSessionDuration: ga4Report?.metrics?.avgSessionDuration || 85,
+    newUsers: ga4Report?.metrics?.newUsers || 64,
+    eventCount: ga4Report?.metrics?.eventCount || 425,
+    trafficSources: ga4Report?.trafficSources || [
+      { source: "Direct", sessions: 48, percentage: 47.5 },
+      { source: "Organic Search", sessions: 22, percentage: 21.8 },
+      { source: "Unassigned", sessions: 18, percentage: 17.8 },
+      { source: "Paid Search", sessions: 11, percentage: 10.9 },
+      { source: "Referral", sessions: 1, percentage: 1.0 },
     ],
-    topPages: [
-      { path: "/apartments", views: 12340, avgTime: 145 },
-      { path: "/booking", views: 8920, avgTime: 230 },
-      { path: "/gallery", views: 6780, avgTime: 95 },
-      { path: "/location", views: 4560, avgTime: 120 },
-      { path: "/contact", views: 2340, avgTime: 85 },
+    topPages: ga4Report?.topPages?.map(p => ({
+      path: p.pagePath,
+      views: p.views,
+      avgTime: 0,
+    })) || [
+      { path: "/", views: 105, avgTime: 0 },
+      { path: "/apartments", views: 25, avgTime: 0 },
+      { path: "/booking", views: 30, avgTime: 0 },
+      { path: "/gallery", views: 6, avgTime: 0 },
+      { path: "/contact", views: 3, avgTime: 0 },
     ],
+    countries: ga4Report?.countries || [
+      { country: "Georgia", users: 10, percentage: 15.4 },
+      { country: "Turkey", users: 8, percentage: 12.3 },
+      { country: "United States", users: 5, percentage: 7.7 },
+    ],
+    properties: ga4Report?.properties || ['orbicitybatumi.com', 'www.orbicitybatumi.com'],
   };
 
   return (
@@ -88,6 +105,31 @@ export default function Google() {
 
         {/* Analytics Tab */}
         <TabsContent value="analytics" className="space-y-6">
+          {/* Properties Header */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="flex gap-2">
+                {analytics.properties.map((prop: string) => (
+                  <Badge key={prop} variant="outline" className="bg-green-500/20 text-green-400 border-green-500/50">
+                    <Globe className="w-3 h-3 mr-1" />
+                    {prop}
+                  </Badge>
+                ))}
+              </div>
+              <span className="text-white/60 text-sm">GA4 Property: 518261169</span>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => refetchGA4()}
+              disabled={ga4Loading}
+              className="border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/20"
+            >
+              <RefreshCw className={`w-4 h-4 mr-2 ${ga4Loading ? 'animate-spin' : ''}`} />
+              {ga4Loading ? 'Loading...' : 'Refresh'}
+            </Button>
+          </div>
+
           {/* Analytics KPIs */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="ocean-gradient-blue rounded-2xl p-6 shadow-xl">

@@ -16,11 +16,12 @@ const { exec, spawn } = require('child_process');
 // Keep a global reference of the window object
 let mainWindow;
 
-// Development mode check
-const isDev = process.env.NODE_ENV === 'development' || !app.isPackaged;
+// Use localhost only if LOCAL=true is set, otherwise use Vercel
+const useLocal = process.env.LOCAL === 'true';
 
-// Production URL (Vercel)
+// URLs
 const PRODUCTION_URL = 'https://orbi-city-hub.vercel.app';
+const LOCAL_URL = 'http://localhost:3000';
 
 function createWindow() {
   // Create the browser window
@@ -42,13 +43,15 @@ function createWindow() {
     show: false, // Don't show until ready
   });
 
-  // Load the app
-  if (isDev) {
-    // In development, load from Vite dev server
-    mainWindow.loadURL('http://localhost:3000');
+  // Load the app - Vercel by default, localhost only with LOCAL=true
+  if (useLocal) {
+    // Local development mode
+    console.log('Loading from localhost...');
+    mainWindow.loadURL(LOCAL_URL);
     mainWindow.webContents.openDevTools();
   } else {
-    // In production, load from Vercel
+    // Production mode - Vercel
+    console.log('Loading from Vercel:', PRODUCTION_URL);
     mainWindow.loadURL(PRODUCTION_URL);
   }
 
@@ -227,4 +230,4 @@ app.on('web-contents-created', (event, contents) => {
 });
 
 console.log('ORBICITY Desktop App starting...');
-console.log('Development mode:', isDev);
+console.log('Mode:', useLocal ? 'LOCAL (localhost:3000)' : 'PRODUCTION (Vercel)');
