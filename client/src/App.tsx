@@ -10,6 +10,7 @@ import { LanguageProvider } from "./contexts/LanguageContext";
 import ModularLayout from "./components/ModularLayout";
 import { UniversalChatPopup } from "./components/UniversalChatPopup";
 import { PageLoadingSkeleton } from "./components/LoadingSkeleton";
+import { ClawdBotProvider, ClawdBotChat } from "./components/clawdbot";
 
 // Only Home is eagerly loaded for fast initial render
 import Home from "./pages/Home";
@@ -227,11 +228,14 @@ function App() {
         <LanguageProvider>
           <RoleProvider>
             <DemoModeProvider>
-              <TooltipProvider>
-                <Toaster />
-                <Router />
-                <UniversalChatPopup />
-              </TooltipProvider>
+              <ClawdBotProvider>
+                <TooltipProvider>
+                  <Toaster />
+                  <Router />
+                  <UniversalChatPopup />
+                  <ClawdBotChat />
+                </TooltipProvider>
+              </ClawdBotProvider>
             </DemoModeProvider>
           </RoleProvider>
         </LanguageProvider>

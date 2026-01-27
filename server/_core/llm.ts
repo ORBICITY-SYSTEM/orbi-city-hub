@@ -280,7 +280,7 @@ export async function invokeLLM(params: InvokeParams): Promise<InvokeResult> {
   } = params;
 
   const payload: Record<string, unknown> = {
-    model: "claude-3-5-haiku-20241022",
+    model: "claude-sonnet-4-20250514",
     messages: messages.map(normalizeMessage),
   };
 

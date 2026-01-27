@@ -3,18 +3,21 @@
  *
  * Compact, futuristic cards with realistic AI-generated avatars
  * Holographic design with subtle animations
+ * NOW INTEGRATED WITH CLAWDBOT - Opens unified AI chat on click
  */
 
 import { useState } from "react";
-import { Link } from "wouter";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { trpc } from "@/lib/trpc";
 import { motion } from "framer-motion";
 import {
   ArrowRight,
   Sparkles,
-  Activity
+  Activity,
+  MessageCircle
 } from "lucide-react";
+import { useClawdBot } from "@/components/clawdbot";
+import { ClawdBotModule } from "@/services/clawdbot/types";
 
 interface AIDirector {
   id: string;
@@ -22,7 +25,7 @@ interface AIDirector {
   nameKa: string;
   avatar: string;
   style: string;
-  path: string;
+  module: ClawdBotModule; // Changed from path to module
   gradient: string;
   accentColor: string;
   glowColor: string;
@@ -35,8 +38,8 @@ const AI_DIRECTORS: AIDirector[] = [
     nameKa: "CEO AI",
     // Style 1: "Ex Machina" - Sleek feminine android
     avatar: "https://images.unsplash.com/photo-1676277791608-ac54525aa94d?w=200&h=200&fit=crop&crop=face",
-    style: "Ex Machina",
-    path: "/",
+    style: "ClawdBot",
+    module: "general",
     gradient: "from-purple-600 via-pink-500 to-rose-500",
     accentColor: "rgb(168, 85, 247)",
     glowColor: "rgba(168, 85, 247, 0.5)",
@@ -48,7 +51,7 @@ const AI_DIRECTORS: AIDirector[] = [
     // Style 2: "Detroit: Become Human" - Humanoid robot with LED
     avatar: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=200&h=200&fit=crop",
     style: "Detroit",
-    path: "/marketing/ai-director",
+    module: "marketing",
     gradient: "from-blue-600 via-cyan-500 to-teal-500",
     accentColor: "rgb(6, 182, 212)",
     glowColor: "rgba(6, 182, 212, 0.5)",
@@ -60,7 +63,7 @@ const AI_DIRECTORS: AIDirector[] = [
     // Style 3: "Westworld" - Advanced android
     avatar: "https://images.unsplash.com/photo-1546776310-eef45dd6d63c?w=200&h=200&fit=crop",
     style: "Westworld",
-    path: "/reservations/ai-director",
+    module: "reservations",
     gradient: "from-green-600 via-emerald-500 to-teal-500",
     accentColor: "rgb(16, 185, 129)",
     glowColor: "rgba(16, 185, 129, 0.5)",
@@ -72,7 +75,7 @@ const AI_DIRECTORS: AIDirector[] = [
     // Style 4: "Cyberpunk/Neon" - Futuristic chrome robot
     avatar: "https://images.unsplash.com/photo-1555255707-c07966088b7b?w=200&h=200&fit=crop",
     style: "Cyberpunk",
-    path: "/finance/ai-director",
+    module: "finance",
     gradient: "from-amber-500 via-yellow-500 to-orange-500",
     accentColor: "rgb(245, 158, 11)",
     glowColor: "rgba(245, 158, 11, 0.5)",
@@ -84,7 +87,7 @@ const AI_DIRECTORS: AIDirector[] = [
     // Style 5: "I, Robot" - Sleek chrome humanoid
     avatar: "https://images.unsplash.com/photo-1535378620166-273708d44e4c?w=200&h=200&fit=crop",
     style: "I, Robot",
-    path: "/logistics/ai-director",
+    module: "logistics",
     gradient: "from-indigo-600 via-purple-500 to-pink-500",
     accentColor: "rgb(129, 140, 248)",
     glowColor: "rgba(129, 140, 248, 0.5)",
@@ -94,6 +97,12 @@ const AI_DIRECTORS: AIDirector[] = [
 export default function AIDirectorsShowcase() {
   const { language } = useLanguage();
   const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const { openClawdBot } = useClawdBot();
+
+  // Handle director click - opens ClawdBot in the appropriate module
+  const handleDirectorClick = (director: AIDirector) => {
+    openClawdBot(director.module);
+  };
 
   // Fetch real-time task data
   const { data: marketingTasks } = trpc.marketing.getTaskStats.useQuery(undefined, { refetchInterval: 30000 });
@@ -137,7 +146,10 @@ export default function AIDirectorsShowcase() {
           const stats = getTaskStats(director.id);
 
           return (
-            <Link key={director.id} href={director.path}>
+            <motion.div
+              key={director.id}
+              onClick={() => handleDirectorClick(director)}
+            >
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -247,7 +259,7 @@ export default function AIDirectorsShowcase() {
                       </div>
                     </div>
 
-                    {/* View button */}
+                    {/* Chat button */}
                     <div
                       className="flex items-center justify-center gap-1 py-1.5 px-2 rounded-lg text-xs font-medium transition-all duration-300"
                       style={{
@@ -256,16 +268,13 @@ export default function AIDirectorsShowcase() {
                         border: `1px solid ${isHovered ? director.accentColor : 'rgba(255, 255, 255, 0.1)'}`,
                       }}
                     >
-                      <span>{language === 'ka' ? 'ნახვა' : 'View'}</span>
-                      <ArrowRight
-                        className="w-3 h-3 transition-transform duration-300"
-                        style={{ transform: isHovered ? 'translateX(2px)' : 'translateX(0)' }}
-                      />
+                      <MessageCircle className="w-3 h-3" />
+                      <span>{language === 'ka' ? 'ჩატი' : 'Chat'}</span>
                     </div>
                   </div>
                 </div>
               </motion.div>
-            </Link>
+            </motion.div>
           );
         })}
       </div>
