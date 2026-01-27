@@ -170,22 +170,30 @@ export const reviewsRouter = router({
   getOutscraperStatus: protectedProcedure.query(async () => {
     // Check if we have any reviews from outscraper
     const db = await getDb();
-    if (!db) return { connected: false, lastSync: null, totalReviews: 0 };
+    if (!db) {
+      console.warn("[Reviews] Database not available for getOutscraperStatus");
+      return { connected: false, lastSync: null, totalGoogleReviews: 0, webhookUrl: '/api/trpc/reviews.receiveOutscraperWebhook' };
+    }
 
-    const result = await db
-      .select({ 
-        count: sql<number>`COUNT(*)`,
-        lastDate: sql<string>`MAX(createdAt)`,
-      })
-      .from(guestReviews)
-      .where(eq(guestReviews.source, 'google'));
+    try {
+      const result = await db
+        .select({
+          count: sql<number>`COUNT(*)`,
+          lastDate: sql<string>`MAX(createdAt)`,
+        })
+        .from(guestReviews)
+        .where(eq(guestReviews.source, 'google'));
 
-    return {
-      connected: true,
-      webhookUrl: '/api/trpc/reviews.receiveOutscraperWebhook',
-      lastSync: result[0]?.lastDate || null,
-      totalGoogleReviews: result[0]?.count || 0,
-    };
+      return {
+        connected: true,
+        webhookUrl: '/api/trpc/reviews.receiveOutscraperWebhook',
+        lastSync: result[0]?.lastDate || null,
+        totalGoogleReviews: result[0]?.count || 0,
+      };
+    } catch (error) {
+      console.error("[Reviews] getOutscraperStatus error:", error);
+      return { connected: false, lastSync: null, totalGoogleReviews: 0, webhookUrl: '/api/trpc/reviews.receiveOutscraperWebhook' };
+    }
   }),
 
   /**
@@ -205,7 +213,10 @@ export const reviewsRouter = router({
     }).optional())
     .query(async ({ input }) => {
       const db = await getDb();
-      if (!db) throw new Error("Database not available");
+      if (!db) {
+        console.warn("[Reviews] Database not available for getAll");
+        return { reviews: [], total: 0, hasMore: false };
+      }
 
       const filters = input || {};
       const conditions: any[] = [];
@@ -269,7 +280,21 @@ export const reviewsRouter = router({
     }).optional())
     .query(async ({ input }) => {
       const db = await getDb();
-      if (!db) throw new Error("Database not available");
+      if (!db) {
+        console.warn("[Reviews] Database not available for getStats");
+        return {
+          total: 0,
+          avgRating: 0,
+          positiveCount: 0,
+          neutralCount: 0,
+          negativeCount: 0,
+          repliedCount: 0,
+          pendingCount: 0,
+          responseRate: 0,
+          positiveRate: 0,
+          trend: { change: 0, percentage: 0 },
+        };
+      }
 
       const filters = input || {};
       const conditions: any[] = [];
@@ -355,7 +380,10 @@ export const reviewsRouter = router({
     .input(z.object({ id: z.number() }))
     .query(async ({ input }) => {
       const db = await getDb();
-      if (!db) throw new Error("Database not available");
+      if (!db) {
+        console.warn("[Reviews] Database not available for getById");
+        return null;
+      }
 
       const result = await db
         .select()
@@ -376,7 +404,10 @@ export const reviewsRouter = router({
     }))
     .mutation(async ({ input, ctx }) => {
       const db = await getDb();
-      if (!db) throw new Error("Database not available");
+      if (!db) {
+        console.warn("[Reviews] Database not available for reply");
+        return { success: false, error: "Database not available" };
+      }
 
       await db
         .update(guestReviews)
@@ -398,7 +429,10 @@ export const reviewsRouter = router({
     .input(z.object({ id: z.number() }))
     .mutation(async ({ input }) => {
       const db = await getDb();
-      if (!db) throw new Error("Database not available");
+      if (!db) {
+        console.warn("[Reviews] Database not available for deleteReply");
+        return { success: false, error: "Database not available" };
+      }
 
       await db
         .update(guestReviews)
@@ -420,7 +454,10 @@ export const reviewsRouter = router({
     .input(z.object({ id: z.number() }))
     .mutation(async ({ input }) => {
       const db = await getDb();
-      if (!db) throw new Error("Database not available");
+      if (!db) {
+        console.warn("[Reviews] Database not available for generateAiReply");
+        return { aiReply: "", error: "Database not available" };
+      }
 
       const review = await db
         .select()
@@ -454,7 +491,10 @@ export const reviewsRouter = router({
     }).optional())
     .query(async ({ input }) => {
       const db = await getDb();
-      if (!db) throw new Error("Database not available");
+      if (!db) {
+        console.warn("[Reviews] Database not available for getTopicsAnalysis");
+        return [];
+      }
 
       const filters = input || {};
       const conditions: any[] = [];
@@ -500,7 +540,10 @@ export const reviewsRouter = router({
    */
   syncDemoReviews: protectedProcedure.mutation(async () => {
     const db = await getDb();
-    if (!db) throw new Error("Database not available");
+    if (!db) {
+      console.warn("[Reviews] Database not available for syncDemoReviews");
+      return { success: false, imported: 0, skipped: 0, total: 0, error: "Database not available" };
+    }
 
     // Demo reviews for testing
     const demoReviews = [
@@ -557,7 +600,10 @@ export const reviewsRouter = router({
    */
   getPlatformBreakdown: publicProcedure.query(async () => {
     const db = await getDb();
-    if (!db) throw new Error("Database not available");
+    if (!db) {
+      console.warn("[Reviews] Database not available for getPlatformBreakdown");
+      return [];
+    }
 
     const breakdown = await db
       .select({
@@ -580,7 +626,19 @@ export const reviewsRouter = router({
    */
   getResponseTimeMetrics: publicProcedure.query(async () => {
     const db = await getDb();
-    if (!db) throw new Error("Database not available");
+    if (!db) {
+      console.warn("[Reviews] Database not available for getResponseTimeMetrics");
+      return {
+        avgResponseTimeHours: 0,
+        avgResponseTimeDays: 0,
+        fastestResponseHours: 0,
+        slowestResponseHours: 0,
+        totalReplied: 0,
+        respondedWithin24h: 0,
+        respondedWithin48h: 0,
+        respondedWithin7d: 0,
+      };
+    }
 
     // Get all reviews that have replies
     const repliedReviews = await db
@@ -647,7 +705,10 @@ export const reviewsRouter = router({
    */
   getLastSyncTime: publicProcedure.query(async () => {
     const db = await getDb();
-    if (!db) throw new Error("Database not available");
+    if (!db) {
+      console.warn("[Reviews] Database not available for getLastSyncTime");
+      return { lastSync: null };
+    }
 
     const result = await db
       .select({ createdAt: guestReviews.createdAt })
@@ -672,7 +733,10 @@ export const reviewsRouter = router({
     }))
     .query(async ({ input }) => {
       const db = await getDb();
-      if (!db) throw new Error("Database not available");
+      if (!db) {
+        console.warn("[Reviews] Database not available for exportReviews");
+        return { format: input.format, data: input.format === "csv" ? "" : [], count: 0 };
+      }
 
       const conditions = [];
       
@@ -737,7 +801,10 @@ export const reviewsRouter = router({
     }).optional())
     .query(async ({ input }) => {
       const db = await getDb();
-      if (!db) throw new Error("Database not available");
+      if (!db) {
+        console.warn("[Reviews] Database not available for getRatingTrend");
+        return [];
+      }
 
       const monthsBack = input?.months || 12;
       const startDate = new Date();
