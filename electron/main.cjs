@@ -19,6 +19,9 @@ let mainWindow;
 // Development mode check
 const isDev = process.env.NODE_ENV === 'development' || !app.isPackaged;
 
+// Production URL (Vercel)
+const PRODUCTION_URL = 'https://orbi-city-hub.vercel.app';
+
 function createWindow() {
   // Create the browser window
   mainWindow = new BrowserWindow({
@@ -45,8 +48,8 @@ function createWindow() {
     mainWindow.loadURL('http://localhost:3000');
     mainWindow.webContents.openDevTools();
   } else {
-    // In production, load the built files
-    mainWindow.loadFile(path.join(__dirname, '../dist/client/index.html'));
+    // In production, load from Vercel
+    mainWindow.loadURL(PRODUCTION_URL);
   }
 
   // Show window when ready
