@@ -1,7 +1,7 @@
 /**
  * OTA Sync Status Component
- * Monitor connection status for all 15 distribution channels + 4 coming soon
- * Based on Distribution-Channels-Portfolio.pdf
+ * Monitor connection status for all distribution channels
+ * Data from Supabase distribution_channels table
  */
 
 import { useState } from "react";
@@ -29,358 +29,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
-
-interface OTAChannel {
-  id: string;
-  name: string;
-  nameKa: string;
-  category: "ota" | "social" | "pms" | "website" | "coming_soon";
-  logo: string;
-  color: string;
-  status: "connected" | "warning" | "error" | "syncing" | "coming_soon";
-  lastSync: string;
-  nextSync: string;
-  syncProgress?: number;
-  bookingsToday: number;
-  revenue24h: number;
-  listingUrl: string;
-  extranetUrl: string;
-  apiStatus: "healthy" | "degraded" | "down" | "unknown";
-}
-
-// ALL 15 Active Channels + 4 Coming Soon (from PDF)
-const ALL_CHANNELS: OTAChannel[] = [
-  // OTA CHANNELS (10 active)
-  {
-    id: "booking",
-    name: "Booking.com",
-    nameKa: "ბუქინგი",
-    category: "ota",
-    logo: "B",
-    color: "bg-blue-600",
-    status: "connected",
-    lastSync: "2 min ago",
-    nextSync: "in 8 min",
-    bookingsToday: 5,
-    revenue24h: 1250,
-    listingUrl: "https://www.booking.com/hotel/ge/orbi-city-luxury-sea-view-apartm",
-    extranetUrl: "https://admin.booking.com",
-    apiStatus: "healthy",
-  },
-  {
-    id: "airbnb",
-    name: "Airbnb",
-    nameKa: "ეარბიენბი",
-    category: "ota",
-    logo: "A",
-    color: "bg-pink-500",
-    status: "connected",
-    lastSync: "5 min ago",
-    nextSync: "in 5 min",
-    bookingsToday: 3,
-    revenue24h: 890,
-    listingUrl: "https://www.airbnb.com/rooms/1455314718960040955",
-    extranetUrl: "https://www.airbnb.com/hosting",
-    apiStatus: "healthy",
-  },
-  {
-    id: "agoda",
-    name: "Agoda",
-    nameKa: "აგოდა",
-    category: "ota",
-    logo: "AG",
-    color: "bg-red-500",
-    status: "connected",
-    lastSync: "3 min ago",
-    nextSync: "in 7 min",
-    bookingsToday: 1,
-    revenue24h: 180,
-    listingUrl: "https://www.agoda.com/batumi-orbi-sitiy-twin-tower-sea-wiev/hotel",
-    extranetUrl: "https://ycs.agoda.com",
-    apiStatus: "healthy",
-  },
-  {
-    id: "expedia",
-    name: "Expedia",
-    nameKa: "ექსპედია",
-    category: "ota",
-    logo: "E",
-    color: "bg-yellow-500",
-    status: "warning",
-    lastSync: "15 min ago",
-    nextSync: "in 2 min",
-    bookingsToday: 2,
-    revenue24h: 420,
-    listingUrl: "https://www.expedia.com/Batumi-Hotels-ORBI-CITY-Luxury-Sea-View-A",
-    extranetUrl: "https://www.expediapartnercentral.com",
-    apiStatus: "degraded",
-  },
-  {
-    id: "tripadvisor",
-    name: "TripAdvisor",
-    nameKa: "ტრიპადვაიზორი",
-    category: "ota",
-    logo: "TA",
-    color: "bg-emerald-500",
-    status: "connected",
-    lastSync: "8 min ago",
-    nextSync: "in 2 min",
-    bookingsToday: 0,
-    revenue24h: 0,
-    listingUrl: "https://www.tripadvisor.com/Hotel_Review-g297576-d27797353-Review",
-    extranetUrl: "https://www.tripadvisor.com/Owners",
-    apiStatus: "healthy",
-  },
-  {
-    id: "ostrovok",
-    name: "Ostrovok",
-    nameKa: "ოსტროვოკი",
-    category: "ota",
-    logo: "OS",
-    color: "bg-orange-500",
-    status: "connected",
-    lastSync: "4 min ago",
-    nextSync: "in 6 min",
-    bookingsToday: 1,
-    revenue24h: 150,
-    listingUrl: "https://ostrovok.ru/hotel/georgia/batumi/mid13345479/hotel_orbi_c",
-    extranetUrl: "https://extranet.emergingtravel.com/v3/hotels/393043548/hotel/info",
-    apiStatus: "healthy",
-  },
-  {
-    id: "sutochno",
-    name: "Sutochno.com",
-    nameKa: "სუტოჩნო",
-    category: "ota",
-    logo: "S",
-    color: "bg-red-600",
-    status: "connected",
-    lastSync: "6 min ago",
-    nextSync: "in 4 min",
-    bookingsToday: 2,
-    revenue24h: 280,
-    listingUrl: "https://sutochno.com/front/searchapp/search",
-    extranetUrl: "https://extranet.sutochno.ru/cabinet/objects",
-    apiStatus: "healthy",
-  },
-  {
-    id: "bronevik",
-    name: "Bronevik.com",
-    nameKa: "ბრონევიკი",
-    category: "ota",
-    logo: "BR",
-    color: "bg-green-700",
-    status: "connected",
-    lastSync: "7 min ago",
-    nextSync: "in 3 min",
-    bookingsToday: 0,
-    revenue24h: 0,
-    listingUrl: "https://bronevik.com/en/hotel/start?hotel_id=757157",
-    extranetUrl: "https://bronevik.com/en/info/hotels",
-    apiStatus: "healthy",
-  },
-  {
-    id: "tvil",
-    name: "Tvil.ru",
-    nameKa: "ტვილი",
-    category: "ota",
-    logo: "TV",
-    color: "bg-purple-600",
-    status: "connected",
-    lastSync: "5 min ago",
-    nextSync: "in 5 min",
-    bookingsToday: 1,
-    revenue24h: 120,
-    listingUrl: "https://tvil.ru/city/batumi/hotels/2062593",
-    extranetUrl: "https://tvil.ru",
-    apiStatus: "healthy",
-  },
-  {
-    id: "hostelworld",
-    name: "Hostelworld",
-    nameKa: "ჰოსტელვორლდი",
-    category: "ota",
-    logo: "HW",
-    color: "bg-orange-600",
-    status: "connected",
-    lastSync: "9 min ago",
-    nextSync: "in 1 min",
-    bookingsToday: 0,
-    revenue24h: 0,
-    listingUrl: "https://www.hostelworld.com/pwa/hosteldetails.php/Orbi-City-Sea-v",
-    extranetUrl: "https://inbox.hostelworld.com",
-    apiStatus: "healthy",
-  },
-
-  // PMS
-  {
-    id: "otelms",
-    name: "OtelMS",
-    nameKa: "ოტელმს",
-    category: "pms",
-    logo: "O",
-    color: "bg-cyan-500",
-    status: "syncing",
-    lastSync: "now",
-    nextSync: "—",
-    syncProgress: 67,
-    bookingsToday: 0,
-    revenue24h: 0,
-    listingUrl: "",
-    extranetUrl: "https://116758.otelms.com/reservation_c2/calendar",
-    apiStatus: "healthy",
-  },
-
-  // SOCIAL MEDIA
-  {
-    id: "facebook",
-    name: "Facebook",
-    nameKa: "ფეისბუქი",
-    category: "social",
-    logo: "FB",
-    color: "bg-blue-500",
-    status: "connected",
-    lastSync: "1 hr ago",
-    nextSync: "in 1 hr",
-    bookingsToday: 0,
-    revenue24h: 0,
-    listingUrl: "https://www.facebook.com/share/1D9xvSc6Dh/?mibextid=wwXIfr",
-    extranetUrl: "https://business.facebook.com",
-    apiStatus: "healthy",
-  },
-  {
-    id: "instagram",
-    name: "Instagram",
-    nameKa: "ინსტაგრამი",
-    category: "social",
-    logo: "IG",
-    color: "bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400",
-    status: "connected",
-    lastSync: "1 hr ago",
-    nextSync: "in 1 hr",
-    bookingsToday: 0,
-    revenue24h: 0,
-    listingUrl: "https://www.instagram.com/orbi_city_sea_view_apartment",
-    extranetUrl: "https://www.instagram.com",
-    apiStatus: "healthy",
-  },
-  {
-    id: "tiktok",
-    name: "TikTok",
-    nameKa: "ტიკტოკი",
-    category: "social",
-    logo: "TT",
-    color: "bg-black",
-    status: "connected",
-    lastSync: "2 hr ago",
-    nextSync: "in 1 hr",
-    bookingsToday: 0,
-    revenue24h: 0,
-    listingUrl: "https://www.tiktok.com/@orbi.apartments.batumi",
-    extranetUrl: "https://www.tiktok.com",
-    apiStatus: "healthy",
-  },
-  {
-    id: "youtube",
-    name: "YouTube",
-    nameKa: "იუთუბი",
-    category: "social",
-    logo: "YT",
-    color: "bg-red-600",
-    status: "connected",
-    lastSync: "3 hr ago",
-    nextSync: "in 1 hr",
-    bookingsToday: 0,
-    revenue24h: 0,
-    listingUrl: "https://www.youtube.com/@ORBIAPARTMENTS",
-    extranetUrl: "https://studio.youtube.com",
-    apiStatus: "healthy",
-  },
-
-  // WEBSITE
-  {
-    id: "website",
-    name: "orbicitybatumi.com",
-    nameKa: "ვებსაიტი",
-    category: "website",
-    logo: "W",
-    color: "bg-emerald-500",
-    status: "connected",
-    lastSync: "real-time",
-    nextSync: "—",
-    bookingsToday: 1,
-    revenue24h: 200,
-    listingUrl: "https://www.orbicitybatumi.com",
-    extranetUrl: "",
-    apiStatus: "healthy",
-  },
-
-  // COMING SOON
-  {
-    id: "yandex",
-    name: "Yandex Travel",
-    nameKa: "იანდექს თრეველი",
-    category: "coming_soon",
-    logo: "Y",
-    color: "bg-red-500",
-    status: "coming_soon",
-    lastSync: "—",
-    nextSync: "—",
-    bookingsToday: 0,
-    revenue24h: 0,
-    listingUrl: "",
-    extranetUrl: "",
-    apiStatus: "unknown",
-  },
-  {
-    id: "hrs",
-    name: "HRS",
-    nameKa: "აშარეს",
-    category: "coming_soon",
-    logo: "HRS",
-    color: "bg-red-700",
-    status: "coming_soon",
-    lastSync: "—",
-    nextSync: "—",
-    bookingsToday: 0,
-    revenue24h: 0,
-    listingUrl: "",
-    extranetUrl: "",
-    apiStatus: "unknown",
-  },
-  {
-    id: "trip",
-    name: "Trip.com",
-    nameKa: "ტრიპ.კომ",
-    category: "coming_soon",
-    logo: "TR",
-    color: "bg-blue-600",
-    status: "coming_soon",
-    lastSync: "—",
-    nextSync: "—",
-    bookingsToday: 0,
-    revenue24h: 0,
-    listingUrl: "",
-    extranetUrl: "",
-    apiStatus: "unknown",
-  },
-  {
-    id: "cbooking",
-    name: "Cbooking.ru",
-    nameKa: "სიბუქინგი",
-    category: "coming_soon",
-    logo: "CB",
-    color: "bg-teal-600",
-    status: "coming_soon",
-    lastSync: "—",
-    nextSync: "—",
-    bookingsToday: 0,
-    revenue24h: 0,
-    listingUrl: "",
-    extranetUrl: "",
-    apiStatus: "unknown",
-  },
-];
+import { useDistributionChannels, ChannelForUI } from "@/hooks/useDistributionChannels";
 
 const STATUS_CONFIG = {
   connected: {
@@ -429,9 +78,28 @@ const API_STATUS_CONFIG = {
 
 export function OTASyncStatus() {
   const { language } = useLanguage();
-  const [channels, setChannels] = useState<OTAChannel[]>(ALL_CHANNELS);
+  const {
+    channels,
+    otaChannels,
+    socialChannels,
+    pmsChannels,
+    websiteChannels,
+    comingSoonChannels,
+    activeChannels,
+    connectedCount,
+    totalBookings,
+    totalRevenue,
+    isLoading,
+    error,
+    refetch,
+    updateChannelStatus,
+    setChannels,
+  } = useDistributionChannels();
+
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [activeTab, setActiveTab] = useState("ota");
+  const [syncingChannels, setSyncingChannels] = useState<Set<string>>(new Set());
+  const [syncProgress, setSyncProgress] = useState<Record<string, number>>({});
 
   const handleSyncAll = async () => {
     setIsRefreshing(true);
@@ -441,7 +109,11 @@ export function OTASyncStatus() {
         : "Starting sync across all channels..."
     );
 
+    // Simulate sync
     await new Promise((resolve) => setTimeout(resolve, 2000));
+
+    // Refresh data from Supabase
+    await refetch();
 
     setIsRefreshing(false);
     toast.success(
@@ -452,47 +124,40 @@ export function OTASyncStatus() {
   };
 
   const handleSyncChannel = async (channelId: string) => {
-    setChannels((prev) =>
-      prev.map((c) =>
-        c.id === channelId ? { ...c, status: "syncing", syncProgress: 0 } : c
-      )
-    );
+    setSyncingChannels((prev) => new Set(prev).add(channelId));
+    setSyncProgress((prev) => ({ ...prev, [channelId]: 0 }));
 
+    // Simulate sync progress
     for (let i = 0; i <= 100; i += 20) {
       await new Promise((resolve) => setTimeout(resolve, 200));
-      setChannels((prev) =>
-        prev.map((c) =>
-          c.id === channelId ? { ...c, syncProgress: i } : c
-        )
-      );
+      setSyncProgress((prev) => ({ ...prev, [channelId]: i }));
     }
 
-    setChannels((prev) =>
-      prev.map((c) =>
-        c.id === channelId
-          ? { ...c, status: "connected", lastSync: "just now", syncProgress: undefined }
-          : c
-      )
-    );
+    // Update in Supabase
+    await updateChannelStatus(channelId, {
+      api_status: "healthy",
+    });
 
-    toast.success(`${channels.find((c) => c.id === channelId)?.name} synced!`);
+    setSyncingChannels((prev) => {
+      const next = new Set(prev);
+      next.delete(channelId);
+      return next;
+    });
+    setSyncProgress((prev) => {
+      const next = { ...prev };
+      delete next[channelId];
+      return next;
+    });
+
+    const channel = channels.find((c) => c.id === channelId);
+    toast.success(`${channel?.name} synced!`);
   };
 
-  // Filter channels by category
-  const otaChannels = channels.filter((c) => c.category === "ota");
-  const socialChannels = channels.filter((c) => c.category === "social");
-  const pmsChannels = channels.filter((c) => c.category === "pms");
-  const websiteChannels = channels.filter((c) => c.category === "website");
-  const comingSoonChannels = channels.filter((c) => c.category === "coming_soon");
-
-  // Stats
-  const activeChannels = channels.filter((c) => c.status !== "coming_soon");
-  const connectedCount = activeChannels.filter((c) => c.status === "connected" || c.status === "syncing").length;
-  const totalBookings = otaChannels.reduce((sum, c) => sum + c.bookingsToday, 0);
-  const totalRevenue = otaChannels.reduce((sum, c) => sum + c.revenue24h, 0);
-
-  const renderChannelCard = (channel: OTAChannel) => {
-    const statusConfig = STATUS_CONFIG[channel.status];
+  const renderChannelCard = (channel: ChannelForUI) => {
+    const isSyncing = syncingChannels.has(channel.id);
+    const currentProgress = syncProgress[channel.id];
+    const effectiveStatus = isSyncing ? "syncing" : channel.status;
+    const statusConfig = STATUS_CONFIG[effectiveStatus];
     const StatusIcon = statusConfig.icon;
     const apiConfig = API_STATUS_CONFIG[channel.apiStatus];
 
@@ -521,7 +186,7 @@ export function OTASyncStatus() {
             </div>
             <Badge className={`${statusConfig.bg} ${statusConfig.color}`}>
               <StatusIcon
-                className={`w-3 h-3 mr-1 ${channel.status === "syncing" ? "animate-spin" : ""}`}
+                className={`w-3 h-3 mr-1 ${isSyncing ? "animate-spin" : ""}`}
               />
               {statusConfig.label[language === "ka" ? "ka" : "en"]}
             </Badge>
@@ -529,10 +194,10 @@ export function OTASyncStatus() {
         </CardHeader>
         <CardContent>
           {/* Sync Progress */}
-          {channel.status === "syncing" && channel.syncProgress !== undefined && (
+          {isSyncing && currentProgress !== undefined && (
             <div className="mb-3">
-              <Progress value={channel.syncProgress} className="h-2" />
-              <p className="text-xs text-blue-400 mt-1">{channel.syncProgress}%</p>
+              <Progress value={currentProgress} className="h-2" />
+              <p className="text-xs text-blue-400 mt-1">{currentProgress}%</p>
             </div>
           )}
 
@@ -576,9 +241,9 @@ export function OTASyncStatus() {
                   size="sm"
                   className="flex-1 border-slate-600 hover:bg-slate-700"
                   onClick={() => handleSyncChannel(channel.id)}
-                  disabled={channel.status === "syncing"}
+                  disabled={isSyncing}
                 >
-                  <RefreshCw className="w-3 h-3 mr-1" />
+                  <RefreshCw className={`w-3 h-3 mr-1 ${isSyncing ? "animate-spin" : ""}`} />
                   {language === "ka" ? "სინქ" : "Sync"}
                 </Button>
                 {channel.listingUrl && (
@@ -620,13 +285,50 @@ export function OTASyncStatus() {
     );
   };
 
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <Loader2 className="w-8 h-8 animate-spin text-cyan-400 mx-auto mb-4" />
+          <p className="text-slate-400">
+            {language === "ka" ? "იტვირთება არხები..." : "Loading channels..."}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <XCircle className="w-8 h-8 text-red-400 mx-auto mb-4" />
+          <p className="text-red-400 mb-2">
+            {language === "ka" ? "შეცდომა მონაცემების ჩატვირთვისას" : "Error loading channels"}
+          </p>
+          <p className="text-slate-500 text-sm mb-4">{error}</p>
+          <Button onClick={refetch} variant="outline" className="border-slate-600">
+            <RefreshCw className="w-4 h-4 mr-2" />
+            {language === "ka" ? "ხელახლა ცდა" : "Retry"}
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-semibold text-white">
+          <h2 className="text-xl font-semibold text-white flex items-center gap-2">
             {language === "ka" ? "დისტრიბუციის არხები" : "Distribution Channels"}
+            <Badge variant="outline" className="border-cyan-500/50 text-cyan-400 text-xs">
+              <Database className="w-3 h-3 mr-1" />
+              Supabase
+            </Badge>
           </h2>
           <p className="text-sm text-slate-400">
             {language === "ka"
