@@ -10,7 +10,7 @@ import { ModulePageLayout, SubModule } from "@/components/ModulePageLayout";
 import { BookingsTable } from "@/components/BookingsTable";
 import { ReservationsCalendar } from "@/components/ReservationsCalendar";
 import { ReservationsOverview } from "@/components/reservations/ReservationsOverview";
-import { OtelmsCalendar } from "@/components/reservations/OtelmsCalendar";
+import { OtelmsCalendarFull } from "@/components/reservations/OtelmsCalendarFull";
 
 // Lazy load sub-module components
 const GuestsCRMContent = lazy(() => import("./reservations/GuestsCRM"));
@@ -44,10 +44,10 @@ const CalendarTab = () => (
   </div>
 );
 
-// OtelMS Calendar Tab (New - matching OtelMS style)
+// OtelMS Calendar Tab (New - exact replica of OtelMS)
 const OtelmsCalendarTab = () => (
-  <div className="bg-slate-800/30 rounded-xl p-6 border border-white/10">
-    <OtelmsCalendar defaultDays={45} />
+  <div className="bg-slate-800/30 rounded-xl p-2 border border-white/10">
+    <OtelmsCalendarFull defaultDays={45} />
   </div>
 );
 

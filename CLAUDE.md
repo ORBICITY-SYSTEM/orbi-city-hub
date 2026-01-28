@@ -72,6 +72,10 @@ Scrapers:  Cloud Run (Python) - github.com/ORBICITY-SYSTEM/otelms-rows-api
 - **Default Port**: 3000 (falls back to 3001 if busy)
 - **URL**: http://localhost:3000 or http://localhost:3001
 
+### Anthropic Claude AI (CEO AI Chat)
+- **API Key**: See .env file (ANTHROPIC_API_KEY)
+- **Model**: `claude-3-5-haiku-20241022`
+
 ---
 
 ## Claude Code Profiles
