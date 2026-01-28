@@ -404,7 +404,7 @@ async function executeGenerateReviewReply(input: Record<string, any>) {
     : '';
 
   const response = await anthropic.messages.create({
-    model: 'claude-3-5-haiku-20241022',
+    model: 'claude-3-haiku-20240307',
     max_tokens: 500,
     messages: [
       {
@@ -486,7 +486,7 @@ export async function askCEO(
   try {
     // First API call with tools
     let response = await anthropic.messages.create({
-      model: 'claude-3-5-haiku-20241022',
+      model: 'claude-3-haiku-20240307',
       max_tokens: 2048,
       system: CEO_SYSTEM_PROMPT,
       tools: CEO_TOOLS,
@@ -525,7 +525,7 @@ export async function askCEO(
 
       // Get next response
       response = await anthropic.messages.create({
-        model: 'claude-3-5-haiku-20241022',
+        model: 'claude-3-haiku-20240307',
         max_tokens: 2048,
         system: CEO_SYSTEM_PROMPT,
         tools: CEO_TOOLS,
