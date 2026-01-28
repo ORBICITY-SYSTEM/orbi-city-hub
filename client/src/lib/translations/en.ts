@@ -624,6 +624,38 @@ export const en = {
     noDeparturesToday: "No check-outs today",
     loadingData: "Loading operations data...",
   },
+
+  // CEO AI Chat
+  ceoChat: {
+    title: "CEO AI Assistant",
+    subtitle: "Your intelligent hotel management assistant",
+    placeholder: "Ask me anything about the hotel...",
+    send: "Send",
+    voiceInput: "Voice Input",
+    listening: "Listening...",
+    voiceNotSupported: "Voice input not supported",
+    alerts: "Alerts",
+    suggestions: "Suggestions",
+    noAlerts: "No alerts",
+    noSuggestions: "No suggestions",
+    toolsUsed: "Tools Used",
+    thinking: "Thinking...",
+    error: "Error occurred",
+    tryAgain: "Try again",
+    // Alert types
+    alertCritical: "Critical",
+    alertWarning: "Warning",
+    alertInfo: "Info",
+    alertSuccess: "Success",
+    // Tool labels
+    toolSupabaseQuery: "Database Query",
+    toolSupabaseInsert: "Save Data",
+    toolSupabaseUpdate: "Update Data",
+    toolN8nWorkflow: "Automation",
+    toolSendEmail: "Send Email",
+    toolRunScraper: "Sync Data",
+    toolGenerateReply: "AI Response",
+  },
 };
 
 export type Translations = typeof en;

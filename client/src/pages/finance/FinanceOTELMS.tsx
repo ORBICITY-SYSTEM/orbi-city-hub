@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Database, RefreshCw,
   Calendar, Users, TrendingUp,
-  LogIn, LogOut
+  LogIn, LogOut, BarChart3
 } from "lucide-react";
 import {
   useOtelmsConnection,
@@ -15,13 +15,14 @@ import {
   useRListBookings,
 } from "@/hooks/useOtelmsData";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { OtelmsFinanceDashboard } from "@/components/finance/OtelmsFinanceDashboard";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PageHeader } from "@/components/ui/PageHeader";
 
 const FinanceOtelMS = () => {
   const { t } = useLanguage();
-  const [activeTab, setActiveTab] = useState("today");
+  const [activeTab, setActiveTab] = useState("dashboard");
 
   // Supabase connection check
   const connectionQuery = useOtelmsConnection();
@@ -166,6 +167,10 @@ const FinanceOtelMS = () => {
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="bg-slate-800/50 border border-white/10">
+            <TabsTrigger value="dashboard" className="data-[state=active]:bg-green-600 data-[state=active]:text-white">
+              <BarChart3 className="h-4 w-4 mr-1" />
+              {t("დეშბორდი", "Dashboard")}
+            </TabsTrigger>
             <TabsTrigger value="today" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
               {t("დღევანდელი", "Today")}
             </TabsTrigger>
@@ -176,6 +181,11 @@ const FinanceOtelMS = () => {
               {t("RList", "RList")}
             </TabsTrigger>
           </TabsList>
+
+          {/* Finance Dashboard - Revenue, ADR, RevPAR, Occupancy */}
+          <TabsContent value="dashboard">
+            <OtelmsFinanceDashboard />
+          </TabsContent>
 
           {/* Today's Operations */}
           <TabsContent value="today" className="space-y-6">

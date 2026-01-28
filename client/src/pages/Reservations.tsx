@@ -10,6 +10,7 @@ import { ModulePageLayout, SubModule } from "@/components/ModulePageLayout";
 import { BookingsTable } from "@/components/BookingsTable";
 import { ReservationsCalendar } from "@/components/ReservationsCalendar";
 import { ReservationsOverview } from "@/components/reservations/ReservationsOverview";
+import { OtelmsCalendar } from "@/components/reservations/OtelmsCalendar";
 
 // Lazy load sub-module components
 const GuestsCRMContent = lazy(() => import("./reservations/GuestsCRM"));
@@ -36,10 +37,17 @@ const OTAAnalyticsTab = () => (
   </Suspense>
 );
 
-// Calendar Tab
+// Calendar Tab (Old style)
 const CalendarTab = () => (
   <div className="bg-slate-800/30 rounded-xl p-6 border border-white/10">
     <ReservationsCalendar />
+  </div>
+);
+
+// OtelMS Calendar Tab (New - matching OtelMS style)
+const OtelmsCalendarTab = () => (
+  <div className="bg-slate-800/30 rounded-xl p-6 border border-white/10">
+    <OtelmsCalendar defaultDays={45} />
   </div>
 );
 
@@ -83,9 +91,9 @@ const Reservations = () => {
     {
       id: "calendar",
       nameKey: "reservations.calendar",
-      nameFallback: "Calendar",
+      nameFallback: "OtelMS Calendar",
       icon: CalendarDays,
-      component: <CalendarTab />,
+      component: <OtelmsCalendarTab />,
     },
     {
       id: "bookings",

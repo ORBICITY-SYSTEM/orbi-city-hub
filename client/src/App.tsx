@@ -11,6 +11,7 @@ import ModularLayout from "./components/ModularLayout";
 import { UniversalChatPopup } from "./components/UniversalChatPopup";
 import { PageLoadingSkeleton } from "./components/LoadingSkeleton";
 import { ClawdBotProvider, ClawdBotChat } from "./components/clawdbot";
+import { CEOChat } from "./components/CEOChat";
 
 // Only Home is eagerly loaded for fast initial render
 import Home from "./pages/Home";
@@ -234,6 +235,7 @@ function App() {
                   <Router />
                   <UniversalChatPopup />
                   <ClawdBotChat />
+                  <CEOChat />
                 </TooltipProvider>
               </ClawdBotProvider>
             </DemoModeProvider>

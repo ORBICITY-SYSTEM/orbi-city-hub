@@ -17,6 +17,7 @@
     "electron:start": "electron ."
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.71.2",
     "@aws-sdk/client-s3": "^3.693.0",
     "@aws-sdk/s3-request-presigner": "^3.693.0",
     "@google-analytics/data": "^5.2.1",

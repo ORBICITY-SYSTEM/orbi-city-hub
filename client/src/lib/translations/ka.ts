@@ -628,4 +628,36 @@ export const ka: Translations = {
     noDeparturesToday: "დღეს გასვლები არ არის",
     loadingData: "ოპერაციების ჩატვირთვა...",
   },
+
+  // CEO AI ჩატი
+  ceoChat: {
+    title: "CEO AI ასისტენტი",
+    subtitle: "თქვენი ინტელექტუალური სასტუმროს მართვის ასისტენტი",
+    placeholder: "მკითხეთ რაიმე სასტუმროს შესახებ...",
+    send: "გაგზავნა",
+    voiceInput: "ხმოვანი შეყვანა",
+    listening: "მოსმენა...",
+    voiceNotSupported: "ხმოვანი შეყვანა არ არის მხარდაჭერილი",
+    alerts: "გაფრთხილებები",
+    suggestions: "რეკომენდაციები",
+    noAlerts: "გაფრთხილებები არ არის",
+    noSuggestions: "რეკომენდაციები არ არის",
+    toolsUsed: "გამოყენებული ინსტრუმენტები",
+    thinking: "ფიქრობს...",
+    error: "შეცდომა მოხდა",
+    tryAgain: "სცადეთ ხელახლა",
+    // Alert types
+    alertCritical: "კრიტიკული",
+    alertWarning: "გაფრთხილება",
+    alertInfo: "ინფორმაცია",
+    alertSuccess: "წარმატება",
+    // Tool labels
+    toolSupabaseQuery: "მონაცემთა ბაზის მოთხოვნა",
+    toolSupabaseInsert: "მონაცემების შენახვა",
+    toolSupabaseUpdate: "მონაცემების განახლება",
+    toolN8nWorkflow: "ავტომატიზაცია",
+    toolSendEmail: "ელფოსტის გაგზავნა",
+    toolRunScraper: "მონაცემების სინქრონიზაცია",
+    toolGenerateReply: "AI პასუხი",
+  },
 };
