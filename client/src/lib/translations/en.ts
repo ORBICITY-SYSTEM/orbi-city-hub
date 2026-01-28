@@ -590,6 +590,40 @@ export const en = {
     alreadyHaveAccount: "Already have an account?",
     dontHaveAccount: "Don't have an account?",
   },
+
+  // Reservations Module
+  reservations: {
+    overview: "Overview",
+    calendar: "Calendar",
+    bookings: "Bookings",
+    analytics: "OTA Analytics",
+    guests: "Guests",
+    reviews: "Reviews",
+    communication: "Communication",
+    todayArrivals: "Today's Arrivals",
+    todayDepartures: "Today's Check-outs",
+    activeBookings: "Active Bookings",
+    upcomingBookings: "Upcoming Bookings",
+    totalRevenue: "Total Revenue",
+    channelDistribution: "Channel Distribution",
+    recentBookings: "Recent Bookings",
+    noArrivalsToday: "No arrivals today",
+    noDeparturesToday: "No check-outs today",
+    loadingData: "Loading reservations data...",
+  },
+
+  // Logistics Operations
+  operations: {
+    title: "Operations",
+    todayArrivals: "Today's Arrivals",
+    todayDepartures: "Today's Check-outs",
+    tomorrowArrivals: "Tomorrow's Arrivals",
+    needsCleaning: "Needs Cleaning",
+    cleaningRequired: "Rooms Requiring Cleaning",
+    noArrivalsToday: "No arrivals today",
+    noDeparturesToday: "No check-outs today",
+    loadingData: "Loading operations data...",
+  },
 };
 
 export type Translations = typeof en;

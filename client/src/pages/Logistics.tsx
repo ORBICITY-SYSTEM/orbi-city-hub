@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Package, ArrowLeft, BarChart3, ClipboardList, Wrench, History } from "lucide-react";
+import { Package, ArrowLeft, BarChart3, ClipboardList, Wrench, History, CalendarCheck } from "lucide-react";
 import { useLocation } from "wouter";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { InventoryDashboardStats } from "@/components/InventoryDashboardStats";
@@ -9,6 +9,7 @@ import { StudioInventoryList } from "@/components/StudioInventoryList";
 import { HousekeepingModule } from "@/components/HousekeepingModule";
 import { MaintenanceModule } from "@/components/MaintenanceModule";
 import { LogisticsActivityLog } from "@/components/LogisticsActivityLog";
+import { TodayOperations } from "@/components/logistics/TodayOperations";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useEffect, useState, Suspense } from "react";
 import { Loader2 } from "lucide-react";
@@ -54,8 +55,12 @@ const Logistics = () => {
       </header>
 
       <main className="container mx-auto px-6 py-8">
-        <Tabs defaultValue="dashboard" className="w-full">
-          <TabsList className="grid w-full grid-cols-5 mb-8">
+        <Tabs defaultValue="operations" className="w-full">
+          <TabsList className="grid w-full grid-cols-6 mb-8">
+            <TabsTrigger value="operations" className="flex items-center gap-2">
+              <CalendarCheck className="h-4 w-4" />
+              {t("ოპერაციები", "Operations")}
+            </TabsTrigger>
             <TabsTrigger value="dashboard" className="flex items-center gap-2">
               <BarChart3 className="h-4 w-4" />
               {t("დეშბორდი", "Dashboard")}
@@ -77,6 +82,16 @@ const Logistics = () => {
               {t("აქტივობა", "Activity")}
             </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="operations">
+            <Suspense fallback={
+              <div className="flex items-center justify-center p-12">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              </div>
+            }>
+              <TodayOperations />
+            </Suspense>
+          </TabsContent>
 
           <TabsContent value="dashboard">
             <Suspense fallback={

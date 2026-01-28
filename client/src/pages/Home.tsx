@@ -13,11 +13,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, Suspense, lazy } from "react";
 import {
   DollarSign, Megaphone, Calendar, Truck, Star,
-  CheckCircle2, ArrowUpRight, Volume2, Brain, Zap, Sparkles, Settings, Database
+  CheckCircle2, ArrowUpRight, Volume2, Brain, Zap, Sparkles, Settings, Database,
+  TrendingUp, Building2, Users
 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { trpc } from "@/lib/trpc";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { useDashboardKPIs } from "@/hooks/useOrbicityData";
 
 // Import Command Center components
 import { AICEOAvatar } from "@/components/command-center/AICEOAvatar";
@@ -704,7 +706,10 @@ export default function Home() {
   const [activeDirector, setActiveDirector] = useState<string | null>(null);
   const [aiMessage, setAiMessage] = useState("");
 
-  // Real-time data fetching
+  // Real-time data from Supabase via useOrbicityData hook
+  const dashboardKPIs = useDashboardKPIs();
+
+  // Legacy tRPC data (fallback)
   const { data: todayOverview } = trpc.ceoDashboard.getTodayOverview.useQuery(undefined, {
     refetchInterval: 60000,
   });
@@ -718,6 +723,13 @@ export default function Home() {
     if (value >= 1000) return `₾${(value / 1000).toFixed(0)}K`;
     return `₾${value.toLocaleString()}`;
   };
+
+  // Use real data from Supabase with fallback to tRPC
+  const realRevenue = dashboardKPIs.hasData ? dashboardKPIs.todayRevenue : (todayOverview?.todayRevenue?.value || 0);
+  const realBookings = dashboardKPIs.hasData ? dashboardKPIs.activeBookings : (todayOverview?.activeBookings?.value || 0);
+  const realOccupancy = dashboardKPIs.hasData ? dashboardKPIs.currentOccupancy : 0;
+  const realArrivals = dashboardKPIs.hasData ? dashboardKPIs.todayArrivals : 0;
+  const realDepartures = dashboardKPIs.hasData ? dashboardKPIs.todayDepartures : 0;
 
   const directors = [
     {
@@ -1030,29 +1042,29 @@ export default function Home() {
               <RealTimeMetricCard
                 icon={DollarSign}
                 label={language === 'ka' ? 'შემოსავალი' : 'Revenue'}
-                value={todayOverview ? formatCurrency(todayOverview.todayRevenue.value) : '₾0'}
-                change={todayOverview?.todayRevenue.changePercent || '+0%'}
+                value={formatCurrency(realRevenue)}
+                change={dashboardKPIs.hasData ? `+${dashboardKPIs.revenueChange}%` : (todayOverview?.todayRevenue?.changePercent || '+0%')}
                 color="#22c55e"
               />
               <RealTimeMetricCard
                 icon={Calendar}
                 label={language === 'ka' ? 'ჯავშნები' : 'Bookings'}
-                value={todayOverview?.activeBookings.value.toString() || '0'}
-                change={`+${todayOverview?.activeBookings.change || 0}`}
+                value={realBookings.toString()}
+                change={`${realArrivals} ${language === 'ka' ? 'ჩამოსვლა' : 'arrivals'}`}
                 color="#06b6d4"
               />
               <RealTimeMetricCard
-                icon={Star}
-                label={language === 'ka' ? 'რეიტინგი' : 'Rating'}
-                value={moduleSummaries?.reservations.avgRating?.toString() || '4.8'}
-                change="+0.2"
+                icon={Building2}
+                label={language === 'ka' ? 'დაკავება' : 'Occupancy'}
+                value={`${Math.round(realOccupancy)}%`}
+                change={`${dashboardKPIs.roomsOccupied || 0}/60 ${language === 'ka' ? 'ოთახი' : 'rooms'}`}
                 color="#f59e0b"
               />
               <RealTimeMetricCard
-                icon={CheckCircle2}
-                label={language === 'ka' ? 'დავალებები' : 'Tasks'}
-                value={todayOverview?.todayTasks.value.toString() || '0'}
-                change={`${todayOverview?.todayTasks.completed || 0} done`}
+                icon={Users}
+                label={language === 'ka' ? 'გასვლა' : 'Check-outs'}
+                value={realDepartures.toString()}
+                change={language === 'ka' ? 'დასალაგებელი' : 'need cleaning'}
                 color="#a855f7"
               />
             </div>

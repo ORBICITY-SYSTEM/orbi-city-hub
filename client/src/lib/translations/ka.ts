@@ -594,4 +594,38 @@ export const ka: Translations = {
     alreadyHaveAccount: "უკვე გაქვთ ანგარიში?",
     dontHaveAccount: "არ გაქვთ ანგარიში?",
   },
+
+  // რეზერვაციების მოდული
+  reservations: {
+    overview: "მიმოხილვა",
+    calendar: "კალენდარი",
+    bookings: "ჯავშნები",
+    analytics: "OTA ანალიტიკა",
+    guests: "სტუმრები",
+    reviews: "მიმოხილვები",
+    communication: "კომუნიკაცია",
+    todayArrivals: "დღეს ჩამოსვლა",
+    todayDepartures: "დღეს გასვლა",
+    activeBookings: "აქტიური ჯავშნები",
+    upcomingBookings: "მოსალოდნელი ჯავშნები",
+    totalRevenue: "სულ შემოსავალი",
+    channelDistribution: "არხების განაწილება",
+    recentBookings: "ბოლო ჯავშნები",
+    noArrivalsToday: "დღეს ჩამოსვლები არ არის",
+    noDeparturesToday: "დღეს გასვლები არ არის",
+    loadingData: "რეზერვაციების ჩატვირთვა...",
+  },
+
+  // ლოჯისტიკის ოპერაციები
+  operations: {
+    title: "ოპერაციები",
+    todayArrivals: "დღეს ჩამოსვლა",
+    todayDepartures: "დღეს გასვლა",
+    tomorrowArrivals: "ხვალ ჩამოსვლა",
+    needsCleaning: "დასალაგებელი",
+    cleaningRequired: "დასალაგებელი ოთახები",
+    noArrivalsToday: "დღეს ჩამოსვლები არ არის",
+    noDeparturesToday: "დღეს გასვლები არ არის",
+    loadingData: "ოპერაციების ჩატვირთვა...",
+  },
 };
