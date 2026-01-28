@@ -20,7 +20,7 @@ let mainWindow;
 const useLocal = process.env.LOCAL === 'true';
 
 // URLs
-const PRODUCTION_URL = 'https://orbi-city-hub.vercel.app';
+const PRODUCTION_URL = 'https://orbicityhotel.com';
 const LOCAL_URL = 'http://localhost:3000';
 
 function createWindow() {
