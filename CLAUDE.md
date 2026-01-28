@@ -281,6 +281,47 @@ All rows.com code has been removed and replaced with Supabase:
 
 ---
 
+## OTELMS Scraper - Supabase Tables (განახლებულია 2026-01-28)
+
+**Cloud Run Service:** https://otelms-scraper-739050138690.europe-west1.run.app
+**GitHub:** https://github.com/ORBICITY-SYSTEM/otelms-rows-api
+**Scheduler:** ყოველდღე ავტომატურად (Cloud Scheduler)
+
+### Finance Tables (ფინანსური მონაცემები)
+
+| ცხრილი | აღწერა | სვეტები | პერიოდი | განახლება |
+|--------|--------|---------|---------|-----------|
+| **otelms_revenue** | შემოსავალი კატეგორიებით | year, month, category, amount | მიმდინარე თვე | ყოველდღე |
+| **otelms_occupancy** | ყოველდღიური დატვირთვა % | year, month, day, occupancy_pct | მიმდინარე წელი (2026) | ყოველდღე |
+| **otelms_adr** | ADR - საშუალო დღიური ტარიფი | year, month, day, adr | მიმდინარე წელი (2026) | ყოველდღე |
+| **otelms_revpar** | RevPAR - შემოსავალი ოთახზე | year, month, day, revpar | მიმდინარე წელი (2026) | ყოველდღე |
+| **otelms_sources** | წყაროების მიხედვით შემოსავალი | start_date, end_date, source, revenue, bookings | წლის დასაწყისიდან | ყოველდღე |
+
+### Booking Tables (ჯავშნები)
+
+| ცხრილი | აღწერა | სვეტები | პერიოდი | განახლება |
+|--------|--------|---------|---------|-----------|
+| **otelms_bookings** | კალენდარის ჯავშნები | resid, booking_id, guest_name, source, date_in, date_out, status | -1 თვე ~ +1 თვე | ყოველდღე |
+| **otelms_status** | დღევანდელი სტატუსი | booking_id, room, column_name, text_content | დღეს | ყოველდღე |
+
+### რა ინფორმაცია სად გამოიყენება
+
+| მოდული | ცხრილები | რისთვის |
+|--------|----------|---------|
+| **Finance Director** | otelms_revenue, otelms_occupancy, otelms_adr, otelms_revpar | დეშბორდი, გრაფიკები, ანალიტიკა |
+| **Reservations Director** | otelms_bookings, otelms_status | კალენდარი, ჩამოსვლები/გასვლები |
+| **Marketing Director** | otelms_sources | წყაროების ანალიზი (Booking.com, Airbnb, Direct) |
+
+### Manual Scrape (ხელით გაშვება)
+
+```bash
+# Cloud Shell-ში:
+TOKEN=$(gcloud auth print-identity-token)
+curl -X POST "https://otelms-scraper-739050138690.europe-west1.run.app/scrape?months_back=1" -H "Authorization: Bearer $TOKEN"
+```
+
+---
+
 ## Deprecated (DO NOT USE)
 
 These integrations have been fully removed:
