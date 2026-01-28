@@ -4,7 +4,7 @@
  * CEO AI will use this data to distribute across modules
  */
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -19,7 +19,8 @@ import {
   Database, Lock, Unlock, Table2, RefreshCw, Download,
   Home, Users, Calendar, DollarSign, Package, Wrench,
   ClipboardList, BarChart3, Eye, AlertCircle, CheckCircle2,
-  Loader2, ArrowLeft, Brain, Sparkles
+  Loader2, ArrowLeft, Brain, Sparkles, ChevronLeft, ChevronRight,
+  TrendingUp, Zap, Activity, Globe, Building2
 } from "lucide-react";
 import { AISQLCopilot } from "@/components/ai/AISQLCopilot";
 import { Link } from "wouter";
@@ -64,8 +65,9 @@ const SUPABASE_TABLES = [
   { name: "otelms_revpar", icon: DollarSign, color: "amber", category: "finance", description: "Revenue Per Available Room" },
   { name: "otelms_change_history", icon: BarChart3, color: "slate", category: "finance", description: "OtelMS change tracking" },
 
-  // === SOCIAL MEDIA ===
+  // === SOCIAL MEDIA / MARKETING ===
   { name: "social_media_metrics", icon: BarChart3, color: "pink", category: "marketing", description: "Social media metrics" },
+  { name: "distribution_channels", icon: Globe, color: "blue", category: "marketing", description: "OTA & distribution channels" },
 
   // === AI / SYSTEM ===
   { name: "ai_director_conversations", icon: BarChart3, color: "purple", category: "ai", description: "AI chat history" },
@@ -326,29 +328,54 @@ const DataHubContent = () => {
   const { language } = useLanguage();
   const [activeTable, setActiveTable] = useState("rooms");
   const [activeCategory, setActiveCategory] = useState("all");
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  // Scroll navigation functions
+  const scrollLeft = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: -300, behavior: 'smooth' });
+    }
+  };
+
+  const scrollRight = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: 300, behavior: 'smooth' });
+    }
+  };
 
   // Filter tables by category
   const filteredTables = activeCategory === "all"
     ? SUPABASE_TABLES
     : SUPABASE_TABLES.filter(t => t.category === activeCategory);
 
-  // Stats query
-  const { data: stats, isLoading: statsLoading } = useQuery({
+  // Stats query - PARALLEL LOADING for speed
+  const { data: stats, isLoading: statsLoading, refetch: refetchStats } = useQuery({
     queryKey: ["datahub-stats"],
     queryFn: async () => {
-      const results: Record<string, number> = {};
-      for (const table of SUPABASE_TABLES) {
+      // Run all count queries in parallel for speed
+      const countPromises = SUPABASE_TABLES.map(async (table) => {
         try {
-          const { count } = await supabase
+          const { count, error } = await supabase
             .from(table.name as any)
             .select("*", { count: "exact", head: true });
-          results[table.name] = count || 0;
-        } catch {
-          results[table.name] = 0;
+          if (error) {
+            console.warn(`Error counting ${table.name}:`, error);
+            return { name: table.name, count: 0 };
+          }
+          return { name: table.name, count: count || 0 };
+        } catch (e) {
+          console.warn(`Exception counting ${table.name}:`, e);
+          return { name: table.name, count: 0 };
         }
-      }
-      return results;
+      });
+
+      const results = await Promise.all(countPromises);
+      return results.reduce((acc, { name, count }) => {
+        acc[name] = count;
+        return acc;
+      }, {} as Record<string, number>);
     },
+    staleTime: 30000, // Cache for 30 seconds
   });
 
   // Calculate total records
@@ -426,10 +453,35 @@ const DataHubContent = () => {
         </div>
       </div>
 
-      {/* Stats Overview */}
+      {/* Stats Overview with Navigation Buttons */}
       <div className="px-6 py-4">
-        <ScrollArea className="w-full">
-          <div className="flex gap-3 pb-2">
+        <div className="relative">
+          {/* Left Navigation Button */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={scrollLeft}
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-slate-900/90 hover:bg-slate-800 border border-cyan-500/30 shadow-lg rounded-full h-10 w-10"
+          >
+            <ChevronLeft className="w-6 h-6 text-cyan-400" />
+          </Button>
+
+          {/* Right Navigation Button */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={scrollRight}
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-slate-900/90 hover:bg-slate-800 border border-cyan-500/30 shadow-lg rounded-full h-10 w-10"
+          >
+            <ChevronRight className="w-6 h-6 text-cyan-400" />
+          </Button>
+
+          {/* Scrollable Container */}
+          <div
+            ref={scrollContainerRef}
+            className="flex gap-3 pb-2 overflow-x-auto scrollbar-hide px-12"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
             {filteredTables.map((table) => {
               const Icon = table.icon;
               const colorGradients: Record<string, string> = {
@@ -456,24 +508,38 @@ const DataHubContent = () => {
                 neutral: "from-neutral-500/20 to-neutral-600/20 border-neutral-500/30",
                 stone: "from-stone-500/20 to-stone-600/20 border-stone-500/30",
               };
+              const recordCount = stats?.[table.name] ?? 0;
+              const hasData = recordCount > 0;
               return (
                 <motion.button
                   key={table.name}
                   onClick={() => setActiveTable(table.name)}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className={`flex-shrink-0 p-3 rounded-xl border bg-gradient-to-br transition-all min-w-[120px] ${
+                  className={`flex-shrink-0 p-4 rounded-xl border bg-gradient-to-br transition-all min-w-[140px] ${
                     colorGradients[table.color] || colorGradients.purple
-                  } ${activeTable === table.name ? 'ring-2 ring-cyan-400' : ''}`}
+                  } ${activeTable === table.name ? 'ring-2 ring-cyan-400 shadow-lg shadow-cyan-500/20' : ''}`}
                 >
-                  <Icon className="w-5 h-5 text-white/70 mb-2" />
-                  <p className="text-xs text-white/60 truncate">{table.name}</p>
-                  <p className="text-lg font-bold text-white">{stats?.[table.name] ?? '...'}</p>
+                  <div className="flex items-center justify-between mb-2">
+                    <Icon className="w-5 h-5 text-white/70" />
+                    {hasData && (
+                      <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+                    )}
+                  </div>
+                  <p className="text-xs text-white/60 truncate text-left">{table.name}</p>
+                  <p className="text-xl font-bold text-white text-left">
+                    {statsLoading ? (
+                      <Loader2 className="w-4 h-4 animate-spin inline" />
+                    ) : (
+                      recordCount.toLocaleString()
+                    )}
+                  </p>
+                  <p className="text-[10px] text-white/40 text-left mt-1">{table.description}</p>
                 </motion.button>
               );
             })}
           </div>
-        </ScrollArea>
+        </div>
       </div>
 
       {/* Table Content */}
@@ -498,55 +564,185 @@ const DataHubContent = () => {
         <AISQLCopilot />
       </div>
 
-      {/* CEO AI Dashboard */}
+      {/* CEO AI Data Command Center - INTELLIGENT DISTRIBUTION HUB */}
       <div className="px-6 pb-6">
-        <Card className="bg-gradient-to-r from-cyan-900/30 to-purple-900/30 border-cyan-500/30 overflow-hidden">
+        <Card className="bg-gradient-to-r from-cyan-900/30 via-purple-900/20 to-pink-900/30 border-cyan-500/30 overflow-hidden">
           <CardContent className="p-6">
-            <div className="flex items-start gap-4">
-              <div className="p-3 rounded-xl bg-gradient-to-br from-cyan-500 to-purple-600">
-                <BarChart3 className="w-6 h-6 text-white" />
+            {/* Header */}
+            <div className="flex items-start gap-4 mb-6">
+              <div className="p-3 rounded-xl bg-gradient-to-br from-cyan-500 to-purple-600 animate-pulse">
+                <Brain className="w-6 h-6 text-white" />
               </div>
               <div className="flex-1">
-                <h3 className="text-xl font-bold text-white mb-2 flex items-center gap-2">
-                  🤖 CEO AI - {language === 'ka' ? 'მონაცემთა ცენტრი' : 'Data Command Center'}
+                <h3 className="text-xl font-bold text-white mb-1 flex items-center gap-2">
+                  🤖 CEO AI - {language === 'ka' ? 'მონაცემთა სარდლობა' : 'Data Command Center'}
+                  <Badge className="bg-green-500/30 text-green-300 border-green-500/50 text-xs">
+                    <Activity className="w-3 h-3 mr-1" />
+                    LIVE
+                  </Badge>
                 </h3>
-                <p className="text-white/70 text-sm mb-4">
+                <p className="text-white/60 text-sm">
                   {language === 'ka'
-                    ? 'CEO AI (Claude Code) ხედავს ყველა მონაცემს და ავტომატურად ანაწილებს მოდულებში. აქვს უფლება შექმნას ახალი widgets, charts და analytics.'
-                    : 'CEO AI (Claude Code) sees all data and automatically distributes it across modules. Has authority to create new widgets, charts and analytics.'}
+                    ? 'ჭკვიანი მონაცემთა განაწილება - ვხედავ ყველაფერს, ვანაწილებ სწორ მოდულებში'
+                    : 'Intelligent data distribution - I see everything, I distribute to right modules'}
                 </p>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => refetchStats()}
+                className="border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/20"
+              >
+                <RefreshCw className="w-4 h-4 mr-2" />
+                Sync
+              </Button>
+            </div>
 
-                {/* Data Summary Grid */}
-                <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-4">
-                  {CATEGORIES.filter(c => c.id !== 'all').map((cat) => {
-                    const categoryTables = SUPABASE_TABLES.filter(t => t.category === cat.id);
-                    const categoryTotal = categoryTables.reduce((sum, t) => sum + (stats?.[t.name] || 0), 0);
-                    return (
-                      <div key={cat.id} className="p-3 rounded-lg bg-slate-800/50 border border-white/10">
-                        <p className="text-xs text-white/60">{language === 'ka' ? cat.nameKa : cat.name}</p>
-                        <p className="text-lg font-bold text-white">{categoryTotal.toLocaleString()}</p>
-                        <p className="text-xs text-white/40">{categoryTables.length} {language === 'ka' ? 'ტაბულა' : 'tables'}</p>
-                      </div>
-                    );
-                  })}
+            {/* Data Flow Visualization */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
+              {/* Source: Supabase */}
+              <div className="p-4 rounded-xl bg-slate-800/50 border border-green-500/30">
+                <div className="flex items-center gap-2 mb-3">
+                  <Database className="w-5 h-5 text-green-400" />
+                  <span className="font-semibold text-white">
+                    {language === 'ka' ? 'წყარო: Supabase' : 'Source: Supabase'}
+                  </span>
                 </div>
-
-                {/* AI Actions */}
-                <div className="flex flex-wrap gap-2">
-                  <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
-                    <CheckCircle2 className="w-3 h-3 mr-1" />
-                    {language === 'ka' ? 'მონაცემები სინქრონიზებულია' : 'Data Synced'}
-                  </Badge>
-                  <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30">
-                    <BarChart3 className="w-3 h-3 mr-1" />
-                    {language === 'ka' ? 'მზადაა ანალიზისთვის' : 'Ready for Analysis'}
-                  </Badge>
-                  <Badge className="bg-cyan-500/20 text-cyan-400 border-cyan-500/30">
-                    <Eye className="w-3 h-3 mr-1" />
-                    {language === 'ka' ? 'რეალ-ტაიმ მონიტორინგი' : 'Real-time Monitoring'}
-                  </Badge>
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-white/60">{language === 'ka' ? 'ტაბულები' : 'Tables'}</span>
+                    <span className="text-green-400 font-bold">{SUPABASE_TABLES.length}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-white/60">{language === 'ka' ? 'ჩანაწერები' : 'Records'}</span>
+                    <span className="text-green-400 font-bold">{totalRecords.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-white/60">{language === 'ka' ? 'სტატუსი' : 'Status'}</span>
+                    <span className="text-green-400">● Connected</span>
+                  </div>
                 </div>
               </div>
+
+              {/* Processing: CEO AI */}
+              <div className="p-4 rounded-xl bg-slate-800/50 border border-purple-500/30 relative">
+                <div className="absolute -left-4 top-1/2 -translate-y-1/2 text-purple-400">
+                  <ChevronRight className="w-6 h-6" />
+                </div>
+                <div className="flex items-center gap-2 mb-3">
+                  <Brain className="w-5 h-5 text-purple-400" />
+                  <span className="font-semibold text-white">CEO AI Brain</span>
+                </div>
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-center gap-2 text-white/70">
+                    <Zap className="w-3 h-3 text-yellow-400" />
+                    {language === 'ka' ? 'ანალიზი & კატეგორიზაცია' : 'Analyze & Categorize'}
+                  </div>
+                  <div className="flex items-center gap-2 text-white/70">
+                    <TrendingUp className="w-3 h-3 text-cyan-400" />
+                    {language === 'ka' ? 'ტრენდების აღმოჩენა' : 'Detect Trends'}
+                  </div>
+                  <div className="flex items-center gap-2 text-white/70">
+                    <Sparkles className="w-3 h-3 text-pink-400" />
+                    {language === 'ka' ? 'ჭკვიანი განაწილება' : 'Smart Distribution'}
+                  </div>
+                </div>
+              </div>
+
+              {/* Destination: Modules */}
+              <div className="p-4 rounded-xl bg-slate-800/50 border border-cyan-500/30 relative">
+                <div className="absolute -left-4 top-1/2 -translate-y-1/2 text-cyan-400">
+                  <ChevronRight className="w-6 h-6" />
+                </div>
+                <div className="flex items-center gap-2 mb-3">
+                  <Building2 className="w-5 h-5 text-cyan-400" />
+                  <span className="font-semibold text-white">
+                    {language === 'ka' ? 'მოდულები' : 'Modules'}
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div className="p-2 rounded bg-purple-500/20 text-purple-300">Logistics</div>
+                  <div className="p-2 rounded bg-cyan-500/20 text-cyan-300">Finance</div>
+                  <div className="p-2 rounded bg-green-500/20 text-green-300">Reservations</div>
+                  <div className="p-2 rounded bg-pink-500/20 text-pink-300">Marketing</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Data Distribution Matrix */}
+            <div className="mb-6">
+              <h4 className="text-sm font-semibold text-white/80 mb-3">
+                {language === 'ka' ? '📊 მონაცემთა განაწილების მატრიცა' : '📊 Data Distribution Matrix'}
+              </h4>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {/* Logistics Distribution */}
+                <div className="p-3 rounded-lg bg-purple-500/10 border border-purple-500/30">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Package className="w-4 h-4 text-purple-400" />
+                    <span className="text-sm font-medium text-white">Logistics</span>
+                  </div>
+                  <p className="text-2xl font-bold text-purple-400">
+                    {((stats?.['rooms'] || 0) + (stats?.['housekeeping_schedules'] || 0) + (stats?.['maintenance_schedules'] || 0)).toLocaleString()}
+                  </p>
+                  <p className="text-xs text-white/50">rooms, schedules, inventory</p>
+                </div>
+
+                {/* Finance Distribution */}
+                <div className="p-3 rounded-lg bg-cyan-500/10 border border-cyan-500/30">
+                  <div className="flex items-center gap-2 mb-2">
+                    <DollarSign className="w-4 h-4 text-cyan-400" />
+                    <span className="text-sm font-medium text-white">Finance</span>
+                  </div>
+                  <p className="text-2xl font-bold text-cyan-400">
+                    {((stats?.['otelms_revenue'] || 0) + (stats?.['otelms_adr'] || 0) + (stats?.['otelms_revpar'] || 0) + (stats?.['finance_records'] || 0)).toLocaleString()}
+                  </p>
+                  <p className="text-xs text-white/50">revenue, ADR, RevPAR</p>
+                </div>
+
+                {/* Reservations Distribution */}
+                <div className="p-3 rounded-lg bg-green-500/10 border border-green-500/30">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Calendar className="w-4 h-4 text-green-400" />
+                    <span className="text-sm font-medium text-white">Reservations</span>
+                  </div>
+                  <p className="text-2xl font-bold text-green-400">
+                    {((stats?.['bookings'] || 0) + (stats?.['ota_reservations'] || 0) + (stats?.['guest_reviews'] || 0)).toLocaleString()}
+                  </p>
+                  <p className="text-xs text-white/50">bookings, reviews, guests</p>
+                </div>
+
+                {/* Marketing Distribution */}
+                <div className="p-3 rounded-lg bg-pink-500/10 border border-pink-500/30">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Globe className="w-4 h-4 text-pink-400" />
+                    <span className="text-sm font-medium text-white">Marketing</span>
+                  </div>
+                  <p className="text-2xl font-bold text-pink-400">
+                    {((stats?.['social_media_metrics'] || 0) + (stats?.['distribution_channels'] || 0) + (stats?.['ota_reviews'] || 0)).toLocaleString()}
+                  </p>
+                  <p className="text-xs text-white/50">social, channels, reviews</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Status Badges */}
+            <div className="flex flex-wrap gap-2">
+              <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
+                <CheckCircle2 className="w-3 h-3 mr-1" />
+                {language === 'ka' ? 'სინქრონიზებულია' : 'Synced'}
+              </Badge>
+              <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30">
+                <Brain className="w-3 h-3 mr-1" />
+                {language === 'ka' ? 'AI აქტიურია' : 'AI Active'}
+              </Badge>
+              <Badge className="bg-cyan-500/20 text-cyan-400 border-cyan-500/30">
+                <Eye className="w-3 h-3 mr-1" />
+                {language === 'ka' ? 'რეალ-ტაიმ' : 'Real-time'}
+              </Badge>
+              <Badge className="bg-amber-500/20 text-amber-400 border-amber-500/30">
+                <Zap className="w-3 h-3 mr-1" />
+                {language === 'ka' ? 'ავტო-განაწილება' : 'Auto-distribute'}
+              </Badge>
             </div>
           </CardContent>
         </Card>
